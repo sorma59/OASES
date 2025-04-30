@@ -2,7 +2,9 @@ package com.unimib.oases.ui.login
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.HealthAndSafety
 import androidx.compose.material.icons.filled.LocalHospital
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -54,72 +57,82 @@ fun LoginScreen(navController: NavController){
 
     Column(
         modifier = Modifier.fillMaxSize().padding(20.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally,
     ){
 
-
+Row(){
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Icon(
             imageVector = Icons.Default.LocalHospital,
             contentDescription = "",
             tint = MaterialTheme.colorScheme.primaryContainer,
-            modifier = Modifier.size(200.dp)
+            modifier = Modifier.size(250.dp)
         )
 
 
-            Text(text = "OASES", fontSize = 32.sp, fontWeight = FontWeight.Bold)
-   
-
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = username,
-            onValueChange = {
-                username = it
-            },
-            modifier = Modifier.fillMaxWidth(),
-            label = {
-                Text(text = AuthStrings.USERNAME)
-            },
-            shape = RoundedCornerShape(10.dp),
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = password,
-            onValueChange = {
-                password = it
-            },
-            modifier = Modifier.fillMaxWidth(),
-            label = {
-                Text(text = AuthStrings.PASSWORD)
-            },
-            shape = RoundedCornerShape(10.dp),
-            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-
-            trailingIcon = {
-                val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Icon(imageVector = image, contentDescription = "PASSWORD")
-                }
-            }
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(onClick = {
-            navController.navigate("home_screen")
-        },
-
-            shape = RoundedCornerShape(5.dp),
-            modifier = Modifier.fillMaxWidth().height(80.dp).padding(top = 10.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
-            //enabled = authState.value != AuthState.Loading
-        ) {
-            Text(text = "LOGIN")
-        }
+        Text(text = "OASES", fontSize = 32.sp, fontWeight = FontWeight.Bold)
     }
+}
+
+
+
+
+        Spacer(modifier = Modifier.height(100.dp))
+
+        Row(){
+            Column {
+                OutlinedTextField(
+                    value = username,
+                    onValueChange = {
+                        username = it
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = {
+                        Text(text = AuthStrings.USERNAME)
+                    },
+                    shape = RoundedCornerShape(10.dp),
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = {
+                        password = it
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = {
+                        Text(text = AuthStrings.PASSWORD)
+                    },
+                    shape = RoundedCornerShape(10.dp),
+                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+
+                    trailingIcon = {
+                        val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                            Icon(imageVector = image, contentDescription = "PASSWORD")
+                        }
+                    }
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(onClick = {
+                    navController.navigate("home_screen")
+                },
+
+                    shape = RoundedCornerShape(5.dp),
+                    modifier = Modifier.fillMaxWidth().height(80.dp).padding(top = 10.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                    //enabled = authState.value != AuthState.Loading
+                ) {
+                    Text(text = "LOGIN")
+                }
+
+            }
+
+    }
+        }
 
 
 
