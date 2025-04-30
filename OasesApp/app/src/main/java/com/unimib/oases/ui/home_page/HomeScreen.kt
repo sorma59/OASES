@@ -31,11 +31,15 @@ fun HomeScreen(navController: NavController){
         horizontalAlignment = Alignment.CenterHorizontally
     ){
 
-        Surface (
-            modifier = Modifier.fillMaxWidth(),
-            color = MaterialTheme.colorScheme.primaryContainer
-        ) {
-            Column {
+        Column(
+            modifier = Modifier.weight(1f),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ){
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                color = MaterialTheme.colorScheme.primaryContainer
+            ) {
+//                Column {
 //                    Row (
 //                        modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp, horizontal = 12.dp),
 //                        horizontalArrangement = Arrangement.SpaceBetween,
@@ -47,23 +51,24 @@ fun HomeScreen(navController: NavController){
 //                        }
 //                    }
 
-                Row (
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 12.dp, horizontal = 12.dp)){
-                    SearchBar(
-                        query = "",
-                        onQueryChange = { },
-                        onSearch = { },
-                        active = false,
-                        onActiveChange = { },
-                        searchHistory = emptyList()
-                    ){ }
-                }
-
-                // qui va la lista dei pazienti
-                //  PatientList()
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 12.dp, horizontal = 12.dp)
+                    ) {
+                        SearchBar(
+                            query = "",
+                            onQueryChange = { },
+                            onSearch = { },
+                            active = false,
+                            onActiveChange = { },
+                            searchHistory = emptyList()
+                        ) { }
+                    }
+//                }
             }
+            // qui va la lista dei pazienti
+            //  PatientList()
         }
 
 
