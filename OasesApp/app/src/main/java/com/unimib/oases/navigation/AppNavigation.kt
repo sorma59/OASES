@@ -1,7 +1,10 @@
-package com.unimib.oases.ui.util
+package com.unimib.oases.navigation
 
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavController
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -10,8 +13,15 @@ import com.unimib.oases.ui.login.LoginScreen
 import com.unimib.oases.ui.patient_registration.RegistrationScreen
 
 @Composable
-fun AppNavigation(navController: NavHostController){
-    NavHost(navController = navController,
+fun AppNavigation(
+    navController: NavHostController,
+    padding: PaddingValues
+){
+    NavHost(
+        modifier = Modifier
+            .consumeWindowInsets(padding)
+            .padding(padding),
+        navController = navController,
         startDestination = Screen.LoginScreen.route) {
 
         composable(Screen.LoginScreen.route){

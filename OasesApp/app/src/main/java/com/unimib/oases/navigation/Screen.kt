@@ -1,4 +1,4 @@
-package com.unimib.oases.ui.util
+package com.unimib.oases.navigation
 
 sealed class Screen(val route: String) {
     // screen pages

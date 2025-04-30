@@ -4,19 +4,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.ScrollableTabRow
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -44,8 +38,6 @@ fun RegistrationScreen(navController: NavController) {
 fun TabNavigationWithButtons(navController: NavController) {
     val tabs = listOf("Dati anagrafici", "History", "Past Medical History", "Vital Signs", "Triage")
     var currentIndex by remember { mutableIntStateOf(0) }
-
-
 
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -86,24 +78,28 @@ fun TabNavigationWithButtons(navController: NavController) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             OutlinedButton(
-                onClick = { if (currentIndex > 0) currentIndex--
-                          else navController.navigate("home_screen"){
+                onClick = {
+                    if (currentIndex > 0)
+                        currentIndex--
+                    else navController.navigate("home_screen"){
                         popUpTo(0) { inclusive = true }
                     }
-                          },
+                },
             ) {
                 Text("Back")
             }
 
             Button(
-                onClick = { if (currentIndex < tabs.lastIndex) currentIndex++ else {
-                    navController.navigate("home_screen"){
-                        popUpTo(0) { inclusive = true }
+                onClick = {
+                    if (currentIndex < tabs.lastIndex)
+                        currentIndex++
+                    else {
+                        navController.navigate("home_screen"){
+                            popUpTo(0) { inclusive = true }
+                        }
                     }
-                } },
-
+                },
             ) {
-
                 Text(text = if (currentIndex == tabs.lastIndex) "Submit" else "Next")
             }
         }
