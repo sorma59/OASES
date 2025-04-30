@@ -1,7 +1,7 @@
 [versions]
 agp = "8.7.0"
 daggerCompilerVersion = "2.51.1"
-hiltAndroidGradlePlugin = "2.47"
+hiltAndroidGradlePlugin = "2.51.1"
 kotlin = "2.0.21"
 coreKtx = "1.13.1"
 junit = "4.13.2"

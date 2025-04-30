@@ -33,11 +33,13 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.unimib.oases.core.util.AuthStrings
 import com.unimib.oases.ui.theme.OasesTheme
 
 @Composable
-fun LoginScreen(modifier: Modifier){
+fun LoginScreen(navController: NavController){
     var username by remember {
         mutableStateOf("")
     }
@@ -60,7 +62,7 @@ fun LoginScreen(modifier: Modifier){
         Icon(
             imageVector = Icons.Default.LocalHospital,
             contentDescription = "",
-            tint = MaterialTheme.colorScheme.primary,
+            tint = MaterialTheme.colorScheme.primaryContainer,
             modifier = Modifier.size(200.dp)
         )
 
@@ -107,12 +109,12 @@ fun LoginScreen(modifier: Modifier){
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(onClick = {
-            //authViewModel.login(username,password)
+            navController.navigate("home_screen")
         },
 
             shape = RoundedCornerShape(5.dp),
             modifier = Modifier.fillMaxWidth().height(80.dp).padding(top = 10.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
             //enabled = authState.value != AuthState.Loading
         ) {
             Text(text = "LOGIN")
@@ -130,6 +132,6 @@ fun LoginScreen(modifier: Modifier){
 @Composable
 fun LoginScreenPreview(){
     OasesTheme {
-        LoginScreen(modifier = Modifier)
+        LoginScreen(navController = rememberNavController())
     }
 }

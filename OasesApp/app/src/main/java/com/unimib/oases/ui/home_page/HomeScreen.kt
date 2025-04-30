@@ -30,29 +30,32 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.unimib.oases.core.presentation.components.SearchBar
 import com.unimib.oases.ui.theme.OasesTheme
 
 @Composable
-fun HomeScreen(){
+fun HomeScreen(navController: NavController){
     Box(modifier = Modifier.fillMaxSize()){
         Column (modifier = Modifier.fillMaxSize()){
             Surface (
                 modifier = Modifier.fillMaxWidth(),
                 color = MaterialTheme.colorScheme.primaryContainer
             ) {
-                Column (){
-                    Row (
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically){
-                        Text("OASES")
-                        IconButton(onClick = {}) {
-                            Icon(imageVector = Icons.Default.MoreVert,
-                                contentDescription = "More")
-                        }
-                    }
+                Column {
+//                    Row (
+//                        modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp, horizontal = 12.dp),
+//                        horizontalArrangement = Arrangement.SpaceBetween,
+//                        verticalAlignment = Alignment.CenterVertically){
+//                        Text("OASES")
+//                        IconButton(onClick = {}) {
+//                            Icon(imageVector = Icons.Default.MoreVert,
+//                                contentDescription = "More")
+//                        }
+//                    }
 
-                    Row (modifier = Modifier.fillMaxWidth()){
+                    Row (modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp, horizontal = 12.dp)){
                         SearchBar(
                             query = "",
                             onQueryChange = { },
@@ -68,86 +71,23 @@ fun HomeScreen(){
         }
 
         FloatingActionButton(
-            onClick = {},
+            onClick = {navController.navigate("registration_screen")},
             modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(16.dp)
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 30.dp)
+
         ){
             Icon(Icons.Default.Add, "Add")
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun SearchBar(
-    query: String,
-    onQueryChange: (String) -> Unit,
-    onSearch: (String) -> Unit,
-    active: Boolean,
-    onActiveChange: (Boolean) -> Unit,
-    searchHistory: List<String>,
-    onHistoryItemClick: (String) -> Unit
-) {
-    DockedSearchBar(
-        shadowElevation = 5.dp,
-        colors = SearchBarDefaults.colors(MaterialTheme.colorScheme.surfaceContainer),
-        query = query,
-        onQueryChange = onQueryChange,
-        onSearch = {
-            onSearch(it)
-            onActiveChange(false)
-        },
-        active = active,
-        shape = RoundedCornerShape(10.dp),
-        onActiveChange = onActiveChange,
-        modifier = Modifier
-            .padding(vertical = 12.dp, horizontal = 12.dp)
-            .fillMaxWidth(),
-        enabled = true,
-        leadingIcon = {
-            Icon(
-                imageVector = Icons.Filled.Search,
-                contentDescription = "Search"
-            )
-        },
-        trailingIcon = {
-            if (active) {
-                Icon(
-                    modifier = Modifier.clickable {
-                        if (query.isNotEmpty()) {
-                            onQueryChange("")
-                        } else {
-                            onActiveChange(false)
-                        }
-                    },
-                    imageVector = Icons.Default.Close,
-                    contentDescription = "Close search",
-                )
-            }
-        }
-    ) {
-        searchHistory.takeLast(3).forEach { item ->
-            ListItem(
-                modifier = Modifier.clickable { onHistoryItemClick(item) },
-                headlineContent = { Text(text = item) },
-                leadingContent = {
-                    Icon(
-                        modifier = Modifier.padding(end = 10.dp),
-                        imageVector = Icons.Default.History,
-                        contentDescription = "History",
-                    )
-                }
-            )
-        }
-    }
-}
 
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     OasesTheme {
-        HomeScreen()
+        HomeScreen(navController = rememberNavController())
     }
 }
 
