@@ -31,8 +31,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.compose.OasesTheme
 import com.unimib.oases.ui.Greeting
+import com.unimib.oases.ui.theme.OasesTheme
 
 @Composable
 fun HomeScreen(){
