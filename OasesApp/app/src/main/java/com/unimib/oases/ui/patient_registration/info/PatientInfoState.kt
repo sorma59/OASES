@@ -1,4 +1,0 @@
-package com.unimib.oases.ui.patient_registration.info
-
-class PatientInfoState {
-}
