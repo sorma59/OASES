@@ -16,8 +16,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -28,20 +26,16 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.unimib.oases.ui.components.ActionIcon
 import com.unimib.oases.ui.components.PatientUi
 import com.unimib.oases.ui.components.SearchBar
 import com.unimib.oases.ui.components.SwipeableItem
-import com.unimib.oases.ui.theme.OasesTheme
 
 @Composable
 fun HomeScreen(navController: NavController) {
@@ -103,7 +97,7 @@ fun HomeScreen(navController: NavController) {
 //                }
             }
 
-            LazyColumn(contentPadding = PaddingValues(bottom = 30.dp, top = 10.dp),) {
+            LazyColumn(contentPadding = PaddingValues(bottom = 30.dp, top = 10.dp)) {
                 itemsIndexed(
                     items = patients,
                 ) { index, patient ->
@@ -147,7 +141,9 @@ fun HomeScreen(navController: NavController) {
                         },
                     ) {
                         Column(
-                            modifier = Modifier.fillMaxWidth().background(color = MaterialTheme.colorScheme.primary)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(color = MaterialTheme.colorScheme.primary)
                         ) {
 
                             Column(modifier = Modifier.padding(10.dp)) {

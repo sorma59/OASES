@@ -1,7 +1,11 @@
 [versions]
 agp = "8.7.0"
 daggerCompilerVersion = "2.51.1"
+gson = "2.10.1"
+hiltAndroid = "2.50"
+hiltAndroidCompiler = "2.50"
 hiltAndroidGradlePlugin = "2.51.1"
+jbcrypt = "0.4"
 kotlin = "2.0.21"
 coreKtx = "1.13.1"
 junit = "4.13.2"
@@ -25,6 +29,7 @@ firebaseAuthKtx = "23.1.0"
 runtimeLivedata = "1.7.7"
 googleGmsGoogleServices = "4.4.2"
 firebaseAuth = "23.1.0"
+securityCrypto = "1.1.0-alpha07"
 uiTextGoogleFonts = "1.7.6"
 googleGmsGoogleServicesVersion = "4.4.2"
 firebaseAuthVersion = "23.1.0"
@@ -35,9 +40,14 @@ firebaseDatabaseKtx = "21.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-security-crypto = { module = "androidx.security:security-crypto", version.ref = "securityCrypto" }
+gson-v2101 = { module = "com.google.code.gson:gson", version.ref = "gson" }
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hiltVersion" }
+hilt-android-compiler-v250 = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidCompiler" }
+hilt-android-v250 = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hiltVersion" }
 hilt-android-gradle-plugin = { module = "com.google.dagger:hilt-android-gradle-plugin", version.ref = "hiltAndroidGradlePlugin" }
+jbcrypt = { module = "org.mindrot:jbcrypt", version.ref = "jbcrypt" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }

@@ -34,6 +34,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.unimib.oases.ui.theme.OasesTheme
@@ -41,17 +42,14 @@ import com.unimib.oases.util.AuthStrings
 
 @Composable
 fun LoginScreen(navController: NavController){
-    var username by remember {
-        mutableStateOf("")
-    }
+
+    val authViewModel: AuthViewModel = hiltViewModel()
+
+    var username by remember { mutableStateOf("") }
 
     var passwordVisible by remember { mutableStateOf(false) }
 
-
-    var password by remember{
-        mutableStateOf("")
-    }
-
+    var password by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier.fillMaxSize().padding(20.dp),
@@ -59,26 +57,23 @@ fun LoginScreen(navController: NavController){
         horizontalAlignment = Alignment.CenterHorizontally,
     ){
 
-Row(){
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Icon(
-            imageVector = Icons.Default.LocalHospital,
-            contentDescription = "",
-            tint = MaterialTheme.colorScheme.primaryContainer,
-            modifier = Modifier.size(250.dp)
-        )
+        Row{
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Icon(
+                    imageVector = Icons.Default.LocalHospital,
+                    contentDescription = "",
+                    tint = MaterialTheme.colorScheme.primaryContainer,
+                    modifier = Modifier.size(250.dp)
+                )
 
 
-        Text(text = "OASES", fontSize = 32.sp, fontWeight = FontWeight.Bold)
-    }
-}
-
-
-
+                Text(text = "OASES", fontSize = 32.sp, fontWeight = FontWeight.Bold)
+            }
+        }
 
         Spacer(modifier = Modifier.height(100.dp))
 
-        Row(){
+        Row{
             Column {
                 OutlinedTextField(
                     value = username,
@@ -115,10 +110,11 @@ Row(){
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Button(onClick = {
-                    navController.navigate("home_screen")
-                },
-
+                Button(
+                    onClick = {
+                        if (authViewModel.authenticate(username, password))
+                            navController.navigate("home_screen")
+                    },
                     shape = RoundedCornerShape(5.dp),
                     modifier = Modifier.fillMaxWidth().height(80.dp).padding(top = 10.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
@@ -126,14 +122,9 @@ Row(){
                 ) {
                     Text(text = "LOGIN")
                 }
-
             }
-
-    }
         }
-
-
-
+    }
 
 }
 

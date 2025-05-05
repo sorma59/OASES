@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
+    kotlin("kapt") // ✅ for Hilt
 }
 
 android {
@@ -68,7 +69,8 @@ dependencies {
 
     // Dagger - Hilt
     implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
+    kapt(libs.hilt.compiler)
+    //ksp(libs.hilt.compiler)
 
     // Compose dependencies
     implementation(libs.androidx.viewmodel.compose)
@@ -100,5 +102,12 @@ dependencies {
     implementation(libs.coil.kt.compose)
     implementation(libs.coil.kt.network)
 
-
+// ... other dependencies ...
+    implementation(libs.androidx.security.crypto) // For EncryptedSharedPreferences
+    implementation(libs.jbcrypt) // For BCrypt hashing
+    implementation(libs.gson.v2101) // For converting object to Json
+//    kapt(libs.hilt.android.compiler.v250)
+}
+kapt {
+    correctErrorTypes = true
 }
