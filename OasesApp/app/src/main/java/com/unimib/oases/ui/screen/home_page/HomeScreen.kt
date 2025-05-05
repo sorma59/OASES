@@ -189,15 +189,13 @@ fun HomeScreen(navController: NavController) {
                     }
                 }
             }
+        }
+        FloatingActionButton(
+            onClick = { navController.navigate("registration_screen") },
+            modifier = Modifier.padding(bottom = 30.dp)
 
-
-            FloatingActionButton(
-                onClick = { navController.navigate("registration_screen") },
-                modifier = Modifier.padding(bottom = 30.dp)
-
-            ) {
-                Icon(Icons.Default.Add, "Add")
-            }
+        ) {
+            Icon(Icons.Default.Add, "Add")
         }
     }
 }
