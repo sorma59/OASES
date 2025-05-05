@@ -4,13 +4,15 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,36 +40,39 @@ fun PatientInfoScreen() {
     var date by remember { mutableStateOf("") }
     var time by remember { mutableStateOf("") }
 
+    val scrollState = rememberScrollState()
+
     Column(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxSize()
+            .verticalScroll(scrollState)
             .padding(16.dp)
     ) {
-        com.unimib.oases.ui.screen.medical_visit.info.AnimatedLabelOutlinedTextField(
+        AnimatedLabelOutlinedTextField(
             value = name,
             onValueChange = { name = it },
-            labelText = "Nome",
+            labelText = "Name",
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))
 
-        com.unimib.oases.ui.screen.medical_visit.info.AnimatedLabelOutlinedTextField(
+        AnimatedLabelOutlinedTextField(
             value = age,
             onValueChange = { age = it },
-            labelText = "Età",
+            labelText = "Age",
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))
 
-        com.unimib.oases.ui.screen.medical_visit.info.AnimatedLabelOutlinedTextField(
+        AnimatedLabelOutlinedTextField(
             value = sex,
             onValueChange = { sex = it },
-            labelText = "Sesso",
+            labelText = "Sex",
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))
 
-        com.unimib.oases.ui.screen.medical_visit.info.AnimatedLabelOutlinedTextField(
+        AnimatedLabelOutlinedTextField(
             value = village,
             onValueChange = { village = it },
             labelText = "Village",
@@ -75,7 +80,7 @@ fun PatientInfoScreen() {
         )
         Spacer(modifier = Modifier.height(8.dp))
 
-        com.unimib.oases.ui.screen.medical_visit.info.AnimatedLabelOutlinedTextField(
+        AnimatedLabelOutlinedTextField(
             value = parish,
             onValueChange = { parish = it },
             labelText = "Parish",
@@ -83,7 +88,7 @@ fun PatientInfoScreen() {
         )
         Spacer(modifier = Modifier.height(8.dp))
 
-        com.unimib.oases.ui.screen.medical_visit.info.AnimatedLabelOutlinedTextField(
+        AnimatedLabelOutlinedTextField(
             value = subCountry,
             onValueChange = { subCountry = it },
             labelText = "Sub Country",
@@ -91,7 +96,7 @@ fun PatientInfoScreen() {
         )
         Spacer(modifier = Modifier.height(8.dp))
 
-        com.unimib.oases.ui.screen.medical_visit.info.AnimatedLabelOutlinedTextField(
+        AnimatedLabelOutlinedTextField(
             value = district,
             onValueChange = { district = it },
             labelText = "District",
@@ -99,7 +104,7 @@ fun PatientInfoScreen() {
         )
         Spacer(modifier = Modifier.height(8.dp))
 
-        com.unimib.oases.ui.screen.medical_visit.info.AnimatedLabelOutlinedTextField(
+        AnimatedLabelOutlinedTextField(
             value = nextOfKin,
             onValueChange = { nextOfKin = it },
             labelText = "Next of Kin",
@@ -107,7 +112,7 @@ fun PatientInfoScreen() {
         )
         Spacer(modifier = Modifier.height(8.dp))
 
-        com.unimib.oases.ui.screen.medical_visit.info.AnimatedLabelOutlinedTextField(
+        AnimatedLabelOutlinedTextField(
             value = contact,
             onValueChange = { contact = it },
             labelText = "Contact",
@@ -115,7 +120,7 @@ fun PatientInfoScreen() {
         )
         Spacer(modifier = Modifier.height(8.dp))
 
-        com.unimib.oases.ui.screen.medical_visit.info.AnimatedLabelOutlinedTextField(
+        AnimatedLabelOutlinedTextField(
             value = date,
             onValueChange = { date = it },
             labelText = "Date",
@@ -123,7 +128,7 @@ fun PatientInfoScreen() {
         )
         Spacer(modifier = Modifier.height(8.dp))
 
-        com.unimib.oases.ui.screen.medical_visit.info.AnimatedLabelOutlinedTextField(
+        AnimatedLabelOutlinedTextField(
             value = time,
             onValueChange = { time = it },
             labelText = "Time",
@@ -132,7 +137,6 @@ fun PatientInfoScreen() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AnimatedLabelOutlinedTextField(
     value: String,
@@ -153,7 +157,7 @@ fun AnimatedLabelOutlinedTextField(
         label = { Text(labelText, color = labelColor) },
         modifier = modifier
             .onFocusChanged { isFocused = it.isFocused },
-        colors = TextFieldDefaults.outlinedTextFieldColors(
+        colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = Color.Blue,
             unfocusedBorderColor = Color.Gray
         )

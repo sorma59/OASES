@@ -52,7 +52,9 @@ fun LoginScreen(navController: NavController){
     var password by remember { mutableStateOf("") }
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(20.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(20.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
     ){
@@ -116,7 +118,10 @@ fun LoginScreen(navController: NavController){
                             navController.navigate("home_screen")
                     },
                     shape = RoundedCornerShape(5.dp),
-                    modifier = Modifier.fillMaxWidth().height(80.dp).padding(top = 10.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(80.dp)
+                        .padding(top = 10.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
                     //enabled = authState.value != AuthState.Loading
                 ) {
@@ -125,10 +130,7 @@ fun LoginScreen(navController: NavController){
             }
         }
     }
-
 }
-
-
 
 @Preview(showBackground = true)
 @Composable

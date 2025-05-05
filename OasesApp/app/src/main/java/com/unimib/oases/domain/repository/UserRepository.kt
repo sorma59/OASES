@@ -4,8 +4,8 @@ import com.unimib.oases.data.model.Role
 import com.unimib.oases.data.model.User
 
 interface UserRepository {
-    fun createAccount(username: String, password: String, role: Role)
+    fun createUser(username: String, password: String, role: Role)
     fun authenticate(username: String, password: String): Boolean
-    fun getUser(): User?
-    fun deleteAccount()
+    fun getUser(username: String): User?
+    fun deleteUser(username: String)
 }

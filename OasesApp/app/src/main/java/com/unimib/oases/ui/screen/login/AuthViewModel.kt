@@ -22,7 +22,7 @@ class AuthViewModel @Inject constructor(
         password: String,
         role: Role,
     ) {
-        userRepository.createAccount(username, password, role)
+        userRepository.createUser(username, password, role)
     }
 
     fun authenticate(
@@ -30,7 +30,7 @@ class AuthViewModel @Inject constructor(
         password: String,
     ): Boolean {
         if (userRepository.authenticate(username, password)){
-            val user = userRepository.getUser()
+            val user = userRepository.getUser(username)
             _authState.value = user?.let { AuthState.Authenticated(it) }!!
             return true
         }
@@ -40,11 +40,11 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun getUser(): User? {
-        return userRepository.getUser()
+    fun getUser(username: String): User? {
+        return userRepository.getUser(username)
     }
 
-    fun deleteAccount(){
-        userRepository.deleteAccount()
+    fun deleteUser(username: String){
+        userRepository.deleteUser(username)
     }
 }

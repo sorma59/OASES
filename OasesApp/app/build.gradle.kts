@@ -1,9 +1,9 @@
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.hilt)
-    alias(libs.plugins.ksp)
+    id ("com.android.application")
+    id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.plugin.compose")
+    id("com.google.dagger.hilt.android")
+    id("com.google.devtools.ksp") version "2.1.20-2.0.0"
     kotlin("kapt") // ✅ for Hilt
 }
 
@@ -14,7 +14,7 @@ android {
     defaultConfig {
         applicationId = "com.unimib.oases"
         minSdk = 29
-        targetSdk = 34
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -105,7 +105,7 @@ dependencies {
 // ... other dependencies ...
     implementation(libs.androidx.security.crypto) // For EncryptedSharedPreferences
     implementation(libs.jbcrypt) // For BCrypt hashing
-    implementation(libs.gson.v2101) // For converting object to Json
+    implementation(libs.gson) // For converting object to Json
 //    kapt(libs.hilt.android.compiler.v250)
 }
 kapt {

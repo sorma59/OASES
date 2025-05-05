@@ -24,7 +24,7 @@ class UserRepositoryImpl @Inject constructor(
 
         EncryptedSharedPreferences.create(
             context,
-            "account_prefs",
+            "user_prefs",
             masterKey,
             EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
             EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
@@ -34,36 +34,39 @@ class UserRepositoryImpl @Inject constructor(
     private val gson = Gson()
 
     companion object {
-        const val ACCOUNT_KEY = "account_key"
+        fun getUserKey(username: String) = "user_$username"
     }
 
-    override fun createAccount(username: String, password: String, role: Role) {
-        // Generate a unique salt for each PIN
+    override fun createUser(username: String, password: String, role: Role) {
+        // Generate a unique salt for each password
         val salt = BCrypt.gensalt()
-        // Hash the PIN with the salt
-        val pinHash = BCrypt.hashpw(password, salt)
+        // Hash the password with the salt
+        val pwHash = BCrypt.hashpw(password, salt)
 
-        val account = User(username, role, pinHash, salt)
-        val accountJson = gson.toJson(account)
-
-        sharedPreferences.edit() { putString(ACCOUNT_KEY, accountJson) }
+        val user = User(username, role, pwHash)
+        val userJson = gson.toJson(user)
+        val userKey = getUserKey(username)
+        sharedPreferences.edit() { putString(userKey, userJson) }
     }
 
     override fun authenticate(username: String, password: String): Boolean {
-        val accountJson = sharedPreferences.getString(ACCOUNT_KEY, null)
+        val userKey = getUserKey(username)
+        val userJson = sharedPreferences.getString(userKey, null)
             ?: return false
 
-        val account = gson.fromJson(accountJson, User::class.java)
+        val user = gson.fromJson(userJson, User::class.java)
         // Check if the provided PIN matches the stored hash
-        return BCrypt.checkpw(password, account.pwHash)
+        return BCrypt.checkpw(password, user.pwHash)
     }
 
-    override fun getUser(): User? {
-        val accountJson = sharedPreferences.getString(ACCOUNT_KEY, null) ?: return null
+    override fun getUser(username: String): User? {
+        val accountKey = getUserKey(username)
+        val accountJson = sharedPreferences.getString(accountKey, null) ?: return null
         return gson.fromJson(accountJson, User::class.java)
     }
 
-    override fun deleteAccount(){
-        sharedPreferences.edit() { remove(ACCOUNT_KEY) }
+    override fun deleteUser(username: String) {
+        val accountKey = getUserKey(username)
+        sharedPreferences.edit() { remove(accountKey) }
     }
 }

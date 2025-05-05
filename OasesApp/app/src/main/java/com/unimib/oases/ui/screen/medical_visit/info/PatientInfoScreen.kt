@@ -4,26 +4,27 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.unimib.oases.ui.theme.OasesTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PatientInfoScreen() {
     var name by remember { mutableStateOf("") }
@@ -38,15 +39,18 @@ fun PatientInfoScreen() {
     var date by remember { mutableStateOf("") }
     var time by remember { mutableStateOf("") }
 
+    val scrollState = rememberScrollState()
+
     Column(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .padding(16.dp)
+            .verticalScroll(scrollState)
     ) {
         AnimatedLabelOutlinedTextField(
             value = name,
             onValueChange = { name = it },
-            labelText = "Nome",
+            labelText = "Name",
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))
@@ -54,7 +58,7 @@ fun PatientInfoScreen() {
         AnimatedLabelOutlinedTextField(
             value = age,
             onValueChange = { age = it },
-            labelText = "Età",
+            labelText = "Age",
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))
@@ -62,7 +66,7 @@ fun PatientInfoScreen() {
         AnimatedLabelOutlinedTextField(
             value = sex,
             onValueChange = { sex = it },
-            labelText = "Sesso",
+            labelText = "Sex",
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))
@@ -132,7 +136,6 @@ fun PatientInfoScreen() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AnimatedLabelOutlinedTextField(
     value: String,
@@ -153,7 +156,7 @@ fun AnimatedLabelOutlinedTextField(
         label = { Text(labelText, color = labelColor) },
         modifier = modifier
             .onFocusChanged { isFocused = it.isFocused },
-        colors = TextFieldDefaults.outlinedTextFieldColors(
+        colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = Color.Blue,
             unfocusedBorderColor = Color.Gray
         )
