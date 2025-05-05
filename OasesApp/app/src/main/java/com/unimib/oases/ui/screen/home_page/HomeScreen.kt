@@ -28,9 +28,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.unimib.oases.ui.components.ActionIcon
+import com.unimib.oases.ui.home_page.components.card.PatientUi
 import com.unimib.oases.ui.components.SearchBar
-import com.unimib.oases.ui.home_page.components.PatientCard
-import com.unimib.oases.ui.home_page.components.PatientUi
+import com.unimib.oases.ui.home_page.components.card.PatientCard
 
 @Composable
 fun HomeScreen(navController: NavController) {
@@ -43,7 +43,7 @@ fun HomeScreen(navController: NavController) {
                     name = "Patient $it",
                     isOptionsRevealed = false,
                     lastVisit = "05/05/2025",
-                    state = "🟡"
+                    state = "G"
                 )
             }.toTypedArray()
         )
@@ -122,7 +122,7 @@ fun HomeScreen(navController: NavController) {
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 },
-                                backgroundColor = MaterialTheme.colorScheme.primary,
+                                backgroundColor = MaterialTheme.colorScheme.secondary,
                                 icon = Icons.Default.Bluetooth,
                                 modifier = Modifier.fillMaxHeight()
                             )

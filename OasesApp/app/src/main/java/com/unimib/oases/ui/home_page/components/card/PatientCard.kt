@@ -1,6 +1,6 @@
 @file:JvmName("PatientCardKt")
 
-package com.unimib.oases.ui.home_page.components
+package com.unimib.oases.ui.home_page.components.card
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.background
@@ -15,9 +15,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -60,7 +64,7 @@ fun PatientCard(
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(key1 = isRevealed, contextMenuWidth) {
-        if(isRevealed) {
+        if (isRevealed) {
             offset.animateTo(contextMenuWidth)
         } else {
             offset.animateTo(0f)
@@ -86,12 +90,12 @@ fun PatientCard(
                 .background(color = MaterialTheme.colorScheme.primary),
             verticalAlignment = Alignment.CenterVertically,
 
-        ) {
+            ) {
             actions()
         }
         Card(
             onClick = onCardClick,
-            shape =RoundedCornerShape(0.dp),
+            shape = RoundedCornerShape(0.dp),
             modifier = Modifier
                 .fillMaxSize()
                 .fillMaxWidth()
@@ -124,7 +128,8 @@ fun PatientCard(
                         }
                     )
                 },
-            colors = CardDefaults.cardColors().copy(containerColor = MaterialTheme.colorScheme.primary),
+            colors = CardDefaults.cardColors()
+                .copy(containerColor = MaterialTheme.colorScheme.primary),
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth()
@@ -139,13 +144,13 @@ fun PatientCard(
 
 
                     Text(
-                        text = "Data ultima visita: ${patient.lastVisit}",
+                        text = "Last Visit: ${patient.lastVisit}",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.surface,
                         fontWeight = FontWeight.Normal,
                         letterSpacing = 0.sp,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(bottom = 8.dp) ,
+                        modifier = Modifier.padding(bottom = 8.dp),
                         maxLines = 1
                     )
 
@@ -156,19 +161,33 @@ fun PatientCard(
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 0.sp,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(bottom = 8.dp) ,
+                        modifier = Modifier.padding(bottom = 8.dp),
                         maxLines = 1
                     )
 
-                    Text(
-                        text = "Stato: ${patient.state}",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.surface,
-                        fontWeight = FontWeight.Normal,
-                        overflow = TextOverflow.Ellipsis,
-                        maxLines = 1
 
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+
+                        Text(
+                            text = "State:",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.surface,
+                            fontWeight = FontWeight.Normal,
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1
+                        )
+                        Icon(
+                            imageVector = Icons.Default.Circle,
+                            contentDescription = "",
+                            tint = when (patient.state) {
+                                "Y" -> Color.Yellow
+                                "R" -> Color.Red
+                                else -> Color.Green
+                            },
+                            modifier = Modifier.size(10.dp)
+                        )
+                    }
+
                 }
             }
         }
