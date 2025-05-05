@@ -28,9 +28,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.unimib.oases.ui.components.ActionIcon
-import com.unimib.oases.ui.home_page.components.PatientUi
 import com.unimib.oases.ui.components.SearchBar
 import com.unimib.oases.ui.home_page.components.PatientCard
+import com.unimib.oases.ui.home_page.components.PatientUi
 
 @Composable
 fun HomeScreen(navController: NavController) {

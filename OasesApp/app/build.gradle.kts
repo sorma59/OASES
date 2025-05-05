@@ -5,6 +5,7 @@ plugins {
     id("com.google.dagger.hilt.android")
     id("com.google.devtools.ksp") version "2.1.20-2.0.0"
     kotlin("kapt") // ✅ for Hilt
+    id("kotlin-parcelize")
 }
 
 android {
