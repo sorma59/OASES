@@ -1,62 +1,53 @@
 package com.unimib.oases.ui.screen.patient_registration.info
 
+
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Context
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Timer
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.unimib.oases.ui.theme.OasesTheme
 import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
+import java.util.*
 
 @Composable
-fun PatientInfoScreen() {
-
-    var name by remember { mutableStateOf("") }
-    var age by remember { mutableStateOf("") }
-    var sex by remember { mutableStateOf("") }
-    var village by remember { mutableStateOf("") }
-    var parish by remember { mutableStateOf("") }
-    var subCountry by remember { mutableStateOf("") }
-    var district by remember { mutableStateOf("") }
-    var nextOfKin by remember { mutableStateOf("") }
-    var contact by remember { mutableStateOf("") }
-    var date by remember { mutableStateOf("") }
-    var time by remember { mutableStateOf("") }
-
+fun PatientInfoScreen(
+    name: String,
+    onNameChanged: (String) -> Unit,
+    age: String,
+    onAgeChanged: (String) -> Unit,
+    sex: String,
+    onSexChanged: (String) -> Unit,
+    village: String,
+    onVillageChanged: (String) -> Unit,
+    parish: String,
+    onParishChanged: (String) -> Unit,
+    subCountry: String,
+    onSubCountryChanged: (String) -> Unit,
+    district: String,
+    onDistrictChanged: (String) -> Unit,
+    nextOfKin: String,
+    onNextOfKinChanged: (String) -> Unit,
+    contact: String,
+    onContactChanged: (String) -> Unit,
+    date: String,
+    onDateChanged: (String) -> Unit,
+    time: String,
+    onTimeChanged: (String) -> Unit,
+) {
     val scrollState = rememberScrollState()
     val context = LocalContext.current
 
@@ -66,99 +57,40 @@ fun PatientInfoScreen() {
             .verticalScroll(scrollState)
             .padding(16.dp)
     ) {
-        AnimatedLabelOutlinedTextField(
-            value = name,
-            onValueChange = { name = it },
-            labelText = "Name",
-            modifier = Modifier.fillMaxWidth()
-        )
+        AnimatedLabelOutlinedTextField(name, onNameChanged, "Name", Modifier.fillMaxWidth())
         Spacer(modifier = Modifier.height(8.dp))
 
-        AnimatedLabelOutlinedTextField(
-            value = age,
-            onValueChange = { newText ->
-                val filteredText = newText.filter { it.isDigit() }
-                val newAge = filteredText.toIntOrNull() ?: 0
-                if (newAge in 1..100 || filteredText.isEmpty()) {
-                    age = filteredText
-                }
-            },
-            labelText = "Age",
-            modifier = Modifier.fillMaxWidth()
-        )
+        AnimatedLabelOutlinedTextField(age, onAgeChanged, "Age", Modifier.fillMaxWidth())
         Spacer(modifier = Modifier.height(8.dp))
 
-        SexDropdown(
-            selectedSex = sex,
-            onSexSelected = { sex = it },
-            modifier = Modifier.fillMaxWidth()
-        )
+        SexDropdown(sex, onSexChanged, Modifier.fillMaxWidth())
         Spacer(modifier = Modifier.height(8.dp))
 
-        AnimatedLabelOutlinedTextField(
-            value = village,
-            onValueChange = { village = it },
-            labelText = "Village",
-            modifier = Modifier.fillMaxWidth()
-        )
+        AnimatedLabelOutlinedTextField(village, onVillageChanged, "Village", Modifier.fillMaxWidth())
         Spacer(modifier = Modifier.height(8.dp))
 
-        AnimatedLabelOutlinedTextField(
-            value = parish,
-            onValueChange = { parish = it },
-            labelText = "Parish",
-            modifier = Modifier.fillMaxWidth()
-        )
+        AnimatedLabelOutlinedTextField(parish, onParishChanged, "Parish", Modifier.fillMaxWidth())
         Spacer(modifier = Modifier.height(8.dp))
 
-        AnimatedLabelOutlinedTextField(
-            value = subCountry,
-            onValueChange = { subCountry = it },
-            labelText = "Sub Country",
-            modifier = Modifier.fillMaxWidth()
-        )
+        AnimatedLabelOutlinedTextField(subCountry, onSubCountryChanged, "Sub Country", Modifier.fillMaxWidth())
         Spacer(modifier = Modifier.height(8.dp))
 
-        AnimatedLabelOutlinedTextField(
-            value = district,
-            onValueChange = { district = it },
-            labelText = "District",
-            modifier = Modifier.fillMaxWidth()
-        )
+        AnimatedLabelOutlinedTextField(district, onDistrictChanged, "District", Modifier.fillMaxWidth())
         Spacer(modifier = Modifier.height(8.dp))
 
-        AnimatedLabelOutlinedTextField(
-            value = nextOfKin,
-            onValueChange = { nextOfKin = it },
-            labelText = "Next of Kin",
-            modifier = Modifier.fillMaxWidth()
-        )
+        AnimatedLabelOutlinedTextField(nextOfKin, onNextOfKinChanged, "Next of Kin", Modifier.fillMaxWidth())
         Spacer(modifier = Modifier.height(8.dp))
 
-        AnimatedLabelOutlinedTextField(
-            value = contact,
-            onValueChange = { contact = it },
-            labelText = "Contact",
-            modifier = Modifier.fillMaxWidth()
-        )
+        AnimatedLabelOutlinedTextField(contact, onContactChanged, "Contact", Modifier.fillMaxWidth())
         Spacer(modifier = Modifier.height(8.dp))
 
-        DateSelector(
-            selectedDate = date,
-            onDateSelected = { date = it },
-            modifier = Modifier.fillMaxWidth(),
-            context = context
-        )
+        DateSelector(date, onDateChanged, Modifier.fillMaxWidth(), context)
         Spacer(modifier = Modifier.height(8.dp))
 
-        TimeSelector(
-            selectedTime = time,
-            onTimeSelected = { time = it },
-            modifier = Modifier.fillMaxWidth(),
-            context = context
-        )
+        TimeSelector(time, onTimeChanged, Modifier.fillMaxWidth(), context)
     }
 }
+
 
 @Composable
 fun AnimatedLabelOutlinedTextField(
@@ -313,10 +245,3 @@ fun TimeSelector(
     )
 }
 
-@Preview(showBackground = true)
-@Composable
-fun PatientInfoScreenPreview() {
-    OasesTheme {
-        PatientInfoScreen()
-    }
-}
