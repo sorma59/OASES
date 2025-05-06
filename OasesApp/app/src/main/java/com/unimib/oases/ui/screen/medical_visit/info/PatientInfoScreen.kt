@@ -26,19 +26,19 @@ import androidx.compose.ui.unit.dp
 import com.unimib.oases.ui.theme.OasesTheme
 
 @Composable
-fun PatientInfoScreen() {
-    var name by remember { mutableStateOf("") }
-    var age by remember { mutableStateOf("") }
-    var sex by remember { mutableStateOf("") }
-    var village by remember { mutableStateOf("") }
-    var parish by remember { mutableStateOf("") }
-    var subCountry by remember { mutableStateOf("") }
-    var district by remember { mutableStateOf("") }
-    var nextOfKin by remember { mutableStateOf("") }
-    var contact by remember { mutableStateOf("") }
-    var date by remember { mutableStateOf("") }
-    var time by remember { mutableStateOf("") }
-
+fun PatientInfoScreen(
+    patientName: String = "",
+    patientAge: String = "",
+    patientSex: String = "",
+    patientVillage: String = "",
+    patientParish: String = "",
+    patientSubCountry: String = "",
+    patientDistrict: String = "",
+    patientNextOfKin: String = "",
+    patientContact: String = "",
+    patientDate: String = "",
+    patientTime: String = ""
+) {
     val scrollState = rememberScrollState()
 
     Column(
@@ -48,90 +48,101 @@ fun PatientInfoScreen() {
             .verticalScroll(scrollState)
     ) {
         AnimatedLabelOutlinedTextField(
-            value = name,
-            onValueChange = { name = it },
+            value = patientName,
+            onValueChange = { }, // Disabilita la modifica
             labelText = "Name",
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            readOnly = true
         )
         Spacer(modifier = Modifier.height(8.dp))
 
         AnimatedLabelOutlinedTextField(
-            value = age,
-            onValueChange = { age = it },
+            value = patientAge,
+            onValueChange = { }, // Disabilita la modifica
             labelText = "Age",
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            readOnly = true
         )
         Spacer(modifier = Modifier.height(8.dp))
 
         AnimatedLabelOutlinedTextField(
-            value = sex,
-            onValueChange = { sex = it },
+            value = patientSex,
+            onValueChange = { }, // Disabilita la modifica
             labelText = "Sex",
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            readOnly = true
         )
         Spacer(modifier = Modifier.height(8.dp))
 
         AnimatedLabelOutlinedTextField(
-            value = village,
-            onValueChange = { village = it },
+            value = patientVillage,
+            onValueChange = { }, // Disabilita la modifica
             labelText = "Village",
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            readOnly = true
         )
         Spacer(modifier = Modifier.height(8.dp))
 
         AnimatedLabelOutlinedTextField(
-            value = parish,
-            onValueChange = { parish = it },
+            value = patientParish,
+            onValueChange = { }, // Disabilita la modifica
             labelText = "Parish",
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            readOnly = true
         )
         Spacer(modifier = Modifier.height(8.dp))
 
         AnimatedLabelOutlinedTextField(
-            value = subCountry,
-            onValueChange = { subCountry = it },
+            value = patientSubCountry,
+            onValueChange = { }, // Disabilita la modifica
             labelText = "Sub Country",
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            readOnly = true
         )
         Spacer(modifier = Modifier.height(8.dp))
 
         AnimatedLabelOutlinedTextField(
-            value = district,
-            onValueChange = { district = it },
+            value = patientDistrict,
+            onValueChange = { }, // Disabilita la modifica
             labelText = "District",
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            readOnly = true
         )
         Spacer(modifier = Modifier.height(8.dp))
 
         AnimatedLabelOutlinedTextField(
-            value = nextOfKin,
-            onValueChange = { nextOfKin = it },
+            value = patientNextOfKin,
+            onValueChange = { }, // Disabilita la modifica
             labelText = "Next of Kin",
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            readOnly = true
         )
         Spacer(modifier = Modifier.height(8.dp))
 
         AnimatedLabelOutlinedTextField(
-            value = contact,
-            onValueChange = { contact = it },
+            value = patientContact,
+            onValueChange = { }, // Disabilita la modifica
             labelText = "Contact",
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            readOnly = true
         )
         Spacer(modifier = Modifier.height(8.dp))
 
         AnimatedLabelOutlinedTextField(
-            value = date,
-            onValueChange = { date = it },
+            value = patientDate,
+            onValueChange = { }, // Disabilita la modifica
             labelText = "Date",
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            readOnly = true
         )
         Spacer(modifier = Modifier.height(8.dp))
 
         AnimatedLabelOutlinedTextField(
-            value = time,
-            onValueChange = { time = it },
+            value = patientTime,
+            onValueChange = { }, // Disabilita la modifica
             labelText = "Time",
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            readOnly = true
         )
     }
 }
@@ -141,7 +152,8 @@ fun AnimatedLabelOutlinedTextField(
     value: String,
     onValueChange: (String) -> Unit,
     labelText: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    readOnly: Boolean = false // Aggiungiamo il parametro readOnly
 ) {
     var isFocused by remember { mutableStateOf(false) }
     val labelColor by animateColorAsState(
@@ -159,7 +171,8 @@ fun AnimatedLabelOutlinedTextField(
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = Color.Blue,
             unfocusedBorderColor = Color.Gray
-        )
+        ),
+        readOnly = readOnly // Utilizziamo il parametro readOnly
     )
 }
 
@@ -167,6 +180,18 @@ fun AnimatedLabelOutlinedTextField(
 @Composable
 fun PatientInfoScreenPreview() {
     OasesTheme {
-        PatientInfoScreen()
+        PatientInfoScreen(
+            patientName = "Mario Rossi",
+            patientAge = "35",
+            patientSex = "Maschio",
+            patientVillage = "Paese Bello",
+            patientParish = "Parrocchia Centrale",
+            patientSubCountry = "Sub-Regione A",
+            patientDistrict = "Distretto 1",
+            patientNextOfKin = "Luigi Bianchi",
+            patientContact = "3331234567",
+            patientDate = "05/05/2025",
+            patientTime = "10:00"
+        )
     }
 }

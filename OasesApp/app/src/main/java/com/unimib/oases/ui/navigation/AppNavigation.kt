@@ -22,7 +22,7 @@ fun AppNavigation(
             .consumeWindowInsets(padding)
             .padding(padding),
         navController = navController,
-        startDestination = Screen.LoginScreen.route) {
+        startDestination = Screen.HomeScreen.route) {
 
         composable(Screen.LoginScreen.route){
             LoginScreen(navController)
