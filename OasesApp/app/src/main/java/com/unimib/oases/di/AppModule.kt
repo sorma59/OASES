@@ -40,6 +40,7 @@ object AppModule {
             "oases_database"
         )
             .addMigrations(MIGRATION_1_2) // Add migrations here
+            .createFromAsset("databases/users.db")
             .build()
     }
 
@@ -58,7 +59,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideUserRepository(@ApplicationContext context: Context): UserRepository {
-        return UserRepositoryImpl(context)
+    fun provideUserRepository(roomDataSource: RoomDataSource): UserRepository {
+        return UserRepositoryImpl(roomDataSource)
     }
 }

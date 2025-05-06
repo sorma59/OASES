@@ -1,72 +1,124 @@
 package com.unimib.oases.data.repository
 
-import android.content.Context
-import android.content.SharedPreferences
-import androidx.core.content.edit
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKey
-import com.google.gson.Gson
+import com.unimib.oases.data.local.RoomDataSource
 import com.unimib.oases.data.model.Role
 import com.unimib.oases.data.model.User
 import com.unimib.oases.domain.repository.UserRepository
-import dagger.hilt.android.qualifiers.ApplicationContext
-import org.mindrot.jbcrypt.BCrypt
+import com.unimib.oases.util.PasswordUtils
+import com.unimib.oases.util.Resource
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
-    @ApplicationContext private val context: Context
+    private val roomDataSource: RoomDataSource
 ): UserRepository {
 
-    private val sharedPreferences: SharedPreferences by lazy {
-        val masterKey = MasterKey.Builder(context)
-            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-            .build()
-
-        EncryptedSharedPreferences.create(
-            context,
-            "user_prefs",
-            masterKey,
-            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-        )
+    override fun createUser(username: String, password: String, role: Role):Resource<Unit> {
+        return try {
+            // Generate a unique salt for each password
+            val salt = PasswordUtils.generateSalt()
+            val hash = PasswordUtils.hashPassword(password, salt)
+            val user = User(username, hash, role, salt)
+            if (insert(user))
+                Resource.Success(Unit)
+            else
+                Resource.Error("Error creating user")
+        } catch (e: Exception) {
+            Resource.Error(e.message ?: "Unknown error")
+        }
     }
 
-    private val gson = Gson()
-
-    companion object {
-        fun getUserKey(username: String) = "user_$username"
+    private fun insert(user: User): Boolean {
+        return try {
+            //launch a coroutine to run the suspend function
+            CoroutineScope(Dispatchers.IO).launch {
+                roomDataSource.insertUser(user)
+            }
+            true
+        } catch (e: Exception) {
+            false
+        }
     }
 
-    override fun createUser(username: String, password: String, role: Role) {
-        // Generate a unique salt for each password
-        val salt = BCrypt.gensalt()
-        // Hash the password with the salt
-        val pwHash = BCrypt.hashpw(password, salt)
+    override suspend fun authenticate(username: String, password: String): Resource<User> {
+        return try {
+            //launch a coroutine to run the suspend function
+            val user = roomDataSource.getUser(username).firstOrNull()
+                ?: return Resource.Error("User not found")
+            if (PasswordUtils.verifyPassword(password, user.pwHash, user.salt))
+                Resource.Success(user)
+            else
+                Resource.Error("Wrong password")
+        } catch (e: Exception) {
+            Resource.Error(e.message ?: "Unknown error")
+        }
 
-        val user = User(username, role, pwHash)
-        val userJson = gson.toJson(user)
-        val userKey = getUserKey(username)
-        sharedPreferences.edit() { putString(userKey, userJson) }
     }
 
-    override fun authenticate(username: String, password: String): Boolean {
-        val userKey = getUserKey(username)
-        val userJson = sharedPreferences.getString(userKey, null)
-            ?: return false
-
-        val user = gson.fromJson(userJson, User::class.java)
-        // Check if the provided PIN matches the stored hash
-        return BCrypt.checkpw(password, user.pwHash)
+    override fun deleteUser(username: String): Resource<Unit> {
+        return try {
+            //launch a coroutine to run the suspend function
+            CoroutineScope(Dispatchers.IO).launch {
+                roomDataSource.getUser(username).firstOrNull()?.let {
+                    roomDataSource.deleteUser(it)
+                }
+            }
+            Resource.Success(Unit)
+        } catch (e: Exception) {
+            Resource.Error(e.message ?: "Unknown error")
+        }
     }
 
-    override fun getUser(username: String): User? {
-        val accountKey = getUserKey(username)
-        val accountJson = sharedPreferences.getString(accountKey, null) ?: return null
-        return gson.fromJson(accountJson, User::class.java)
+    override fun getAllUsers(): Flow<Resource<List<User>>> = flow {
+
+        emit(Resource.Loading())
+        try {
+            roomDataSource.getAllUsers().collect {
+                emit(Resource.Success(it))
+            }
+        } catch (e: Exception) {
+            emit(Resource.Error(e.message ?: "Unknown error"))
+        }
     }
 
-    override fun deleteUser(username: String) {
-        val accountKey = getUserKey(username)
-        sharedPreferences.edit() { remove(accountKey) }
+    override fun getAllNurses(): Flow<Resource<List<User>>> = flow {
+
+        emit(Resource.Loading())
+        try {
+            roomDataSource.getAllUsersByRole(Role.Nurse).collect {
+                emit(Resource.Success(it))
+            }
+        } catch (e: Exception) {
+            emit(Resource.Error(e.message ?: "Unknown error"))
+        }
+    }
+
+    override fun getAllDoctors(): Flow<Resource<List<User>>> = flow {
+
+        emit(Resource.Loading())
+        try {
+            roomDataSource.getAllUsersByRole(Role.Doctor).collect {
+                emit(Resource.Success(it))
+            }
+        } catch (e: Exception) {
+            emit(Resource.Error(e.message ?: "Unknown error"))
+        }
+    }
+
+    override fun getUser(username: String): Flow<Resource<User?>> = flow {
+
+        emit(Resource.Loading())
+        try {
+            roomDataSource.getUser(username).collect {
+                emit(Resource.Success(it))
+            }
+        } catch (e: Exception) {
+            emit(Resource.Error(e.message ?: "Unknown error"))
+        }
     }
 }

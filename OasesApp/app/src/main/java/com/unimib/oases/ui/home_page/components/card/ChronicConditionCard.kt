@@ -36,12 +36,12 @@ fun ChronicConditionCard(condition: ChronicConditionUi) {
                 .padding(16.dp)
         ) {
             Text(
-                text = "Malattia: ${condition.name}",
+                text = "Chronic condition: ${condition.name}",
                 style = MaterialTheme.typography.bodyLarge,
                 color = textColor
             )
             Text(
-                text = "Data diagnosi: ${condition.diagnosisDate}",
+                text = "Diagnosis date: ${condition.diagnosisDate}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = textColor
             )

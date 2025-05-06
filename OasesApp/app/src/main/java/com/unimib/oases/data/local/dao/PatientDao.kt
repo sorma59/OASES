@@ -1,4 +1,4 @@
-package com.unimib.oases.data.local
+package com.unimib.oases.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -11,10 +11,10 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface PatientDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertPatient(patient: Patient): Long
+    suspend fun insert(patient: Patient): Long
 
     @Delete
-    suspend fun deletePatient(patient: Patient)
+    suspend fun delete(patient: Patient)
 
     @Query("SELECT * FROM patients")
     fun getPatients(): Flow<List<Patient>>
