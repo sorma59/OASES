@@ -16,32 +16,34 @@ import com.unimib.oases.ui.screen.admin_screen.AdminScreen
 @Composable
 fun AppNavigation(
     navController: NavHostController,
-    padding: PaddingValues
 ){
-    NavHost(
-        modifier = Modifier
-            .consumeWindowInsets(padding)
-            .padding(padding),
-        navController = navController,
-        startDestination = Screen.HomeScreen.route) {
 
 
-        composable(Screen.AdminScreen.route){
-            AdminScreen()
+        NavHost(
+           // modifier = Modifier
+               // .consumeWindowInsets(padding)
+              //  .padding(padding),
+            navController = navController,
+            startDestination = Screen.HomeScreen.route
+        ) {
+
+            composable(Screen.AdminScreen.route) {
+                AdminScreen()
+            }
+
+
+            composable(Screen.LoginScreen.route) {
+                LoginScreen(navController)
+            }
+
+            composable(Screen.HomeScreen.route) {
+                HomeScreen(navController)
+            }
+
+            composable(Screen.RegistrationScreen.route) {
+                RegistrationScreen(navController)
+            }
+
         }
 
-
-        composable(Screen.LoginScreen.route){
-            LoginScreen(navController)
-        }
-
-        composable(Screen.HomeScreen.route){
-            HomeScreen(navController)
-        }
-
-        composable(Screen.RegistrationScreen.route){
-            RegistrationScreen(navController)
-        }
-
-    }
 }

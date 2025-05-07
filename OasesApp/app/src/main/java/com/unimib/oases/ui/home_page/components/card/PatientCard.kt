@@ -5,11 +5,13 @@ package com.unimib.oases.ui.home_page.components.card
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -131,18 +133,31 @@ fun PatientCard(
             colors = CardDefaults.cardColors()
                 .copy(containerColor = MaterialTheme.colorScheme.primary),
         ) {
+
             Column(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 10.dp)
             ) {
 
 
-                // Text and buttons section
-                Column(
+                Text(
+                    text = patient.name,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.surface,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 0.sp,
+                    overflow = TextOverflow.Ellipsis,
                     modifier = Modifier
-                        .padding(10.dp)
+                        .fillMaxWidth(),
+                    maxLines = 1
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-
-
                     Text(
                         text = "Last Visit: ${patient.lastVisit}",
                         style = MaterialTheme.typography.labelSmall,
@@ -150,24 +165,10 @@ fun PatientCard(
                         fontWeight = FontWeight.Normal,
                         letterSpacing = 0.sp,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(bottom = 8.dp),
                         maxLines = 1
                     )
-
-                    Text(
-                        text = patient.name,
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.surface,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 0.sp,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(bottom = 8.dp),
-                        maxLines = 1
-                    )
-
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
-
                         Text(
                             text = "State:",
                             style = MaterialTheme.typography.labelSmall,
@@ -187,8 +188,8 @@ fun PatientCard(
                             modifier = Modifier.size(10.dp)
                         )
                     }
-
                 }
+
             }
         }
     }

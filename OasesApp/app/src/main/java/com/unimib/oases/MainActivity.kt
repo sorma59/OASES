@@ -20,11 +20,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             OasesTheme {
                 val navController = rememberNavController()
-                Scaffold(
-                    modifier = Modifier.fillMaxSize()
-                ) { innerPadding ->
-                    AppNavigation(navController, innerPadding)
-                }
+                    AppNavigation(navController)
             }
         }
     }

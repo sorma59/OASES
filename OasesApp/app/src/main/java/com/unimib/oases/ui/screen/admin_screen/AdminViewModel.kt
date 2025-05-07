@@ -55,6 +55,7 @@ class AdminViewModel @Inject constructor(
                     user = event.value
                 )
             }
+
             is AdminEvent.Delete -> {
                 viewModelScope.launch(dispatcher + errorHandler) {
                     useCases.deleteUser(event.value)
@@ -81,8 +82,8 @@ class AdminViewModel @Inject constructor(
             }
 
             AdminEvent.UndoDelete -> {
-                viewModelScope.launch(dispatcher + errorHandler){
-                    useCases.createUser(undoUser?: return@launch)
+                viewModelScope.launch(dispatcher + errorHandler) {
+                    useCases.createUser(undoUser ?: return@launch)
                     undoUser = null
                     getUsers()
                 }
@@ -102,7 +103,7 @@ class AdminViewModel @Inject constructor(
                     try {
                         _state.value = _state.value.copy(isLoading = true)
 
-                            useCases.createUser(_state.value.user)
+                        useCases.createUser(_state.value.user)
 
                         _state.value = _state.value.copy(isLoading = false)
                         // _eventFlow.emit(UiEvent.SaveUser) // I emit it into the screen then
@@ -155,6 +156,7 @@ class AdminViewModel @Inject constructor(
                             error = resource.message,
                         )
                     }
+
                     is Resource.None -> {}
                 }
             }

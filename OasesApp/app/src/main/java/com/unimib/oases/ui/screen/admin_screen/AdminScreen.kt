@@ -42,7 +42,7 @@ fun AdminScreen(
             modifier = Modifier
                 .padding(16.dp),
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
 
             Text(
