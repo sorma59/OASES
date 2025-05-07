@@ -1,0 +1,27 @@
+package com.unimib.oases.domain.use_case
+
+
+import com.unimib.oases.data.model.User
+import com.unimib.oases.domain.repository.UserRepository
+import com.unimib.oases.util.Resource
+import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
+
+class AdminUseCase @Inject constructor(
+    private val repo: UserRepository
+) {
+
+    fun createUser(user: User) {
+        repo.createUser(user.username, user.pwHash, user.role)
+    }
+
+    fun getUsers(): Flow<Resource<List<User>>> {
+        val result = repo.getAllUsers()
+        return result
+    }
+
+    fun deleteUser(user: User){
+        repo.deleteUser(user.username)
+    }
+
+}

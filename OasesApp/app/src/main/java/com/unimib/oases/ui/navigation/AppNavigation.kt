@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import com.unimib.oases.ui.screen.home_page.HomeScreen
 import com.unimib.oases.ui.screen.login.LoginScreen
 import com.unimib.oases.ui.screen.patient_registration.RegistrationScreen
+import com.unimib.oases.ui.screen.admin_screen.AdminScreen
 
 @Composable
 fun AppNavigation(
@@ -22,7 +23,13 @@ fun AppNavigation(
             .consumeWindowInsets(padding)
             .padding(padding),
         navController = navController,
-        startDestination = Screen.LoginScreen.route) {
+        startDestination = Screen.HomeScreen.route) {
+
+
+        composable(Screen.AdminScreen.route){
+            AdminScreen()
+        }
+
 
         composable(Screen.LoginScreen.route){
             LoginScreen(navController)
