@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unimib.oases.data.model.Role
+import com.unimib.oases.data.model.User
 import com.unimib.oases.domain.repository.UserRepository
 import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,6 +34,13 @@ class AuthViewModel @Inject constructor(
         _creationResult.value = result
     }
 
+    fun currentUser(): User? {
+        return if (authState.value is AuthState.Authenticated) {
+            (authState.value as AuthState.Authenticated).user
+        } else
+            null
+    }
+
     fun authenticate(username: String, password: String) {
         viewModelScope.launch {
             _authState.value = AuthState.Loading
@@ -50,5 +58,17 @@ class AuthViewModel @Inject constructor(
                 _authState.value = AuthState.Error((result as Resource.Error).message ?: "Unknown error")
             }
         }
+    }
+
+    fun isNurse():Boolean {
+        return authState.value is AuthState.Authenticated && (authState.value as AuthState.Authenticated).user.role == Role.Nurse
+    }
+
+    fun isDoctor(): Boolean {
+        return authState.value is AuthState.Authenticated && (authState.value as AuthState.Authenticated).user.role == Role.Doctor
+    }
+
+    fun isAdmin(): Boolean {
+        return authState.value is AuthState.Authenticated && (authState.value as AuthState.Authenticated).user.role == Role.Admin
     }
 }

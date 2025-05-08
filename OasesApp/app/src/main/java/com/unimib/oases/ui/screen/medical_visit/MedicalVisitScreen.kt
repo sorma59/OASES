@@ -20,22 +20,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import com.unimib.oases.ui.screen.login.AuthViewModel
 import com.unimib.oases.ui.screen.medical_visit.info.PatientInfoScreen
 import com.unimib.oases.ui.screen.medical_visit.past_medical_history.PastHistoryScreen
 import com.unimib.oases.ui.screen.medical_visit.visit.VisitScreen
 import com.unimib.oases.ui.screen.medical_visit.visit_history.VisitHistoryScreen
 
 @Composable
-fun MedicalVisitScreen(navController: NavController) {
-    TabNavigationWithButtons(navController)
+fun MedicalVisitScreen(navController: NavController, authViewModel: AuthViewModel) {
+    TabNavigationWithButtons(navController, authViewModel)
 }
 
 @Composable
-fun TabNavigationWithButtons(navController: NavController) {
+fun TabNavigationWithButtons(navController: NavController, authViewModel: AuthViewModel) {
     val tabs = listOf("Dati anagrafici", "History", "Past Medical History", "Medical Visit")
     var currentIndex by remember { mutableIntStateOf(0) }
 
@@ -105,9 +104,9 @@ fun TabNavigationWithButtons(navController: NavController) {
     }
 }
 
-@Preview
-@Composable
-fun MedicalVisitScreenPreview() {
-    MedicalVisitScreen(navController = rememberNavController())
-}
+//@Preview
+//@Composable
+//fun MedicalVisitScreenPreview() {
+//    MedicalVisitScreen(navController = rememberNavController())
+//}
 

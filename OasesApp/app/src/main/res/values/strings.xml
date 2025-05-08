@@ -1,3 +1,25 @@
 <resources>
     <string name="app_name">Oases</string>
+    <string name="app_uuid">6213e49e-a0d1-4662-ac91-956af711e5f4</string>
+
+    <!-- Toast Messages -->
+    <string name="bluetooth_denied">Bluetooth enabling was denied,\nyou won\'t be able to receive patients,\nrestart the app and enable bluetooth</string>
+    <string name="bluetooth_not_supported">Bluetooth is not supported on this device</string>
+    <string name="bluetooth_server_not_started">Failed to start bluetooth server,\nyou won\'t be able to receive patients,\nplease enable bluetooth</string>
+    <string name="bluetooth_server_started">Server started</string>
+    <string name="bluetooth_server_stopped">Server was stopped</string>
+    <string name="bluetooth_missing_permissions">Missing bluetooth permissions</string>
+    <string name="bluetooth_permission_denied">Bluetooth features won\'t work without permission!</string>
+    <string name="bluetooth_connection_failed">Bluetooth connection failed</string>
+    <string name="bluetooth_connection_lost">Connection was lost</string>
+    <string name="bluetooth_connection_lost_due_to_remote_device_disconnection">The connected device has disconnected</string>
+    <string name="bluetooth_connection_lost_due_to_IOexception">Connection lost due to an unexpected error</string>
+    <string name="add_patient_form_not_valid">Saving failed, fill in mandatory fields</string>
+    <string name="add_patient_success">Patient added successfully</string>
+    <string name="add_patient_error">Error: Patient was not added</string>
+    <string name="bluetooth_launcher_not_initialized">Launcher not initialized</string>
+
+    <string name="bluetooth_turning_off">Bluetooth was turned off, several features won\'t be available</string>
+
+    <string name="disconnect_request_code">DISCONNECT</string>
 </resources>

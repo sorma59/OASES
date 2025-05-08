@@ -5,12 +5,11 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import kotlinx.parcelize.Parcelize
-import java.util.UUID
 
 @Entity(tableName = "patients")
 @Parcelize
-data class Patient (
-    @PrimaryKey val id: String = UUID.randomUUID().toString(),
+data class PatientEntity (
+    @PrimaryKey val id: String,
     @ColumnInfo(name = "name") var name: String,
     @ColumnInfo(name = "age") var age: Int,
     @ColumnInfo(name = "sex") var sex: String,
@@ -27,7 +26,7 @@ data class Patient (
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as Patient
+        other as PatientEntity
 
         if (age != other.age) return false
         if (id != other.id) return false

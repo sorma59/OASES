@@ -1,6 +1,16 @@
 package com.unimib.oases.ui.screen.admin_screen
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.icons.Icons
@@ -8,8 +18,29 @@ import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.contentDescription
@@ -79,172 +110,172 @@ fun AdminScreen(
 
     )
 
-        Column(
+    Column(
+        modifier = Modifier
+            .padding(padding)
+            .padding(top = padding.calculateTopPadding() + 20.dp)
+            .consumeWindowInsets(padding)
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+
+        OutlinedTextField(
+            value = state.user.username,
+            onValueChange = { viewModel.onEvent(AdminEvent.EnteredUsername(it)) },
+            label = { Text("Username") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        OutlinedTextField(
+            value = state.user.pwHash,
+            onValueChange = { viewModel.onEvent(AdminEvent.EnteredPassword(it)) },
+            label = { Text("Password") },
+            singleLine = true,
+            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            trailingIcon = {
+                val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    Icon(imageVector = image, contentDescription = "PASSWORD")
+                }
+            },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+
+        // Role selection radio buttons
+        Text(
+            text = "Select Role:",
             modifier = Modifier
-                .padding(padding)
-                .padding(top = padding.calculateTopPadding() + 20.dp)
-                .consumeWindowInsets(padding)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
+                .fillMaxWidth()
+                .padding(bottom = 8.dp)
+        )
+
+        Column(
+            modifier = Modifier.fillMaxWidth()
         ) {
-
-            OutlinedTextField(
-                value = state.user.username,
-                onValueChange = { viewModel.onEvent(AdminEvent.EnteredUsername(it)) },
-                label = { Text("Username") },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            OutlinedTextField(
-                value = state.user.pwHash,
-                onValueChange = { viewModel.onEvent(AdminEvent.EnteredPassword(it)) },
-                label = { Text("Password") },
-                singleLine = true,
-                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                trailingIcon = {
-                    val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                        Icon(imageVector = image, contentDescription = "PASSWORD")
-                    }
-                },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-
-            // Role selection radio buttons
-            Text(
-                text = "Select Role:",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp)
-            )
-
-            Column(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Role.entries.forEach { roleOption ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .selectable(
-                                selected = (roleOption == state.user.role),
-                                onClick = { viewModel.onEvent(AdminEvent.SelectedRole(roleOption)) }
-                            )
-                            .padding(horizontal = 16.dp, vertical = 0.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        RadioButton(
+            Role.entries.forEach { roleOption ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .selectable(
                             selected = (roleOption == state.user.role),
                             onClick = { viewModel.onEvent(AdminEvent.SelectedRole(roleOption)) }
                         )
-                        Text(
-                            text = roleOption.displayName,
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(start = 8.dp)
-                        )
-                    }
-                }
-
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Button(
-                    onClick = {
-
-                        if (state.user.username.isBlank() || state.user.pwHash.isBlank()) {
-                            state.error = "Username and password cannot be empty!"
-                            return@Button
-                        }
-
-                        viewModel.onEvent(AdminEvent.SaveUser)
-
-                    },
-                    modifier = Modifier.fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 0.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Create User")
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                state.error?.let {
+                    RadioButton(
+                        selected = (roleOption == state.user.role),
+                        onClick = { viewModel.onEvent(AdminEvent.SelectedRole(roleOption)) }
+                    )
                     Text(
-                        text = it,
-                        color = MaterialTheme.colorScheme.error
+                        text = roleOption.displayName,
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(start = 8.dp)
                     )
                 }
-
-                state.message?.let {
-                    Text(
-                        text = it,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Text(
-                    text = "Registered Users (${state.users.size})",
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp)
-                )
-
-
-                if (state.isLoading) {
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        CircularProgressIndicator(
-                            Modifier.semantics {
-                                this.contentDescription = "LOADING INDICATOR"
-                            }
-                        )
-                    }
-                } else {
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                    ) {
-                        items(state.users.size) { i ->
-                            val user = state.users[i]
-                            UserListItem(
-                                user = user,
-                                onDelete = {
-                                    viewModel.onEvent(AdminEvent.Delete(user))
-                                    scope.launch {
-                                        val undo = snackbarHostState.showSnackbar(
-                                            message = "Deleted user ${user.username}",
-                                            actionLabel = "UNDO"
-                                        )
-                                        if(undo == SnackbarResult.ActionPerformed){
-                                            viewModel.onEvent(AdminEvent.UndoDelete)
-                                        }
-                                    }
-                                },
-                                onClick = {
-                                    viewModel.onEvent(AdminEvent.Click(user))
-                                }
-                            )
-                        }
-                    }
-                }
-
             }
 
 
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Button(
+                onClick = {
+
+                    if (state.user.username.isBlank() || state.user.pwHash.isBlank()) {
+                        state.error = "Username and password cannot be empty!"
+                        return@Button
+                    }
+
+                    viewModel.onEvent(AdminEvent.SaveUser)
+
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Create User")
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            state.error?.let {
+                Text(
+                    text = it,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+
+            state.message?.let {
+                Text(
+                    text = it,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                text = "Registered Users (${state.users.size})",
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            )
+
+
+            if (state.isLoading) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    CircularProgressIndicator(
+                        Modifier.semantics {
+                            this.contentDescription = "LOADING INDICATOR"
+                        }
+                    )
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                ) {
+                    items(state.users.size) { i ->
+                        val user = state.users[i]
+                        UserListItem(
+                            user = user,
+                            onDelete = {
+                                viewModel.onEvent(AdminEvent.Delete(user))
+                                scope.launch {
+                                    val undo = snackbarHostState.showSnackbar(
+                                        message = "Deleted user ${user.username}",
+                                        actionLabel = "UNDO"
+                                    )
+                                    if(undo == SnackbarResult.ActionPerformed){
+                                        viewModel.onEvent(AdminEvent.UndoDelete)
+                                    }
+                                }
+                            },
+                            onClick = {
+                                viewModel.onEvent(AdminEvent.Click(user))
+                            }
+                        )
+                    }
+                }
+            }
+
         }
+
+
+    }
 }
 
 

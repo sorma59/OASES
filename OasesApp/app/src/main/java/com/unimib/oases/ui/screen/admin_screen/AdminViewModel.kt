@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unimib.oases.data.model.User
 import com.unimib.oases.di.IoDispatcher
-import com.unimib.oases.domain.use_case.AdminUseCase
+import com.unimib.oases.domain.usecase.AdminUseCase
 import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher

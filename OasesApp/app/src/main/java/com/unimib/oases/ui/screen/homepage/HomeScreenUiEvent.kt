@@ -1,4 +1,4 @@
-package com.unimib.oases.ui.screen.home_page
+package com.unimib.oases.ui.screen.homepage
 
 sealed class HomeScreenUiEvent {
     data object LoadPatients : HomeScreenUiEvent()

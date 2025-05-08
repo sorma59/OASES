@@ -116,6 +116,7 @@ fun AnimatedLabelOutlinedTextField(
     onValueChange: (String) -> Unit,
     labelText: String,
     modifier: Modifier = Modifier,
+    isError: Boolean = false,
     readOnly: Boolean = false,
     trailingIcon: @Composable (() -> Unit)? = null,
     anchorModifier: Modifier = Modifier
@@ -131,6 +132,7 @@ fun AnimatedLabelOutlinedTextField(
         value = value,
         onValueChange = onValueChange,
         label = { Text(labelText, color = labelColor) },
+        isError = isError,
         modifier = modifier
             .onFocusChanged { isFocused = it.isFocused }
             .then(anchorModifier),

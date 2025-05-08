@@ -14,5 +14,6 @@ data class User(
 
 enum class Role(val displayName: String) {
     Doctor("Doctor"),
-    Nurse("Nurse")
+    Nurse("Nurse"),
+    Admin("Admin")
 }

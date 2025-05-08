@@ -37,22 +37,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.unimib.oases.ui.navigation.Screen
-import com.unimib.oases.ui.theme.OasesTheme
 import com.unimib.oases.util.AuthStrings
 
 @Composable
-fun LoginScreen(navController: NavController, padding: PaddingValues){
+fun LoginScreen(navController: NavController, padding: PaddingValues, authViewModel: AuthViewModel){
 
-    val authViewModel: AuthViewModel = hiltViewModel()
-
-    val authState = authViewModel.authState.collectAsState()
+    val authState by authViewModel.authState.collectAsState()
 
     val context = LocalContext.current
 
@@ -62,14 +56,14 @@ fun LoginScreen(navController: NavController, padding: PaddingValues){
 
     var password by remember { mutableStateOf("") }
 
-    LaunchedEffect(authState.value) {
-        when(authState.value) {
+    LaunchedEffect(authState) {
+        when(authState) {
             is AuthState.Authenticated -> {
                 navController.navigate(Screen.HomeScreen.route)
             }
 
             is AuthState.Error -> {
-                Toast.makeText(context, (authState.value as AuthState.Error).message, Toast.LENGTH_LONG).show()
+                Toast.makeText(context, (authState as AuthState.Error).message, Toast.LENGTH_LONG).show()
             }
 
             else -> {}
@@ -159,10 +153,10 @@ fun LoginScreen(navController: NavController, padding: PaddingValues){
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun LoginScreenPreview(){
-    OasesTheme {
-        LoginScreen(navController = rememberNavController(), padding = PaddingValues(0.dp))
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun LoginScreenPreview(){
+//    OasesTheme {
+//        LoginScreen(navController = rememberNavController(), padding = PaddingValues(0.dp), authViewModel = )
+//    }
+//}

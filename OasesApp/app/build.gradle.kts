@@ -2,6 +2,8 @@ plugins {
     id ("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
+    id("org.jetbrains.kotlin.plugin.serialization")
+
     id("com.google.dagger.hilt.android")
     id("com.google.devtools.ksp") version "2.1.20-2.0.0"
     kotlin("kapt") // ✅ for Hilt
@@ -102,6 +104,9 @@ dependencies {
 
     implementation(libs.coil.kt.compose)
     implementation(libs.coil.kt.network)
+
+    // SERIALIZE
+    implementation(libs.kotlinx.serialization.json)
 
 // ... other dependencies ...
     implementation(libs.androidx.security.crypto) // For EncryptedSharedPreferences

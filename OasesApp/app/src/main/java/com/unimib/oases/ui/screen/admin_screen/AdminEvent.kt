@@ -9,6 +9,6 @@ sealed class AdminEvent {
     data class SelectedRole(val value: Role) : AdminEvent()
     data class Delete(val value: User) : AdminEvent()
     data class Click(val value: User) : AdminEvent()
-    object SaveUser : AdminEvent()
-    object UndoDelete: AdminEvent()
+    data object SaveUser : AdminEvent()
+    data object UndoDelete: AdminEvent()
 }

@@ -1,4 +1,4 @@
-package com.unimib.oases.domain.use_case
+package com.unimib.oases.domain.usecase
 
 
 import com.unimib.oases.data.model.User

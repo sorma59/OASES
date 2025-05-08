@@ -4,12 +4,15 @@ import android.content.Context
 import androidx.room.Room
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.unimib.oases.data.bluetooth.BluetoothCustomManager
 import com.unimib.oases.data.local.OasesDatabase
 import com.unimib.oases.data.local.RoomDataSource
 import com.unimib.oases.data.repository.PatientRepositoryImpl
 import com.unimib.oases.data.repository.UserRepositoryImpl
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.domain.repository.UserRepository
+import com.unimib.oases.domain.usecase.InsertPatientLocallyUseCase
+import com.unimib.oases.domain.usecase.SendPatientViaBluetoothUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -53,13 +56,35 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providePatientRepository(roomDataSource: RoomDataSource): PatientRepository {
-        return PatientRepositoryImpl(roomDataSource)
+    fun providePatientRepository(roomDataSource: RoomDataSource, bluetoothManager: BluetoothCustomManager): PatientRepository {
+        return PatientRepositoryImpl(roomDataSource, bluetoothManager)
     }
 
     @Provides
     @Singleton
-    fun provideUserRepository(roomDataSource: RoomDataSource): UserRepository {
+    fun provideUserRepository(
+        roomDataSource: RoomDataSource
+    ): UserRepository {
         return UserRepositoryImpl(roomDataSource)
+    }
+
+    @Provides
+    @Singleton
+    fun provideBluetoothCustomManager(): BluetoothCustomManager {
+        return BluetoothCustomManager()
+    }
+
+    @Provides
+    fun provideSendPatientUseCase(
+        bluetoothManager: BluetoothCustomManager,
+    ): SendPatientViaBluetoothUseCase {
+        return SendPatientViaBluetoothUseCase(bluetoothManager)
+    }
+
+    @Provides
+    fun provideInsertPatientLocallyUseCase(
+        patientRepository: PatientRepository
+    ): InsertPatientLocallyUseCase {
+        return InsertPatientLocallyUseCase(patientRepository)
     }
 }

@@ -1,0 +1,78 @@
+package com.unimib.oases.ui.components.patients
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bluetooth
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.unimib.oases.domain.model.Patient
+import com.unimib.oases.ui.components.util.TitleText
+import com.unimib.oases.ui.navigation.Screen
+
+@Composable
+fun PatientItem(
+    patient: Patient,
+    navController: NavController,
+    modifier: Modifier = Modifier,
+    hideBluetoothButton: Boolean = false,
+    onClick: () -> Unit = {}
+){
+    Card(
+        onClick = onClick,
+        shape = RoundedCornerShape(0.dp),
+        modifier = modifier.padding(vertical = 2.dp),
+        colors = CardDefaults.cardColors()
+            .copy(containerColor = MaterialTheme.colorScheme.primary),
+    ){
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 8.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            Column(
+                modifier = Modifier.padding(horizontal = 8.dp)
+            ) {
+                TitleText(patient.name, color = MaterialTheme.colorScheme.onPrimary)
+                Text(patient.age.toString() + ", " + patient.sex, color = MaterialTheme.colorScheme.onPrimary)
+            }
+
+            if (!hideBluetoothButton)
+                BluetoothButton(patient, navController)
+        }
+    }
+}
+
+@Composable
+fun BluetoothButton(patient: Patient, navController: NavController) {
+
+    val route = Screen.SendPatient.route
+
+    IconButton(
+        onClick = {
+            navController.currentBackStackEntry?.savedStateHandle?.set("patient", patient)
+            navController.navigate(route)
+        },
+    ) {
+        Icon(
+            imageVector = Icons.Default.Bluetooth,
+            contentDescription = "Send Patient via Bluetooth",
+            tint = MaterialTheme.colorScheme.onSurface
+        )
+    }
+}
