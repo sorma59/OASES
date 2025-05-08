@@ -3,8 +3,10 @@ package com.unimib.oases.ui.screen.login
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -46,7 +48,7 @@ import com.unimib.oases.ui.theme.OasesTheme
 import com.unimib.oases.util.AuthStrings
 
 @Composable
-fun LoginScreen(navController: NavController){
+fun LoginScreen(navController: NavController, padding: PaddingValues){
 
     val authViewModel: AuthViewModel = hiltViewModel()
 
@@ -77,9 +79,12 @@ fun LoginScreen(navController: NavController){
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(20.dp),
+            .padding(padding)
+            .padding(horizontal = 20.dp)
+            .consumeWindowInsets(padding),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
+
     ){
 
         Row{
@@ -158,6 +163,6 @@ fun LoginScreen(navController: NavController){
 @Composable
 fun LoginScreenPreview(){
     OasesTheme {
-        LoginScreen(navController = rememberNavController())
+        LoginScreen(navController = rememberNavController(), padding = PaddingValues(0.dp))
     }
 }

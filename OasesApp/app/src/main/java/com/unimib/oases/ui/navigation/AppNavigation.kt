@@ -17,6 +17,7 @@ import com.unimib.oases.ui.screen.medical_visit.MedicalVisitScreen
 @Composable
 fun AppNavigation(
     navController: NavHostController,
+    padding: PaddingValues,
 ){
 
 
@@ -29,20 +30,20 @@ fun AppNavigation(
         ) {
 
             composable(Screen.AdminScreen.route) {
-                AdminScreen()
+                AdminScreen(navController, padding)
             }
 
 
             composable(Screen.LoginScreen.route) {
-                LoginScreen(navController)
+                LoginScreen(navController, padding)
             }
 
             composable(Screen.HomeScreen.route) {
-                HomeScreen(navController)
+                HomeScreen(navController, padding)
             }
 
             composable(Screen.RegistrationScreen.route) {
-                RegistrationScreen(navController)
+                RegistrationScreen(navController, padding)
             }
 
             composable(Screen.MedicalVisitScreen.route) {

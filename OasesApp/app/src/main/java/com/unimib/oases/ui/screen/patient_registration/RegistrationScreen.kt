@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
@@ -50,14 +52,10 @@ import com.unimib.oases.ui.screen.patient_registration.visit_history.VisitHistor
 import com.unimib.oases.ui.screen.patient_registration.vital_signs.VitalSignsScreen
 import kotlinx.coroutines.launch
 
-@Composable
-fun RegistrationScreen(navController: NavController) {
-    TabNavigationWithConditionalNext(navController)
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TabNavigationWithConditionalNext(navController: NavController) {
+fun RegistrationScreen(navController: NavController, padding: PaddingValues) {
     val tabs = listOf("Dati anagrafici", "History", "Past Medical History", "Vital Signs", "Triage", "Non Red Code")
     var currentIndex by remember { mutableIntStateOf(0) }
 
@@ -96,12 +94,8 @@ fun TabNavigationWithConditionalNext(navController: NavController) {
         }
     }
 
-    Scaffold(
 
-        topBar = {
-
-            CenterAlignedTopAppBar(
-
+    CenterAlignedTopAppBar(
                 title = {
                     Row(horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically){
 
@@ -129,13 +123,14 @@ fun TabNavigationWithConditionalNext(navController: NavController) {
                 },
                 actions = {},
                 scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
-            )
-        },
-    ) { innerPadding ->
 
-        Column(modifier = Modifier.fillMaxSize()
-            .consumeWindowInsets(innerPadding)
-            .padding(innerPadding)
+        )
+
+        Column(
+            modifier = Modifier.padding(padding)
+                .padding(top = padding.calculateTopPadding() + 20.dp)
+                .consumeWindowInsets(padding)
+                .fillMaxSize(),
         ) {
             // Titolo centrale in alto
             Box(
@@ -267,10 +262,10 @@ fun TabNavigationWithConditionalNext(navController: NavController) {
             }
         }
     }
-}
+
 
 @Preview
 @Composable
 fun RegistrationScreenPreview() {
-    RegistrationScreen(navController = rememberNavController())
+    RegistrationScreen(navController = rememberNavController(), padding =  PaddingValues(0.dp))
 }

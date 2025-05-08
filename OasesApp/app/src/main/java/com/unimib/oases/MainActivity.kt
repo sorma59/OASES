@@ -20,7 +20,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             OasesTheme {
                 val navController = rememberNavController()
-                    AppNavigation(navController)
+                Scaffold { padding ->
+                    AppNavigation(navController, padding)
+                }
             }
         }
     }

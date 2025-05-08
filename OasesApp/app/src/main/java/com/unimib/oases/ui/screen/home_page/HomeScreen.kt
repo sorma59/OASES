@@ -52,8 +52,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -67,23 +65,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.unimib.oases.R
-import com.unimib.oases.data.model.Role
 import com.unimib.oases.ui.components.ActionIcon
 import com.unimib.oases.ui.components.SearchBar
 import com.unimib.oases.ui.home_page.components.card.PatientCard
 import com.unimib.oases.ui.home_page.components.card.PatientUi
-import com.unimib.oases.ui.screen.login.AuthState
-import com.unimib.oases.ui.screen.login.AuthViewModel
 import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(navController: NavController, padding: PaddingValues)  {
 
     val patients = remember {
         mutableStateListOf(
@@ -100,8 +94,7 @@ fun HomeScreen(navController: NavController) {
     }
 
     val context = LocalContext.current
-    val authViewModel: AuthViewModel = hiltViewModel();
-    val authState by authViewModel.authState.collectAsState()
+
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
@@ -211,65 +204,68 @@ fun HomeScreen(navController: NavController) {
 
 
         }) {
-        Scaffold(
-
-            topBar = {
-
-                CenterAlignedTopAppBar(
-
-                    title = {
-                            Row(horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically){
-
-                                Image(
-                                    painter = painterResource(R.drawable.ic_launcher_round),
-                                    contentDescription = "Icon",
-                                    modifier = Modifier.size(50.dp).padding(5.dp)
-                                )
-
-                                Text("OASES", fontWeight = FontWeight.Bold,
-                                    fontSize = 20.sp,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis)
-                            }
-
-                    },
-                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.onPrimary,
-                        scrolledContainerColor = MaterialTheme.colorScheme.onPrimary,
-                        navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
-                        titleContentColor = MaterialTheme.colorScheme.onBackground,
-                        actionIconContentColor = MaterialTheme.colorScheme.onBackground,
-                    ),
-                    navigationIcon = {
-                        IconButton(onClick = {
-                            scope.launch { drawerState.open() } // open sorting menu
-                        }) {
-                            Icon(
-                                imageVector = Icons.Filled.Menu,
-                                contentDescription = "MENU"
-                            )
-                        }
-                    },
-                    actions = {},
-                    scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
-                )
-            },
-        )
 
 
-        { innerPadding ->
+            CenterAlignedTopAppBar(
+
+                title = {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        Image(
+                            painter = painterResource(R.drawable.ic_launcher_round),
+                            contentDescription = "Icon",
+                            modifier = Modifier.size(50.dp).padding(5.dp)
+                        )
+
+                        Text(
+                            "OASES", fontWeight = FontWeight.Bold,
+                            fontSize = 20.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.onPrimary,
+                    scrolledContainerColor = MaterialTheme.colorScheme.onPrimary,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                    actionIconContentColor = MaterialTheme.colorScheme.onBackground,
+                ),
+                navigationIcon = {
+                    IconButton(onClick = {
+                        scope.launch { drawerState.open() } // open sorting menu
+                    }) {
+                        Icon(
+                            imageVector = Icons.Filled.Menu,
+                            contentDescription = "MENU"
+                        )
+                    }
+                },
+                actions = {},
+                scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+
+            )
+
+
 
             Column(
                 modifier = Modifier
-                    .consumeWindowInsets(innerPadding)
-                    .padding(innerPadding)
+                    .padding(padding)
+                    .padding(top = padding.calculateTopPadding() + 20.dp)
+                    .consumeWindowInsets(padding)
                     .fillMaxSize(),
                 verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
                 Column(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f)
+                        .fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Surface(
@@ -342,31 +338,27 @@ fun HomeScreen(navController: NavController) {
                                     )
                                 },
                                 onCardClick = {
-                                    if(authState is AuthState.Authenticated && (authState as AuthState.Authenticated).user.role == Role.Nurse)
-                                        navController.navigate("registration_screen")
-                                    else
-                                        navController.navigate("medical_visit_screen")
+                                    navController.navigate("registration_screen")
                                 },
                             )
                         }
                     }
                 }
-                if(authState is AuthState.Authenticated && (authState as AuthState.Authenticated).user.role == Role.Nurse){
-                    FloatingActionButton(
-                        onClick = { navController.navigate("registration_screen") },
-                        modifier = Modifier.padding(30.dp),
-                        containerColor = MaterialTheme.colorScheme.primary
-                    ) {
-                        Icon(
-                            tint = MaterialTheme.colorScheme.surface,
-                            imageVector = Icons.Default.Add,
-                            contentDescription = "History",
-                        )
+                FloatingActionButton(
+                    onClick = { navController.navigate("registration_screen") },
+                    modifier = Modifier.padding(30.dp),
+                    containerColor = MaterialTheme.colorScheme.primary
+                ) {
+                    Icon(
+                        tint = MaterialTheme.colorScheme.surface,
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "History",
+                    )
 
-                    }
                 }
             }
-        }
+
+
     }
 }
 
