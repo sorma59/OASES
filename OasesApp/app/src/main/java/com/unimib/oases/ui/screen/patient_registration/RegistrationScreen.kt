@@ -61,7 +61,14 @@ fun RegistrationScreen(
 
     val errors by registrationScreenViewModel.errors.collectAsState()
 
-    val tabs = listOf("Dati anagrafici", "History", "Past Medical History", "Vital Signs", "Triage", "Non Red Code")
+    val tabs = listOf(
+        "Dati anagrafici",
+        "History",
+        "Past Medical History",
+        "Vital Signs",
+        "Triage",
+        "Non Red Code"
+    )
     var currentIndex by remember { mutableIntStateOf(0) }
 
     // Stato per tenere traccia se almeno un checkbox in TriageScreen è selezionato
@@ -100,12 +107,26 @@ fun RegistrationScreen(
     }
 
 
-    CenterAlignedTopAppBar(
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        CenterAlignedTopAppBar(
             title = {
-                Row(horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically){
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
 
 
-                    Text("Patient Registration", fontWeight = FontWeight.Bold, fontSize = 20.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(
+                        "Patient Registration",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
                 }
 
             },
@@ -130,11 +151,10 @@ fun RegistrationScreen(
             scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
         )
 
+
         Column(
-            modifier = Modifier.padding(padding)
-                .padding(top = padding.calculateTopPadding() + 20.dp)
-                .consumeWindowInsets(padding)
-                .fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize().padding(bottom = padding.calculateBottomPadding())
         ) {
             // Titolo centrale in alto
             Box(
@@ -228,8 +248,8 @@ fun RegistrationScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
 
-                Column(){
-                    if (currentIndex > 0){
+                Column() {
+                    if (currentIndex > 0) {
                         OutlinedButton(
                             onClick = {
                                 currentIndex--
@@ -266,6 +286,7 @@ fun RegistrationScreen(
             }
         }
     }
+}
 
 
 //@Preview

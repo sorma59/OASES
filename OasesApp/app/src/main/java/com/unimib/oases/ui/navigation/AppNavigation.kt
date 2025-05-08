@@ -28,9 +28,7 @@ fun AppNavigation(
     val authViewModel: AuthViewModel = hiltViewModel()
 
     NavHost(
-        modifier = Modifier
-            .consumeWindowInsets(padding)
-            .padding(padding),
+//  nurse
         navController = navController,
         startDestination = Screen.LoginScreen.route
     ) {

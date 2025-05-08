@@ -78,203 +78,211 @@ fun AdminScreen(
     }
 
 
-
-    CenterAlignedTopAppBar(
-        title = {
-            Row(horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically){
+    Column(modifier = Modifier.fillMaxSize()) {
 
 
-                Text("Admin Panel", fontWeight = FontWeight.Bold, fontSize = 20.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            }
+        CenterAlignedTopAppBar(
+            title = {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
 
-        },
-        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-            containerColor = MaterialTheme.colorScheme.onPrimary,
-            scrolledContainerColor = MaterialTheme.colorScheme.onPrimary,
-            navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
-            titleContentColor = MaterialTheme.colorScheme.onBackground,
-            actionIconContentColor = MaterialTheme.colorScheme.onBackground,
-        ),
-        navigationIcon = {
-            IconButton(onClick = {
-                navController.popBackStack()
-            }) {
-                Icon(
-                    imageVector = Icons.Filled.ArrowBackIosNew,
-                    contentDescription = "Arrow back"
-                )
-            }
-        },
-        actions = {},
-        scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
-    )
+                    Text(
+                        "Admin Panel",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
 
-    Column(
-        modifier = Modifier
-            .padding(padding)
-            .padding(top = padding.calculateTopPadding() + 20.dp)
-            .consumeWindowInsets(padding)
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-
-        OutlinedTextField(
-            value = state.user.username,
-            onValueChange = { viewModel.onEvent(AdminEvent.EnteredUsername(it)) },
-            label = { Text("Username") },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = state.user.pwHash,
-            onValueChange = { viewModel.onEvent(AdminEvent.EnteredPassword(it)) },
-            label = { Text("Password") },
-            singleLine = true,
-            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-            trailingIcon = {
-                val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Icon(imageVector = image, contentDescription = "PASSWORD")
+            },
+            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                containerColor = MaterialTheme.colorScheme.onPrimary,
+                scrolledContainerColor = MaterialTheme.colorScheme.onPrimary,
+                navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
+                titleContentColor = MaterialTheme.colorScheme.onBackground,
+                actionIconContentColor = MaterialTheme.colorScheme.onBackground,
+            ),
+            navigationIcon = {
+                IconButton(onClick = {
+                    navController.popBackStack()
+                }) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBackIosNew,
+                        contentDescription = "Arrow back"
+                    )
                 }
             },
-            modifier = Modifier.fillMaxWidth()
-        )
+            actions = {},
+            scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-
-        // Role selection radio buttons
-        Text(
-            text = "Select Role:",
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 8.dp)
         )
 
         Column(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .padding(horizontal = 10.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Role.entries.forEach { roleOption ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .selectable(
-                            selected = (roleOption == state.user.role),
-                            onClick = { viewModel.onEvent(AdminEvent.SelectedRole(roleOption)) }
-                        )
-                        .padding(horizontal = 16.dp, vertical = 0.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    RadioButton(
-                        selected = (roleOption == state.user.role),
-                        onClick = { viewModel.onEvent(AdminEvent.SelectedRole(roleOption)) }
-                    )
-                    Text(
-                        text = roleOption.displayName,
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(start = 8.dp)
-                    )
-                }
-            }
 
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Button(
-                onClick = {
-
-                    if (state.user.username.isBlank() || state.user.pwHash.isBlank()) {
-                        state.error = "Username and password cannot be empty!"
-                        return@Button
-                    }
-
-                    viewModel.onEvent(AdminEvent.SaveUser)
-
-                },
+            OutlinedTextField(
+                value = state.user.username,
+                onValueChange = { viewModel.onEvent(AdminEvent.EnteredUsername(it)) },
+                label = { Text("Username") },
+                singleLine = true,
                 modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Create User")
-            }
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            state.error?.let {
-                Text(
-                    text = it,
-                    color = MaterialTheme.colorScheme.error
-                )
-            }
-
-            state.message?.let {
-                Text(
-                    text = it,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Text(
-                text = "Registered Users (${state.users.size})",
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
+            OutlinedTextField(
+                value = state.user.pwHash,
+                onValueChange = { viewModel.onEvent(AdminEvent.EnteredPassword(it)) },
+                label = { Text("Password") },
+                singleLine = true,
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                trailingIcon = {
+                    val image =
+                        if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                        Icon(imageVector = image, contentDescription = "PASSWORD")
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
             )
 
 
-            if (state.isLoading) {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    CircularProgressIndicator(
-                        Modifier.semantics {
-                            this.contentDescription = "LOADING INDICATOR"
-                        }
-                    )
-                }
-            } else {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                ) {
-                    items(state.users.size) { i ->
-                        val user = state.users[i]
-                        UserListItem(
-                            user = user,
-                            onDelete = {
-                                viewModel.onEvent(AdminEvent.Delete(user))
-                                scope.launch {
-                                    val undo = snackbarHostState.showSnackbar(
-                                        message = "Deleted user ${user.username}",
-                                        actionLabel = "UNDO"
-                                    )
-                                    if(undo == SnackbarResult.ActionPerformed){
-                                        viewModel.onEvent(AdminEvent.UndoDelete)
-                                    }
-                                }
-                            },
-                            onClick = {
-                                viewModel.onEvent(AdminEvent.Click(user))
-                            }
+            Spacer(modifier = Modifier.height(16.dp))
+
+
+            // Role selection radio buttons
+            Text(
+                text = "Select Role:",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp)
+            )
+
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Role.entries.forEach { roleOption ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .selectable(
+                                selected = (roleOption == state.user.role),
+                                onClick = { viewModel.onEvent(AdminEvent.SelectedRole(roleOption)) }
+                            )
+                            .padding(horizontal = 16.dp, vertical = 0.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = (roleOption == state.user.role),
+                            onClick = { viewModel.onEvent(AdminEvent.SelectedRole(roleOption)) }
+                        )
+                        Text(
+                            text = roleOption.displayName,
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.padding(start = 8.dp)
                         )
                     }
                 }
+
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Button(
+                    onClick = {
+
+                        if (state.user.username.isBlank() || state.user.pwHash.isBlank()) {
+                            state.error = "Username and password cannot be empty!"
+                            return@Button
+                        }
+
+                        viewModel.onEvent(AdminEvent.SaveUser)
+
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Create User")
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                state.error?.let {
+                    Text(
+                        text = it,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+
+                state.message?.let {
+                    Text(
+                        text = it,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Text(
+                    text = "Registered Users (${state.users.size})",
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                )
+
+
+                if (state.isLoading) {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        CircularProgressIndicator(
+                            Modifier.semantics {
+                                this.contentDescription = "LOADING INDICATOR"
+                            }
+                        )
+                    }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                    ) {
+                        items(state.users.size) { i ->
+                            val user = state.users[i]
+                            UserListItem(
+                                user = user,
+                                onDelete = {
+                                    viewModel.onEvent(AdminEvent.Delete(user))
+                                    scope.launch {
+                                        val undo = snackbarHostState.showSnackbar(
+                                            message = "Deleted user ${user.username}",
+                                            actionLabel = "UNDO"
+                                        )
+                                        if (undo == SnackbarResult.ActionPerformed) {
+                                            viewModel.onEvent(AdminEvent.UndoDelete)
+                                        }
+                                    }
+                                },
+                                onClick = {
+                                    viewModel.onEvent(AdminEvent.Click(user))
+                                }
+                            )
+                        }
+                    }
+                }
+
             }
-
         }
-
-
     }
 }
 

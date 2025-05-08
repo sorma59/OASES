@@ -163,7 +163,7 @@ fun HomeScreen(navController: NavController, padding: PaddingValues, authViewMod
                             .fillMaxWidth()
                             .padding(0.dp),
                         shape = RoundedCornerShape(0),
-                        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.onBackground),
+                        colors = ButtonDefaults.buttonColors(Color.Transparent),
                         border = BorderStroke(0.dp, Color.Transparent),
                         contentPadding = PaddingValues(0.dp),
 
@@ -182,7 +182,7 @@ fun HomeScreen(navController: NavController, padding: PaddingValues, authViewMod
                                 modifier = Modifier
                                     .size(40.dp)
                                     .padding(10.dp),
-                                tint = Color.Black,
+                                tint = MaterialTheme.colorScheme.onBackground,
                                 imageVector = Icons.AutoMirrored.Filled.ExitToApp,
                                 contentDescription = "ContentDescriptions.Exit"
                             )
@@ -191,7 +191,7 @@ fun HomeScreen(navController: NavController, padding: PaddingValues, authViewMod
                                 "Logout",
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.Normal,
-                                color = MaterialTheme.colorScheme.background
+                                color = MaterialTheme.colorScheme.onBackground
                             )
                         }
                     }
@@ -201,113 +201,116 @@ fun HomeScreen(navController: NavController, padding: PaddingValues, authViewMod
     ) {
 
 
-        CenterAlignedTopAppBar(
-
-            title = {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-
-                    Image(
-                        painter = painterResource(R.drawable.ic_launcher_round),
-                        contentDescription = "Icon",
-                        modifier = Modifier.size(50.dp).padding(5.dp)
-                    )
-
-                    Text(
-                        "OASES", fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-
-            },
-            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                containerColor = MaterialTheme.colorScheme.onPrimary,
-                scrolledContainerColor = MaterialTheme.colorScheme.onPrimary,
-                navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
-                titleContentColor = MaterialTheme.colorScheme.onBackground,
-                actionIconContentColor = MaterialTheme.colorScheme.onBackground,
-            ),
-            navigationIcon = {
-                IconButton(onClick = {
-                    scope.launch { drawerState.open() } // open sorting menu
-                }) {
-                    Icon(
-                        imageVector = Icons.Filled.Menu,
-                        contentDescription = "MENU"
-                    )
-                }
-            },
-            actions = {},
-            scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
-
-        )
-
-
         Column(
             modifier = Modifier
-                .padding(padding)
-                .padding(top = padding.calculateTopPadding() + 20.dp)
-                .consumeWindowInsets(padding)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.SpaceBetween,
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxSize().padding(bottom = padding.calculateBottomPadding())
         ) {
 
+            CenterAlignedTopAppBar(
+
+                title = {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        Image(
+                            painter = painterResource(R.drawable.ic_launcher_round),
+                            contentDescription = "Icon",
+                            modifier = Modifier.size(50.dp).padding(5.dp)
+                        )
+
+                        Text(
+                            "OASES", fontWeight = FontWeight.Bold,
+                            fontSize = 20.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.onPrimary,
+                    scrolledContainerColor = MaterialTheme.colorScheme.onPrimary,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                    actionIconContentColor = MaterialTheme.colorScheme.onBackground,
+                ),
+                navigationIcon = {
+                    IconButton(onClick = {
+                        scope.launch { drawerState.open() } // open sorting menu
+                    }) {
+                        Icon(
+                            imageVector = Icons.Filled.Menu,
+                            contentDescription = "MENU"
+                        )
+                    }
+                },
+                actions = {},
+                scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+
+            )
+
+
             Column(
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
                     .fillMaxSize(),
+                verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
+
+                Column(
+                    modifier = Modifier.weight(1f)
+                        .fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 12.dp, horizontal = 12.dp)
+                    Surface(
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
-                        SearchBar(
-                            query = "",
-                            onQueryChange = { },
-                            onSearch = { },
-                            active = false,
-                            onActiveChange = { },
-                            searchHistory = emptyList()
-                        ) { }
+
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 12.dp, horizontal = 12.dp)
+                        ) {
+                            SearchBar(
+                                query = "",
+                                onQueryChange = { },
+                                onSearch = { },
+                                active = false,
+                                onActiveChange = { },
+                                searchHistory = emptyList()
+                            ) { }
+                        }
+                    }
+
+                    when (patients) {
+                        is Resource.Error<*> -> {
+                            GenericErrorBoxAndText((patients as Resource.Error).message)
+                        }
+
+                        is Resource.Loading<*> -> CustomCircularProgressIndicator()
+                        is Resource.None<*> -> {}
+                        is Resource.Success<*> -> PatientList(
+                            patients.data as List<Patient>,
+                            navController
+                        )
                     }
                 }
-
-                when (patients) {
-                    is Resource.Error<*> -> {
-                        GenericErrorBoxAndText((patients as Resource.Error).message)
+                Log.d("Home", (authState as AuthState.Authenticated).user.role.toString())
+                if (authState is AuthState.Authenticated && (authState as AuthState.Authenticated).user.role == Role.Nurse) {
+                    FloatingActionButton(
+                        onClick = { navController.navigate(Screen.RegistrationScreen.route) },
+                        modifier = Modifier.padding(30.dp),
+                        containerColor = MaterialTheme.colorScheme.primary
+                    ) {
+                        Icon(
+                            tint = MaterialTheme.colorScheme.surface,
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "History",
+                        )
                     }
-
-                    is Resource.Loading<*> -> CustomCircularProgressIndicator()
-                    is Resource.None<*> -> {}
-                    is Resource.Success<*> -> PatientList(
-                        patients.data as List<Patient>,
-                        navController
-                    )
-                }
-            }
-            Log.d("Home", (authState as AuthState.Authenticated).user.role.toString())
-            if (authState is AuthState.Authenticated && (authState as AuthState.Authenticated).user.role == Role.Nurse) {
-                FloatingActionButton(
-                    onClick = { navController.navigate(Screen.RegistrationScreen.route) },
-                    modifier = Modifier.padding(30.dp),
-                    containerColor = MaterialTheme.colorScheme.primary
-                ) {
-                    Icon(
-                        tint = MaterialTheme.colorScheme.surface,
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "History",
-                    )
                 }
             }
         }
