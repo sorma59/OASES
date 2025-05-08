@@ -12,6 +12,7 @@ import com.unimib.oases.ui.screen.home_page.HomeScreen
 import com.unimib.oases.ui.screen.login.LoginScreen
 import com.unimib.oases.ui.screen.patient_registration.RegistrationScreen
 import com.unimib.oases.ui.screen.admin_screen.AdminScreen
+import com.unimib.oases.ui.screen.medical_visit.MedicalVisitScreen
 
 @Composable
 fun AppNavigation(
@@ -24,7 +25,7 @@ fun AppNavigation(
                // .consumeWindowInsets(padding)
               //  .padding(padding),
             navController = navController,
-            startDestination = Screen.HomeScreen.route
+            startDestination = Screen.LoginScreen.route
         ) {
 
             composable(Screen.AdminScreen.route) {
@@ -44,6 +45,9 @@ fun AppNavigation(
                 RegistrationScreen(navController)
             }
 
+            composable(Screen.MedicalVisitScreen.route) {
+                MedicalVisitScreen(navController)
+            }
         }
 
 }

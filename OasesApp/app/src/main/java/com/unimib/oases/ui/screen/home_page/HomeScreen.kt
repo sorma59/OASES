@@ -52,6 +52,8 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -65,13 +67,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import com.unimib.oases.R
+import com.unimib.oases.data.model.Role
 import com.unimib.oases.ui.components.ActionIcon
 import com.unimib.oases.ui.components.SearchBar
 import com.unimib.oases.ui.home_page.components.card.PatientCard
 import com.unimib.oases.ui.home_page.components.card.PatientUi
+import com.unimib.oases.ui.screen.login.AuthState
+import com.unimib.oases.ui.screen.login.AuthViewModel
 import kotlinx.coroutines.launch
 
 
@@ -94,7 +100,8 @@ fun HomeScreen(navController: NavController) {
     }
 
     val context = LocalContext.current
-
+    val authViewModel: AuthViewModel = hiltViewModel();
+    val authState by authViewModel.authState.collectAsState()
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
@@ -335,23 +342,28 @@ fun HomeScreen(navController: NavController) {
                                     )
                                 },
                                 onCardClick = {
-                                    navController.navigate("registration_screen")
+                                    if(authState is AuthState.Authenticated && (authState as AuthState.Authenticated).user.role == Role.Nurse)
+                                        navController.navigate("registration_screen")
+                                    else
+                                        navController.navigate("medical_visit_screen")
                                 },
                             )
                         }
                     }
                 }
-                FloatingActionButton(
-                    onClick = { navController.navigate("registration_screen") },
-                    modifier = Modifier.padding(30.dp),
-                    containerColor = MaterialTheme.colorScheme.primary
-                ) {
-                    Icon(
-                        tint = MaterialTheme.colorScheme.surface,
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "History",
-                    )
+                if(authState is AuthState.Authenticated && (authState as AuthState.Authenticated).user.role == Role.Nurse){
+                    FloatingActionButton(
+                        onClick = { navController.navigate("registration_screen") },
+                        modifier = Modifier.padding(30.dp),
+                        containerColor = MaterialTheme.colorScheme.primary
+                    ) {
+                        Icon(
+                            tint = MaterialTheme.colorScheme.surface,
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "History",
+                        )
 
+                    }
                 }
             }
         }
