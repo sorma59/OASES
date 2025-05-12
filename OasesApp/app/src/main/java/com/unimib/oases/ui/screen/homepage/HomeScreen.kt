@@ -1,5 +1,6 @@
 package com.unimib.oases.ui.screen.homepage
 
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -41,8 +42,10 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -88,13 +91,23 @@ fun HomeScreen(navController: NavController, padding: PaddingValues, authViewMod
 //        )
 //    }
 
-    LocalContext.current
 
-    //val authViewModel: AuthViewModel = hiltViewModel();
 
     val homeScreenViewModel: HomeScreenViewModel = hiltViewModel()
 
-    val authState by authViewModel.authState.collectAsState()
+    val authState = authViewModel.authState.observeAsState()
+
+    LaunchedEffect(authState.value) {
+        when (authState.value) {
+            is AuthState.Unauthenticated ->
+                navController.navigate(Screen.LoginScreen.route) {
+                    popUpTo(0) { inclusive = true }
+                }
+            else -> Unit
+        }
+    }
+
+
 
     val patients by homeScreenViewModel.patients.collectAsState()
 
@@ -121,7 +134,7 @@ fun HomeScreen(navController: NavController, padding: PaddingValues, authViewMod
                         Modifier
                             .background(Color.Transparent)
                             .fillMaxWidth()
-                            .padding(top = 80.dp, end = 16.dp, start = 16.dp, bottom = 16.dp)
+                            .padding(top = 50.dp, end = 16.dp, start = 16.dp, bottom = 16.dp)
                     ) {
 
 
@@ -135,7 +148,7 @@ fun HomeScreen(navController: NavController, padding: PaddingValues, authViewMod
                             Icon(
                                 imageVector = Icons.Default.Person,
                                 contentDescription = "Icon",
-                                tint = Color.White,
+                                tint = MaterialTheme.colorScheme.onPrimary,
                                 modifier = Modifier.size(28.dp)
                             )
                         }
@@ -143,7 +156,7 @@ fun HomeScreen(navController: NavController, padding: PaddingValues, authViewMod
                         Spacer(Modifier.padding(10.dp))
 
                         Text(
-                            text = "utente",
+                            text = authViewModel.currentUser()?.username ?: "",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Normal,
                             color = MaterialTheme.colorScheme.onBackground
@@ -166,7 +179,7 @@ fun HomeScreen(navController: NavController, padding: PaddingValues, authViewMod
                         contentPadding = PaddingValues(0.dp),
 
                         onClick = {
-                            // TODO signout
+                            authViewModel.signout()
                         },
 
                         ) {
@@ -296,7 +309,7 @@ fun HomeScreen(navController: NavController, padding: PaddingValues, authViewMod
                         )
                     }
                 }
-                if (authState is AuthState.Authenticated && (authState as AuthState.Authenticated).user.role == Role.Nurse) {
+                if (authViewModel.currentUser()?.role == Role.Nurse) {
                     FloatingActionButton(
                         onClick = { navController.navigate(Screen.RegistrationScreen.route) },
                         modifier = Modifier.padding(30.dp),

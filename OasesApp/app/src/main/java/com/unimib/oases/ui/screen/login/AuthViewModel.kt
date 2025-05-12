@@ -1,6 +1,8 @@
 package com.unimib.oases.ui.screen.login
 
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unimib.oases.data.model.Role
@@ -15,30 +17,46 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val auth: AuthManager
 ): ViewModel() {
 
-    private var _authState = MutableStateFlow<AuthState>(AuthState.Uninitialized)
-    val authState = _authState.asStateFlow()
 
-    private var _creationResult = MutableStateFlow<Resource<Unit>>(Resource.None())
-    val creationResult = _creationResult.asStateFlow()
 
-    fun createUser(
-        username: String,
-        password: String,
-        role: Role,
-    ) {
-        _creationResult.value = Resource.Loading()
-        val result = userRepository.createUser(username, password, role)
-        _creationResult.value = result
+    private val _authState = MutableLiveData<AuthState>()
+    val authState: LiveData<AuthState> = _authState
+
+
+    init {
+        checkAuthStatus()
     }
+
+
 
     fun currentUser(): User? {
         return if (authState.value is AuthState.Authenticated) {
-            (authState.value as AuthState.Authenticated).user
+           (authState.value as AuthState.Authenticated).user
         } else
             null
+    }
+
+
+
+
+
+    private fun checkAuthStatus() {
+        if (auth.currentUser == null) {
+            _authState.value = AuthState.Unauthenticated
+        } else {
+            _authState.value = AuthState.Authenticated(User(auth.currentUser!!.username, auth.currentUser!!.pwHash, auth.currentUser!!.role, auth.currentUser!!.salt))
+        }
+    }
+
+
+
+    fun signout() {
+        _authState.value = AuthState.Unauthenticated
+        auth.logout()
     }
 
     fun authenticate(username: String, password: String) {
@@ -48,7 +66,9 @@ class AuthViewModel @Inject constructor(
             val result = userRepository.authenticate(username, password)
             if (result is Resource.Success) {
                 val user = result.data
+                // save the user in the auth object into cache here
                 if (user != null) {
+                    auth.login(user)
                     _authState.value = AuthState.Authenticated(user)
                 } else {
                     _authState.value = AuthState.Error("User not found")

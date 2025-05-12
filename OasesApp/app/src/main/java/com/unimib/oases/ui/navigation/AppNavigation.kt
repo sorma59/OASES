@@ -31,7 +31,7 @@ fun AppNavigation(
     ) {
 
         composable(Screen.AdminScreen.route) {
-            AdminScreen(navController, padding)
+            AdminScreen(navController, padding, authViewModel)
         }
 
 

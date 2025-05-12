@@ -9,7 +9,7 @@ data class AdminState(
         username = "",
         pwHash = "",
         salt = "",
-        role = Role.Nurse,
+        role = Role.Doctor,
     ),
     val users: List<User> = emptyList(),
     val isLoading: Boolean = false,

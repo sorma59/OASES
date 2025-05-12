@@ -1,6 +1,7 @@
 package com.unimib.oases.ui.screen.admin_screen
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -37,6 +38,7 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -55,6 +57,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.unimib.oases.data.model.Role
 import com.unimib.oases.data.model.User
+import com.unimib.oases.ui.navigation.Screen
+import com.unimib.oases.ui.screen.login.AuthState
+import com.unimib.oases.ui.screen.login.AuthViewModel
 import kotlinx.coroutines.launch
 
 
@@ -63,10 +68,15 @@ import kotlinx.coroutines.launch
 fun AdminScreen(
     navController: NavController,
     padding : PaddingValues,
-    viewModel: AdminViewModel = hiltViewModel(),
+    authViewModel: AuthViewModel,
+    adminViewModel: AdminViewModel = hiltViewModel(),
 ) {
 
-    val state = viewModel.state.value
+    val state = adminViewModel.state.value
+
+    val authState = authViewModel.authState.observeAsState()
+
+
     val snackbarHostState =
         remember { SnackbarHostState() } // for hosting snackbars, if I delete a intem I get a snackbar to undo the item
 
@@ -74,8 +84,21 @@ fun AdminScreen(
     var passwordVisible by remember { mutableStateOf(false) }
 
     LaunchedEffect(key1 = true) {
-        viewModel.getUsers()
+        adminViewModel.getUsers()
     }
+
+
+
+    LaunchedEffect(authState.value) {
+        when (authState.value) {
+            is AuthState.Unauthenticated ->
+                navController.navigate(Screen.LoginScreen.route) {
+                    popUpTo(0) { inclusive = true }
+                }
+            else -> Unit
+        }
+    }
+
 
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -108,7 +131,7 @@ fun AdminScreen(
             ),
             navigationIcon = {
                 IconButton(onClick = {
-                    navController.popBackStack()
+                    authViewModel.signout()
                 }) {
                     Icon(
                         imageVector = Icons.Filled.ArrowBackIosNew,
@@ -123,14 +146,28 @@ fun AdminScreen(
 
         Column(
             modifier = Modifier
-                .padding(horizontal = 10.dp),
+                .padding(horizontal = 20.dp)
+                .padding(bottom = padding.calculateBottomPadding()),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
 
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "User registration:",
+                    style = MaterialTheme.typography.titleLarge
+                )
+            }
+
+
             OutlinedTextField(
                 value = state.user.username,
-                onValueChange = { viewModel.onEvent(AdminEvent.EnteredUsername(it)) },
+                onValueChange = { adminViewModel.onEvent(AdminEvent.EnteredUsername(it)) },
                 label = { Text("Username") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
@@ -140,7 +177,7 @@ fun AdminScreen(
 
             OutlinedTextField(
                 value = state.user.pwHash,
-                onValueChange = { viewModel.onEvent(AdminEvent.EnteredPassword(it)) },
+                onValueChange = { adminViewModel.onEvent(AdminEvent.EnteredPassword(it)) },
                 label = { Text("Password") },
                 singleLine = true,
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -163,7 +200,6 @@ fun AdminScreen(
                 text = "Select Role:",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 8.dp)
             )
 
             Column(
@@ -175,19 +211,17 @@ fun AdminScreen(
                             .fillMaxWidth()
                             .selectable(
                                 selected = (roleOption == state.user.role),
-                                onClick = { viewModel.onEvent(AdminEvent.SelectedRole(roleOption)) }
-                            )
-                            .padding(horizontal = 16.dp, vertical = 0.dp),
+                                onClick = { adminViewModel.onEvent(AdminEvent.SelectedRole(roleOption)) }
+                            ),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         RadioButton(
                             selected = (roleOption == state.user.role),
-                            onClick = { viewModel.onEvent(AdminEvent.SelectedRole(roleOption)) }
+                            onClick = { adminViewModel.onEvent(AdminEvent.SelectedRole(roleOption)) }
                         )
                         Text(
                             text = roleOption.displayName,
                             style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(start = 8.dp)
                         )
                     }
                 }
@@ -203,7 +237,7 @@ fun AdminScreen(
                             return@Button
                         }
 
-                        viewModel.onEvent(AdminEvent.SaveUser)
+                        adminViewModel.onEvent(AdminEvent.SaveUser)
 
                     },
                     modifier = Modifier.fillMaxWidth()
@@ -262,19 +296,19 @@ fun AdminScreen(
                             UserListItem(
                                 user = user,
                                 onDelete = {
-                                    viewModel.onEvent(AdminEvent.Delete(user))
+                                    adminViewModel.onEvent(AdminEvent.Delete(user))
                                     scope.launch {
                                         val undo = snackbarHostState.showSnackbar(
                                             message = "Deleted user ${user.username}",
                                             actionLabel = "UNDO"
                                         )
                                         if (undo == SnackbarResult.ActionPerformed) {
-                                            viewModel.onEvent(AdminEvent.UndoDelete)
+                                            adminViewModel.onEvent(AdminEvent.UndoDelete)
                                         }
                                     }
                                 },
                                 onClick = {
-                                    viewModel.onEvent(AdminEvent.Click(user))
+                                    adminViewModel.onEvent(AdminEvent.Click(user))
                                 }
                             )
                         }
