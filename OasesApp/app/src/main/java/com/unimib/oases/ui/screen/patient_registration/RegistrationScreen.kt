@@ -1,44 +1,18 @@
 package com.unimib.oases.ui.screen.patient_registration
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.consumeWindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
-import androidx.compose.material3.Button
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberTopAppBarState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.unimib.oases.ui.navigation.Screen
-import com.unimib.oases.ui.screen.login.AuthViewModel
 import com.unimib.oases.ui.screen.patient_registration.info.PatientInfoScreen
 import com.unimib.oases.ui.screen.patient_registration.past_medical_history.PastHistoryScreen
 import com.unimib.oases.ui.screen.patient_registration.triage.NonRedCodeScreen
@@ -46,20 +20,13 @@ import com.unimib.oases.ui.screen.patient_registration.triage.TriageScreen
 import com.unimib.oases.ui.screen.patient_registration.visit_history.VisitHistoryScreen
 import com.unimib.oases.ui.screen.patient_registration.vital_signs.VitalSignsScreen
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegistrationScreen(
     navController: NavController,
-    padding: PaddingValues,
-    authViewModel: AuthViewModel
+    padding: PaddingValues
 ) {
 
-    val registrationScreenViewModel: RegistrationScreenViewModel = hiltViewModel()
-
-    val formState by registrationScreenViewModel.formState.collectAsState()
-
-    val errors by registrationScreenViewModel.errors.collectAsState()
 
     val tabs = listOf(
         "Dati anagrafici",
@@ -69,12 +36,11 @@ fun RegistrationScreen(
         "Triage",
         "Non Red Code"
     )
+
     var currentIndex by remember { mutableIntStateOf(0) }
 
-    // Stato per tenere traccia se almeno un checkbox in TriageScreen è selezionato
     var isRedCodeSelected by remember { mutableStateOf(false) }
 
-    // Stato per i valori dei segni vitali
     var sbpValue by remember { mutableStateOf("") }
     var dbpValue by remember { mutableStateOf("") }
     var spo2Value by remember { mutableStateOf("") }
@@ -82,7 +48,6 @@ fun RegistrationScreen(
     var rrValue by remember { mutableStateOf("") }
     var tempValue by remember { mutableStateOf("") }
 
-    // Stato per i valori anagrafici
     var name by remember { mutableStateOf("") }
     var age by remember { mutableStateOf("") }
     var sex by remember { mutableStateOf("") }
@@ -95,7 +60,8 @@ fun RegistrationScreen(
     var date by remember { mutableStateOf("") }
     var time by remember { mutableStateOf("") }
 
-    // Stato per determinare il testo del bottone "Next/Submit"
+    var showDialog by remember { mutableStateOf(false) }
+
     val nextButtonText = remember(currentIndex, isRedCodeSelected) {
         if (currentIndex == tabs.lastIndex) {
             "Submit"
@@ -106,20 +72,13 @@ fun RegistrationScreen(
         }
     }
 
-
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
+    Column(modifier = Modifier.fillMaxSize()) {
         CenterAlignedTopAppBar(
             title = {
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-
-
                     Text(
                         "Patient Registration",
                         fontWeight = FontWeight.Bold,
@@ -128,7 +87,6 @@ fun RegistrationScreen(
                         overflow = TextOverflow.Ellipsis
                     )
                 }
-
             },
             colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                 containerColor = MaterialTheme.colorScheme.onPrimary,
@@ -151,12 +109,11 @@ fun RegistrationScreen(
             scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
         )
 
-
         Column(
             modifier = Modifier
-                .fillMaxSize().padding(bottom = padding.calculateBottomPadding())
+                .fillMaxSize()
+                .padding(bottom = padding.calculateBottomPadding())
         ) {
-            // Titolo centrale in alto
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -169,7 +126,6 @@ fun RegistrationScreen(
                 )
             }
 
-            // Contenuto dinamico al centro
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -207,7 +163,6 @@ fun RegistrationScreen(
                         time = time,
                         onTimeChanged = { time = it }
                     )
-
                     1 -> VisitHistoryScreen()
                     2 -> PastHistoryScreen()
                     3 -> VitalSignsScreen(
@@ -224,13 +179,11 @@ fun RegistrationScreen(
                         onRrChanged = { rrValue = it },
                         onTempChanged = { tempValue = it }
                     )
-
                     4 -> TriageScreen(
                         onRedCodeSelected = { isRedCodeSelected = it },
                         sbpValue = sbpValue,
                         dbpValue = dbpValue
                     )
-
                     5 -> NonRedCodeScreen(
                         spo2Value = spo2Value,
                         hrValue = hrValue,
@@ -240,57 +193,72 @@ fun RegistrationScreen(
                 }
             }
 
-            // Pulsanti in basso
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-
-                Column() {
+                Column {
                     if (currentIndex > 0) {
-                        OutlinedButton(
-                            onClick = {
-                                currentIndex--
-                            },
-                        ) {
+                        OutlinedButton(onClick = { currentIndex-- }) {
                             Text("Back")
                         }
                     }
                 }
 
-                Column() {
+                Column {
                     Button(
                         onClick = {
-                            if (currentIndex < tabs.lastIndex) {
+                            if (currentIndex == 0) {
+                                showDialog = true
+                            } else if (currentIndex < tabs.lastIndex) {
                                 if (currentIndex == 4 && !isRedCodeSelected) {
-                                    currentIndex++ // Procede solo se il codice rosso non è selezionato
-                                } else if (currentIndex == 4 && isRedCodeSelected) {
+                                    currentIndex++
+                                } else if (currentIndex == 4 ) {
                                     navController.navigate(Screen.HomeScreen.route) {
                                         popUpTo(0) { inclusive = true }
                                     }
                                 } else {
-                                    currentIndex++ // Procede al tab successivo
+                                    currentIndex++
                                 }
                             } else {
                                 navController.navigate(Screen.HomeScreen.route) {
                                     popUpTo(0) { inclusive = true }
                                 }
                             }
-                        },
+                        }
                     ) {
                         Text(text = nextButtonText)
                     }
                 }
             }
+
+            if (showDialog) {
+                AlertDialog(
+                    onDismissRequest = { showDialog = false },
+                    title = { Text("Conferma") },
+                    text = { Text("Vuoi continuare con la registrazione?") },
+                    confirmButton = {
+                        Button(onClick = {
+                            showDialog = false
+                            currentIndex++
+                        }) {
+                            Text("Sì")
+                        }
+                    },
+                    dismissButton = {
+                        OutlinedButton(onClick = {
+                            showDialog = false
+                            navController.navigate(Screen.HomeScreen.route) {
+                                popUpTo(0) { inclusive = true }
+                            }
+                        }) {
+                            Text("No")
+                        }
+                    }
+                )
+            }
         }
     }
 }
-
-
-//@Preview
-//@Composable
-//fun RegistrationScreenPreview() {
-//    RegistrationScreen(navController = rememberNavController(), padding =  PaddingValues(0.dp))
-//}

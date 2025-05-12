@@ -3,7 +3,6 @@ package com.unimib.oases.ui.screen.patient_registration.info
 
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
-import android.app.TimePickerDialog
 import android.content.Context
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
@@ -28,6 +27,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import java.util.TimeZone
 
 @Composable
 fun PatientInfoScreen(
@@ -105,7 +106,7 @@ fun PatientInfoScreen(
         DateSelector(date, onDateChanged, Modifier.fillMaxWidth(), context)
         Spacer(modifier = Modifier.height(8.dp))
 
-        TimeSelector(time, onTimeChanged, Modifier.fillMaxWidth(), context)
+        CurrentTimeDisplay(onTimeChanged, Modifier.fillMaxWidth())
     }
 }
 
@@ -230,38 +231,28 @@ fun DateSelector(
 
 @SuppressLint("DefaultLocale")
 @Composable
-fun TimeSelector(
-    selectedTime: String,
-    onTimeSelected: (String) -> Unit,
-    modifier: Modifier = Modifier,
-    context: Context
+fun CurrentTimeDisplay(
+    onTimeChanged: (String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    val calendar = Calendar.getInstance()
-    val hour = calendar.get(Calendar.HOUR_OF_DAY)
-    val minute = calendar.get(Calendar.MINUTE)
+    var time by remember { mutableStateOf("") }
+    val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+        .apply { timeZone = TimeZone.getTimeZone("Europe/Rome") }
 
-    val timePickerDialog = TimePickerDialog(
-        context,
-        { _, hourOfDay, minuteOfHour ->
-            val formattedTime = String.format("%02d:%02d", hourOfDay, minuteOfHour)
-            onTimeSelected(formattedTime)
-        },
-        hour,
-        minute,
-        true // is24HourView
-    )
+    LaunchedEffect(key1 = Unit) {
+        val calendar = Calendar.getInstance(TimeZone.getTimeZone("Europe/Rome"))
+        time = timeFormat.format(calendar.time)
+        onTimeChanged(time)
+    }
 
     AnimatedLabelOutlinedTextField(
-        value = selectedTime,
+        value = time,
         onValueChange = { /* Non permettere la modifica diretta */ },
         labelText = "Time",
         modifier = modifier,
         readOnly = true,
         trailingIcon = {
-            IconButton(onClick = { timePickerDialog.show() }) {
-                Icon(Icons.Filled.Timer, contentDescription = "Seleziona l'ora")
-            }
+            Icon(Icons.Filled.Timer, contentDescription = "Ora attuale")
         }
     )
 }
-

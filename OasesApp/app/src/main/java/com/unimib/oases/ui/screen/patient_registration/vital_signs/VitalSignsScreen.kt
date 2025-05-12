@@ -38,7 +38,7 @@ fun VitalSignsScreen(
         AnimatedLabelOutlinedTextField(
             value = sbp,
             onValueChange = { if (it.isEmpty() || it.all { ch -> ch.isDigit() }) onSbpChanged(it) },
-            labelText = "SBP (Pressione Sistolica)",
+            labelText = "SBP (Systolic Blood Pressure)",
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -47,7 +47,7 @@ fun VitalSignsScreen(
         AnimatedLabelOutlinedTextField(
             value = dbp,
             onValueChange = { if (it.isEmpty() || it.all { ch -> ch.isDigit() }) onDbpChanged(it) },
-            labelText = "DBP (Pressione Diastolica)",
+            labelText = "DBP (Diastolic Blood Pressure)",
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -56,7 +56,7 @@ fun VitalSignsScreen(
         AnimatedLabelOutlinedTextField(
             value = spo2,
             onValueChange = { if (it.isEmpty() || it.all { ch -> ch.isDigit() }) onSpo2Changed(it) },
-            labelText = "SpO2 (%)",
+            labelText = "SpO₂ (Oxygen Saturation)",
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -65,7 +65,7 @@ fun VitalSignsScreen(
         AnimatedLabelOutlinedTextField(
             value = hr,
             onValueChange = { if (it.isEmpty() || it.all { ch -> ch.isDigit() }) onHrChanged(it) },
-            labelText = "HR (Frequenza Cardiaca)",
+            labelText = "HR (Heart Rate)",
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -74,7 +74,7 @@ fun VitalSignsScreen(
         AnimatedLabelOutlinedTextField(
             value = rr,
             onValueChange = { if (it.isEmpty() || it.all { ch -> ch.isDigit() }) onRrChanged(it) },
-            labelText = "RR (Frequenza Respiratoria)",
+            labelText = "RR (Respiratory Rate)",
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -93,4 +93,3 @@ fun VitalSignsScreen(
         Spacer(modifier = Modifier.height(16.dp))
     }
 }
-

@@ -1,10 +1,7 @@
 package com.unimib.oases.ui.navigation
 
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.consumeWindowInsets
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -47,7 +44,7 @@ fun AppNavigation(
         }
 
         composable(Screen.RegistrationScreen.route) {
-            RegistrationScreen(navController, padding, authViewModel)
+            RegistrationScreen(navController, padding)
         }
 
         composable(Screen.SendPatient.route){
