@@ -25,10 +25,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.fiax.hdr.ui.components.bluetooth.devices.DeviceList
+import com.unimib.oases.ui.components.bluetooth.devices.DeviceList
 import com.unimib.oases.ui.components.util.BottomButtons
 import com.unimib.oases.ui.components.util.CenteredText
-import com.unimib.oases.ui.components.util.FadeOverlay
 import com.unimib.oases.ui.components.util.circularprogressindicator.SmallCircularProgressIndicator
 
 @Composable
@@ -139,17 +138,12 @@ fun PairNewDeviceScreen(
                 Spacer(modifier = Modifier.height(32.dp))
             }
 
-            Box(
+            DeviceList(
+                devices = discoveredDevices,
+                devicesType = "Discovered Devices",
+                onClick = { pairNewDeviceScreenViewModel.pairDevice(it) },
                 modifier = Modifier.weight(1f)
-            ){
-                DeviceList(
-                    devices = discoveredDevices,
-                    devicesType = "Discovered Devices",
-                    onClick = { pairNewDeviceScreenViewModel.pairDevice(it) },
-                )
-
-                FadeOverlay(Modifier.align(Alignment.BottomCenter))
-            }
+            )
         }
 
         BottomButtons(

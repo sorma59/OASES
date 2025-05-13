@@ -5,14 +5,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.unimib.oases.data.model.Role
 import com.unimib.oases.data.model.User
 import com.unimib.oases.domain.repository.UserRepository
 import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,7 +20,6 @@ class AuthViewModel @Inject constructor(
 ): ViewModel() {
 
 
-
     private val _authState = MutableLiveData<AuthState>()
     val authState: LiveData<AuthState> = _authState
 
@@ -31,8 +27,6 @@ class AuthViewModel @Inject constructor(
     init {
         checkAuthStatus()
     }
-
-
 
     fun currentUser(): User? {
         return if (authState.value is AuthState.Authenticated) {
@@ -82,15 +76,15 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun isNurse():Boolean {
-        return authState.value is AuthState.Authenticated && (authState.value as AuthState.Authenticated).user.role == Role.Nurse
-    }
-
-    fun isDoctor(): Boolean {
-        return authState.value is AuthState.Authenticated && (authState.value as AuthState.Authenticated).user.role == Role.Doctor
-    }
-
-    fun isAdmin(): Boolean {
-        return authState.value is AuthState.Authenticated && (authState.value as AuthState.Authenticated).user.role == Role.Admin
-    }
+//    fun isNurse():Boolean {
+//        return authState.value is AuthState.Authenticated && (authState.value as AuthState.Authenticated).user.role == Role.Nurse
+//    }
+//
+//    fun isDoctor(): Boolean {
+//        return authState.value is AuthState.Authenticated && (authState.value as AuthState.Authenticated).user.role == Role.Doctor
+//    }
+//
+//    fun isAdmin(): Boolean {
+//        return authState.value is AuthState.Authenticated && (authState.value as AuthState.Authenticated).user.role == Role.Admin
+//    }
 }

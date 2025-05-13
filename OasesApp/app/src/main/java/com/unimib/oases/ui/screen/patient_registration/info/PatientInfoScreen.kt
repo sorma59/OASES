@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
@@ -36,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -79,7 +81,7 @@ fun PatientInfoScreen(
         AnimatedLabelOutlinedTextField(name, onNameChanged, "Name", Modifier.fillMaxWidth())
         Spacer(modifier = Modifier.height(8.dp))
 
-        AnimatedLabelOutlinedTextField(age, onAgeChanged, "Age", Modifier.fillMaxWidth())
+        AnimatedLabelOutlinedTextField(age, onAgeChanged, "Age", Modifier.fillMaxWidth(), onlyNumbers = true)
         Spacer(modifier = Modifier.height(8.dp))
 
         SexDropdown(sex, onSexChanged, Modifier.fillMaxWidth())
@@ -120,6 +122,7 @@ fun AnimatedLabelOutlinedTextField(
     isError: Boolean = false,
     readOnly: Boolean = false,
     trailingIcon: @Composable (() -> Unit)? = null,
+    onlyNumbers: Boolean = false,
     anchorModifier: Modifier = Modifier
 ) {
     var isFocused by remember { mutableStateOf(false) }
@@ -141,6 +144,7 @@ fun AnimatedLabelOutlinedTextField(
             focusedBorderColor = Color.Blue,
             unfocusedBorderColor = Color.Gray
         ),
+        keyboardOptions = if (onlyNumbers) KeyboardOptions(keyboardType = KeyboardType.Number) else KeyboardOptions.Default,
         readOnly = readOnly,
         trailingIcon = trailingIcon
     )

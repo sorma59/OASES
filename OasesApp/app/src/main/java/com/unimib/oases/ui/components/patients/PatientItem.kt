@@ -29,10 +29,10 @@ fun PatientItem(
     navController: NavController,
     modifier: Modifier = Modifier,
     hideBluetoothButton: Boolean = false,
-    onClick: () -> Unit = {}
+    onClick: (Patient) -> Unit = {}
 ){
     Card(
-        onClick = onClick,
+        onClick = {onClick(patient)},
         shape = RoundedCornerShape(0.dp),
         modifier = modifier.padding(vertical = 2.dp),
         colors = CardDefaults.cardColors()
@@ -72,7 +72,7 @@ fun BluetoothButton(patient: Patient, navController: NavController) {
         Icon(
             imageVector = Icons.Default.Bluetooth,
             contentDescription = "Send Patient via Bluetooth",
-            tint = MaterialTheme.colorScheme.onSurface
+            tint = MaterialTheme.colorScheme.onPrimary
         )
     }
 }

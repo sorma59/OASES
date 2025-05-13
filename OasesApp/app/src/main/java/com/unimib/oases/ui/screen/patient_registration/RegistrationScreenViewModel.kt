@@ -114,18 +114,20 @@ class RegistrationScreenViewModel @Inject constructor(
 //            sendToast(appContext.getString(R.string.add_patient_form_not_valid))
     }
 
-    private suspend fun addPatient(patient: Patient) {
+    internal fun addPatient(patient: Patient) {
         updateInsertionStatus(Resource.Loading())
-        val result = patientRepository.addPatient(patient)
-        updateInsertionStatus(result)
-        when (result) {
-            is Resource.Success -> {
+        viewModelScope.launch{
+            val result = patientRepository.addPatient(patient)
+            updateInsertionStatus(result)
+            when (result) {
+                is Resource.Success -> {
 //                sendToast(appContext.getString(R.string.add_patient_success))
-            }
-            is Resource.Error -> {
+                }
+                is Resource.Error -> {
 //                sendToast(appContext.getString(R.string.add_patient_error))
+                }
+                else -> {}
             }
-            else -> {}
         }
     }
 

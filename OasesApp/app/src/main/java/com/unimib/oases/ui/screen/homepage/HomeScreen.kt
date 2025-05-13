@@ -1,6 +1,5 @@
 package com.unimib.oases.ui.screen.homepage
 
-import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -9,7 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -52,7 +50,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -65,6 +62,7 @@ import com.unimib.oases.data.model.Role
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.ui.components.SearchBar
 import com.unimib.oases.ui.components.patients.PatientList
+import com.unimib.oases.ui.components.patients.RecentlyReceivedPatientList
 import com.unimib.oases.ui.components.util.GenericErrorBoxAndText
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 import com.unimib.oases.ui.navigation.Screen
@@ -109,10 +107,6 @@ fun HomeScreen(navController: NavController, padding: PaddingValues, authViewMod
             else -> Unit
         }
     }
-
-
-
-    val patients by homeScreenViewModel.patients.collectAsState()
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
@@ -286,7 +280,6 @@ fun HomeScreen(navController: NavController, padding: PaddingValues, authViewMod
                         modifier = Modifier.fillMaxWidth(),
                     ) {
 
-
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -303,18 +296,7 @@ fun HomeScreen(navController: NavController, padding: PaddingValues, authViewMod
                         }
                     }
 
-                    when (patients) {
-                        is Resource.Error<*> -> {
-                            GenericErrorBoxAndText((patients as Resource.Error).message)
-                        }
-
-                        is Resource.Loading<*> -> CustomCircularProgressIndicator()
-                        is Resource.None<*> -> {}
-                        is Resource.Success<*> -> PatientList(
-                            patients.data as List<Patient>,
-                            navController
-                        )
-                    }
+                    PatientLists(navController, homeScreenViewModel)
                 }
                 if (authViewModel.currentUser()?.role == Role.Nurse) {
                     FloatingActionButton(
@@ -330,6 +312,38 @@ fun HomeScreen(navController: NavController, padding: PaddingValues, authViewMod
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun PatientLists(
+    navController: NavController,
+    homeScreenViewModel: HomeScreenViewModel,
+    modifier: Modifier = Modifier
+){
+
+    val patients = homeScreenViewModel.patients.collectAsState()
+
+    val receivedPatients = homeScreenViewModel.receivedPatients.collectAsState()
+
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ){
+        RecentlyReceivedPatientList(receivedPatients.value, navController)
+
+        when (patients.value) {
+            is Resource.Error<*> -> {
+                GenericErrorBoxAndText((patients.value as Resource.Error).message)
+            }
+
+            is Resource.Loading<*> -> CustomCircularProgressIndicator()
+            is Resource.None<*> -> {}
+            is Resource.Success<*> -> PatientList(
+                patients.value.data as List<Patient>,
+                navController
+            )
         }
     }
 }

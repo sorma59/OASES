@@ -1,7 +1,10 @@
 package com.unimib.oases.domain.model
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import java.util.UUID
 
+@Parcelize
 data class Patient(
     val id: String = UUID.randomUUID().toString(),
     var name: String,
@@ -14,4 +17,4 @@ data class Patient(
     var nextOfKin: String,
     var contact: String,
     var image: ByteArray? = null
-)
+) : Parcelable

@@ -18,11 +18,21 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+
+    @Provides
+    @Singleton
+    @ApplicationScope
+    fun provideApplicationScope(): CoroutineScope {
+        return CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    }
 
     // Define migrations
     private val MIGRATION_1_2 = object : Migration(1, 2) {
@@ -56,8 +66,12 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providePatientRepository(roomDataSource: RoomDataSource, bluetoothManager: BluetoothCustomManager): PatientRepository {
-        return PatientRepositoryImpl(roomDataSource, bluetoothManager)
+    fun providePatientRepository(
+        @ApplicationScope applicationScope: CoroutineScope,
+        roomDataSource: RoomDataSource,
+        bluetoothManager: BluetoothCustomManager,
+    ): PatientRepository {
+        return PatientRepositoryImpl(roomDataSource, bluetoothManager, applicationScope)
     }
 
     @Provides

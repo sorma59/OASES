@@ -5,20 +5,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unimib.oases.data.bluetooth.BluetoothCustomManager
 import com.unimib.oases.domain.model.Patient
-import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.domain.usecase.SendPatientViaBluetoothUseCase
 import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @HiltViewModel
 class SendPatientViaBluetoothViewModel @Inject constructor(
     private val useCase: SendPatientViaBluetoothUseCase,
-    bluetoothCustomManager: BluetoothCustomManager,
-    private val patientRepository: PatientRepository
+    bluetoothCustomManager: BluetoothCustomManager
 ) : ViewModel(){
 
     val pairedDevices = bluetoothCustomManager.pairedDevices
@@ -37,7 +34,7 @@ class SendPatientViaBluetoothViewModel @Inject constructor(
         }
     }
 
-    fun getPatientById(patientId: String): Patient = runBlocking {
-        patientRepository.getPatientById(patientId)!!
+    fun resetSendPatientResult(){
+        _sendPatientResult.value = Resource.None()
     }
 }

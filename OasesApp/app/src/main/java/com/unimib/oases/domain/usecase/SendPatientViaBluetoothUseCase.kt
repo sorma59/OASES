@@ -27,15 +27,20 @@ class SendPatientViaBluetoothUseCase(
                 if (enabled){
                     try {
                         if (bluetoothManager.connectToServer(device) != null){
+                            // Connection was successful
                             val patientBytes = PatientSerializer.serialize(patient)
                             val envelope = BluetoothEnvelope(
                                 type = "data",
                                 payload = patientBytes
                             )
                             val jsonEnvelope = Json.encodeToString(BluetoothEnvelope.serializer(), envelope)
+
+                            // Send the patient data
                             bluetoothManager.sendData(jsonEnvelope)
-                            delay(1000)
-                            bluetoothManager.disconnect()
+                            // Make sure the patient data is sent and received
+                            delay(2000)
+                            // Disconnect from the device
+                            bluetoothManager.closeConnectionSocket()
                             result = Resource.Success(Unit)
                         } else
                             result = Resource.Error("Could not connect to device")
