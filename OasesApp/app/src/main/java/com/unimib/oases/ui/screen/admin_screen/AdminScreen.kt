@@ -57,6 +57,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.unimib.oases.data.model.Role
 import com.unimib.oases.data.model.User
+import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 import com.unimib.oases.ui.navigation.Screen
 import com.unimib.oases.ui.screen.login.AuthState
 import com.unimib.oases.ui.screen.login.AuthViewModel
@@ -274,17 +275,7 @@ fun AdminScreen(
 
 
                 if (state.isLoading) {
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        CircularProgressIndicator(
-                            Modifier.semantics {
-                                this.contentDescription = "LOADING INDICATOR"
-                            }
-                        )
-                    }
+                    CustomCircularProgressIndicator()
                 } else {
                     LazyColumn(
                         modifier = Modifier

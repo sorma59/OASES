@@ -10,6 +10,7 @@ import com.unimib.oases.data.model.User
 import com.unimib.oases.domain.repository.UserRepository
 import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -45,6 +46,7 @@ class AuthViewModel @Inject constructor(
 
 
     private fun checkAuthStatus() {
+
         if (auth.currentUser == null) {
             _authState.value = AuthState.Unauthenticated
         } else {
@@ -62,7 +64,7 @@ class AuthViewModel @Inject constructor(
     fun authenticate(username: String, password: String) {
         viewModelScope.launch {
             _authState.value = AuthState.Loading
-
+            delay(2000)
             val result = userRepository.authenticate(username, password)
             if (result is Resource.Success) {
                 val user = result.data

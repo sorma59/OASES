@@ -46,6 +46,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -97,6 +98,8 @@ fun HomeScreen(navController: NavController, padding: PaddingValues, authViewMod
 
     val authState = authViewModel.authState.observeAsState()
 
+    val currentUser = remember { authViewModel.currentUser() }
+
     LaunchedEffect(authState.value) {
         when (authState.value) {
             is AuthState.Unauthenticated ->
@@ -134,33 +137,37 @@ fun HomeScreen(navController: NavController, padding: PaddingValues, authViewMod
                         Modifier
                             .background(Color.Transparent)
                             .fillMaxWidth()
-                            .padding(top = 50.dp, end = 16.dp, start = 16.dp, bottom = 16.dp)
+                            .padding(top = padding.calculateTopPadding() + 10.dp, end = 16.dp, start = 10.dp, bottom = 16.dp)
                     ) {
 
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(
+                                modifier = Modifier
+                                    .size(50.dp)
+                                    .clip(CircleShape)
+                                    .background(MaterialTheme.colorScheme.primary),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Person,
+                                    contentDescription = "Icon",
+                                    tint = MaterialTheme.colorScheme.onPrimary,
+                                    modifier = Modifier.size(28.dp)
+                                )
+                            }
 
-                        Box(
-                            modifier = Modifier
-                                .size(70.dp)
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.primary),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Person,
-                                contentDescription = "Icon",
-                                tint = MaterialTheme.colorScheme.onPrimary,
-                                modifier = Modifier.size(28.dp)
-                            )
+
+
+                            if (currentUser != null) {
+                                Text(
+                                    text = currentUser.username,
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Normal,
+                                    modifier = Modifier.padding(10.dp),
+                                    color = MaterialTheme.colorScheme.onBackground
+                                )
+                            }
                         }
-
-                        Spacer(Modifier.padding(10.dp))
-
-                        Text(
-                            text = authViewModel.currentUser()?.username ?: "",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Normal,
-                            color = MaterialTheme.colorScheme.onBackground
-                        )
                     }
                 }
 
