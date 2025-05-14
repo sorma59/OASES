@@ -33,7 +33,7 @@ fun PatientItem(
 ){
     Card(
         onClick = {onClick(patient)},
-        shape = RoundedCornerShape(0.dp),
+        shape = RoundedCornerShape(20.dp),
         modifier = modifier.padding(vertical = 2.dp),
         colors = CardDefaults.cardColors()
             .copy(containerColor = MaterialTheme.colorScheme.primary),
