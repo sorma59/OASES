@@ -125,7 +125,8 @@ fun GoToSettingsDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
 fun NoPermissionMessage(
     context: Context,
     bluetoothManager: BluetoothCustomManager,
-    onBack: () -> Unit
+    onBack: () -> Unit = {},
+    showBackButton: Boolean = false
 ) {
     var showRationale by remember { mutableStateOf(false) }
     var showSettingsDialog by remember { mutableStateOf(false) }
@@ -172,8 +173,10 @@ fun NoPermissionMessage(
             Text("Grant Permissions")
         }
 
-        Button(onClick = onBack) {
-            Text("Go Back")
+        if (showBackButton){
+            Button(onClick = onBack) {
+                Text("Go Back")
+            }
         }
     }
 

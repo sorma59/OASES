@@ -76,9 +76,6 @@ fun DeviceList(
                     devices.forEach { device ->
                         DeviceItem(device, onClick)
                     }
-                    devices.forEach { device ->
-                        DeviceItem(device, onClick)
-                    }
                 } else {
                     // Display the "No devices found" message
 
