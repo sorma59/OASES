@@ -1,11 +1,5 @@
 package com.unimib.oases.ui.screen.medical_visit.info
 
-import android.annotation.SuppressLint
-import android.app.DatePickerDialog
-import android.app.TimePickerDialog
-import android.content.Context
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,14 +8,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.Timer
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -29,10 +15,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.unimib.oases.ui.components.util.AnimatedLabelOutlinedTextField
+import com.unimib.oases.ui.components.util.DateSelector
+import com.unimib.oases.ui.components.util.TimeSelector
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -50,9 +37,9 @@ fun PatientInfoScreen(
     patientNextOfKin: String = "",
     patientContact: String = "",
     patientDate: String = "",
-    onPatientDateChanged: (String) -> Unit = {}, // Callback per la data
+    onPatientDateChanged: (String) -> Unit = {},
     patientTime: String = "",
-    onPatientTimeChanged: (String) -> Unit = {} // Callback per l'ora
+    onPatientTimeChanged: (String) -> Unit = {}
 ) {
     val scrollState = rememberScrollState()
     val context = LocalContext.current
@@ -183,124 +170,4 @@ fun PatientInfoScreen(
             readOnly = true // Imposta a true per disabilitare la modifica diretta
         )
     }
-}
-
-@Composable
-fun AnimatedLabelOutlinedTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    labelText: String,
-    modifier: Modifier = Modifier,
-    isError: Boolean = false,
-    readOnly: Boolean = false,
-    trailingIcon: @Composable (() -> Unit)? = null,
-    anchorModifier: Modifier = Modifier
-) {
-    var isFocused by remember { mutableStateOf(false) }
-    val labelColor by animateColorAsState(
-        targetValue = if (isFocused || value.isNotEmpty()) Color.Blue else Color.Gray,
-        animationSpec = tween(durationMillis = 200),
-        label = "labelColorAnimation"
-    )
-
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = { Text(labelText, color = labelColor) },
-        isError = isError,
-        modifier = modifier
-            .onFocusChanged { isFocused = it.isFocused }
-            .then(anchorModifier),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = Color.Blue,
-            unfocusedBorderColor = Color.Gray
-        ),
-        readOnly = readOnly,
-        trailingIcon = trailingIcon
-    )
-}
-
-@Composable
-fun DateSelector(
-    selectedDate: String,
-    onDateSelected: (String) -> Unit,
-    modifier: Modifier = Modifier,
-    context: Context,
-    readOnly: Boolean = false
-) {
-    val calendar = Calendar.getInstance()
-    val year = calendar.get(Calendar.YEAR)
-    val month = calendar.get(Calendar.MONTH)
-    val day = calendar.get(Calendar.DAY_OF_MONTH)
-
-    val datePickerDialog = DatePickerDialog(
-        context,
-        { _, yearSelected, monthOfYear, dayOfMonth ->
-            val calendarNew = Calendar.getInstance()
-            calendarNew.set(yearSelected, monthOfYear, dayOfMonth)
-            val formattedDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(calendarNew.time)
-            onDateSelected(formattedDate)
-        },
-        year,
-        month,
-        day
-    )
-
-    AnimatedLabelOutlinedTextField(
-        value = selectedDate,
-        onValueChange = { /* Non permettere la modifica diretta */ },
-        labelText = "Date",
-        modifier = modifier,
-        readOnly = true,
-        trailingIcon = {
-            IconButton(onClick = { if (!readOnly) datePickerDialog.show() }) {
-                Icon(Icons.Filled.CalendarMonth, contentDescription = "Seleziona la data")
-            }
-        }
-    )
-}
-
-@SuppressLint("DefaultLocale")
-@Composable
-fun TimeSelector(
-    selectedTime: String,
-    onTimeSelected: (String) -> Unit,
-    modifier: Modifier = Modifier,
-    context: Context,
-    readOnly: Boolean = false
-) {
-    val timeZoneRome = TimeZone.getTimeZone("Europe/Rome")
-    val calendar = Calendar.getInstance(timeZoneRome)
-    val hour = calendar.get(Calendar.HOUR_OF_DAY)
-    val minute = calendar.get(Calendar.MINUTE)
-
-    val timePickerDialog = TimePickerDialog(
-        context,
-        { _, hourOfDay, minuteOfHour ->
-            val calendarNew = Calendar.getInstance(timeZoneRome)
-            calendarNew.set(Calendar.HOUR_OF_DAY, hourOfDay)
-            calendarNew.set(Calendar.MINUTE, minuteOfHour)
-
-            val timeFormatter = SimpleDateFormat("HH:mm", Locale.getDefault())
-            timeFormatter.timeZone = timeZoneRome
-            val formattedTime = timeFormatter.format(calendarNew.time)
-            onTimeSelected(formattedTime)
-        },
-        hour,
-        minute,
-        true // is24HourView
-    )
-
-    AnimatedLabelOutlinedTextField(
-        value = selectedTime,
-        onValueChange = { /* Non permettere la modifica diretta */ },
-        labelText = "Time",
-        modifier = modifier,
-        readOnly = true,
-        trailingIcon = {
-            IconButton(onClick = { if (!readOnly) timePickerDialog.show() }) {
-                Icon(Icons.Filled.Timer, contentDescription = "Seleziona l'ora")
-            }
-        }
-    )
 }

@@ -45,6 +45,6 @@ fun PatientList(
                 }
             )
         } else
-            CenteredText(noPatientsMessage)
+            CenteredText(noPatientsMessage, Modifier.padding(top = 16.dp))
     }
 }

@@ -74,6 +74,7 @@ fun RegistrationScreen(
     var hrValue by remember { mutableStateOf("") }
     var rrValue by remember { mutableStateOf("") }
     var tempValue by remember { mutableStateOf("") }
+    var rbsValue by remember { mutableStateOf("") }
 
     var name by remember { mutableStateOf("") }
     var age by remember { mutableStateOf("") }
@@ -199,12 +200,14 @@ fun RegistrationScreen(
                         hr = hrValue,
                         rr = rrValue,
                         temp = tempValue,
+                        rbs = rbsValue,
                         onSbpChanged = { sbpValue = it },
                         onDbpChanged = { dbpValue = it },
                         onSpo2Changed = { spo2Value = it },
                         onHrChanged = { hrValue = it },
                         onRrChanged = { rrValue = it },
-                        onTempChanged = { tempValue = it }
+                        onTempChanged = { tempValue = it },
+                        onRbsChanged = { rbsValue = it }
                     )
                     4 -> TriageScreen(
                         onRedCodeSelected = { isRedCodeSelected = it },

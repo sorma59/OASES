@@ -2,6 +2,7 @@ package com.unimib.oases.util
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import com.google.gson.Gson
 import com.unimib.oases.data.model.User
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -15,7 +16,7 @@ class UserPreferences @Inject constructor(@ApplicationContext context: Context) 
     private val gson = Gson()
 
     fun saveUser(user: User) {
-        prefs.edit().putString("user", gson.toJson(user)).apply()
+        prefs.edit() { putString("user", gson.toJson(user)) }
     }
 
     fun getUser(): User? {
@@ -24,6 +25,6 @@ class UserPreferences @Inject constructor(@ApplicationContext context: Context) 
     }
 
     fun clear() {
-        prefs.edit().clear().apply()
+        prefs.edit() { clear() }
     }
 }

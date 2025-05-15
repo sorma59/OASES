@@ -23,11 +23,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -42,12 +40,8 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.unimib.oases.data.bluetooth.BluetoothCustomManager
 import com.unimib.oases.data.model.Role
-import com.unimib.oases.ui.components.util.BluetoothPermissionHandler
-import com.unimib.oases.ui.components.util.NoPermissionMessage
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
-import com.unimib.oases.ui.navigation.AppNavigation
 import com.unimib.oases.ui.navigation.Screen
 import com.unimib.oases.util.AuthStrings
 
@@ -61,8 +55,6 @@ fun LoginScreen(
     val authState = authViewModel.authState.observeAsState()
 
     val context = LocalContext.current
-
-
 
     if (authViewModel.currentUser() != null) {
         when (authViewModel.currentUser()?.role) {
