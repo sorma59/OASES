@@ -29,24 +29,15 @@ fun AnimatedLabelOutlinedTextField(
     anchorModifier: Modifier = Modifier
 ) {
     var isFocused by remember { mutableStateOf(false) }
-    val labelColor by animateColorAsState(
-        targetValue = if (isFocused || value.isNotEmpty()) Color.Blue else Color.Gray,
-        animationSpec = tween(durationMillis = 200),
-        label = "labelColorAnimation"
-    )
 
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(labelText, color = labelColor) },
+        label = { Text(labelText) },
         isError = isError,
         modifier = modifier
             .onFocusChanged { isFocused = it.isFocused }
             .then(anchorModifier),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = Color.Blue,
-            unfocusedBorderColor = Color.Gray
-        ),
         keyboardOptions = if (isNumeric) KeyboardOptions(keyboardType = KeyboardType.Number) else KeyboardOptions.Default,
         readOnly = readOnly,
         trailingIcon = trailingIcon

@@ -111,7 +111,7 @@ fun LoginScreen(
                 Icon(
                     imageVector = Icons.Default.LocalHospital,
                     contentDescription = "",
-                    tint = MaterialTheme.colorScheme.primaryContainer,
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(250.dp)
                 )
 
@@ -168,15 +168,15 @@ fun LoginScreen(
                             onClick = {
                                 authViewModel.authenticate(username, password)
                             },
-                            shape = RoundedCornerShape(5.dp),
+                            shape = RoundedCornerShape(10.dp),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(80.dp)
                                 .padding(top = 10.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                             //enabled = authState.value != AuthState.Loading
                         ) {
-                            Text(text = "LOGIN")
+                            Text(text = "LOGIN", color = MaterialTheme.colorScheme.surface)
                         }
                     }
                 }

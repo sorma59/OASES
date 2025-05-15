@@ -125,7 +125,7 @@ fun RegistrationScreen(
             ),
             navigationIcon = {
                 IconButton(onClick = {
-                    navController.popBackStack()
+                    navController.navigate(Screen.HomeScreen.route)
                 }) {
                     Icon(
                         imageVector = Icons.Filled.ArrowBackIosNew,
