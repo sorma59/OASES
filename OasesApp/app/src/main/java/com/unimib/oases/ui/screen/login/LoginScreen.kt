@@ -23,9 +23,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -40,8 +42,12 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.unimib.oases.data.bluetooth.BluetoothCustomManager
 import com.unimib.oases.data.model.Role
+import com.unimib.oases.ui.components.util.BluetoothPermissionHandler
+import com.unimib.oases.ui.components.util.NoPermissionMessage
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
+import com.unimib.oases.ui.navigation.AppNavigation
 import com.unimib.oases.ui.navigation.Screen
 import com.unimib.oases.util.AuthStrings
 
@@ -49,10 +55,13 @@ import com.unimib.oases.util.AuthStrings
 fun LoginScreen(
     navController: NavController,
     padding: PaddingValues,
-    authViewModel: AuthViewModel
+    authViewModel: AuthViewModel,
 ) {
 
     val authState = authViewModel.authState.observeAsState()
+
+    val context = LocalContext.current
+
 
 
     if (authViewModel.currentUser() != null) {
@@ -68,7 +77,6 @@ fun LoginScreen(
         return
     }
 
-    val context = LocalContext.current
 
     var username by remember { mutableStateOf("") }
 
@@ -126,61 +134,61 @@ fun LoginScreen(
         if (authState.value == AuthState.Loading) {
             CustomCircularProgressIndicator()
         } else {
-            Row {
-                Column {
-                    OutlinedTextField(
-                        value = username,
-                        onValueChange = {
-                            username = it
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        label = {
-                            Text(text = AuthStrings.USERNAME)
-                        },
-                        shape = RoundedCornerShape(10.dp),
-                    )
+                Row {
+                    Column {
+                        OutlinedTextField(
+                            value = username,
+                            onValueChange = {
+                                username = it
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            label = {
+                                Text(text = AuthStrings.USERNAME)
+                            },
+                            shape = RoundedCornerShape(10.dp),
+                        )
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
 
-                    OutlinedTextField(
-                        value = password,
-                        onValueChange = {
-                            password = it
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        label = {
-                            Text(text = AuthStrings.PASSWORD)
-                        },
-                        shape = RoundedCornerShape(10.dp),
-                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        OutlinedTextField(
+                            value = password,
+                            onValueChange = {
+                                password = it
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            label = {
+                                Text(text = AuthStrings.PASSWORD)
+                            },
+                            shape = RoundedCornerShape(10.dp),
+                            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
 
-                        trailingIcon = {
-                            val image =
-                                if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                                Icon(imageVector = image, contentDescription = "PASSWORD")
+                            trailingIcon = {
+                                val image =
+                                    if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                                    Icon(imageVector = image, contentDescription = "PASSWORD")
+                                }
                             }
-                        }
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
 
-                    Button(
-                        onClick = {
-                            authViewModel.authenticate(username, password)
-                        },
-                        shape = RoundedCornerShape(5.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(80.dp)
-                            .padding(top = 10.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
-                        //enabled = authState.value != AuthState.Loading
-                    ) {
-                        Text(text = "LOGIN")
+                        Button(
+                            onClick = {
+                                authViewModel.authenticate(username, password)
+                            },
+                            shape = RoundedCornerShape(5.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(80.dp)
+                                .padding(top = 10.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                            //enabled = authState.value != AuthState.Loading
+                        ) {
+                            Text(text = "LOGIN")
+                        }
                     }
                 }
             }
-        }
     }
 }
 

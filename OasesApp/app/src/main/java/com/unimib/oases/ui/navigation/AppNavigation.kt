@@ -6,6 +6,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.unimib.oases.data.bluetooth.BluetoothCustomManager
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.ui.screen.admin_screen.AdminScreen
 import com.unimib.oases.ui.screen.bluetooth.pairing.PairNewDeviceScreen
@@ -20,6 +21,7 @@ import com.unimib.oases.ui.screen.patient_registration.RegistrationScreen
 fun AppNavigation(
     navController: NavHostController,
     padding: PaddingValues,
+    bluetoothCustomManager: BluetoothCustomManager
 ){
 
     val authViewModel: AuthViewModel = hiltViewModel()
@@ -40,7 +42,7 @@ fun AppNavigation(
         }
 
         composable(Screen.HomeScreen.route) {
-            HomeScreen(navController, padding, authViewModel)
+            HomeScreen(navController, padding, authViewModel, bluetoothCustomManager)
         }
 
         composable(Screen.RegistrationScreen.route) {

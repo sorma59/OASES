@@ -15,23 +15,7 @@ fun MainScaffold(
     navController: NavHostController,
     bluetoothManager: BluetoothCustomManager,
 ) {
-
-    val context = navController.context
-
-    val hasPermissions by bluetoothManager.hasPermissions.collectAsState()
-
-    // Handles permission requests before showing the UI
-    BluetoothPermissionHandler(
-        context = context,
-        onPermissionGranted = {
-            bluetoothManager.updatePermissions()
-        }
-    )
-
-    if (hasPermissions){
         Scaffold { padding ->
-            AppNavigation(navController, padding)
+            AppNavigation(navController, padding, bluetoothManager)
         }
-    } else
-        NoPermissionMessage(context, bluetoothManager)
 }
