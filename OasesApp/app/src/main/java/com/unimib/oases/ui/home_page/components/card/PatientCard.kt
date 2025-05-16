@@ -44,6 +44,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.unimib.oases.domain.model.Patient
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -54,7 +55,7 @@ fun PatientCard(
     modifier: Modifier = Modifier,
     onExpanded: () -> Unit = {},
     onCollapsed: () -> Unit = {},
-    patient: PatientUi,
+    patient: Patient,
     onCardClick: () -> Unit,
 ) {
     var contextMenuWidth by remember {
@@ -159,7 +160,7 @@ fun PatientCard(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Last Visit: ${patient.lastVisit}",
+                        text = "Last Visit: ",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.surface,
                         fontWeight = FontWeight.Normal,
@@ -180,11 +181,11 @@ fun PatientCard(
                         Icon(
                             imageVector = Icons.Default.Circle,
                             contentDescription = "",
-                            tint = when (patient.state) {
-                                "Y" -> Color.Yellow
-                                "R" -> Color.Red
-                                else -> Color.Green
-                            },
+//                            tint = when (patient.state) {
+//                                "Y" -> Color.Yellow
+//                                "R" -> Color.Red
+//                                else -> Color.Green
+//                            },
                             modifier = Modifier.size(10.dp)
                         )
                     }

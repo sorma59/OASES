@@ -291,7 +291,7 @@ fun RegistrationScreen(
                                         subCounty = subCountry,
                                         district = district,
                                         nextOfKin = nextOfKin,
-                                        contact = contact
+                                        contact = contact,
                                     )
                                 registrationScreenViewModel.addPatient(patient)
                                 navController.navigate(Screen.HomeScreen.route) {

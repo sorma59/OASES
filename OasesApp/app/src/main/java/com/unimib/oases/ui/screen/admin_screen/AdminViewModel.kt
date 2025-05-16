@@ -7,12 +7,15 @@ import androidx.lifecycle.viewModelScope
 import com.unimib.oases.data.model.User
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.usecase.AdminUseCase
+import com.unimib.oases.ui.screen.homepage.HomeScreenState
 import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -25,8 +28,10 @@ class AdminViewModel @Inject constructor(
 
 
     private var getUsersJob: Job? = null
-    private val _state = mutableStateOf(AdminState())
-    val state: State<AdminState> = _state
+
+    private val _state = MutableStateFlow(AdminState())
+    val state: StateFlow<AdminState> = _state
+
     private var undoUser: User? = null
     private var errorHandler = CoroutineExceptionHandler { _, e ->
         e.printStackTrace()

@@ -44,8 +44,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -69,25 +72,44 @@ import com.unimib.oases.ui.components.util.BluetoothPermissionHandler
 import com.unimib.oases.ui.components.util.GenericErrorBoxAndText
 import com.unimib.oases.ui.components.util.NoPermissionMessage
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
+import com.unimib.oases.ui.home_page.components.card.PatientUi
 import com.unimib.oases.ui.navigation.Screen
 import com.unimib.oases.ui.screen.login.AuthState
 import com.unimib.oases.ui.screen.login.AuthViewModel
 import com.unimib.oases.util.Resource
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(navController: NavController, padding: PaddingValues, authViewModel: AuthViewModel,  bluetoothManager: BluetoothCustomManager) {
+fun HomeScreen(
+    navController: NavController,
+    padding: PaddingValues,
+    authViewModel: AuthViewModel,
+    bluetoothManager: BluetoothCustomManager,
+    homeScreenViewModel: HomeScreenViewModel = hiltViewModel(),
+) {
+
 
 
     val context = LocalContext.current
 
     val hasPermissions by bluetoothManager.hasPermissions.collectAsState()
 
-    val homeScreenViewModel: HomeScreenViewModel = hiltViewModel()
-
     val authState = authViewModel.authState.observeAsState()
+
+    val state by homeScreenViewModel.state.collectAsState()
+
+
+    var searchText by remember { mutableStateOf("") }
+    var active by remember { mutableStateOf(false) }
+    val listState = remember { mutableStateListOf<String>() }
+
+
+    val filteredItems = state.patients.filter { item ->
+        item.name.contains(searchText, ignoreCase = true)
+    }
 
 
     BluetoothPermissionHandler(
@@ -96,7 +118,6 @@ fun HomeScreen(navController: NavController, padding: PaddingValues, authViewMod
             bluetoothManager.updatePermissions()
         }
     )
-
 
     val currentUser = remember { authViewModel.currentUser() }
 
@@ -111,9 +132,22 @@ fun HomeScreen(navController: NavController, padding: PaddingValues, authViewMod
         }
     }
 
+
+
+
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
     val scope = rememberCoroutineScope()
+
+
+
+
+    LaunchedEffect(key1 = true) {
+        if(homeScreenViewModel.state.value.patients.isEmpty()){
+            homeScreenViewModel.getPatients()
+        }
+
+    }
 
 
     if (!hasPermissions) {
@@ -133,7 +167,6 @@ fun HomeScreen(navController: NavController, padding: PaddingValues, authViewMod
                     drawerContainerColor = MaterialTheme.colorScheme.onPrimary,
                 ) {
                     Row {
-
                         Column(
                             Modifier
                                 .background(Color.Transparent)
@@ -224,10 +257,10 @@ fun HomeScreen(navController: NavController, padding: PaddingValues, authViewMod
             }
         ) {
 
-
             Column(
                 modifier = Modifier
-                    .fillMaxSize().padding(bottom = padding.calculateBottomPadding())
+                    .fillMaxSize()
+                    .padding(bottom = padding.calculateBottomPadding())
             ) {
 
                 CenterAlignedTopAppBar(
@@ -241,7 +274,9 @@ fun HomeScreen(navController: NavController, padding: PaddingValues, authViewMod
                             Image(
                                 painter = painterResource(R.drawable.ic_launcher_round),
                                 contentDescription = "Icon",
-                                modifier = Modifier.size(50.dp).padding(5.dp)
+                                modifier = Modifier
+                                    .size(50.dp)
+                                    .padding(5.dp)
                             )
 
                             Text(
@@ -272,19 +307,16 @@ fun HomeScreen(navController: NavController, padding: PaddingValues, authViewMod
                     },
                     actions = {},
                     scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
-
                 )
-
-
                 Column(
                     modifier = Modifier
                         .fillMaxSize(),
                     verticalArrangement = Arrangement.SpaceBetween,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-
                     Column(
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier
+                            .weight(1f)
                             .fillMaxSize(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
@@ -298,17 +330,28 @@ fun HomeScreen(navController: NavController, padding: PaddingValues, authViewMod
                                     .padding(vertical = 12.dp, horizontal = 12.dp)
                             ) {
                                 SearchBar(
-                                    query = "",
-                                    onQueryChange = { },
-                                    onSearch = { },
-                                    active = false,
-                                    onActiveChange = { },
-                                    searchHistory = emptyList()
-                                ) { }
+                                    query = searchText,
+                                    onQueryChange = { searchText = it },
+                                    onSearch = {
+                                        listState.add(searchText)
+                                        active = false
+                                    },
+                                    active = active,
+                                    onActiveChange = { active = it },
+                                    searchHistory = listState,
+                                    onHistoryItemClick = { searchText = it })
                             }
                         }
+                        if(state.isLoading){
+                            CustomCircularProgressIndicator()
+                        }
+                        else if (state.patients.isNotEmpty()) {
+                            PatientList(
+                                filteredItems,
+                                navController,
+                            )
+                        }
 
-                        PatientLists(navController, homeScreenViewModel)
                     }
                     if (authViewModel.currentUser()?.role == Role.Nurse) {
                         FloatingActionButton(
@@ -329,37 +372,41 @@ fun HomeScreen(navController: NavController, padding: PaddingValues, authViewMod
     }
 }
 
-@Composable
-fun PatientLists(
-    navController: NavController,
-    homeScreenViewModel: HomeScreenViewModel,
-    modifier: Modifier = Modifier
-){
+//@Composable
+//fun PatientLists(
+//    navController: NavController,
+//    homeScreenViewModel: HomeScreenViewModel,
+//    modifier: Modifier = Modifier
+//) {
+//
+//    val patients = homeScreenViewModel.patients.collectAsState()
+//
+//    val receivedPatients = homeScreenViewModel.receivedPatients.collectAsState()
+//
+//    Column(
+//        modifier = modifier.fillMaxWidth(),
+//        horizontalAlignment = Alignment.CenterHorizontally
+//    ) {
+//        RecentlyReceivedPatientList(receivedPatients.value, navController)
+//
+//        when (patients.value) {
+//            is Resource.Error<*> -> {
+//                GenericErrorBoxAndText((patients.value as Resource.Error).message)
+//            }
+//
+//            is Resource.Loading<*> -> CustomCircularProgressIndicator()
+//            is Resource.None<*> -> {}
+//            is Resource.Success<*> ->
+//
+//                PatientList(
+//                    patients.value.data as List<Patient>,
+//                    navController
+//                )
+//        }
+//    }
+//
+//}
 
-    val patients = homeScreenViewModel.patients.collectAsState()
-
-    val receivedPatients = homeScreenViewModel.receivedPatients.collectAsState()
-
-    Column(
-        modifier = modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ){
-        RecentlyReceivedPatientList(receivedPatients.value, navController)
-
-        when (patients.value) {
-            is Resource.Error<*> -> {
-                GenericErrorBoxAndText((patients.value as Resource.Error).message)
-            }
-
-            is Resource.Loading<*> -> CustomCircularProgressIndicator()
-            is Resource.None<*> -> {}
-            is Resource.Success<*> -> PatientList(
-                patients.value.data as List<Patient>,
-                navController
-            )
-        }
-    }
-}
 
 //@Preview(showBackground = true)
 //@Composable

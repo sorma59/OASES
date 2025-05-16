@@ -1,12 +1,12 @@
 package com.unimib.oases.ui.screen.homepage
 
 import com.unimib.oases.data.model.PatientEntity
+import com.unimib.oases.domain.model.Patient
 
-data class HomeScreenUiState(
-    val patients: List<PatientEntity> = emptyList(),
+data class HomeScreenState(
+    val patients: List<Patient> = emptyList(),
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
-    val selectedPatient: PatientEntity? = null,
-    val isRefreshing: Boolean = false,
+
     // Add more screen-specific UI flags as needed
 )
