@@ -3,7 +3,9 @@ package com.unimib.oases.ui.screen.bluetooth.sending
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,7 +29,6 @@ import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.ui.components.bluetooth.devices.DeviceList
 import com.unimib.oases.ui.components.patients.PatientItem
 import com.unimib.oases.ui.components.util.BottomButtons
-import com.unimib.oases.ui.components.util.CenteredText
 import com.unimib.oases.ui.components.util.TitleText
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 import com.unimib.oases.ui.navigation.Screen
@@ -37,7 +38,8 @@ import com.unimib.oases.util.Resource
 @Composable
 fun SendPatientViaBluetoothScreen(
     patient: Patient,
-    navController: NavController
+    navController: NavController,
+    padding: PaddingValues
 ) {
 
     var showResultDialog by remember { mutableStateOf(false) }
@@ -74,7 +76,10 @@ fun SendPatientViaBluetoothScreen(
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(padding)
+            .consumeWindowInsets(padding)
     ){
         Box(
             modifier = Modifier.fillMaxWidth()
@@ -170,7 +175,7 @@ fun ResultDialog(
         onDismissRequest = onDismiss, // Handles dismiss on tap outside/back press
         text = {
             // Display the result message
-            CenteredText(resultMessage)
+            Text(resultMessage)
         },
         confirmButton = {
             // Optional: An explicit dismiss button

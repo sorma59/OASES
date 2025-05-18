@@ -28,6 +28,7 @@ import com.unimib.oases.ui.components.util.CenteredText
 import com.unimib.oases.ui.components.util.SmallGrayText
 import com.unimib.oases.ui.home_page.components.card.PatientCard
 import com.unimib.oases.ui.home_page.components.card.PatientUi
+import com.unimib.oases.ui.navigation.Screen
 
 @Composable
 fun PatientList(
@@ -51,9 +52,9 @@ fun PatientList(
                 )
             }.toTypedArray()
         )
-    }
+   }
 
-        Column (
+    Column (
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier.padding(16.dp)
     ){
@@ -99,12 +100,8 @@ fun PatientList(
                                 )
                                 ActionIcon(
                                     onClick = {
-                                        //patients[index] = patient.copy(isOptionsRevealed = false)
-                                        Toast.makeText(
-                                            context,
-                                            "Patients ${patient.item.id} was shared.",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
+                                        navController.currentBackStackEntry?.savedStateHandle?.set("patient", patient.item)
+                                        navController.navigate(Screen.SendPatient.route)
                                     },
                                     backgroundColor = Color.Gray,
                                     icon = Icons.Default.Bluetooth,

@@ -1,6 +1,5 @@
 package com.unimib.oases.ui.screen.homepage
 
-import com.unimib.oases.data.model.PatientEntity
 import com.unimib.oases.domain.model.Patient
 
 data class HomeScreenState(

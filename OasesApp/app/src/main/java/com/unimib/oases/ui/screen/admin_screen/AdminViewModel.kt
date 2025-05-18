@@ -1,13 +1,10 @@
 package com.unimib.oases.ui.screen.admin_screen
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unimib.oases.data.model.User
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.usecase.AdminUseCase
-import com.unimib.oases.ui.screen.homepage.HomeScreenState
 import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher

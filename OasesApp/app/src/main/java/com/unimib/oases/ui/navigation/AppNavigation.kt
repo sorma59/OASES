@@ -59,16 +59,17 @@ fun AppNavigation(
             if (patient != null) {
                 SendPatientViaBluetoothScreen(
                     patient = patient,
-                    navController = navController
+                    navController = navController,
+                    padding = padding
                 )
             }
         }
 
         composable(Screen.PairDevice.route){
-            PairNewDeviceScreen(navController)
+            PairNewDeviceScreen(navController, padding)
         }
         composable(Screen.MedicalVisitScreen.route) {
-            MedicalVisitScreen(navController, authViewModel)
+            MedicalVisitScreen(navController, authViewModel, padding)
         }
     }
 }

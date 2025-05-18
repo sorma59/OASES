@@ -64,20 +64,14 @@ import androidx.navigation.NavController
 import com.unimib.oases.R
 import com.unimib.oases.data.bluetooth.BluetoothCustomManager
 import com.unimib.oases.data.model.Role
-import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.ui.components.SearchBar
 import com.unimib.oases.ui.components.patients.PatientList
-import com.unimib.oases.ui.components.patients.RecentlyReceivedPatientList
 import com.unimib.oases.ui.components.util.BluetoothPermissionHandler
-import com.unimib.oases.ui.components.util.GenericErrorBoxAndText
 import com.unimib.oases.ui.components.util.NoPermissionMessage
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
-import com.unimib.oases.ui.home_page.components.card.PatientUi
 import com.unimib.oases.ui.navigation.Screen
 import com.unimib.oases.ui.screen.login.AuthState
 import com.unimib.oases.ui.screen.login.AuthViewModel
-import com.unimib.oases.util.Resource
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 
 
@@ -90,8 +84,6 @@ fun HomeScreen(
     bluetoothManager: BluetoothCustomManager,
     homeScreenViewModel: HomeScreenViewModel = hiltViewModel(),
 ) {
-
-
 
     val context = LocalContext.current
 
@@ -116,6 +108,7 @@ fun HomeScreen(
         context = context,
         onPermissionGranted = {
             bluetoothManager.updatePermissions()
+            bluetoothManager.initialize()
         }
     )
 
@@ -132,15 +125,9 @@ fun HomeScreen(
         }
     }
 
-
-
-
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
     val scope = rememberCoroutineScope()
-
-
-
 
     LaunchedEffect(key1 = true) {
         if(homeScreenViewModel.state.value.patients.isEmpty()){

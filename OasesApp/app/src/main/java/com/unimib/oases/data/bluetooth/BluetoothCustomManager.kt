@@ -141,6 +141,7 @@ class BluetoothCustomManager @Inject constructor(){
             onEnabled = {
                 fetchPairedDevices()
                 attemptStartServer()
+                Log.d("BluetoothServer", "Initialized")
             },
             onDenied = {
                 updateToastMessage(appContext.getString(R.string.bluetooth_server_not_started))
@@ -374,6 +375,7 @@ class BluetoothCustomManager @Inject constructor(){
     // ---------------Connection------------------------
 
     private fun attemptStartServer() {
+//        ContextCompat.startForegroundService(appContext, Intent(appContext, BluetoothServerService::class.java))
         serverJob?.cancel()
         serverJob = serverScope.launch {
             startServer()
@@ -381,7 +383,7 @@ class BluetoothCustomManager @Inject constructor(){
     }
 
 
-    private suspend fun startServer() {
+    internal suspend fun startServer() {
 
         var enabled = false
 
@@ -400,9 +402,7 @@ class BluetoothCustomManager @Inject constructor(){
                     serverSocket = bluetoothAdapter?.listenUsingRfcommWithServiceRecord(appName, appUuid)
                     Log.d("BluetoothServer", "Server started, waiting for client...")
                     delay(1000)
-                    val socket = withContext(Dispatchers.IO) {
-                        acceptClientConnection()
-                    }
+                    val socket = acceptClientConnection()
 
                     if (socket != null) {
                         listenForData(socket) // Pass the new socket explicitly
