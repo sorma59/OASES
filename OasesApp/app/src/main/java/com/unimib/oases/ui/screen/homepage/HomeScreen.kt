@@ -318,7 +318,9 @@ fun HomeScreen(
                             ) {
                                 SearchBar(
                                     query = searchText,
-                                    onQueryChange = { searchText = it },
+                                    onQueryChange = {
+
+                                        searchText = it },
                                     onSearch = {
                                         listState.add(searchText)
                                         active = false
@@ -336,6 +338,7 @@ fun HomeScreen(
                             PatientList(
                                 filteredItems,
                                 navController,
+                                homeScreenViewModel
                             )
                         }
 

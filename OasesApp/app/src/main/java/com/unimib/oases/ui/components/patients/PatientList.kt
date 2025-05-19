@@ -14,8 +14,11 @@ import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,30 +32,39 @@ import com.unimib.oases.ui.components.util.SmallGrayText
 import com.unimib.oases.ui.home_page.components.card.PatientCard
 import com.unimib.oases.ui.home_page.components.card.PatientUi
 import com.unimib.oases.ui.navigation.Screen
+import com.unimib.oases.ui.screen.admin_screen.AdminEvent
+import com.unimib.oases.ui.screen.homepage.HomeScreenEvent
+import com.unimib.oases.ui.screen.homepage.HomeScreenViewModel
 
 @Composable
 fun PatientList(
     patients: List<Patient> = emptyList(),
     navController: NavController,
+    homeScreenViewModel: HomeScreenViewModel,
     modifier: Modifier = Modifier,
     title: String = "Patient List",
   //  onItemClick: (Patient) -> Unit = {},
-    noPatientsMessage: String = "No patients yet"
+    noPatientsMessage: String = "No patients found."
 ) {
 
     val context = LocalContext.current
 
+    val wrappedPatientList = remember { mutableStateListOf<PatientUi>() }
 
-   val wrappedPatientList = remember {
-        mutableStateListOf(
-            *patients.map { patient ->
+
+
+    LaunchedEffect(patients) {
+        wrappedPatientList.clear()
+        wrappedPatientList.addAll(
+            patients.map { patient ->
                 PatientUi(
                     isOptionsRevealed = false,
                     item = patient
                 )
-            }.toTypedArray()
+            }
         )
-   }
+    }
+
 
     Column (
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -87,6 +99,7 @@ fun PatientList(
                             actions = {
                                 ActionIcon(
                                     onClick = {
+                                        homeScreenViewModel.onEvent(HomeScreenEvent.Delete(patient.item))
                                         Toast.makeText(
                                             context,
                                             "Patient ${patient.item.id} was deleted.",

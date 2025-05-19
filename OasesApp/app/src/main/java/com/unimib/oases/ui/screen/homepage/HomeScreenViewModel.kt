@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.domain.usecase.PatientUseCase
+import com.unimib.oases.ui.screen.admin_screen.AdminEvent
 import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -36,9 +37,23 @@ class HomeScreenViewModel @Inject constructor(
     }
 
 
+    fun onEvent(event: HomeScreenEvent) {
+        when (event) {
+            is HomeScreenEvent.Delete -> {
+                //useCases.deletePatient(event.value)
+            }
+
+            is HomeScreenEvent.Share -> {
+                // share with bluetooth
+            }
+        }
+    }
 
 
-    // ----------------------Patients-------------------------------
+
+
+
+            // ----------------------Patients-------------------------------
 
 //    val patients: StateFlow<Resource<List<Patient>>> = patientRepository
 //        .getPatients()
