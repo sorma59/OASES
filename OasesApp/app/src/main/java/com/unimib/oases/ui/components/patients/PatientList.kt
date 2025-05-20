@@ -15,10 +15,8 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,7 +30,6 @@ import com.unimib.oases.ui.components.util.SmallGrayText
 import com.unimib.oases.ui.home_page.components.card.PatientCard
 import com.unimib.oases.ui.home_page.components.card.PatientUi
 import com.unimib.oases.ui.navigation.Screen
-import com.unimib.oases.ui.screen.admin_screen.AdminEvent
 import com.unimib.oases.ui.screen.homepage.HomeScreenEvent
 import com.unimib.oases.ui.screen.homepage.HomeScreenViewModel
 
