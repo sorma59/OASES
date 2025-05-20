@@ -13,6 +13,7 @@ import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.domain.repository.UserRepository
 import com.unimib.oases.domain.usecase.InsertPatientLocallyUseCase
 import com.unimib.oases.domain.usecase.SendPatientViaBluetoothUseCase
+import com.unimib.oases.ui.screen.patient_registration.RegistrationScreenViewModel
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -42,6 +43,13 @@ object AppModule {
         }
     }
 
+    private val MIGRATION_2_3 = object : Migration(2, 3) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            // Migration1-2: image field added for Patient entity
+            db.execSQL("ALTER TABLE patients ADD COLUMN status TEXT DEFAULT NULL")
+        }
+    }
+
     @Provides
     @Singleton
     fun provideAppDatabase(
@@ -53,6 +61,7 @@ object AppModule {
             "oases_database"
         )
             .addMigrations(MIGRATION_1_2) // Add migrations here
+            .addMigrations(MIGRATION_2_3)
             .createFromAsset("databases/users.db")
             .build()
     }
@@ -83,12 +92,6 @@ object AppModule {
     }
 
     @Provides
-    @Singleton
-    fun provideBluetoothCustomManager(): BluetoothCustomManager {
-        return BluetoothCustomManager()
-    }
-
-    @Provides
     fun provideSendPatientUseCase(
         bluetoothManager: BluetoothCustomManager,
     ): SendPatientViaBluetoothUseCase {
@@ -100,5 +103,13 @@ object AppModule {
         patientRepository: PatientRepository
     ): InsertPatientLocallyUseCase {
         return InsertPatientLocallyUseCase(patientRepository)
+    }
+
+    @Provides
+    fun provideRegistrationScreenViewModel(
+        patientRepository: PatientRepository,
+        @ApplicationScope applicationScope: CoroutineScope
+    ): RegistrationScreenViewModel {
+        return RegistrationScreenViewModel(patientRepository, applicationScope)
     }
 }

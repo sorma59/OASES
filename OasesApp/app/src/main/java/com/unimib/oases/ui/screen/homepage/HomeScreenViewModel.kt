@@ -5,14 +5,16 @@ import androidx.lifecycle.viewModelScope
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.domain.usecase.PatientUseCase
-import com.unimib.oases.ui.screen.admin_screen.AdminEvent
 import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -53,21 +55,14 @@ class HomeScreenViewModel @Inject constructor(
 
 
 
-            // ----------------------Patients-------------------------------
+    // ----------------------Patients-------------------------------
 
-//    val patients: StateFlow<Resource<List<Patient>>> = patientRepository
-//        .getPatients()
-//        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), Resource.Loading())
-//
-//
-//    val receivedPatients: StateFlow<List<Patient>> = patientRepository
-//        .receivedPatients
-//        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
-//
-
-
-
-
+    init {
+        patientRepository
+            .receivedPatients
+            .onEach { _state.value = _state.value.copy(receivedPatients = it) }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    }
 
     fun getPatients() {
         getPatientsJob?.cancel()
@@ -101,31 +96,4 @@ class HomeScreenViewModel @Inject constructor(
             }
         }
     }
-
-
-
-
-
-    // ---------------------Enable bluetooth-------------------------------
-
-//    init {
-//        loadPatients()
-//    }
-//
-//    private fun loadPatients() {
-//        // Use viewModelScope to launch the coroutine for collecting data
-//        viewModelScope.launch {
-//            patientRepository.getPatients()
-//                .collect { patientsList ->
-//                   _patients.value = patientsList
-//                }
-//        }
-//    }
-
-    //-------------------Mock----------------------------------------------------------------------------------
-
-//    private fun mockLoadPatients() {
-//        // Use viewModelScope to launch the coroutine for collecting data
-//        _patients.value = Resource.Error("Could not load patients")
-//    }
 }

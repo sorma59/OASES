@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.unimib.oases.data.model.PatientStatus
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.ui.navigation.Screen
 import com.unimib.oases.ui.screen.patient_registration.info.PatientInfoScreen
@@ -56,7 +57,7 @@ fun RegistrationScreen(
 
 
     val tabs = listOf(
-        "Dati anagrafici",
+        "Demographics",
         "History",
         "Past Medical History",
         "Vital Signs",
@@ -291,12 +292,11 @@ fun RegistrationScreen(
                                         subCounty = subCountry,
                                         district = district,
                                         nextOfKin = nextOfKin,
+                                        status = PatientStatus.WAITING_FOR_TRIAGE.name,
                                         contact = contact,
                                     )
                                 registrationScreenViewModel.addPatient(patient)
-                                navController.navigate(Screen.HomeScreen.route) {
-                                    popUpTo(0) { inclusive = true }
-                                }
+                                navController.popBackStack()
                             }
                         ) {
                             Text("No")

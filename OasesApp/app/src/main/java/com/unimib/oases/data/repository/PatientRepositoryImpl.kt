@@ -21,9 +21,8 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-class PatientRepositoryImpl @Inject constructor(
+class PatientRepositoryImpl(
     private val roomDataSource: RoomDataSource,
     private val bluetoothCustomManager: BluetoothCustomManager,
     private val applicationScope: CoroutineScope

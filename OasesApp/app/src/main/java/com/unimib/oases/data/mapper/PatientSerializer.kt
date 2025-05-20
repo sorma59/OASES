@@ -1,6 +1,7 @@
 package com.unimib.oases.data.mapper
 
 import android.util.Log
+import com.unimib.oases.data.model.PatientStatus
 import com.unimib.oases.domain.model.Patient
 import java.nio.ByteBuffer
 
@@ -16,6 +17,7 @@ object PatientSerializer {
         val districtBytes = patient.district.toByteArray(Charsets.UTF_8)
         val nextOfKinBytes = patient.nextOfKin.toByteArray(Charsets.UTF_8)
         val contactBytes = patient.contact.toByteArray(Charsets.UTF_8)
+        val statusBytes = patient.status.toByteArray(Charsets.UTF_8)
         val imageBytes = patient.image ?: ByteArray(0)
 
         val buffer = ByteBuffer.allocate(
@@ -29,6 +31,7 @@ object PatientSerializer {
                     4 + districtBytes.size +
                     4 + nextOfKinBytes.size +
                     4 + contactBytes.size +
+                    4 + statusBytes.size +
                     4 + imageBytes.size
         ).order(java.nio.ByteOrder.BIG_ENDIAN)
 
@@ -61,6 +64,9 @@ object PatientSerializer {
         buffer.putInt(contactBytes.size)
         buffer.put(contactBytes)
 
+        buffer.putInt(statusBytes.size)
+        buffer.put(statusBytes)
+
         buffer.putInt(imageBytes.size)
         buffer.put(imageBytes)
 
@@ -81,6 +87,7 @@ object PatientSerializer {
         val district = buffer.readString()
         val nextOfKin = buffer.readString()
         val contact = buffer.readString()
+        val status = buffer.readString()
 
         val imageLength = buffer.int
         val image = if (imageLength > 0) {
@@ -100,6 +107,7 @@ object PatientSerializer {
             district = district,
             nextOfKin = nextOfKin,
             contact = contact,
+            status = status,
             image = image
         )
     }
@@ -121,7 +129,7 @@ object PatientSerializer {
 
     // ----------------Testing--------------------
     fun test() {
-        val original = Patient("test", "John", 30, "M", "Kampala", "Central", "Wakiso", "UG", "Jane", "123456", null)
+        val original = Patient("test", "John", 30, "M", "Kampala", "Central", "Wakiso", "UG", "Jane", "123456", PatientStatus.WAITING_FOR_TRIAGE.name, null)
         Log.d("PatientSerializer", "Original: $original")
         val bytes = serialize(original)
         val recovered = deserialize(bytes)

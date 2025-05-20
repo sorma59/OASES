@@ -1,13 +1,10 @@
 package com.unimib.oases.data.model
 
-import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import kotlinx.parcelize.Parcelize
 
 @Entity(tableName = "patients")
-@Parcelize
 data class PatientEntity (
     @PrimaryKey val id: String,
     @ColumnInfo(name = "name") var name: String,
@@ -19,9 +16,10 @@ data class PatientEntity (
     @ColumnInfo(name = "district") var district: String,
     @ColumnInfo(name = "next_of_kin") var nextOfKin: String,
     @ColumnInfo(name = "contact") var contact: String,
+    @ColumnInfo(name = "status") var status: String,
     @ColumnInfo(name = "image") var image: ByteArray? = null
 
-) : Parcelable {
+){
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -38,6 +36,7 @@ data class PatientEntity (
         if (district != other.district) return false
         if (nextOfKin != other.nextOfKin) return false
         if (contact != other.contact) return false
+        if (status != other.status) return false
         if (image != null) {
             if (other.image == null) return false
             if (!image.contentEquals(other.image)) return false
@@ -57,7 +56,18 @@ data class PatientEntity (
         result = 31 * result + district.hashCode()
         result = 31 * result + nextOfKin.hashCode()
         result = 31 * result + contact.hashCode()
+        result = 31 * result + status.hashCode()
         result = 31 * result + (image?.contentHashCode() ?: 0)
         return result
     }
+}
+
+/**
+ * Represents the different states a patient can be in during their hospital visit.
+ */
+enum class PatientStatus {
+    WAITING_FOR_TRIAGE,
+    WAITING_FOR_VISIT,
+    WAITING_FOR_TESTS_RESULTS,
+    DISMISSED
 }

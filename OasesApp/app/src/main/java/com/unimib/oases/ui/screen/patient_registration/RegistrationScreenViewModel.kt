@@ -2,10 +2,12 @@ package com.unimib.oases.ui.screen.patient_registration
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.unimib.oases.data.model.PatientStatus
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -14,6 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class RegistrationScreenViewModel @Inject constructor(
     private val patientRepository: PatientRepository,
+    private val applicationScope: CoroutineScope
 ): ViewModel(){
 
     // -------------------Toasts--------------------------------
@@ -105,7 +108,8 @@ class RegistrationScreenViewModel @Inject constructor(
                 subCounty = _formState.value.subCounty,
                 district = _formState.value.district,
                 nextOfKin = _formState.value.nextOfKin,
-                contact = _formState.value.contact
+                contact = _formState.value.contact,
+                status = PatientStatus.WAITING_FOR_TRIAGE.name
             )
             viewModelScope.launch {
                 addPatient(patient)

@@ -15,6 +15,7 @@ fun PatientEntity.toPatient(): Patient {
         district = district,
         nextOfKin = nextOfKin,
         contact = contact,
+        status = status,
         image = image
     )
 }
@@ -31,6 +32,7 @@ fun Patient.toEntity(): PatientEntity {
         district = district,
         nextOfKin = nextOfKin,
         contact = contact,
+        status = status,
         image = image
     )
 }

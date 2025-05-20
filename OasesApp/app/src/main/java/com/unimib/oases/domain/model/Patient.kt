@@ -16,5 +16,6 @@ data class Patient(
     var district: String,
     var nextOfKin: String,
     var contact: String,
+    var status: String,
     var image: ByteArray? = null
 ) : Parcelable
