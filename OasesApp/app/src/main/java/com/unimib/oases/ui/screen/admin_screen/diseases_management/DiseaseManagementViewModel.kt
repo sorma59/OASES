@@ -1,10 +1,11 @@
-package com.unimib.oases.ui.screen.admin_screen
+package com.unimib.oases.ui.screen.admin_screen.diseases_management
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unimib.oases.data.model.User
 import com.unimib.oases.di.IoDispatcher
-import com.unimib.oases.domain.usecase.AdminUseCase
+import com.unimib.oases.domain.model.Disease
+import com.unimib.oases.domain.usecase.DiseaseUseCase
 import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -18,18 +19,18 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class AdminViewModel @Inject constructor(
-    private val useCases: AdminUseCase,
+class DiseaseManagementViewModel @Inject constructor(
+    private val useCases: DiseaseUseCase,
     @IoDispatcher private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
 
     private var getUsersJob: Job? = null
 
-    private val _state = MutableStateFlow(AdminState())
-    val state: StateFlow<AdminState> = _state
+    private val _state = MutableStateFlow(DiseaseManagementState())
+    val state: StateFlow<DiseaseManagementState> = _state
 
-    private var undoUser: User? = null
+    private var undoDisease: Disease? = null
     private var errorHandler = CoroutineExceptionHandler { _, e ->
         e.printStackTrace()
         _state.value = _state.value.copy(
@@ -50,64 +51,53 @@ class AdminViewModel @Inject constructor(
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
-    fun onEvent(event: AdminEvent) {
+    fun onEvent(event: DiseaseManagementEvent) {
         when (event) {
-            is AdminEvent.Click -> {
+            is DiseaseManagementEvent.Click -> {
                 _state.value = _state.value.copy(
-                    user = event.value
+                    disease = event.value
                 )
             }
 
-            is AdminEvent.Delete -> {
+            is DiseaseManagementEvent.Delete -> {
                 viewModelScope.launch(dispatcher + errorHandler) {
-                    useCases.deleteUser(event.value)
-                    getUsers()
-                    undoUser = event.value
+                    useCases.deleteDisease(event.value)
+                    getDiseases()
+                    undoDisease = event.value
 
                 }
             }
 
-            is AdminEvent.EnteredUsername -> {
+            is DiseaseManagementEvent.EnteredDiseaseName -> {
                 _state.value = _state.value.copy(
-                    user = _state.value.user.copy(
-                        username = event.value
+                    disease = _state.value.disease.copy(
+                        name = event.value
                     )
                 )
             }
 
-            is AdminEvent.EnteredPassword -> {
-                _state.value = _state.value.copy(
-                    user = _state.value.user.copy(
-                        pwHash = event.value
-                    )
-                )
-            }
 
-            AdminEvent.UndoDelete -> {
+            DiseaseManagementEvent.UndoDelete -> {
                 viewModelScope.launch(dispatcher + errorHandler) {
-                    useCases.createUser(undoUser ?: return@launch)
-                    undoUser = null
-                    getUsers()
+                    useCases.addDisease(undoDisease ?: return@launch)
+                    undoDisease = null
+                    getDiseases()
                 }
             }
 
 
-            is AdminEvent.SelectedRole -> {
-                _state.value = _state.value.copy(
-                    user = _state.value.user.copy(
-                        role = event.value
-                    )
-                )
-            }
 
-            AdminEvent.SaveUser -> {
+            DiseaseManagementEvent.SaveDisease -> {
                 viewModelScope.launch(dispatcher + errorHandler) {
                     try {
                         _state.value = _state.value.copy(isLoading = true)
 
-                        useCases.createUser(_state.value.user)
+                        useCases.addDisease(_state.value.disease)
 
-                        _state.value = _state.value.copy(isLoading = false)
+                        _state.value = _state.value.copy(isLoading = false,
+                            disease = state.value.disease.copy(
+                                name = ""
+                            ))
                         // _eventFlow.emit(UiEvent.SaveUser) // I emit it into the screen then
                         // in the screen we handle it and we go back to the list
 
@@ -130,13 +120,13 @@ class AdminViewModel @Inject constructor(
     }
 
 
-    fun getUsers() {
+    fun getDiseases() {
         getUsersJob?.cancel()
 
 
 
         getUsersJob = viewModelScope.launch(dispatcher + errorHandler) {
-            val result = useCases.getUsers()
+            val result = useCases.getDiseases()
 
             result.collect { resource ->
                 when (resource) {
@@ -148,7 +138,7 @@ class AdminViewModel @Inject constructor(
 
                     is Resource.Success -> {
                         _state.value = _state.value.copy(
-                            users = resource.data ?: emptyList(),
+                            diseases = resource.data ?: emptyList(),
                             isLoading = false
                         )
                     }

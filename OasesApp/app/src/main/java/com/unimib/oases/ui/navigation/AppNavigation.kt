@@ -9,6 +9,9 @@ import androidx.navigation.compose.composable
 import com.unimib.oases.data.bluetooth.BluetoothCustomManager
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.ui.screen.admin_screen.AdminScreen
+import com.unimib.oases.ui.screen.admin_screen.diseases_management.DiseaseManagementScreen
+import com.unimib.oases.ui.screen.admin_screen.user_management.UserManagementScreen
+
 import com.unimib.oases.ui.screen.bluetooth.pairing.PairNewDeviceScreen
 import com.unimib.oases.ui.screen.bluetooth.sending.SendPatientViaBluetoothScreen
 import com.unimib.oases.ui.screen.homepage.HomeScreen
@@ -16,6 +19,7 @@ import com.unimib.oases.ui.screen.login.AuthViewModel
 import com.unimib.oases.ui.screen.login.LoginScreen
 import com.unimib.oases.ui.screen.medical_visit.MedicalVisitScreen
 import com.unimib.oases.ui.screen.patient_registration.RegistrationScreen
+import com.unimib.oases.ui.screen.patient_registration.vital_signs.VitalSignsScreen
 
 @Composable
 fun AppNavigation(
@@ -27,7 +31,7 @@ fun AppNavigation(
     val authViewModel: AuthViewModel = hiltViewModel()
 
     NavHost(
-//  nurse
+        //  nurse
         navController = navController,
         startDestination = Screen.LoginScreen.route
     ) {
@@ -35,6 +39,19 @@ fun AppNavigation(
         composable(Screen.AdminScreen.route) {
             AdminScreen(navController, padding, authViewModel)
         }
+
+//        composable(Screen.VitalSignsScreen.route) {
+//            VitalSignsScreen (navController, padding, authViewModel)
+//        }
+
+        composable(Screen.UserManagementScreen.route) {
+            UserManagementScreen (navController, padding)
+        }
+
+        composable(Screen.DiseaseManagementScreen.route) {
+            DiseaseManagementScreen (navController, padding)
+        }
+
 
 
         composable(Screen.LoginScreen.route) {

@@ -7,8 +7,10 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.unimib.oases.data.bluetooth.BluetoothCustomManager
 import com.unimib.oases.data.local.OasesDatabase
 import com.unimib.oases.data.local.RoomDataSource
+import com.unimib.oases.data.repository.DiseaseRepositoryImpl
 import com.unimib.oases.data.repository.PatientRepositoryImpl
 import com.unimib.oases.data.repository.UserRepositoryImpl
+import com.unimib.oases.domain.repository.DiseaseRepository
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.domain.repository.UserRepository
 import com.unimib.oases.domain.usecase.InsertPatientLocallyUseCase
@@ -89,6 +91,14 @@ object AppModule {
         roomDataSource: RoomDataSource
     ): UserRepository {
         return UserRepositoryImpl(roomDataSource)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDiseaseRepository(
+        roomDataSource: RoomDataSource
+    ): DiseaseRepository {
+        return DiseaseRepositoryImpl(roomDataSource)
     }
 
     @Provides

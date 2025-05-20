@@ -342,6 +342,8 @@ fun HomeScreen(
                                 navController,
                                 homeScreenViewModel
                             )
+                        } else if (state.errorMessage != null){
+                            Text(state.errorMessage!!)
                         }
 
                     }

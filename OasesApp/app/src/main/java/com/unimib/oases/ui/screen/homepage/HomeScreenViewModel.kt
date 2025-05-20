@@ -88,7 +88,8 @@ class HomeScreenViewModel @Inject constructor(
                     is Resource.Error -> {
                         _state.value = _state.value.copy(
                             errorMessage = resource.message,
-                        )
+                            isLoading = false
+                            )
                     }
 
                     is Resource.None -> {}

@@ -7,7 +7,7 @@ import com.unimib.oases.util.Resource
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class AdminUseCase @Inject constructor(
+class UserUseCase @Inject constructor(
     private val repo: UserRepository
 ) {
 
