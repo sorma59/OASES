@@ -20,10 +20,8 @@ class DiseaseUseCase @Inject constructor(
     }
 
     fun deleteDisease(disease: Disease){
-       // repo.deleteDisease(user.username)
+       repo.deleteDisease(disease.name)
     }
-
-
 
 
 

@@ -1,5 +1,5 @@
 package com.unimib.oases.domain.model
 
-data class VitalSigns (
+data class VitalSign(
     val name: String = ""
 )

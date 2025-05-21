@@ -4,7 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "vitalSings")
+@Entity(tableName = "vitalSigns")
 data class VitalSignsEntity(
     @PrimaryKey
     @ColumnInfo(name = "name") var name: String,

@@ -166,7 +166,7 @@ fun AdminScreen(
                 }
 
                 item {
-                    Button(onClick = {  }, shape = MaterialTheme.shapes.extraSmall, modifier = Modifier.padding(5.dp)) {
+                    Button(onClick = { navController.navigate(Screen.VitalSignsManagementScreen.route) }, shape = MaterialTheme.shapes.extraSmall, modifier = Modifier.padding(5.dp)) {
                         Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally){
                             Row{
                                 Icon(

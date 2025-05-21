@@ -12,11 +12,13 @@ import com.unimib.oases.data.repository.PatientDiseaseRepositoryImpl
 import com.unimib.oases.data.repository.PatientRepositoryImpl
 import com.unimib.oases.data.repository.UserRepositoryImpl
 import com.unimib.oases.data.repository.VisitRepositoryImpl
+import com.unimib.oases.data.repository.VitalSignRepositoryImpl
 import com.unimib.oases.domain.repository.DiseaseRepository
 import com.unimib.oases.domain.repository.PatientDiseaseRepository
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.domain.repository.UserRepository
 import com.unimib.oases.domain.repository.VisitRepository
+import com.unimib.oases.domain.repository.VitalSignRepository
 import com.unimib.oases.domain.usecase.InsertPatientLocallyUseCase
 import com.unimib.oases.domain.usecase.SendPatientViaBluetoothUseCase
 import com.unimib.oases.ui.screen.patient_registration.RegistrationScreenViewModel
@@ -86,6 +88,8 @@ object AppModule {
         }
     }
 
+
+
     @Provides
     @Singleton
     fun provideAppDatabase(
@@ -152,6 +156,14 @@ object AppModule {
         roomDataSource: RoomDataSource
     ): VisitRepository {
         return VisitRepositoryImpl(roomDataSource)
+    }
+
+    @Provides
+    @Singleton
+    fun provideVitalSignRepository(
+        roomDataSource: RoomDataSource
+    ): VitalSignRepository {
+        return VitalSignRepositoryImpl(roomDataSource)
     }
 
     // -------------Use Cases---------------------

@@ -5,12 +5,14 @@ import com.unimib.oases.data.local.dao.PatientDao
 import com.unimib.oases.data.local.dao.PatientDiseaseDao
 import com.unimib.oases.data.local.dao.UserDao
 import com.unimib.oases.data.local.dao.VisitDao
+import com.unimib.oases.data.local.dao.VitalSignsDao
 import com.unimib.oases.data.model.DiseaseEntity
 import com.unimib.oases.data.model.PatientDiseaseEntity
 import com.unimib.oases.data.model.PatientEntity
 import com.unimib.oases.data.model.Role
 import com.unimib.oases.data.model.User
 import com.unimib.oases.data.model.VisitEntity
+import com.unimib.oases.data.model.VitalSignsEntity
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -22,6 +24,7 @@ class RoomDataSource @Inject constructor(
     private val patientDiseaseDao: PatientDiseaseDao get() = appDatabase.patientDiseaseDao()
     private val diseaseDao: DiseaseDao get() = appDatabase.diseaseDao()
     private val visitDao: VisitDao get() = appDatabase.visitDao()
+    private val vitalSignDao: VitalSignsDao get() = appDatabase.vitalSignDao()
 
     // -------------------Patients-------------------
     suspend fun insertPatient(patient: PatientEntity) {
@@ -78,6 +81,32 @@ class RoomDataSource @Inject constructor(
 
     fun getAllDiseases(): Flow<List<DiseaseEntity>> {
         return diseaseDao.getAllDiseases()
+    }
+
+    fun getDisease(disease: String): Flow<DiseaseEntity?> {
+        return diseaseDao.getDisease(disease)
+    }
+
+    fun deleteDisease(disease: DiseaseEntity) {
+        diseaseDao.delete(disease)
+    }
+
+    // -------------------Vital Signs--------------------
+
+    suspend fun insertVitalSign(vitalSign: VitalSignsEntity) {
+        vitalSignDao.insert(vitalSign)
+    }
+
+    fun getAllVitalSigns(): Flow<List<VitalSignsEntity>> {
+        return vitalSignDao.getAllVitalSigns()
+    }
+
+    fun getVitalSign(vitalSign: String): Flow<VitalSignsEntity?> {
+        return vitalSignDao.getVitalSign(vitalSign)
+    }
+
+    fun deleteVitalSign(vitalSign: VitalSignsEntity) {
+        vitalSignDao.delete(vitalSign)
     }
 
     // -----------------Visits--------------------

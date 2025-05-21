@@ -1,10 +1,12 @@
-package com.unimib.oases.ui.screen.admin_screen.diseases_management
+package com.unimib.oases.ui.screen.admin_screen.vital_signs_management
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.model.Disease
+import com.unimib.oases.domain.model.VitalSign
 import com.unimib.oases.domain.usecase.DiseaseUseCase
+import com.unimib.oases.domain.usecase.VitalSignUseCase
 import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -18,18 +20,18 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class DiseaseManagementViewModel @Inject constructor(
-    private val useCases: DiseaseUseCase,
+class VitalSignManagementViewModel @Inject constructor(
+    private val useCases: VitalSignUseCase,
     @IoDispatcher private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
 
-    private var getDiseasesJob: Job? = null
+    private var getVitalSignsJob: Job? = null
 
-    private val _state = MutableStateFlow(DiseaseManagementState())
-    val state: StateFlow<DiseaseManagementState> = _state
+    private val _state = MutableStateFlow(VitalSignManagementState())
+    val state: StateFlow<VitalSignManagementState> = _state
 
-    private var undoDisease: Disease? = null
+    private var undoVitalSign: VitalSign? = null
     private var errorHandler = CoroutineExceptionHandler { _, e ->
         e.printStackTrace()
         _state.value = _state.value.copy(
@@ -42,58 +44,56 @@ class DiseaseManagementViewModel @Inject constructor(
     sealed class UiEvent {
         // all events that gonna happen when we need to screen to display something and pass data back to the screen
         data class showSnackbar(val message: String) : UiEvent()
-        object SaveUser : UiEvent()
-        object Back : UiEvent()
     }
 
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
-    fun onEvent(event: DiseaseManagementEvent) {
+    fun onEvent(event: VitalSignManagementEvent) {
         when (event) {
-            is DiseaseManagementEvent.Click -> {
+            is VitalSignManagementEvent.Click -> {
                 _state.value = _state.value.copy(
-                    disease = event.value
+                    vitalSign = event.value
                 )
             }
 
-            is DiseaseManagementEvent.Delete -> {
+            is VitalSignManagementEvent.Delete -> {
                 viewModelScope.launch(dispatcher + errorHandler) {
-                    useCases.deleteDisease(event.value)
-                    getDiseases()
-                    undoDisease = event.value
+                    useCases.deleteVitalSign(event.value)
+                    getVitalSigns()
+                    undoVitalSign = event.value
                 }
             }
 
-            is DiseaseManagementEvent.EnteredDiseaseName -> {
+            is VitalSignManagementEvent.EnteredVitalSignName -> {
                 _state.value = _state.value.copy(
-                    disease = _state.value.disease.copy(
+                    vitalSign = _state.value.vitalSign.copy(
                         name = event.value
                     )
                 )
             }
 
 
-            DiseaseManagementEvent.UndoDelete -> {
+            VitalSignManagementEvent.UndoDelete -> {
                 viewModelScope.launch(dispatcher + errorHandler) {
-                    useCases.addDisease(undoDisease ?: return@launch)
-                    undoDisease = null
-                    getDiseases()
+                    useCases.addVitalSign(undoVitalSign ?: return@launch)
+                    undoVitalSign = null
+                    getVitalSigns()
                 }
             }
 
 
 
-            DiseaseManagementEvent.SaveDisease -> {
+            VitalSignManagementEvent.SaveVitalSign -> {
                 viewModelScope.launch(dispatcher + errorHandler) {
                     try {
                         _state.value = _state.value.copy(isLoading = true)
 
-                        useCases.addDisease(_state.value.disease)
+                        useCases.addVitalSign(_state.value.vitalSign)
 
                         _state.value = _state.value.copy(isLoading = false,
-                            disease = state.value.disease.copy(
+                            vitalSign = state.value.vitalSign.copy(
                                 name = ""
                             ))
                         // _eventFlow.emit(UiEvent.SaveUser) // I emit it into the screen then
@@ -118,13 +118,13 @@ class DiseaseManagementViewModel @Inject constructor(
     }
 
 
-    fun getDiseases() {
-        getDiseasesJob?.cancel()
+    fun getVitalSigns() {
+        getVitalSignsJob?.cancel()
 
 
 
-        getDiseasesJob = viewModelScope.launch(dispatcher + errorHandler) {
-            val result = useCases.getDiseases()
+        getVitalSignsJob = viewModelScope.launch(dispatcher + errorHandler) {
+            val result = useCases.getVitalSigns()
 
             result.collect { resource ->
                 when (resource) {
@@ -136,7 +136,7 @@ class DiseaseManagementViewModel @Inject constructor(
 
                     is Resource.Success -> {
                         _state.value = _state.value.copy(
-                            diseases = resource.data ?: emptyList(),
+                            vitalSigns = resource.data ?: emptyList(),
                             isLoading = false
                         )
                     }
