@@ -9,8 +9,9 @@ import com.unimib.oases.domain.repository.VisitRepository
 import com.unimib.oases.util.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import javax.inject.Inject
 
-class VisitRepositoryImpl(
+class VisitRepositoryImpl @Inject constructor(
     private val roomDataSource: RoomDataSource,
 ): VisitRepository {
 

@@ -4,9 +4,10 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import com.unimib.oases.data.local.TableNames
 
 @Entity(
-    tableName = "visits",
+    tableName = TableNames.VISIT,
     foreignKeys = [
         ForeignKey(
             entity = PatientEntity::class,

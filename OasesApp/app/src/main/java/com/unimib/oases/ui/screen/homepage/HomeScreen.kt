@@ -134,7 +134,6 @@ fun HomeScreen(
         if(homeScreenViewModel.state.value.patients.isEmpty()){
             homeScreenViewModel.getPatients()
         }
-
     }
 
 
@@ -399,13 +398,4 @@ fun HomeScreen(
 //        }
 //    }
 //
-//}
-
-
-//@Preview(showBackground = true)
-//@Composable
-//fun GreetingPreview() {
-//    OasesTheme {
-//        HomeScreen(navController = rememberNavController())
-//    }
 //}

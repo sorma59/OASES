@@ -51,10 +51,6 @@ class HomeScreenViewModel @Inject constructor(
         }
     }
 
-
-
-
-
     // ----------------------Patients-------------------------------
 
     init {

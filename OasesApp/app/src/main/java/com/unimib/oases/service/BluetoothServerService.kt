@@ -154,7 +154,6 @@ class BluetoothServerService () : Service() {
     }
 
     private fun attemptStartServer() {
-//        ContextCompat.startForegroundService(appContext, Intent(appContext, BluetoothServerService::class.java))
         serviceScope.launch {
             startServer()
         }
@@ -168,12 +167,12 @@ class BluetoothServerService () : Service() {
             try {
                 if (isBluetoothSupported() && isBluetoothEnabled()) {
                     serverSocket = bluetoothAdapter?.listenUsingRfcommWithServiceRecord(appName, appUuid)
+                    isServerRunning = true
                     Log.d("BluetoothServer", "Server started, waiting for client...")
                     delay(1000)
                     val socket = acceptClientConnection()
 
                     if (socket != null) {
-                        isServerRunning = true
                         listenForData(socket) // Pass the new socket explicitly
                     }
 

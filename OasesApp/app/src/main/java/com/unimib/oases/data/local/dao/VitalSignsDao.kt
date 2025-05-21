@@ -5,23 +5,22 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.unimib.oases.data.model.DiseaseEntity
-import com.unimib.oases.data.model.VitalSignsEntity
+import com.unimib.oases.data.local.TableNames
+import com.unimib.oases.data.model.VitalSignEntity
 import kotlinx.coroutines.flow.Flow
 
 
 @Dao
 interface VitalSignsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(vitalSings: VitalSignsEntity)
+    suspend fun insert(vitalSings: VitalSignEntity)
 
     @Delete
-    fun delete(vitalSign: VitalSignsEntity)
+    suspend fun delete(vitalSign: VitalSignEntity)
 
-    @Query("SELECT * FROM vitalSigns WHERE name = :vitalSign")
-    fun getVitalSign(vitalSign: String): Flow<VitalSignsEntity?>
+    @Query("SELECT * FROM " + TableNames.VITAL_SIGN + " WHERE name = :vitalSign")
+    fun getVitalSign(vitalSign: String): Flow<VitalSignEntity?>
 
-
-    @Query("SELECT * FROM vitalSigns")
-    fun getAllVitalSigns(): Flow<List<VitalSignsEntity>>
+    @Query("SELECT * FROM " + TableNames.VITAL_SIGN)
+    fun getAllVitalSigns(): Flow<List<VitalSignEntity>>
 }

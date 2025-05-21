@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Upsert
+import com.unimib.oases.data.local.TableNames
 import com.unimib.oases.data.model.VisitEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -12,12 +13,12 @@ import kotlinx.coroutines.flow.Flow
 interface VisitDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertVisit(visit: VisitEntity)
+    suspend fun insert(visit: VisitEntity)
 
     @Upsert
-    suspend fun upsertVisit(visit: VisitEntity)
+    suspend fun upsert(visit: VisitEntity)
 
-    @Query("SELECT * FROM visits WHERE patient_id = :patientId")
+    @Query("SELECT * FROM " + TableNames.VISIT + " WHERE patient_id = :patientId")
     fun getVisits(patientId: String): Flow<List<VisitEntity>>
 
 }

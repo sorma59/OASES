@@ -3,9 +3,10 @@ package com.unimib.oases.data.model
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import com.unimib.oases.data.local.TableNames
 
 @Entity(
-    tableName = "patient_diseases",
+    tableName = TableNames.PATIENT_DISEASE,
     primaryKeys = ["patient_id", "disease_name"],
     foreignKeys = [
         ForeignKey(

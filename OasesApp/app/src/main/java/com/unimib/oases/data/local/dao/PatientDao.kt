@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.unimib.oases.data.local.TableNames
 import com.unimib.oases.data.model.PatientEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -16,9 +17,9 @@ interface PatientDao {
     @Delete
     suspend fun delete(patient: PatientEntity)
 
-    @Query("SELECT * FROM patients")
+    @Query("SELECT * FROM " + TableNames.PATIENT)
     fun getPatients(): Flow<List<PatientEntity>>
 
-    @Query("SELECT * FROM patients WHERE id = :id")
+    @Query("SELECT * FROM " + TableNames.PATIENT + " WHERE id = :id")
     suspend fun getPatientById(id: String): PatientEntity?
 }

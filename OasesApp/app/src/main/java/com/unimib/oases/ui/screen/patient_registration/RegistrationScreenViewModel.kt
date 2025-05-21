@@ -3,6 +3,7 @@ package com.unimib.oases.ui.screen.patient_registration
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unimib.oases.data.model.PatientStatus
+import com.unimib.oases.di.ApplicationScope
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.util.Resource
@@ -16,7 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class RegistrationScreenViewModel @Inject constructor(
     private val patientRepository: PatientRepository,
-    private val applicationScope: CoroutineScope
+    @ApplicationScope private val applicationScope: CoroutineScope
 ): ViewModel(){
 
     // -------------------Toasts--------------------------------

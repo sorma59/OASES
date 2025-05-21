@@ -3,9 +3,7 @@ package com.unimib.oases.ui.screen.admin_screen.vital_signs_management
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unimib.oases.di.IoDispatcher
-import com.unimib.oases.domain.model.Disease
 import com.unimib.oases.domain.model.VitalSign
-import com.unimib.oases.domain.usecase.DiseaseUseCase
 import com.unimib.oases.domain.usecase.VitalSignUseCase
 import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel

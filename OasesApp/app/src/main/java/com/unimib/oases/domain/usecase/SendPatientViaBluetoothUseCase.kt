@@ -10,8 +10,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
+import javax.inject.Inject
 
-class SendPatientViaBluetoothUseCase(
+class SendPatientViaBluetoothUseCase @Inject constructor(
     private val bluetoothManager: BluetoothCustomManager,
 ) {
     suspend operator fun invoke(patient: Patient, device: BluetoothDevice): Resource<Unit> {

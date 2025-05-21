@@ -5,6 +5,7 @@ import com.unimib.oases.data.bluetooth.BluetoothCustomManager
 import com.unimib.oases.data.local.RoomDataSource
 import com.unimib.oases.data.mapper.toEntity
 import com.unimib.oases.data.mapper.toPatient
+import com.unimib.oases.di.ApplicationScope
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.util.Resource
@@ -21,11 +22,12 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class PatientRepositoryImpl(
+class PatientRepositoryImpl @Inject constructor(
     private val roomDataSource: RoomDataSource,
     private val bluetoothCustomManager: BluetoothCustomManager,
-    private val applicationScope: CoroutineScope
+    @ApplicationScope private val applicationScope: CoroutineScope
 ) : PatientRepository {
 
     private val _receivedPatients = MutableStateFlow<List<Patient>>(emptyList())

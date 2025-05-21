@@ -5,6 +5,7 @@ import com.unimib.oases.data.local.dao.PatientDao
 import com.unimib.oases.data.local.dao.PatientDiseaseDao
 import com.unimib.oases.data.local.dao.UserDao
 import com.unimib.oases.data.local.dao.VisitDao
+import com.unimib.oases.data.local.dao.VisitVitalSignDao
 import com.unimib.oases.data.local.dao.VitalSignsDao
 import com.unimib.oases.data.model.DiseaseEntity
 import com.unimib.oases.data.model.PatientDiseaseEntity
@@ -12,7 +13,8 @@ import com.unimib.oases.data.model.PatientEntity
 import com.unimib.oases.data.model.Role
 import com.unimib.oases.data.model.User
 import com.unimib.oases.data.model.VisitEntity
-import com.unimib.oases.data.model.VitalSignsEntity
+import com.unimib.oases.data.model.VisitVitalSignEntity
+import com.unimib.oases.data.model.VitalSignEntity
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -24,6 +26,7 @@ class RoomDataSource @Inject constructor(
     private val patientDiseaseDao: PatientDiseaseDao get() = appDatabase.patientDiseaseDao()
     private val diseaseDao: DiseaseDao get() = appDatabase.diseaseDao()
     private val visitDao: VisitDao get() = appDatabase.visitDao()
+    private val visitVitalSignDao: VisitVitalSignDao get() = appDatabase.visitVitalSignDao()
     private val vitalSignDao: VitalSignsDao get() = appDatabase.vitalSignDao()
 
     // -------------------Patients-------------------
@@ -57,7 +60,7 @@ class RoomDataSource @Inject constructor(
         return userDao.getAllUsersByRole(role)
     }
 
-    fun deleteUser(user: User) {
+    suspend fun deleteUser(user: User) {
         userDao.delete(user)
     }
 
@@ -87,39 +90,49 @@ class RoomDataSource @Inject constructor(
         return diseaseDao.getDisease(disease)
     }
 
-    fun deleteDisease(disease: DiseaseEntity) {
+    suspend fun deleteDisease(disease: DiseaseEntity) {
         diseaseDao.delete(disease)
-    }
-
-    // -------------------Vital Signs--------------------
-
-    suspend fun insertVitalSign(vitalSign: VitalSignsEntity) {
-        vitalSignDao.insert(vitalSign)
-    }
-
-    fun getAllVitalSigns(): Flow<List<VitalSignsEntity>> {
-        return vitalSignDao.getAllVitalSigns()
-    }
-
-    fun getVitalSign(vitalSign: String): Flow<VitalSignsEntity?> {
-        return vitalSignDao.getVitalSign(vitalSign)
-    }
-
-    fun deleteVitalSign(vitalSign: VitalSignsEntity) {
-        vitalSignDao.delete(vitalSign)
     }
 
     // -----------------Visits--------------------
 
     suspend fun insertVisit(visit: VisitEntity) {
-        visitDao.insertVisit(visit)
+        visitDao.insert(visit)
     }
 
     suspend fun upsertVisit(visit: VisitEntity) {
-        visitDao.upsertVisit(visit)
+        visitDao.upsert(visit)
     }
 
     fun getVisits(patientId: String): Flow<List<VisitEntity>> {
         return visitDao.getVisits(patientId)
+    }
+
+    // ----------------Visit Vital Signs----------------
+
+    suspend fun insertVisitVitalSigns(visitVitalSign: VisitVitalSignEntity) {
+        visitVitalSignDao.insert(visitVitalSign)
+    }
+
+    fun getVisitVitalSigns(visitId: String): Flow<List<VisitVitalSignEntity>> {
+        return visitVitalSignDao.getVisitVitalSigns(visitId)
+    }
+
+    // -------------------Vital Signs--------------------
+
+    suspend fun insertVitalSign(vitalSign: VitalSignEntity) {
+        vitalSignDao.insert(vitalSign)
+    }
+
+    fun getAllVitalSigns(): Flow<List<VitalSignEntity>> {
+        return vitalSignDao.getAllVitalSigns()
+    }
+
+    fun getVitalSign(vitalSign: String): Flow<VitalSignEntity?> {
+        return vitalSignDao.getVitalSign(vitalSign)
+    }
+
+    suspend fun deleteVitalSign(vitalSign: VitalSignEntity) {
+        vitalSignDao.delete(vitalSign)
     }
 }

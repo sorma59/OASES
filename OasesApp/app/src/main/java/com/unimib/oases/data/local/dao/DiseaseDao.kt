@@ -5,8 +5,8 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.unimib.oases.data.local.TableNames
 import com.unimib.oases.data.model.DiseaseEntity
-import com.unimib.oases.data.model.User
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -15,11 +15,11 @@ interface DiseaseDao {
     suspend fun insert(disease: DiseaseEntity)
 
     @Delete
-    fun delete(disease: DiseaseEntity)
+    suspend fun delete(disease: DiseaseEntity)
 
-    @Query("SELECT * FROM diseases WHERE name = :disease")
+    @Query("SELECT * FROM " + TableNames.DISEASE + " WHERE name = :disease")
     fun getDisease(disease: String): Flow<DiseaseEntity?>
 
-    @Query("SELECT * FROM diseases")
+    @Query("SELECT * FROM " + TableNames.DISEASE)
     fun getAllDiseases(): Flow<List<DiseaseEntity>>
 }

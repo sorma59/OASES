@@ -3,8 +3,9 @@ package com.unimib.oases.data.model
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.unimib.oases.data.local.TableNames
 
-@Entity(tableName = "users")
+@Entity(tableName = TableNames.USER)
 data class User(
     @PrimaryKey val username: String,
     @ColumnInfo(name = "pw_hash") val pwHash: String,
