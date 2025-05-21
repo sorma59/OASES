@@ -53,8 +53,36 @@ object AppModule {
 
     private val MIGRATION_2_3 = object : Migration(2, 3) {
         override fun migrate(db: SupportSQLiteDatabase) {
-            // Migration1-2: image field added for Patient entity
-            db.execSQL("ALTER TABLE patients ADD COLUMN status TEXT DEFAULT NULL")
+            // Migration2-3: status field added for Patient entity
+            db.execSQL("ALTER TABLE patients ADD COLUMN status TEXT NOT NULL DEFAULT ''")
+            db.execSQL("""
+                CREATE TABLE visits (
+                    id TEXT NOT NULL DEFAULT '', 
+                    date TEXT NOT NULL DEFAULT '', 
+                    description TEXT NOT NULL DEFAULT '', 
+                    patient_id TEXT NOT NULL DEFAULT '', 
+                    triage_code TEXT NOT NULL DEFAULT '', 
+                    PRIMARY KEY(id), 
+                    FOREIGN KEY(patient_id) REFERENCES patients(id) ON UPDATE NO ACTION ON DELETE CASCADE 
+                )
+            """.trimIndent())
+            db.execSQL("""
+                CREATE TABLE diseases (
+                    name TEXT NOT NULL DEFAULT '', 
+                    PRIMARY KEY (name)
+                )
+            """.trimIndent())
+            db.execSQL("""
+                CREATE TABLE patient_diseases (
+                    patient_id TEXT NOT NULL DEFAULT '', 
+                    disease_name TEXT NOT NULL DEFAULT '', 
+                    diagnosis_date TEXT NOT NULL DEFAULT '', 
+                    additional_info TEXT NOT NULL DEFAULT '', 
+                    PRIMARY KEY(patient_id, disease_name), 
+                    FOREIGN KEY(patient_id) REFERENCES patients(id) ON UPDATE NO ACTION ON DELETE CASCADE 
+                    FOREIGN KEY(disease_name) REFERENCES diseases(name) ON UPDATE NO ACTION ON DELETE CASCADE 
+                )
+            """.trimIndent())
         }
     }
 

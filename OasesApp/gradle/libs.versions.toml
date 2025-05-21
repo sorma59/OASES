@@ -1,6 +1,5 @@
 [versions]
 agp = "8.7.3"
-hiltAndroidGradlePlugin = "2.51.1"
 jbcrypt = "0.4"
 kotlin = "2.1.20"
 coreKtx = "1.16.0"
@@ -10,7 +9,7 @@ espressoCore = "3.6.1"
 activityCompose = "1.10.1"
 composeBom = "2025.04.01"
 devtoolsKsp = "2.1.20-2.0.0"
-hiltVersion = "2.51.1"
+hilt = "2.56.2"
 lifecycleVersion = "2.8.7"
 navComposeVersion = "2.8.9"
 materialVersion = "1.7.8"
@@ -37,9 +36,9 @@ kotlinxSerializationJson = "1.6.3"
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-security-crypto = { module = "androidx.security:security-crypto", version.ref = "securityCrypto" }
-hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hiltVersion" }
-hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hiltVersion" }
-hilt-android-gradle-plugin = { module = "com.google.dagger:hilt-android-gradle-plugin", version.ref = "hiltAndroidGradlePlugin" }
+hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
+hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
+hilt-android-gradle-plugin = { module = "com.google.dagger:hilt-android-gradle-plugin", version.ref = "hilt" }
 jbcrypt = { module = "org.mindrot:jbcrypt", version.ref = "jbcrypt" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -83,5 +82,5 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 android-library = {id = "com.android.library", version.ref="agp"}
 ksp = {id = "com.google.devtools.ksp", version.ref = "devtoolsKsp"}
-hilt = {id = "com.google.dagger.hilt.android", version.ref="hiltVersion"}
+hilt = {id = "com.google.dagger.hilt.android", version.ref="hilt"}
 google-gms-google-services = { id = "com.google.gms.google-services", version.ref = "googleGmsGoogleServicesVersion" }

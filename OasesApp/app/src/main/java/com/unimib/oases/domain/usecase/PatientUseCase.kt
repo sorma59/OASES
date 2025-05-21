@@ -14,6 +14,4 @@ class PatientUseCase @Inject constructor(
         return patientRepository.getPatients()
     }
 
-
-
 }

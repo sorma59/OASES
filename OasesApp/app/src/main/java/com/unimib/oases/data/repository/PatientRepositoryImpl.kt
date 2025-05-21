@@ -86,6 +86,7 @@ class PatientRepositoryImpl(
             emit(Resource.Success(it.asReversed().map { entity -> entity.toPatient() }))
         }
     }.catch { e ->
+        Log.e("PatientRepositoryImpl", "Error getting patients: ${e.message}")
         emit(Resource.Error(e.localizedMessage ?: "Unknown error occurred"))
     }
 }

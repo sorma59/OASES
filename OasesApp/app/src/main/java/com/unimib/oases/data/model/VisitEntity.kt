@@ -1,5 +1,6 @@
 package com.unimib.oases.data.model
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
@@ -10,14 +11,16 @@ import androidx.room.PrimaryKey
         ForeignKey(
             entity = PatientEntity::class,
             parentColumns = ["id"],
-            childColumns = ["patientId"],
+            childColumns = ["patient_id"],
+            onDelete = ForeignKey.CASCADE,
+            onUpdate = ForeignKey.NO_ACTION
         )
     ]
 )
 data class VisitEntity(
     @PrimaryKey val id: String,
-    val patientId: String,
-    val triageCode: String,
-    val date: String,
-    val description: String,
+    @ColumnInfo("patient_id") val patientId: String,
+    @ColumnInfo("triage_code") val triageCode: String,
+    @ColumnInfo("date") val date: String,
+    @ColumnInfo("description") val description: String,
 )

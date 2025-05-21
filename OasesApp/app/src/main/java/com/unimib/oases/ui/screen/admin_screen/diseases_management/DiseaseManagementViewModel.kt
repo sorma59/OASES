@@ -2,7 +2,6 @@ package com.unimib.oases.ui.screen.admin_screen.diseases_management
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.unimib.oases.data.model.User
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.model.Disease
 import com.unimib.oases.domain.usecase.DiseaseUseCase

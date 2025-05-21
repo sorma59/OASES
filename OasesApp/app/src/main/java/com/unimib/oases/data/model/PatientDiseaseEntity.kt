@@ -12,13 +12,15 @@ import androidx.room.ForeignKey
             entity = PatientEntity::class,
             parentColumns = ["id"],
             childColumns = ["patient_id"],
-            onDelete = ForeignKey.CASCADE
+            onDelete = ForeignKey.CASCADE,
+            onUpdate = ForeignKey.NO_ACTION
         ),
         ForeignKey(
             entity = DiseaseEntity::class,
             parentColumns = ["name"],
             childColumns = ["disease_name"],
-            onDelete = ForeignKey.CASCADE
+            onDelete = ForeignKey.CASCADE,
+            onUpdate = ForeignKey.NO_ACTION
         )
     ]
 )

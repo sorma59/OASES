@@ -17,7 +17,7 @@ interface VisitDao {
     @Upsert
     suspend fun upsertVisit(visit: VisitEntity)
 
-    @Query("SELECT * FROM visits WHERE patientId = :patientId")
+    @Query("SELECT * FROM visits WHERE patient_id = :patientId")
     fun getVisits(patientId: String): Flow<List<VisitEntity>>
 
 }

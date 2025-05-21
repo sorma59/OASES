@@ -1,7 +1,5 @@
 package com.unimib.oases.ui.screen.admin_screen.diseases_management
 
-import com.unimib.oases.data.model.Role
-import com.unimib.oases.data.model.User
 import com.unimib.oases.domain.model.Disease
 
 

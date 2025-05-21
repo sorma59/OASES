@@ -4,10 +4,9 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
     id("org.jetbrains.kotlin.plugin.serialization")
 
-    id("com.google.dagger.hilt.android")
     id("com.google.devtools.ksp") version "2.1.20-2.0.0"
-    kotlin("kapt") // ✅ for Hilt
     id("kotlin-parcelize")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -72,8 +71,8 @@ dependencies {
 
     // Dagger - Hilt
     implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
-    //ksp(libs.hilt.compiler)
+//    kapt(libs.hilt.compiler)
+    ksp(libs.hilt.compiler)
 
     // Compose dependencies
     implementation(libs.androidx.viewmodel.compose)
@@ -113,7 +112,4 @@ dependencies {
     implementation(libs.jbcrypt) // For BCrypt hashing
     implementation(libs.gson) // For converting object to Json
 //    kapt(libs.hilt.android.compiler.v250)
-}
-kapt {
-    correctErrorTypes = true
 }

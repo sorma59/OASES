@@ -22,6 +22,7 @@ import com.unimib.oases.OasesApp
 import com.unimib.oases.R
 import com.unimib.oases.data.mapper.PatientSerializer
 import com.unimib.oases.domain.model.Patient
+import com.unimib.oases.service.BluetoothServerService
 import com.unimib.oases.util.PermissionHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -47,7 +48,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class BluetoothCustomManager @Inject constructor(){
+class BluetoothCustomManager @Inject constructor(): PatientHandler{
 
     private val appContext = OasesApp.getAppContext()
     private val bluetoothAdapter: BluetoothAdapter? by lazy {
@@ -136,12 +137,12 @@ class BluetoothCustomManager @Inject constructor(){
     // -------------------Initialize and Deinitialize-------------------
 
     fun initialize(){
-        Log.d("BluetoothServer", "Initializing")
+        Log.d("BluetoothServer", "Initializing:BCM")
         ensureBluetoothEnabled(
             onEnabled = {
                 fetchPairedDevices()
                 attemptStartServer()
-                Log.d("BluetoothServer", "Initialized")
+                Log.d("BluetoothServer", "Initialized:BCM")
             },
             onDenied = {
                 updateToastMessage(appContext.getString(R.string.bluetooth_server_not_started))
@@ -150,7 +151,7 @@ class BluetoothCustomManager @Inject constructor(){
     }
 
     fun deinitialize() {
-        stopServer()
+        //stopServer()
         emptyPairedDevices()
         emptyDiscoveredDevices()
         updateDiscoveryStatus(false)
@@ -375,11 +376,11 @@ class BluetoothCustomManager @Inject constructor(){
     // ---------------Connection------------------------
 
     private fun attemptStartServer() {
-//        ContextCompat.startForegroundService(appContext, Intent(appContext, BluetoothServerService::class.java))
-        serverJob?.cancel()
-        serverJob = serverScope.launch {
-            startServer()
-        }
+        ContextCompat.startForegroundService(appContext, Intent(appContext, BluetoothServerService()::class.java))
+//        serverJob?.cancel()
+//        serverJob = serverScope.launch {
+//            startServer()
+//        }
     }
 
 
@@ -479,7 +480,7 @@ class BluetoothCustomManager @Inject constructor(){
             val writer = BufferedWriter(OutputStreamWriter(outputStream, Charsets.UTF_8))
             writer.write(message)
             writer.newLine()
-            writer.flush() // 💥 Must flush per message
+            writer.flush()
             Log.d("Bluetooth", "Message sent: $message")
         } catch (e: IOException) {
             Log.e("Bluetooth", "Error sending message: ${e.message}")
@@ -701,7 +702,13 @@ class BluetoothCustomManager @Inject constructor(){
     private fun isBluetoothSupported(): Boolean{
         return bluetoothAdapter != null
     }
+
+    override fun onPatientReceived(patient: Patient) {
+        _receivedPatients.tryEmit(patient)
+    }
 }
+
+
 
 
 
