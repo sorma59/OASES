@@ -62,6 +62,7 @@ fun PatientInfoScreen(
     onDateChanged: (String) -> Unit,
     time: String,
     onTimeChanged: (String) -> Unit,
+
 ) {
     val scrollState = rememberScrollState()
     val context = LocalContext.current
