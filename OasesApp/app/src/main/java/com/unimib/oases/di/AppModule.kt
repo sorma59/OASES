@@ -8,11 +8,15 @@ import com.unimib.oases.data.bluetooth.BluetoothCustomManager
 import com.unimib.oases.data.local.OasesDatabase
 import com.unimib.oases.data.local.RoomDataSource
 import com.unimib.oases.data.repository.DiseaseRepositoryImpl
+import com.unimib.oases.data.repository.PatientDiseaseRepositoryImpl
 import com.unimib.oases.data.repository.PatientRepositoryImpl
 import com.unimib.oases.data.repository.UserRepositoryImpl
+import com.unimib.oases.data.repository.VisitRepositoryImpl
 import com.unimib.oases.domain.repository.DiseaseRepository
+import com.unimib.oases.domain.repository.PatientDiseaseRepository
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.domain.repository.UserRepository
+import com.unimib.oases.domain.repository.VisitRepository
 import com.unimib.oases.domain.usecase.InsertPatientLocallyUseCase
 import com.unimib.oases.domain.usecase.SendPatientViaBluetoothUseCase
 import com.unimib.oases.ui.screen.patient_registration.RegistrationScreenViewModel
@@ -30,6 +34,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
+    // ----------------Application Scope----------------
     @Provides
     @Singleton
     @ApplicationScope
@@ -37,7 +42,8 @@ object AppModule {
         return CoroutineScope(SupervisorJob() + Dispatchers.IO)
     }
 
-    // Define migrations
+    // ----------------Database--------------------
+
     private val MIGRATION_1_2 = object : Migration(1, 2) {
         override fun migrate(db: SupportSQLiteDatabase) {
             // Migration1-2: image field added for Patient entity
@@ -68,11 +74,30 @@ object AppModule {
             .build()
     }
 
-    // Provide RoomDataSource, which will now have the AppDatabase as a parameter
     @Provides
     @Singleton
-    fun provideRoomDataSource(appDatabase: OasesDatabase): RoomDataSource {
+    fun provideRoomDataSource(
+        appDatabase: OasesDatabase
+    ): RoomDataSource {
         return RoomDataSource(appDatabase)
+    }
+
+    // ----------------Repositories-------------------
+
+    @Provides
+    @Singleton
+    fun provideDiseaseRepository(
+        roomDataSource: RoomDataSource
+    ): DiseaseRepository {
+        return DiseaseRepositoryImpl(roomDataSource)
+    }
+
+    @Provides
+    @Singleton
+    fun providePatientDiseaseRepository(
+        roomDataSource: RoomDataSource
+    ): PatientDiseaseRepository {
+        return PatientDiseaseRepositoryImpl(roomDataSource)
     }
 
     @Provides
@@ -95,11 +120,13 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideDiseaseRepository(
+    fun provideVisitRepository(
         roomDataSource: RoomDataSource
-    ): DiseaseRepository {
-        return DiseaseRepositoryImpl(roomDataSource)
+    ): VisitRepository {
+        return VisitRepositoryImpl(roomDataSource)
     }
+
+    // -------------Use Cases---------------------
 
     @Provides
     fun provideSendPatientUseCase(
@@ -114,6 +141,8 @@ object AppModule {
     ): InsertPatientLocallyUseCase {
         return InsertPatientLocallyUseCase(patientRepository)
     }
+
+    // -----------ViewModels----------------
 
     @Provides
     fun provideRegistrationScreenViewModel(

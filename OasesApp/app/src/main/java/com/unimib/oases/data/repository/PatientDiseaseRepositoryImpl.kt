@@ -10,9 +10,8 @@ import com.unimib.oases.domain.repository.PatientDiseaseRepository
 import com.unimib.oases.util.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import javax.inject.Inject
 
-class PatientDiseaseRepositoryImpl @Inject constructor(
+class PatientDiseaseRepositoryImpl(
     val roomDataSource: RoomDataSource,
 ): PatientDiseaseRepository {
 

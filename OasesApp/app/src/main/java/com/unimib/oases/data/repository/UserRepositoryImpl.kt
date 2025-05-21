@@ -12,9 +12,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-class UserRepositoryImpl @Inject constructor(
+class UserRepositoryImpl(
     private val roomDataSource: RoomDataSource
 ): UserRepository {
 
