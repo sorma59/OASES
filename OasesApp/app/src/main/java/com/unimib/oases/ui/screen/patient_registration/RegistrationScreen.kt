@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -39,6 +38,7 @@ import androidx.navigation.NavController
 import com.unimib.oases.data.model.PatientStatus
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.ui.navigation.Screen
+import com.unimib.oases.ui.screen.patient_registration.continue_to_triage.ContinueToTriageDecisionScreen
 import com.unimib.oases.ui.screen.patient_registration.info.PatientInfoScreen
 import com.unimib.oases.ui.screen.patient_registration.past_medical_history.PastHistoryScreen
 import com.unimib.oases.ui.screen.patient_registration.triage.NonRedCodeScreen
@@ -56,13 +56,14 @@ fun RegistrationScreen(
     val registrationScreenViewModel: RegistrationScreenViewModel = hiltViewModel()
 
 
-    val tabs = listOf(
-        "Demographics",
-        "History",
-        "Past Medical History",
-        "Vital Signs",
-        "Triage",
-        "Non Red Code"
+    val tabs = arrayOf(
+        Tabs.Demographics.title,
+        Tabs.ContinueToTriage.title,
+        Tabs.History.title,
+        Tabs.PastMedicalHistory.title,
+        Tabs.VitalSigns.title,
+        Tabs.Triage.title,
+        Tabs.NonRedCode.title
     )
 
     var currentIndex by remember { mutableIntStateOf(0) }
@@ -86,15 +87,11 @@ fun RegistrationScreen(
     var district by remember { mutableStateOf("") }
     var nextOfKin by remember { mutableStateOf("") }
     var contact by remember { mutableStateOf("") }
-    var date by remember { mutableStateOf("") }
-    var time by remember { mutableStateOf("") }
-
-    var showDialog by remember { mutableStateOf(false) }
 
     val nextButtonText = remember(currentIndex, isRedCodeSelected) {
         if (currentIndex == tabs.lastIndex) {
             "Submit"
-        } else if (currentIndex == 4 && isRedCodeSelected) {
+        } else if (tabs[currentIndex] == Tabs.Triage.title && isRedCodeSelected) {
             "Submit"
         } else {
             "Next"
@@ -161,8 +158,8 @@ fun RegistrationScreen(
                     .weight(1f),
                 contentAlignment = Alignment.Center
             ) {
-                when (currentIndex) {
-                    0 -> PatientInfoScreen(
+                when (tabs[currentIndex]) {
+                    Tabs.Demographics.title -> PatientInfoScreen(
                         name = name,
                         onNameChanged = { name = it },
                         age = age,
@@ -186,15 +183,30 @@ fun RegistrationScreen(
                         nextOfKin = nextOfKin,
                         onNextOfKinChanged = { nextOfKin = it },
                         contact = contact,
-                        onContactChanged = { contact = it },
-                        date = date,
-                        onDateChanged = { date = it },
-                        time = time,
-                        onTimeChanged = { time = it }
+                        onContactChanged = { contact = it }
                     )
-                    1 -> VisitHistoryScreen()
-                    2 -> PastHistoryScreen()
-                    3 -> VitalSignsScreen(
+                    Tabs.ContinueToTriage.title -> ContinueToTriageDecisionScreen(
+                        onContinueToTriage = { currentIndex++ },
+                        onSkipTriage = {
+                            savePatientAndNavigateBack(
+                                name = name,
+                                age = age,
+                                sex = sex,
+                                village = village,
+                                parish = parish,
+                                subCountry = subCountry,
+                                district = district,
+                                nextOfKin = nextOfKin,
+                                status = PatientStatus.WAITING_FOR_TRIAGE.name,
+                                contact = contact,
+                                navController = navController,
+                                registrationScreenViewModel = registrationScreenViewModel
+                            )
+                        }
+                    )
+                    Tabs.History.title -> VisitHistoryScreen()
+                    Tabs.PastMedicalHistory.title -> PastHistoryScreen()
+                    Tabs.VitalSigns.title -> VitalSignsScreen(
                         sbp = sbpValue,
                         dbp = dbpValue,
                         spo2 = spo2Value,
@@ -210,12 +222,12 @@ fun RegistrationScreen(
                         onTempChanged = { tempValue = it },
                         onRbsChanged = { rbsValue = it }
                     )
-                    4 -> TriageScreen(
+                    Tabs.Triage.title -> TriageScreen(
                         onRedCodeSelected = { isRedCodeSelected = it },
                         sbpValue = sbpValue,
                         dbpValue = dbpValue
                     )
-                    5 -> NonRedCodeScreen(
+                    Tabs.NonRedCode.title -> NonRedCodeScreen(
                         spo2Value = spo2Value,
                         hrValue = hrValue,
                         rrValue = rrValue,
@@ -231,7 +243,7 @@ fun RegistrationScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column {
-                    if (currentIndex > 0) {
+                    if (tabs[currentIndex] != Tabs.Demographics.title) {
                         OutlinedButton(onClick = { currentIndex-- }) {
                             Text("Back")
                         }
@@ -239,71 +251,67 @@ fun RegistrationScreen(
                 }
 
                 Column {
-                    Button(
-                        onClick = {
-                            if (currentIndex == 0) {
-                                showDialog = true
-                            } else if (currentIndex < tabs.lastIndex) {
-                                if (currentIndex == 4 && !isRedCodeSelected) {
-                                    currentIndex++
-                                } else if (currentIndex == 4 ) {
+                    if (tabs[currentIndex] != Tabs.ContinueToTriage.title){
+                        Button(
+                            onClick = {
+                                if (
+                                    currentIndex == tabs.lastIndex ||
+                                    (tabs[currentIndex] == Tabs.Triage.title && isRedCodeSelected)
+                                ) {
                                     navController.navigate(Screen.HomeScreen.route) {
                                         popUpTo(0) { inclusive = true }
                                     }
                                 } else {
                                     currentIndex++
                                 }
-                            } else {
-                                navController.navigate(Screen.HomeScreen.route) {
-                                    popUpTo(0) { inclusive = true }
-                                }
                             }
+                        ) {
+                            Text(text = nextButtonText)
                         }
-                    ) {
-                        Text(text = nextButtonText)
                     }
                 }
             }
-
-            if (showDialog) {
-                AlertDialog(
-                    onDismissRequest = { showDialog = false },
-                    title = { Text("Conferma") },
-                    text = { Text("Vuoi continuare con la registrazione?") },
-                    confirmButton = {
-                        Button(onClick = {
-                            showDialog = false
-                            currentIndex++
-                        }) {
-                            Text("Sì")
-                        }
-                    },
-                    dismissButton = {
-                        OutlinedButton(
-                            onClick = {
-                                showDialog = false
-                                val patient =
-                                    Patient(
-                                        name = name,
-                                        age = age.toInt(),
-                                        sex = sex,
-                                        village = village,
-                                        parish = parish,
-                                        subCounty = subCountry,
-                                        district = district,
-                                        nextOfKin = nextOfKin,
-                                        status = PatientStatus.WAITING_FOR_TRIAGE.name,
-                                        contact = contact,
-                                    )
-                                registrationScreenViewModel.addPatient(patient)
-                                navController.popBackStack()
-                            }
-                        ) {
-                            Text("No")
-                        }
-                    }
-                )
-            }
         }
     }
+}
+
+fun savePatientAndNavigateBack(
+    name: String,
+    age: String,
+    sex: String,
+    village: String,
+    parish: String,
+    subCountry: String,
+    district: String,
+    nextOfKin: String,
+    status: String,
+    contact: String,
+    navController: NavController,
+    registrationScreenViewModel: RegistrationScreenViewModel
+){
+    val patient =
+        Patient(
+            name = name,
+            age = age.toInt(),
+            sex = sex,
+            village = village,
+            parish = parish,
+            subCounty = subCountry,
+            district = district,
+            nextOfKin = nextOfKin,
+            status = status,
+            contact = contact,
+        )
+    registrationScreenViewModel.addPatient(patient)
+    navController.popBackStack()
+}
+
+enum class Tabs(val title: String){
+    Demographics("Demographics"),
+    ContinueToTriage("Continue to Triage?"),
+    History("History"),
+    PastMedicalHistory("Past Medical History"),
+    VitalSigns("Vital Signs"),
+    Triage("Triage"),
+    NonRedCode("Non Red Code")
 }

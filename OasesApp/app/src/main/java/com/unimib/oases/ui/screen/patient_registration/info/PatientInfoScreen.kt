@@ -28,10 +28,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.unimib.oases.ui.components.util.AnimatedLabelOutlinedTextField
-import com.unimib.oases.ui.components.util.DateSelector
 import com.unimib.oases.ui.components.util.FadeOverlay
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -58,14 +56,9 @@ fun PatientInfoScreen(
     onNextOfKinChanged: (String) -> Unit,
     contact: String,
     onContactChanged: (String) -> Unit,
-    date: String,
-    onDateChanged: (String) -> Unit,
-    time: String,
-    onTimeChanged: (String) -> Unit,
 
 ) {
     val scrollState = rememberScrollState()
-    val context = LocalContext.current
 
     Box{
         Column(
@@ -129,10 +122,6 @@ fun PatientInfoScreen(
                 Modifier.fillMaxWidth()
             )
 
-            DateSelector(date, onDateChanged, Modifier.fillMaxWidth(), context)
-
-            CurrentTimeDisplay(onTimeChanged, Modifier.fillMaxWidth())
-
             Spacer(modifier = Modifier.height(30.dp))
         }
 
@@ -151,7 +140,7 @@ fun SexDropdown(
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val sexOptions = listOf("Maschio", "Femmina")
+    val sexOptions = listOf("Male", "Female")
 
     ExposedDropdownMenuBox(
         expanded = expanded,
@@ -160,8 +149,8 @@ fun SexDropdown(
     ) {
         AnimatedLabelOutlinedTextField(
             value = selectedSex,
-            onValueChange = { /* Non permettere la modifica diretta */ },
-            labelText = "Sesso",
+            onValueChange = { },
+            labelText = "Sex",
             modifier = Modifier.fillMaxWidth(),
             readOnly = true,
             trailingIcon = {

@@ -84,6 +84,7 @@ fun AppNavigation(
         composable(Screen.PairDevice.route){
             PairNewDeviceScreen(navController, padding)
         }
+
         composable(Screen.MedicalVisitScreen.route) {
             MedicalVisitScreen(navController, authViewModel, padding)
         }

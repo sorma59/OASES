@@ -8,20 +8,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun CenteredText(
     text: String,
     modifier: Modifier = Modifier,
-    style: TextStyle = TextStyle.Default
+    style: TextStyle = TextStyle.Default,
+    fontSize: TextUnit = TextUnit.Unspecified
 ) {
     Box(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = text,
             textAlign = TextAlign.Center,
             modifier = modifier.padding(horizontal = 16.dp),
-            style = style
+            style = style,
+            fontSize = fontSize
         )
     }
 }

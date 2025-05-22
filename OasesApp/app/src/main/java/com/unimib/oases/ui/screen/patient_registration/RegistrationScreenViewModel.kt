@@ -1,7 +1,6 @@
 package com.unimib.oases.ui.screen.patient_registration
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.unimib.oases.data.model.PatientStatus
 import com.unimib.oases.di.ApplicationScope
 import com.unimib.oases.domain.model.Patient
@@ -112,16 +111,16 @@ class RegistrationScreenViewModel @Inject constructor(
                 contact = _formState.value.contact,
                 status = PatientStatus.WAITING_FOR_TRIAGE.name
             )
-            viewModelScope.launch {
-                addPatient(patient)
-            }
+
+            addPatient(patient)
+
         } //else
 //            sendToast(appContext.getString(R.string.add_patient_form_not_valid))
     }
 
     internal fun addPatient(patient: Patient) {
         updateInsertionStatus(Resource.Loading())
-        viewModelScope.launch{
+        applicationScope.launch{
             val result = patientRepository.addPatient(patient)
             updateInsertionStatus(result)
             when (result) {
