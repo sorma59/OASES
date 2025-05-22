@@ -2,7 +2,8 @@ package com.unimib.oases.di
 
 import android.content.Context
 import androidx.room.Room
-import com.unimib.oases.data.local.OasesDatabase
+import com.unimib.oases.data.local.db.AuthDatabase
+import com.unimib.oases.data.local.db.OasesDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -96,8 +97,22 @@ object AppModule {
             OasesDatabase::class.java,
             "oases_database"
         )
-            .fallbackToDestructiveMigration(true) // Currently wipes out data each run
-            .createFromAsset("databases/users.db")
-            .build()
+        .fallbackToDestructiveMigration(true)
+//        .createFromAsset("databases/users.db")
+        .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideAuthDatabase(
+        @ApplicationContext context: Context
+    ): AuthDatabase {
+        return Room.databaseBuilder(
+            context,
+            AuthDatabase::class.java,
+            "auth_database"
+        )
+        .createFromAsset("databases/users.db")
+        .build()
     }
 }

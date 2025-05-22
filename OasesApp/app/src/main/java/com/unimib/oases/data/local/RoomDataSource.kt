@@ -7,6 +7,8 @@ import com.unimib.oases.data.local.dao.UserDao
 import com.unimib.oases.data.local.dao.VisitDao
 import com.unimib.oases.data.local.dao.VisitVitalSignDao
 import com.unimib.oases.data.local.dao.VitalSignsDao
+import com.unimib.oases.data.local.db.AuthDatabase
+import com.unimib.oases.data.local.db.OasesDatabase
 import com.unimib.oases.data.model.DiseaseEntity
 import com.unimib.oases.data.model.PatientDiseaseEntity
 import com.unimib.oases.data.model.PatientEntity
@@ -19,10 +21,11 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class RoomDataSource @Inject constructor(
-    private val appDatabase: OasesDatabase
+    private val appDatabase: OasesDatabase,
+    private val authDatabase: AuthDatabase
 ) {
     private val patientDao: PatientDao get() = appDatabase.patientDao()
-    private val userDao: UserDao get() = appDatabase.userDao()
+    private val userDao: UserDao get() = authDatabase.userDao()
     private val patientDiseaseDao: PatientDiseaseDao get() = appDatabase.patientDiseaseDao()
     private val diseaseDao: DiseaseDao get() = appDatabase.diseaseDao()
     private val visitDao: VisitDao get() = appDatabase.visitDao()
@@ -64,7 +67,7 @@ class RoomDataSource @Inject constructor(
         userDao.delete(user)
     }
 
-    // ------------Patient Disease----------------
+    // ------------Patients Diseases----------------
     suspend fun insertPatientDisease(patientDisease: PatientDiseaseEntity) {
         patientDiseaseDao.insert(patientDisease)
     }
@@ -108,7 +111,7 @@ class RoomDataSource @Inject constructor(
         return visitDao.getVisits(patientId)
     }
 
-    // ----------------Visit Vital Signs----------------
+    // ----------------Visits Vital Signs----------------
 
     suspend fun insertVisitVitalSigns(visitVitalSign: VisitVitalSignEntity) {
         visitVitalSignDao.insert(visitVitalSign)

@@ -1,8 +1,9 @@
-package com.unimib.oases.data.local
+package com.unimib.oases.data.local.db
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.unimib.oases.data.local.Converters
 import com.unimib.oases.data.local.dao.DiseaseDao
 import com.unimib.oases.data.local.dao.PatientDao
 import com.unimib.oases.data.local.dao.PatientDiseaseDao

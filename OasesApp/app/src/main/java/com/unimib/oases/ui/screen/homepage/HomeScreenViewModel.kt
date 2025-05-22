@@ -3,6 +3,7 @@ package com.unimib.oases.ui.screen.homepage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unimib.oases.di.IoDispatcher
+import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.domain.usecase.PatientUseCase
 import com.unimib.oases.util.Resource
@@ -13,7 +14,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -53,11 +53,17 @@ class HomeScreenViewModel @Inject constructor(
 
     // ----------------------Patients-------------------------------
 
-    init {
+    private val receivedPatients: StateFlow<List<Patient>> =
         patientRepository
             .receivedPatients
-            .onEach { _state.value = _state.value.copy(receivedPatients = it) }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    init {
+        viewModelScope.launch {
+            receivedPatients.collect { patients ->
+                _state.value = _state.value.copy(receivedPatients = patients)
+            }
+        }
     }
 
     fun getPatients() {
