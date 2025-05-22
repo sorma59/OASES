@@ -1,20 +1,27 @@
 package com.unimib.oases.ui.screen.admin_screen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.MedicalInformation
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -27,6 +34,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -45,7 +53,6 @@ fun AdminScreen(
 ) {
 
 
-
     val authState = authViewModel.authState.observeAsState()
 
 
@@ -55,6 +62,7 @@ fun AdminScreen(
                 navController.navigate(Screen.LoginScreen.route) {
                     popUpTo(0) { inclusive = true }
                 }
+
             else -> Unit
         }
     }
@@ -105,18 +113,31 @@ fun AdminScreen(
 
         Column(
             modifier = Modifier
-                .padding(horizontal = 20.dp)
+                .padding(horizontal = 10.dp)
                 .fillMaxSize()
                 .padding(bottom = padding.calculateBottomPadding()),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
 
-            LazyVerticalGrid(columns = GridCells.Fixed(3), contentPadding = PaddingValues(0.dp)) {
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(minSize = 110.dp),
+                contentPadding = PaddingValues(0.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
+
+
                 item {
-                    Button(onClick = { navController.navigate(Screen.UserManagementScreen.route) }, shape = MaterialTheme.shapes.extraSmall, modifier = Modifier.padding(5.dp)) {
-                        Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally){
-                            Row{
+                    Button(
+                        onClick = { navController.navigate(Screen.UserManagementScreen.route) },
+                        shape = MaterialTheme.shapes.extraSmall,
+                        modifier = Modifier.padding(5.dp)
+                    ) {
+                        Column(
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Row {
                                 Icon(
                                     imageVector = Icons.Default.Person,
 
@@ -127,22 +148,27 @@ fun AdminScreen(
                                 )
                             }
 
-                            Row{
+                            Row {
                                 Text(text = "Users")
                             }
 
 
-
-
                         }
 
                     }
                 }
 
                 item {
-                    Button(onClick = { navController.navigate(Screen.DiseaseManagementScreen.route) }, shape = MaterialTheme.shapes.extraSmall, modifier = Modifier.padding(5.dp)) {
-                        Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally){
-                            Row{
+                    Button(
+                        onClick = { navController.navigate(Screen.DiseaseManagementScreen.route) },
+                        shape = MaterialTheme.shapes.extraSmall,
+                        modifier = Modifier.padding(5.dp)
+                    ) {
+                        Column(
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Row {
                                 Icon(
                                     imageVector = Icons.Default.MedicalInformation,
 
@@ -153,22 +179,27 @@ fun AdminScreen(
                                 )
                             }
 
-                            Row{
+                            Row {
                                 Text(text = "Diseases")
                             }
 
 
-
-
                         }
 
                     }
                 }
 
                 item {
-                    Button(onClick = { navController.navigate(Screen.VitalSignsManagementScreen.route) }, shape = MaterialTheme.shapes.extraSmall, modifier = Modifier.padding(5.dp)) {
-                        Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally){
-                            Row{
+                    Button(
+                        onClick = { navController.navigate(Screen.VitalSignsManagementScreen.route) },
+                        shape = MaterialTheme.shapes.extraSmall,
+                        modifier = Modifier.padding(5.dp)
+                    ) {
+                        Column(
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Row {
                                 Icon(
                                     imageVector = Icons.Default.MedicalInformation,
 
@@ -179,18 +210,15 @@ fun AdminScreen(
                                 )
                             }
 
-                            Row{
+                            Row {
                                 Text(text = "Vital Signs")
                             }
-
-
 
 
                         }
 
                     }
                 }
-
 
 
             }
