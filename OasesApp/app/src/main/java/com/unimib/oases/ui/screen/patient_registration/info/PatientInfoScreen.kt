@@ -2,11 +2,12 @@ package com.unimib.oases.ui.screen.patient_registration.info
 
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -14,23 +15,29 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.unimib.oases.ui.components.util.AnimatedLabelOutlinedTextField
 import com.unimib.oases.ui.components.util.FadeOverlay
+import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -38,98 +45,193 @@ import java.util.TimeZone
 
 @Composable
 fun PatientInfoScreen(
-    name: String,
-    onNameChanged: (String) -> Unit,
-    age: String,
-    onAgeChanged: (String) -> Unit,
-    sex: String,
-    onSexChanged: (String) -> Unit,
-    village: String,
-    onVillageChanged: (String) -> Unit,
-    parish: String,
-    onParishChanged: (String) -> Unit,
-    subCountry: String,
-    onSubCountryChanged: (String) -> Unit,
-    district: String,
-    onDistrictChanged: (String) -> Unit,
-    nextOfKin: String,
-    onNextOfKinChanged: (String) -> Unit,
-    contact: String,
-    onContactChanged: (String) -> Unit,
-
+    onSubmitted: () -> Unit
 ) {
+
+    val patientInfoViewModel: PatientInfoViewModel = hiltViewModel()
+
+    val state by patientInfoViewModel.state.collectAsState()
+
+    val context = LocalContext.current
+
+    LaunchedEffect(key1 = context) {
+        patientInfoViewModel.validationEvents.collect { event ->
+            when (event) {
+                is PatientInfoViewModel.ValidationEvent.Success -> {
+                    Log.d("PatientInfoScreen", "Success")
+                    onSubmitted()
+                }
+            }
+        }
+    }
+
     val scrollState = rememberScrollState()
 
-    Box{
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(scrollState)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            AnimatedLabelOutlinedTextField(name, onNameChanged, "Name", Modifier.fillMaxWidth())
+    if (state.isLoading)
+        CustomCircularProgressIndicator()
+    else {
+        Column {
+            Box(
+                modifier = Modifier.weight(1f)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .verticalScroll(scrollState)
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    AnimatedLabelOutlinedTextField(
+                        value = state.name,
+                        onValueChange = {
+                            patientInfoViewModel.onEvent(
+                                PatientInfoEvent.NameChanged(
+                                    it
+                                )
+                            )
+                        },
+                        labelText = "Name",
+                        isError = state.nameError != null,
+                        modifier = Modifier.fillMaxWidth()
+                    )
 
-            AnimatedLabelOutlinedTextField(
-                age,
-                onAgeChanged,
-                "Age",
-                Modifier.fillMaxWidth(),
-                isNumeric = true
-            )
+                    if (state.nameError != null)
+                        Text(
+                            text = state.nameError!!,
+                            color = MaterialTheme.colorScheme.error
+                        )
 
-            SexDropdown(sex, onSexChanged, Modifier.fillMaxWidth())
+                    AnimatedLabelOutlinedTextField(
+                        value = if (state.age == -1) "" else state.age.toString(),
+                        onValueChange = {
+                            patientInfoViewModel.onEvent(
+                                PatientInfoEvent.AgeChanged(
+                                    if (it.isEmpty()) -1 else it.toInt()
+                                )
+                            )
+                        },
+                        labelText = "Age",
+                        isError = state.ageError != null,
+                        modifier = Modifier.fillMaxWidth(),
+                        isNumeric = true
+                    )
 
-            AnimatedLabelOutlinedTextField(
-                village,
-                onVillageChanged,
-                "Village",
-                Modifier.fillMaxWidth()
-            )
+                    if (state.ageError != null)
+                        Text(
+                            text = state.ageError!!,
+                            color = MaterialTheme.colorScheme.error
+                        )
 
-            AnimatedLabelOutlinedTextField(
-                parish,
-                onParishChanged,
-                "Parish",
-                Modifier.fillMaxWidth()
-            )
+                    SexDropdown(
+                        selectedSex = state.sex,
+                        onSexSelected = {
+                            patientInfoViewModel.onEvent(
+                                PatientInfoEvent.SexChanged(
+                                    it
+                                )
+                            )
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
 
-            AnimatedLabelOutlinedTextField(
-                subCountry,
-                onSubCountryChanged,
-                "Sub Country",
-                Modifier.fillMaxWidth()
-            )
+                    AnimatedLabelOutlinedTextField(
+                        value = state.village,
+                        onValueChange = {
+                            patientInfoViewModel.onEvent(
+                                PatientInfoEvent.VillageChanged(
+                                    it
+                                )
+                            )
+                        },
+                        labelText = "Village",
+                        modifier = Modifier.fillMaxWidth()
+                    )
 
-            AnimatedLabelOutlinedTextField(
-                district,
-                onDistrictChanged,
-                "District",
-                Modifier.fillMaxWidth()
-            )
+                    AnimatedLabelOutlinedTextField(
+                        value = state.parish,
+                        onValueChange = {
+                            patientInfoViewModel.onEvent(
+                                PatientInfoEvent.ParishChanged(
+                                    it
+                                )
+                            )
+                        },
+                        labelText = "Parish",
+                        modifier = Modifier.fillMaxWidth()
+                    )
 
-            AnimatedLabelOutlinedTextField(
-                nextOfKin,
-                onNextOfKinChanged,
-                "Next of Kin",
-                Modifier.fillMaxWidth()
-            )
+                    AnimatedLabelOutlinedTextField(
+                        value = state.subCounty,
+                        onValueChange = {
+                            patientInfoViewModel.onEvent(
+                                PatientInfoEvent.SubCountyChanged(
+                                    it
+                                )
+                            )
+                        },
+                        labelText = "Sub Country",
+                        modifier = Modifier.fillMaxWidth()
+                    )
 
-            AnimatedLabelOutlinedTextField(
-                contact,
-                onContactChanged,
-                "Contact",
-                Modifier.fillMaxWidth()
-            )
+                    AnimatedLabelOutlinedTextField(
+                        value = state.district,
+                        onValueChange = {
+                            patientInfoViewModel.onEvent(
+                                PatientInfoEvent.DistrictChanged(
+                                    it
+                                )
+                            )
+                        },
+                        labelText = "District",
+                        modifier = Modifier.fillMaxWidth()
+                    )
 
-            Spacer(modifier = Modifier.height(30.dp))
+                    AnimatedLabelOutlinedTextField(
+                        value = state.nextOfKin,
+                        onValueChange = {
+                            patientInfoViewModel.onEvent(
+                                PatientInfoEvent.NextOfKinChanged(
+                                    it
+                                )
+                            )
+                        },
+                        labelText = "Next of Kin",
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    AnimatedLabelOutlinedTextField(
+                        value = state.contact,
+                        onValueChange = {
+                            patientInfoViewModel.onEvent(
+                                PatientInfoEvent.ContactChanged(
+                                    it
+                                )
+                            )
+                        },
+                        labelText = "Contact",
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(30.dp))
+                }
+                FadeOverlay(modifier = Modifier.align(Alignment.BottomCenter))
+            }
+            Row(
+                modifier = Modifier
+                    .padding(12.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                Button(
+                    onClick = {
+                        patientInfoViewModel.onEvent(PatientInfoEvent.Submit)
+                    }
+                ) {
+                    Text("Submit")
+                }
+            }
         }
-
-        FadeOverlay(modifier = Modifier.align(Alignment.BottomCenter))
     }
 }
-
-
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -140,7 +242,7 @@ fun SexDropdown(
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val sexOptions = listOf("Male", "Female")
+    val sexOptions = Sex.entries
 
     ExposedDropdownMenuBox(
         expanded = expanded,
@@ -165,9 +267,9 @@ fun SexDropdown(
         ) {
             sexOptions.forEach { option ->
                 DropdownMenuItem(
-                    text = { Text(text = option) },
+                    text = { Text(text = option.displayName) },
                     onClick = {
-                        onSexSelected(option)
+                        onSexSelected(option.displayName)
                         expanded = false
                     }
                 )
@@ -194,12 +296,18 @@ fun CurrentTimeDisplay(
 
     AnimatedLabelOutlinedTextField(
         value = time,
-        onValueChange = { /* Non permettere la modifica diretta */ },
+        onValueChange = { },
         labelText = "Time",
         modifier = modifier,
         readOnly = true,
         trailingIcon = {
-            Icon(Icons.Filled.Timer, contentDescription = "Ora attuale")
+            Icon(Icons.Filled.Timer, contentDescription = "Current time")
         }
     )
+}
+
+enum class Sex(val displayName: String) {
+    Male("Male"),
+    Female("Female"),
+    Unspecified("Unspecified")
 }

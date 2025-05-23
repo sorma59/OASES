@@ -24,7 +24,7 @@ fun ContinueToTriageDecisionScreen(
     ){
 
         CenteredText(
-            "Do you want to continue with triage or simply save the patient?",
+            "The patient was saved, you will be able to edit it later on.\nDo you want to continue with their triage or go back to home?",
             fontSize = 20.sp
         )
 
@@ -46,7 +46,7 @@ fun SkipTriageButton(onClick: () -> Unit) {
     Button(
         onClick = onClick
     ){
-        Text("Save the patient")
+        Text("Go to Home")
     }
 }
 
@@ -55,6 +55,6 @@ fun ContinueToTriageButton(onClick: () -> Unit) {
     Button(
         onClick = onClick
     ){
-        Text("Continue with triage")
+        Text("Continue to triage")
     }
 }

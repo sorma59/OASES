@@ -35,8 +35,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.unimib.oases.data.model.PatientStatus
-import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.ui.navigation.Screen
 import com.unimib.oases.ui.screen.patient_registration.continue_to_triage.ContinueToTriageDecisionScreen
 import com.unimib.oases.ui.screen.patient_registration.info.PatientInfoScreen
@@ -77,16 +75,6 @@ fun RegistrationScreen(
     var rrValue by remember { mutableStateOf("") }
     var tempValue by remember { mutableStateOf("") }
     var rbsValue by remember { mutableStateOf("") }
-
-    var name by remember { mutableStateOf("") }
-    var age by remember { mutableStateOf("") }
-    var sex by remember { mutableStateOf("") }
-    var village by remember { mutableStateOf("") }
-    var parish by remember { mutableStateOf("") }
-    var subCountry by remember { mutableStateOf("") }
-    var district by remember { mutableStateOf("") }
-    var nextOfKin by remember { mutableStateOf("") }
-    var contact by remember { mutableStateOf("") }
 
     val nextButtonText = remember(currentIndex, isRedCodeSelected) {
         if (currentIndex == tabs.lastIndex) {
@@ -160,48 +148,12 @@ fun RegistrationScreen(
             ) {
                 when (tabs[currentIndex]) {
                     Tabs.Demographics.title -> PatientInfoScreen(
-                        name = name,
-                        onNameChanged = { name = it },
-                        age = age,
-                        onAgeChanged = {
-                            val filtered = it.filter { ch -> ch.isDigit() }
-                            val intVal = filtered.toIntOrNull() ?: 0
-                            if (intVal in 1..100 || filtered.isEmpty()) {
-                                age = filtered
-                            }
-                        },
-                        sex = sex,
-                        onSexChanged = { sex = it },
-                        village = village,
-                        onVillageChanged = { village = it },
-                        parish = parish,
-                        onParishChanged = { parish = it },
-                        subCountry = subCountry,
-                        onSubCountryChanged = { subCountry = it },
-                        district = district,
-                        onDistrictChanged = { district = it },
-                        nextOfKin = nextOfKin,
-                        onNextOfKinChanged = { nextOfKin = it },
-                        contact = contact,
-                        onContactChanged = { contact = it }
+                        onSubmitted = { currentIndex++ }
                     )
                     Tabs.ContinueToTriage.title -> ContinueToTriageDecisionScreen(
                         onContinueToTriage = { currentIndex++ },
                         onSkipTriage = {
-                            savePatientAndNavigateBack(
-                                name = name,
-                                age = age,
-                                sex = sex,
-                                village = village,
-                                parish = parish,
-                                subCountry = subCountry,
-                                district = district,
-                                nextOfKin = nextOfKin,
-                                status = PatientStatus.WAITING_FOR_TRIAGE.name,
-                                contact = contact,
-                                navController = navController,
-                                registrationScreenViewModel = registrationScreenViewModel
-                            )
+                            navController.popBackStack()
                         }
                     )
                     Tabs.History.title -> VisitHistoryScreen()
@@ -243,7 +195,7 @@ fun RegistrationScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column {
-                    if (tabs[currentIndex] != Tabs.Demographics.title) {
+                    if (tabs[currentIndex] != Tabs.Demographics.title && tabs[currentIndex] != Tabs.ContinueToTriage.title) {
                         OutlinedButton(onClick = { currentIndex-- }) {
                             Text("Back")
                         }
@@ -251,7 +203,7 @@ fun RegistrationScreen(
                 }
 
                 Column {
-                    if (tabs[currentIndex] != Tabs.ContinueToTriage.title){
+                    if (tabs[currentIndex] != Tabs.ContinueToTriage.title && tabs[currentIndex] != Tabs.Demographics.title){
                         Button(
                             onClick = {
                                 if (
@@ -273,37 +225,6 @@ fun RegistrationScreen(
             }
         }
     }
-}
-
-fun savePatientAndNavigateBack(
-    name: String,
-    age: String,
-    sex: String,
-    village: String,
-    parish: String,
-    subCountry: String,
-    district: String,
-    nextOfKin: String,
-    status: String,
-    contact: String,
-    navController: NavController,
-    registrationScreenViewModel: RegistrationScreenViewModel
-){
-    val patient =
-        Patient(
-            name = name,
-            age = age.toInt(),
-            sex = sex,
-            village = village,
-            parish = parish,
-            subCounty = subCountry,
-            district = district,
-            nextOfKin = nextOfKin,
-            status = status,
-            contact = contact,
-        )
-    registrationScreenViewModel.addPatient(patient)
-    navController.popBackStack()
 }
 
 enum class Tabs(val title: String){

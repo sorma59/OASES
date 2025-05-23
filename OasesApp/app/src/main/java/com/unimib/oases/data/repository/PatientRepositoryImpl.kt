@@ -67,6 +67,7 @@ class PatientRepositoryImpl @Inject constructor(
 
     override suspend fun addPatient(patient: Patient): Resource<Unit> {
         return try {
+            Log.e("PatientRepositoryImpl", "Adding patient: $patient")
             roomDataSource.insertPatient(patient.toEntity())
             Resource.Success(Unit)
         } catch (e: Exception) {
