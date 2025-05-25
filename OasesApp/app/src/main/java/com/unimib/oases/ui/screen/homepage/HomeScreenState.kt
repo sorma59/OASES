@@ -7,6 +7,7 @@ data class HomeScreenState(
     val patients: List<Patient> = emptyList(),
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
+    val toastMessage: String? = null
 
     // Add more screen-specific UI flags as needed
 )

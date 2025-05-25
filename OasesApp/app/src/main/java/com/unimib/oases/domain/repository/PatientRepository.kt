@@ -11,5 +11,6 @@ interface PatientRepository {
     val receivedPatients: StateFlow<List<Patient>>
     suspend fun addPatient(patient: Patient): Resource<Unit>
     suspend fun removePatientFromRecentlyReceived(patient: Patient)
+    suspend fun deletePatient(patient: Patient): Resource<Unit>
     fun getPatients(): Flow<Resource<List<Patient>>>
 }

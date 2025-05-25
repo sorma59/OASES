@@ -1,5 +1,6 @@
 package com.unimib.oases.ui.screen.homepage
 
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -124,6 +125,13 @@ fun HomeScreen(
 
             else -> Unit
         }
+    }
+
+    LaunchedEffect(state.toastMessage) {
+        state.toastMessage?.let { message ->
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        }
+        homeScreenViewModel.onToastMessageShown()
     }
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -337,11 +345,12 @@ fun HomeScreen(
                         }
                         else if (state.patients.isNotEmpty()) {
                             PatientList(
-                                filteredItems,
-                                navController,
-                                homeScreenViewModel
+                                patients = filteredItems,
+                                navController = navController,
+                                homeScreenViewModel = homeScreenViewModel
                             )
-                        } else if (state.errorMessage != null){
+                        }
+                        if (state.errorMessage != null){
                             Text(state.errorMessage!!)
                         }
 

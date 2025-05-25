@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.domain.repository.PatientRepository
+import com.unimib.oases.domain.usecase.DeletePatientUseCase
 import com.unimib.oases.domain.usecase.PatientUseCase
 import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,6 +23,7 @@ import javax.inject.Inject
 class HomeScreenViewModel @Inject constructor(
     patientRepository: PatientRepository,
     private val useCases: PatientUseCase,
+    private val deletePatientUseCase: DeletePatientUseCase,
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
 ): ViewModel() {
 
@@ -41,8 +43,21 @@ class HomeScreenViewModel @Inject constructor(
 
     fun onEvent(event: HomeScreenEvent) {
         when (event) {
+
             is HomeScreenEvent.Delete -> {
-                //useCases.deletePatient(event.value)
+                viewModelScope.launch{
+                    val name = event.patient.name
+                    val result = deletePatientUseCase(event.patient)
+                    if (result is Resource.Success) {
+                        _state.value = _state.value.copy(
+                            toastMessage = "Deleted patient $name."
+                        )
+                    } else if (result is Resource.Error) {
+                        _state.value = _state.value.copy(
+                            toastMessage = "Couldn't delete $name"
+                        )
+                    }
+                }
             }
 
             is HomeScreenEvent.Share -> {
@@ -98,5 +113,10 @@ class HomeScreenViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    // ----------------Toasts----------------
+    fun onToastMessageShown() {
+        _state.value = _state.value.copy(toastMessage = null)
     }
 }

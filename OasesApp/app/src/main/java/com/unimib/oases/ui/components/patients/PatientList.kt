@@ -1,6 +1,5 @@
 package com.unimib.oases.ui.components.patients
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -20,7 +19,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.unimib.oases.domain.model.Patient
@@ -35,16 +33,14 @@ import com.unimib.oases.ui.screen.homepage.HomeScreenViewModel
 
 @Composable
 fun PatientList(
+    modifier: Modifier = Modifier,
     patients: List<Patient> = emptyList(),
     navController: NavController,
     homeScreenViewModel: HomeScreenViewModel,
-    modifier: Modifier = Modifier,
     title: String = "Patient List",
   //  onItemClick: (Patient) -> Unit = {},
     noPatientsMessage: String = "No patients found."
 ) {
-
-    val context = LocalContext.current
 
     val wrappedPatientList = remember { mutableStateListOf<PatientUi>() }
 
@@ -97,12 +93,7 @@ fun PatientList(
                                 ActionIcon(
                                     onClick = {
                                         homeScreenViewModel.onEvent(HomeScreenEvent.Delete(patient.item))
-                                        Toast.makeText(
-                                            context,
-                                            "Patient ${patient.item.id} was deleted.",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                        wrappedPatientList.remove(patient)
+//                                        wrappedPatientList.remove(patient)
                                     },
                                     backgroundColor = MaterialTheme.colorScheme.error,
                                     icon = Icons.Default.Delete,
