@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.Bloodtype
 import androidx.compose.material.icons.filled.MedicalInformation
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
@@ -193,7 +194,7 @@ fun AdminScreen(
                         ) {
                             Row {
                                 Icon(
-                                    imageVector = Icons.Default.MedicalInformation,
+                                    imageVector = Icons.Default.Bloodtype,
 
                                     contentDescription = "",
                                     modifier = Modifier.size(50.dp)

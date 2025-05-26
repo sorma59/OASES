@@ -3,7 +3,6 @@ package com.unimib.oases.ui.screen.medical_visit.info
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -70,7 +69,6 @@ fun PatientInfoScreen(
             value = patientName,
             onValueChange = { }, // Disabilita la modifica
             labelText = "Name",
-            modifier = Modifier.fillMaxWidth(),
             readOnly = true
         )
         Spacer(modifier = Modifier.height(8.dp))
@@ -79,7 +77,6 @@ fun PatientInfoScreen(
             value = patientAge,
             onValueChange = { }, // Disabilita la modifica
             labelText = "Age",
-            modifier = Modifier.fillMaxWidth(),
             readOnly = true
         )
         Spacer(modifier = Modifier.height(8.dp))
@@ -88,7 +85,6 @@ fun PatientInfoScreen(
             value = patientSex,
             onValueChange = { }, // Disabilita la modifica
             labelText = "Sex",
-            modifier = Modifier.fillMaxWidth(),
             readOnly = true
         )
         Spacer(modifier = Modifier.height(8.dp))
@@ -97,7 +93,6 @@ fun PatientInfoScreen(
             value = patientVillage,
             onValueChange = { }, // Disabilita la modifica
             labelText = "Village",
-            modifier = Modifier.fillMaxWidth(),
             readOnly = true
         )
         Spacer(modifier = Modifier.height(8.dp))
@@ -106,7 +101,6 @@ fun PatientInfoScreen(
             value = patientParish,
             onValueChange = { }, // Disabilita la modifica
             labelText = "Parish",
-            modifier = Modifier.fillMaxWidth(),
             readOnly = true
         )
         Spacer(modifier = Modifier.height(8.dp))
@@ -114,8 +108,7 @@ fun PatientInfoScreen(
         AnimatedLabelOutlinedTextField(
             value = patientSubCountry,
             onValueChange = { }, // Disabilita la modifica
-            labelText = "Sub Country",
-            modifier = Modifier.fillMaxWidth(),
+            labelText = "SubCounty",
             readOnly = true
         )
         Spacer(modifier = Modifier.height(8.dp))
@@ -124,7 +117,6 @@ fun PatientInfoScreen(
             value = patientDistrict,
             onValueChange = { }, // Disabilita la modifica
             labelText = "District",
-            modifier = Modifier.fillMaxWidth(),
             readOnly = true
         )
         Spacer(modifier = Modifier.height(8.dp))
@@ -133,7 +125,6 @@ fun PatientInfoScreen(
             value = patientNextOfKin,
             onValueChange = { }, // Disabilita la modifica
             labelText = "Next of Kin",
-            modifier = Modifier.fillMaxWidth(),
             readOnly = true
         )
         Spacer(modifier = Modifier.height(8.dp))
@@ -142,7 +133,6 @@ fun PatientInfoScreen(
             value = patientContact,
             onValueChange = { }, // Disabilita la modifica
             labelText = "Contact",
-            modifier = Modifier.fillMaxWidth(),
             readOnly = true
         )
         Spacer(modifier = Modifier.height(8.dp))
@@ -153,7 +143,6 @@ fun PatientInfoScreen(
                 selectedDate = it
                 onPatientDateChanged(it)
             },
-            modifier = Modifier.fillMaxWidth(),
             context = context,
             readOnly = true // Imposta a true per disabilitare la modifica diretta
         )
@@ -165,7 +154,6 @@ fun PatientInfoScreen(
                 selectedTime = it
                 onPatientTimeChanged(it)
             },
-            modifier = Modifier.fillMaxWidth(),
             context = context,
             readOnly = true // Imposta a true per disabilitare la modifica diretta
         )

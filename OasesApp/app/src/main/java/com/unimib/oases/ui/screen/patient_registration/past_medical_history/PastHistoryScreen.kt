@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.unimib.oases.ui.components.util.AnimatedLabelOutlinedTextField
 import com.unimib.oases.ui.components.util.DateSelector
-import com.unimib.oases.ui.screen.medical_visit.past_medical_history.PastHistoryViewModel
 
 @Composable
 fun PastHistoryScreen() {
@@ -80,9 +79,7 @@ fun CheckboxInputWithDateAndText(
 @Composable
 fun ChronicConditionsCheckboxes(pastHistoryViewModel: PastHistoryViewModel){
 
-    val chronicConditions by pastHistoryViewModel.chronicConditions.collectAsState()
-    val chronicConditionsDates by pastHistoryViewModel.chronicConditionsDates.collectAsState()
-    val chronicConditionAdditionalInfo by pastHistoryViewModel.chronicConditionAdditionalInfo.collectAsState()
+    val state by pastHistoryViewModel.state.collectAsState()
 
     val scrollState = rememberScrollState()
 
@@ -94,55 +91,17 @@ fun ChronicConditionsCheckboxes(pastHistoryViewModel: PastHistoryViewModel){
             .verticalScroll(scrollState)
     ) {
 
-        CheckboxInputWithDateAndText(
-            label = "Diabetes",
-            checked = chronicConditions.diabetes,
-            onCheckedChange = { pastHistoryViewModel.updateDiabetes(it) },
-            date = chronicConditionsDates.diabetes,
-            onDateChange = { pastHistoryViewModel.updateDiabetesDate(it) },
-            additionalInfo = chronicConditionAdditionalInfo.diabetes,
-            onAdditionalInfoChange = { pastHistoryViewModel.updateDiabetesInfo(it) }
-        )
-
-        CheckboxInputWithDateAndText(
-            label = "Hypertension",
-            checked = chronicConditions.hypertension,
-            onCheckedChange = { pastHistoryViewModel.updateHyperTension(it) },
-            date = chronicConditionsDates.hypertension,
-            onDateChange = { pastHistoryViewModel.updateHyperTensionDate(it) },
-            additionalInfo = chronicConditionAdditionalInfo.hypertension,
-            onAdditionalInfoChange = { pastHistoryViewModel.updateHyperTensionInfo(it) }
-        )
-
-        CheckboxInputWithDateAndText(
-            label = "Asthma",
-            checked = chronicConditions.asthma,
-            onCheckedChange = { pastHistoryViewModel.updateAsthma(it) },
-            date = chronicConditionsDates.asthma,
-            onDateChange = { pastHistoryViewModel.updateAsthmaDate(it) },
-            additionalInfo = chronicConditionAdditionalInfo.asthma,
-            onAdditionalInfoChange = { pastHistoryViewModel.updateAsthmaInfo(it) }
-        )
-
-        CheckboxInputWithDateAndText(
-            label = "Arthritis",
-            checked = chronicConditions.arthritis,
-            onCheckedChange = { pastHistoryViewModel.updateArthritis(it) },
-            date = chronicConditionsDates.arthritis,
-            onDateChange = { pastHistoryViewModel.updateArthritisDate(it) },
-            additionalInfo = chronicConditionAdditionalInfo.arthritis,
-            onAdditionalInfoChange = { pastHistoryViewModel.updateArthritisInfo(it) }
-        )
-
-        CheckboxInputWithDateAndText(
-            label = "Depression",
-            checked = chronicConditions.depression,
-            onCheckedChange = { pastHistoryViewModel.updateDepression(it) },
-            date = chronicConditionsDates.depression,
-            onDateChange = { pastHistoryViewModel.updateDepressionDate(it) },
-            additionalInfo = chronicConditionAdditionalInfo.depression,
-            onAdditionalInfoChange = { pastHistoryViewModel.updateDepressionInfo(it) }
-        )
+        for (disease in state.diseases){
+            CheckboxInputWithDateAndText(
+                label = disease.disease,
+                checked = disease.isChecked,
+                onCheckedChange = { pastHistoryViewModel.onEvent(PastHistoryEvent.CheckChanged(disease.disease)) },
+                date = disease.date,
+                onDateChange = { pastHistoryViewModel.onEvent(PastHistoryEvent.DateChanged(disease.disease, it)) },
+                additionalInfo = disease.additionalInfo,
+                onAdditionalInfoChange = { pastHistoryViewModel.onEvent(PastHistoryEvent.AdditionalInfoChanged(disease.disease, it)) }
+            )
+        }
 
         Spacer(modifier = Modifier.height(60.dp)) // Adds breathing room before bottom buttons
     }
