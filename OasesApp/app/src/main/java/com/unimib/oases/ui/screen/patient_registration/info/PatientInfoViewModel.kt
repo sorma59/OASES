@@ -4,9 +4,7 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.unimib.oases.data.model.PatientStatus
 import com.unimib.oases.di.IoDispatcher
-import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.domain.usecase.InsertPatientLocallyUseCase
 import com.unimib.oases.domain.usecase.PatientUseCase
 import com.unimib.oases.domain.usecase.ValidatePatientInfoFormUseCase
@@ -18,7 +16,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -36,12 +33,12 @@ class PatientInfoViewModel @Inject constructor(
     private val _state = MutableStateFlow(PatientInfoState())
     val state: StateFlow<PatientInfoState> = _state.asStateFlow()
 
+    // Abbiamo bisogno di due tipi di eventi di validazione per distinguere
+    // tra validazione del form e successo della sottomissione finale.
     private val validationEventsChannel = Channel<ValidationEvent>()
     val validationEvents = validationEventsChannel.receiveAsFlow()
 
-
     private var currentPatientId: String? = null
-
 
     private var errorHandler = CoroutineExceptionHandler { _, e ->
         e.printStackTrace()
@@ -49,9 +46,15 @@ class PatientInfoViewModel @Inject constructor(
             error = e.message,
             isLoading = false
         )
+        // In caso di errore nel salvataggio finale, potresti voler mostrare una Snackbar
+        viewModelScope.launch {
+            _eventFlow.emit(
+                UiEvent.showSnackbar(
+                    message = e.message ?: "An unexpected error occurred during submission."
+                )
+            )
+        }
     }
-
-
 
     init {
         savedStateHandle.get<String>("patientId")?.let { id ->
@@ -63,7 +66,6 @@ class PatientInfoViewModel @Inject constructor(
                                 is Resource.Loading -> {
                                     _state.value = _state.value.copy(isLoading = true)
                                 }
-
                                 is Resource.Success -> {
                                     _state.value = _state.value.copy(
                                         patient = resource.data!!,
@@ -71,42 +73,31 @@ class PatientInfoViewModel @Inject constructor(
                                     )
                                     currentPatientId = id
                                 }
-
                                 is Resource.Error -> {
                                     _state.value = _state.value.copy(
                                         error = resource.message,
                                         isLoading = false
                                     )
-
                                 }
-
                                 is Resource.None -> {}
                             }
-
                         }
                     }
                 }
             } else {
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        patient = _state.value.patient
-                    )
-                }
+                _state.value = _state.value.copy(
+                    isLoading = false,
+                    patient = _state.value.patient
+                )
             }
         }
-
-
+    }
 
     sealed class UiEvent {
-        // all events that gonna happen when we need to screen to display something and pass data back to the screen
         data class showSnackbar(val message: String) : UiEvent()
-        object SavePatient : UiEvent()
-        object Back : UiEvent()
     }
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
-    val eventFlow = _eventFlow.asSharedFlow()
-
 
     fun onEvent(event: PatientInfoEvent) {
         when(event) {
@@ -137,62 +128,80 @@ class PatientInfoViewModel @Inject constructor(
             is PatientInfoEvent.ContactChanged -> {
                 _state.value = _state.value.copy(patient = _state.value.patient.copy(contact = event.contact))
             }
-            is PatientInfoEvent.Submit -> {
-                viewModelScope.launch(dispatcher + errorHandler) {
-                    try {
-                        _state.value = _state.value.copy(isLoading = true)
-                        submitData()
-                        _state.value = _state.value.copy(isLoading = false)
-                        _eventFlow.emit(UiEvent.SavePatient)
 
-                    } catch (e: Exception) {
-                        _state.value = _state.value.copy(
-                            isLoading = false
-                        )
-                        _eventFlow.emit(
-                            UiEvent.showSnackbar(
-                                message = e.message ?: "An error occurred"
-                            )
-                        )
-                    }
-                }
+            // Nuovo evento: solo per validare il form
+            is PatientInfoEvent.ValidateForm -> {
+                Log.d("PatientInfoViewModel", "ValidateForm event received")
+                validateAndPrepareForSubmission()
+            }
+
+            // Nuovo evento: per la sottomissione finale dopo la conferma dell'alert
+            is PatientInfoEvent.ConfirmSubmission -> {
+                Log.d("PatientInfoViewModel", "ConfirmSubmission event received, proceeding to save data.")
+                savePatientData()
+            }
+
+        }
+    }
+
+    // Funzione per validare i dati e, se validi, chiedere conferma all'utente
+    private fun validateAndPrepareForSubmission() {
+        viewModelScope.launch(dispatcher + errorHandler) {
+            Log.d("PatientInfoViewModel", "validateAndPrepareForSubmission called")
+
+            // Esegui qui la validazione del form
+            val result = validatePatientInfoFormUseCase.invoke(
+                name = _state.value.patient.name,
+                age = _state.value.patient.age
+                // Aggiungi qui tutti gli altri campi da validare
+            )
+
+            // Aggiorna lo stato con gli errori di validazione
+            _state.value = _state.value.copy(
+                nameError = result.nameErrorMessage,
+                ageError = result.ageErrorMessage
+                // Aggiorna anche gli errori per gli altri campi
+            )
+
+            // Se la validazione non ha avuto successo, non procedere oltre
+            if (!result.successful) {
+                Log.d("PatientInfoViewModel", "Validation failed, showing errors.")
+                return@launch // Esci dalla coroutine
+            }
+
+            // Se la validazione ha successo, notifica la UI di mostrare l'AlertDialog
+            Log.d("PatientInfoViewModel", "Validation successful, sending ValidationSuccess event.")
+            validationEventsChannel.send(ValidationEvent.ValidationSuccess)
+        }
+    }
+
+    // Funzione per salvare i dati del paziente nel database
+    private fun savePatientData() {
+        viewModelScope.launch(dispatcher + errorHandler) {
+            _state.value = _state.value.copy(isLoading = true)
+            Log.d("PatientInfoViewModel", "savePatientData called, saving patient: ${_state.value.patient.name}")
+
+            try {
+                // Esegui l'inserimento/aggiornamento del paziente nel database
+                insertPatientLocallyUseCase(_state.value.patient)
+
+                // Notifica alla UI che il salvataggio finale è avvenuto con successo
+                Log.d("PatientInfoViewModel", "Patient data saved successfully, sending SubmissionSuccess event.")
+                validationEventsChannel.send(ValidationEvent.SubmissionSuccess)
+
+            } catch (e: Exception) {
+                Log.e("PatientInfoViewModel", "Error saving patient data: ${e.message}", e)
+                // Gestisci l'errore, magari inviando un evento snackbar
+                _eventFlow.emit(UiEvent.showSnackbar(message = "Failed to save patient data: ${e.message}"))
+            } finally {
+                _state.value = _state.value.copy(isLoading = false)
             }
         }
     }
 
-
-
-
-
-
-
-
-    private fun submitData() {
-        Log.d("PatientInfoViewModel", "submitData called, ${state.value.patient.name} ${state.value.patient.age}")
-        val result = validatePatientInfoFormUseCase.invoke(
-            name = state.value.patient.name,
-            age = state.value.patient.age
-        )
-
-        if (!result.successful){
-            _state.value = _state.value.copy(
-                nameError = result.nameErrorMessage,
-                ageError = result.ageErrorMessage
-            )
-            return
-        }
-
-
-        viewModelScope.launch {
-            _state.value = _state.value.copy(isLoading = true)
-            insertPatientLocallyUseCase(_state.value.patient)
-            validationEventsChannel.send(ValidationEvent.Success)
-            _state.value = _state.value.copy(isLoading = false)
-        }
-    }
-
+    // Modifica la classe ValidationEvent per distinguere i due tipi di successo
     sealed class ValidationEvent {
-        object Success: ValidationEvent()
+        data object ValidationSuccess : ValidationEvent() // Validazione del form completata con successo
+        data object SubmissionSuccess : ValidationEvent() // Salvataggio finale sul DB completato con successo
     }
-
 }

@@ -1,6 +1,5 @@
 package com.unimib.oases.ui.screen.patient_registration.info
 
-
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +14,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -23,6 +23,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -54,12 +55,22 @@ fun PatientInfoScreen(
 
     val context = LocalContext.current
 
+    // State per controllare la visibilità dell'alert dialog
+    var showAlertDialog by remember { mutableStateOf(false) }
+
     LaunchedEffect(key1 = context) {
         patientInfoViewModel.validationEvents.collect { event ->
             when (event) {
-                is PatientInfoViewModel.ValidationEvent.Success -> {
-                    Log.d("PatientInfoScreen", "Success")
-                    onSubmitted()
+                // Modificato: invece di onSubmitted(), ora mostriamo l'alert.
+                // Il ViewModel ora emetterà questo evento *solo* quando la validazione è OK,
+                // e NON ha ancora salvato sul DB.
+                is PatientInfoViewModel.ValidationEvent.ValidationSuccess -> {
+                    showAlertDialog = true
+                }
+                // Nuovo evento per indicare che il salvataggio finale è avvenuto con successo
+                is PatientInfoViewModel.ValidationEvent.SubmissionSuccess -> {
+                    Log.d("PatientInfoScreen", "Final Submission Success")
+                    onSubmitted() // Naviga o esegui l'azione finale solo dopo il salvataggio effettivo
                 }
             }
         }
@@ -223,13 +234,51 @@ fun PatientInfoScreen(
             ) {
                 Button(
                     onClick = {
-                        patientInfoViewModel.onEvent(PatientInfoEvent.Submit)
+                        // Invia l'evento per INIZIARE la validazione (non il submit finale)
+                        patientInfoViewModel.onEvent(PatientInfoEvent.ValidateForm)
                     }
                 ) {
                     Text("Submit")
                 }
             }
         }
+    }
+
+    // Alert Dialog
+    if (showAlertDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                // Chiudi il dialog senza salvare
+                showAlertDialog = false
+            },
+            title = {
+                Text(text = "Conferma Invio Dati")
+            },
+            text = {
+                Text(text = "Tutte le informazioni sono valide. Vuoi salvare i dati del paziente nel database?")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        // Chiudi il dialog e quindi CHIEDI al ViewModel di fare il salvataggio finale sul DB
+                        showAlertDialog = false
+                        patientInfoViewModel.onEvent(PatientInfoEvent.ConfirmSubmission)
+                    }
+                ) {
+                    Text("Conferma")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        // Chiudi il dialog senza fare nulla
+                        showAlertDialog = false
+                    }
+                ) {
+                    Text("Annulla")
+                }
+            }
+        )
     }
 }
 
