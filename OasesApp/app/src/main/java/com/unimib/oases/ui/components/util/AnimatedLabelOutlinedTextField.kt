@@ -1,5 +1,6 @@
 package com.unimib.oases.ui.components.util
 
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -32,6 +33,7 @@ fun AnimatedLabelOutlinedTextField(
         label = { Text(labelText) },
         isError = isError,
         modifier = modifier
+            .fillMaxWidth()
             .onFocusChanged { isFocused = it.isFocused }
             .then(anchorModifier),
         keyboardOptions = if (isNumeric) KeyboardOptions(keyboardType = KeyboardType.Number) else KeyboardOptions.Default,

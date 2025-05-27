@@ -158,22 +158,7 @@ fun RegistrationScreen(
                     )
                     Tabs.History.title -> VisitHistoryScreen()
                     Tabs.PastMedicalHistory.title -> PastHistoryScreen()
-                    Tabs.VitalSigns.title -> VitalSignsScreen(
-                        sbp = sbpValue,
-                        dbp = dbpValue,
-                        spo2 = spo2Value,
-                        hr = hrValue,
-                        rr = rrValue,
-                        temp = tempValue,
-                        rbs = rbsValue,
-                        onSbpChanged = { sbpValue = it },
-                        onDbpChanged = { dbpValue = it },
-                        onSpo2Changed = { spo2Value = it },
-                        onHrChanged = { hrValue = it },
-                        onRrChanged = { rrValue = it },
-                        onTempChanged = { tempValue = it },
-                        onRbsChanged = { rbsValue = it }
-                    )
+                    Tabs.VitalSigns.title -> VitalSignsScreen()
                     Tabs.Triage.title -> TriageScreen(
                         onRedCodeSelected = { isRedCodeSelected = it },
                         sbpValue = sbpValue,
