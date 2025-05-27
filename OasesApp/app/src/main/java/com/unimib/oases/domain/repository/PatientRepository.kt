@@ -1,5 +1,6 @@
 package com.unimib.oases.domain.repository
 
+import com.unimib.oases.data.model.User
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.util.Resource
 import kotlinx.coroutines.flow.Flow
@@ -12,5 +13,7 @@ interface PatientRepository {
     suspend fun addPatient(patient: Patient): Resource<Unit>
     suspend fun removePatientFromRecentlyReceived(patient: Patient)
     suspend fun deletePatient(patient: Patient): Resource<Unit>
+    suspend fun getPatientById(patientId: String): Flow<Resource<Patient?>>
     fun getPatients(): Flow<Resource<List<Patient>>>
+
 }

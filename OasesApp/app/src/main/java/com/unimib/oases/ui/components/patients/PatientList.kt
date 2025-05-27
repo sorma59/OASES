@@ -110,7 +110,7 @@ fun PatientList(
                                 )
                             },
                             onCardClick = {
-                                navController.navigate("registration_screen")
+                                navController.navigate(Screen.RegistrationScreen.route + "?patientId=${patient.item.id}")
                             },
                         )
                     }

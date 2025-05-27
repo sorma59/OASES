@@ -81,7 +81,7 @@ fun PatientInfoScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     AnimatedLabelOutlinedTextField(
-                        value = state.name,
+                        value = state.patient.name,
                         onValueChange = {
                             patientInfoViewModel.onEvent(
                                 PatientInfoEvent.NameChanged(
@@ -101,7 +101,7 @@ fun PatientInfoScreen(
                         )
 
                     AnimatedLabelOutlinedTextField(
-                        value = if (state.age == -1) "" else state.age.toString(),
+                        value = if (state.patient.age == -1) "" else state.patient.age.toString(),
                         onValueChange = {
                             patientInfoViewModel.onEvent(
                                 PatientInfoEvent.AgeChanged(
@@ -122,7 +122,7 @@ fun PatientInfoScreen(
                         )
 
                     SexDropdown(
-                        selectedSex = state.sex,
+                        selectedSex = state.patient.sex,
                         onSexSelected = {
                             patientInfoViewModel.onEvent(
                                 PatientInfoEvent.SexChanged(
@@ -134,7 +134,7 @@ fun PatientInfoScreen(
                     )
 
                     AnimatedLabelOutlinedTextField(
-                        value = state.village,
+                        value = state.patient.village,
                         onValueChange = {
                             patientInfoViewModel.onEvent(
                                 PatientInfoEvent.VillageChanged(
@@ -147,7 +147,7 @@ fun PatientInfoScreen(
                     )
 
                     AnimatedLabelOutlinedTextField(
-                        value = state.parish,
+                        value = state.patient.parish,
                         onValueChange = {
                             patientInfoViewModel.onEvent(
                                 PatientInfoEvent.ParishChanged(
@@ -160,7 +160,7 @@ fun PatientInfoScreen(
                     )
 
                     AnimatedLabelOutlinedTextField(
-                        value = state.subCounty,
+                        value = state.patient.subCounty,
                         onValueChange = {
                             patientInfoViewModel.onEvent(
                                 PatientInfoEvent.SubCountyChanged(
@@ -173,7 +173,7 @@ fun PatientInfoScreen(
                     )
 
                     AnimatedLabelOutlinedTextField(
-                        value = state.district,
+                        value = state.patient.district,
                         onValueChange = {
                             patientInfoViewModel.onEvent(
                                 PatientInfoEvent.DistrictChanged(
@@ -186,7 +186,7 @@ fun PatientInfoScreen(
                     )
 
                     AnimatedLabelOutlinedTextField(
-                        value = state.nextOfKin,
+                        value = state.patient.nextOfKin,
                         onValueChange = {
                             patientInfoViewModel.onEvent(
                                 PatientInfoEvent.NextOfKinChanged(
@@ -199,7 +199,7 @@ fun PatientInfoScreen(
                     )
 
                     AnimatedLabelOutlinedTextField(
-                        value = state.contact,
+                        value = state.patient.contact,
                         onValueChange = {
                             patientInfoViewModel.onEvent(
                                 PatientInfoEvent.ContactChanged(

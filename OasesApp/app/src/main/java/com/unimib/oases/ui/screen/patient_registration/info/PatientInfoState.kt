@@ -1,18 +1,23 @@
 package com.unimib.oases.ui.screen.patient_registration.info
 
+import com.unimib.oases.domain.model.Patient
+
 data class PatientInfoState(
-    var name: String = "",
-    var age: Int = 0,
-    var sex: String = Sex.Unspecified.displayName,
-    var village: String = "",
-    var parish: String = "",
-    var subCounty: String = "",
-    var district: String = "",
-    var nextOfKin: String = "",
-    var contact: String = "",
-
-    var nameError: String? = null,
-    var ageError: String? = null,
-
-    var isLoading: Boolean = false
+    val patient: Patient = Patient(
+        name = "",
+        age = 0,
+        sex = Sex.Unspecified.displayName,
+        village = "",
+        parish = "",
+        subCounty = "",
+        district = "",
+        nextOfKin = "",
+        contact = "",
+        status = "",
+        image = null
+    ),
+    val isLoading: Boolean = true,
+    val nameError: String?= null,
+    val ageError: String?= null,
+    val error: String?= null,
 )

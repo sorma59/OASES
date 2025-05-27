@@ -45,7 +45,7 @@ class RoomDataSource @Inject constructor(
         return patientDao.getPatients()
     }
 
-    suspend fun getPatientById(id: String): PatientEntity? {
+    fun getPatientById(id: String): Flow<PatientEntity?> {
         return patientDao.getPatientById(id)
     }
 

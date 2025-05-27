@@ -21,5 +21,5 @@ interface PatientDao {
     fun getPatients(): Flow<List<PatientEntity>>
 
     @Query("SELECT * FROM " + TableNames.PATIENT + " WHERE id = :id")
-    suspend fun getPatientById(id: String): PatientEntity?
+    fun getPatientById(id: String): Flow<PatientEntity?>
 }

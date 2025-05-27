@@ -5,6 +5,8 @@ import com.unimib.oases.data.bluetooth.BluetoothCustomManager
 import com.unimib.oases.data.local.RoomDataSource
 import com.unimib.oases.data.mapper.toEntity
 import com.unimib.oases.data.mapper.toPatient
+import com.unimib.oases.data.model.PatientEntity
+import com.unimib.oases.data.model.User
 import com.unimib.oases.di.ApplicationScope
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.domain.repository.PatientRepository
@@ -94,9 +96,26 @@ class PatientRepositoryImpl @Inject constructor(
 
     }
 
+    override suspend fun getPatientById(patientId: String): Flow<Resource<Patient?>> = flow {
+        emit(Resource.Loading())
+
+        try {
+            roomDataSource.getPatientById(patientId).collect {
+                emit(Resource.Success(it?.toPatient()))
+            }
+        } catch
+            (e: Exception) {
+            emit(Resource.Error(e.message ?: "Unknown error"))
+        }
+    }
+
     override fun getPatients(): Flow<Resource<List<Patient>>> = flow {
         emit(Resource.Loading())
         roomDataSource.getPatients().collect {
+                it.forEach { patient ->
+                    println(patient)
+                }
+
             emit(Resource.Success(it.asReversed().map { entity -> entity.toPatient() }))
         }
     }.catch { e ->

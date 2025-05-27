@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.domain.repository.PatientRepository
-import com.unimib.oases.domain.usecase.DeletePatientUseCase
 import com.unimib.oases.domain.usecase.PatientUseCase
 import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,7 +22,6 @@ import javax.inject.Inject
 class HomeScreenViewModel @Inject constructor(
     patientRepository: PatientRepository,
     private val useCases: PatientUseCase,
-    private val deletePatientUseCase: DeletePatientUseCase,
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
 ): ViewModel() {
 
@@ -47,7 +45,7 @@ class HomeScreenViewModel @Inject constructor(
             is HomeScreenEvent.Delete -> {
                 viewModelScope.launch{
                     val name = event.patient.name
-                    val result = deletePatientUseCase(event.patient)
+                    val result = useCases.deletePatient(event.patient)
                     if (result is Resource.Success) {
                         _state.value = _state.value.copy(
                             toastMessage = "Deleted patient $name."

@@ -4,8 +4,10 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.unimib.oases.data.bluetooth.BluetoothCustomManager
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.ui.screen.admin_screen.AdminScreen
@@ -61,7 +63,17 @@ fun AppNavigation(
             HomeScreen(navController, padding, authViewModel, bluetoothCustomManager)
         }
 
-        composable(Screen.RegistrationScreen.route) {
+        composable(route = Screen.RegistrationScreen.route + "?patientId={patientId}",
+            arguments =  listOf(
+                navArgument(
+                    name = "patientId"
+                )
+                {
+                    type = NavType.StringType
+                    defaultValue =
+                        ""
+                }
+            )) {
             RegistrationScreen(navController, padding)
         }
 
