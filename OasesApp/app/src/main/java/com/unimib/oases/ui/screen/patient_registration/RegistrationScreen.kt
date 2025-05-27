@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -53,6 +54,7 @@ fun RegistrationScreen(
 
     val registrationScreenViewModel: RegistrationScreenViewModel = hiltViewModel()
 
+    val state by registrationScreenViewModel.state.collectAsState()
 
     val tabs = arrayOf(
         Tabs.Demographics.title,
@@ -148,7 +150,10 @@ fun RegistrationScreen(
             ) {
                 when (tabs[currentIndex]) {
                     Tabs.Demographics.title -> PatientInfoScreen(
-                        onSubmitted = { currentIndex++ }
+                        onSubmitted = { patientInfoState ->
+                            registrationScreenViewModel.onEvent(RegistrationEvent.PatientSubmitted(patientInfoState))
+                            currentIndex++
+                        }
                     )
                     Tabs.ContinueToTriage.title -> ContinueToTriageDecisionScreen(
                         onContinueToTriage = { currentIndex++ },
@@ -156,7 +161,7 @@ fun RegistrationScreen(
                             navController.popBackStack()
                         }
                     )
-                    Tabs.History.title -> VisitHistoryScreen()
+                    Tabs.History.title -> VisitHistoryScreen(state.patientInfoState.patient.id)
                     Tabs.PastMedicalHistory.title -> PastHistoryScreen()
                     Tabs.VitalSigns.title -> VitalSignsScreen()
                     Tabs.Triage.title -> TriageScreen(

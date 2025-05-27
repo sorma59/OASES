@@ -1,6 +1,5 @@
 package com.unimib.oases.domain.repository
 
-import com.unimib.oases.data.model.User
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.util.Resource
 import kotlinx.coroutines.flow.Flow

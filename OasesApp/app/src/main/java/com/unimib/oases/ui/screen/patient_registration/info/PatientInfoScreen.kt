@@ -46,7 +46,7 @@ import java.util.TimeZone
 
 @Composable
 fun PatientInfoScreen(
-    onSubmitted: () -> Unit
+    onSubmitted: (PatientInfoState) -> Unit
 ) {
 
     val patientInfoViewModel: PatientInfoViewModel = hiltViewModel()
@@ -70,7 +70,7 @@ fun PatientInfoScreen(
                 // Nuovo evento per indicare che il salvataggio finale è avvenuto con successo
                 is PatientInfoViewModel.ValidationEvent.SubmissionSuccess -> {
                     Log.d("PatientInfoScreen", "Final Submission Success")
-                    onSubmitted() // Naviga o esegui l'azione finale solo dopo il salvataggio effettivo
+                    onSubmitted(state) // Naviga o esegui l'azione finale solo dopo il salvataggio effettivo
                 }
             }
         }

@@ -7,37 +7,36 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.unimib.oases.domain.model.Visit
 import com.unimib.oases.ui.home_page.components.card.VisitCard
-import com.unimib.oases.ui.home_page.components.card.VisitUi
 
 @Composable
-fun VisitHistoryScreen() {
-    val sampleVisits = remember {
-        listOf(
-            VisitUi(visitNumber = 1, visitDate = "05/05/2025", statusColor = "Verde"),
-            VisitUi(visitNumber = 2, visitDate = "20/04/2025", statusColor = "Giallo"),
-            VisitUi(visitNumber = 3, visitDate = "10/04/2025", statusColor = "Rosso"),
-            VisitUi(visitNumber = 4, visitDate = "28/03/2025", statusColor = "Verde"),
-            VisitUi(visitNumber = 5, visitDate = "15/03/2025", statusColor = "Giallo"),
-            VisitUi(visitNumber = 6, visitDate = "01/03/2025", statusColor = "Verde"),
-            VisitUi(visitNumber = 7, visitDate = "15/02/2025", statusColor = "Rosso"),
-            VisitUi(visitNumber = 8, visitDate = "01/02/2025", statusColor = "Giallo"),
-            VisitUi(visitNumber = 9, visitDate = "18/01/2025", statusColor = "Verde"),
-            VisitUi(visitNumber = 10, visitDate = "05/01/2025", statusColor = "Rosso")
-        )
+fun VisitHistoryScreen(
+    patientId: String
+) {
+
+    val visitHistoryViewModel: VisitHistoryViewModel = hiltViewModel()
+
+    LaunchedEffect(patientId) {
+        visitHistoryViewModel.loadVisits(patientId)
     }
+
+    val state by visitHistoryViewModel.state.collectAsState()
 
     Scaffold(
         content = { paddingValues ->
-            VisitHistoryList(visits = sampleVisits, paddingValues = paddingValues)
+            VisitHistoryList(visits = state.visits, paddingValues = paddingValues)
         }
     )
 }
 
 @Composable
-fun VisitHistoryList(visits: List<VisitUi>, paddingValues: PaddingValues) {
+fun VisitHistoryList(visits: List<Visit>, paddingValues: PaddingValues) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()

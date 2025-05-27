@@ -22,6 +22,12 @@ class RegistrationScreenViewModel @Inject constructor(
     fun onEvent(event: RegistrationEvent) {
         when (event) {
 
+            is RegistrationEvent.PatientSubmitted -> {
+                _state.value = _state.value.copy(
+                    patientInfoState = event.patientInfoState
+                )
+            }
+
             is RegistrationEvent.PastMedicalHistoryNext -> {
                 _state.value = _state.value.copy(
                     pastHistoryState = event.pastHistoryState

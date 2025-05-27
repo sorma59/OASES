@@ -39,7 +39,6 @@ import com.unimib.oases.ui.screen.login.AuthViewModel
 import com.unimib.oases.ui.screen.medical_visit.info.PatientInfoScreen
 import com.unimib.oases.ui.screen.medical_visit.past_medical_history.PastHistoryScreen
 import com.unimib.oases.ui.screen.medical_visit.visit.VisitScreen
-import com.unimib.oases.ui.screen.medical_visit.visit_history.VisitHistoryScreen
 
 
 @Composable
@@ -131,7 +130,7 @@ fun MedicalVisitTabNavigation(
             ) {
                 when (currentIndex) {
                     0 -> PatientInfoScreen()
-                    1 -> VisitHistoryScreen()
+//                    1 -> VisitHistoryScreen()
                     2 -> PastHistoryScreen()
                     3 -> VisitScreen()
                 }

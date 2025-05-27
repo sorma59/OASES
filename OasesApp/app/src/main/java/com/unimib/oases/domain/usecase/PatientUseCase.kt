@@ -1,17 +1,19 @@
 package com.unimib.oases.domain.usecase
 
-import com.unimib.oases.data.model.User
 import com.unimib.oases.domain.model.Patient
+import com.unimib.oases.domain.model.Visit
 import com.unimib.oases.domain.repository.PatientRepository
+import com.unimib.oases.domain.repository.VisitRepository
 import com.unimib.oases.util.Resource
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class PatientUseCase @Inject constructor(
-    private val patientRepository: PatientRepository
+    private val patientRepository: PatientRepository,
+    private val visitRepository: VisitRepository
 ) {
 
-    suspend fun getPatients(): Flow<Resource<List<Patient>>> {
+    fun getPatients(): Flow<Resource<List<Patient>>> {
         return patientRepository.getPatients()
     }
 
@@ -19,10 +21,12 @@ class PatientUseCase @Inject constructor(
         return patientRepository.getPatientById(patientId)
     }
 
-
     suspend fun deletePatient(patient: Patient): Resource<Unit> {
        return patientRepository.deletePatient(patient)
     }
 
+    fun getPatientVisits(patientId: String): Flow<Resource<List<Visit>>> {
+        return visitRepository.getVisits(patientId)
+    }
 
 }

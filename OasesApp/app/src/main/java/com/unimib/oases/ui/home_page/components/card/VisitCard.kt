@@ -22,13 +22,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.unimib.oases.domain.model.TriageCode
+import com.unimib.oases.domain.model.Visit
 
 @Composable
-fun VisitCard(visit: VisitUi) {
-    val statusColor = when (visit.statusColor.lowercase()) {
-        "verde" -> Color.Green
-        "giallo" -> Color.Yellow
-        "rosso" -> Color.Red
+fun VisitCard(visit: Visit) {
+    val statusColor = when (visit.triageCode) {
+        TriageCode.GREEN.name -> Color.Green
+        TriageCode.YELLOW.name -> Color.Yellow
+        TriageCode.RED.name -> Color.Red
         else -> Color.Gray // Colore di default se non riconosciuto
     }
     val textColor = MaterialTheme.colorScheme.onPrimaryContainer
@@ -47,7 +49,7 @@ fun VisitCard(visit: VisitUi) {
                 .padding(16.dp)
         ) {
             Text(
-                text = "Visita #${visit.visitNumber}",
+                text = "Visita del " + visit.date,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = textColor
@@ -57,7 +59,7 @@ fun VisitCard(visit: VisitUi) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Data: ${visit.visitDate}",
+                    text = "Data: " + visit.date,
                     style = MaterialTheme.typography.bodyMedium,
                     color = textColor
                 )
