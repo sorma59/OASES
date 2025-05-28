@@ -23,6 +23,7 @@ import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -37,6 +38,7 @@ import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberTopAppBarState
@@ -74,6 +76,7 @@ import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircu
 import com.unimib.oases.ui.navigation.Screen
 import com.unimib.oases.ui.screen.login.AuthState
 import com.unimib.oases.ui.screen.login.AuthViewModel
+import com.unimib.oases.ui.screen.patient_registration.info.PatientInfoEvent
 import kotlinx.coroutines.launch
 
 
@@ -94,6 +97,7 @@ fun HomeScreen(
     val authState = authViewModel.authState.observeAsState()
 
     val state by homeScreenViewModel.state.collectAsState()
+
 
 
     var searchText by remember { mutableStateOf("") }
@@ -372,6 +376,7 @@ fun HomeScreen(
             }
         }
     }
+
 }
 
 //@Composable
