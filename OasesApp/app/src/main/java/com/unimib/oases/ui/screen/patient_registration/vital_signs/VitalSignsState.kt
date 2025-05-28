@@ -7,7 +7,9 @@ data class VitalSignsState (
 )
 
 data class PatientVitalSignState(
-    var vitalSign: String,
+    var name: String,
+    var acronym: String,
+    var unit: String,
     var value: String = "",
     var error: String? = null
 )

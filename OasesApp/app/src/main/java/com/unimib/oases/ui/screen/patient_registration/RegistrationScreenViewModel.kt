@@ -34,6 +34,12 @@ class RegistrationScreenViewModel @Inject constructor(
                 )
             }
 
+            is RegistrationEvent.VitalSignsSubmitted -> {
+                _state.value = _state.value.copy(
+                    vitalSignsState = event.vitalSignsState
+                )
+            }
+
             is RegistrationEvent.Submit -> {
                 submit()
             }

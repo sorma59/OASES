@@ -25,7 +25,7 @@ class VitalSignRepositoryImpl @Inject constructor(
             roomDataSource.insertVitalSign(vitalSign.toEntity())
             Resource.Success(Unit)
         } catch (e: Exception) {
-            Log.e("DiseaseRepository", "Error adding disease: ${e.message}")
+            Log.e("DiseaseRepository", "Error adding vital sign: ${e.message}")
             Resource.Error(e.message ?: "An error occurred")
         }
     }

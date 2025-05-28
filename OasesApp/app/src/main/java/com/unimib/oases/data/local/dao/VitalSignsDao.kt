@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface VitalSignsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(vitalSings: VitalSignEntity)
+    suspend fun insert(vitalSign: VitalSignEntity)
 
     @Delete
     suspend fun delete(vitalSign: VitalSignEntity)

@@ -72,6 +72,22 @@ class VitalSignManagementViewModel @Inject constructor(
                 )
             }
 
+            is VitalSignManagementEvent.EnteredVitalSignAcronym -> {
+                _state.value = _state.value.copy(
+                    vitalSign = _state.value.vitalSign.copy(
+                        acronym = event.value
+                    )
+                )
+            }
+
+            is VitalSignManagementEvent.EnteredVitalSignUnit -> {
+                _state.value = _state.value.copy(
+                    vitalSign = _state.value.vitalSign.copy(
+                        unit = event.value
+                    )
+                )
+            }
+
 
             VitalSignManagementEvent.UndoDelete -> {
                 viewModelScope.launch(dispatcher + errorHandler) {

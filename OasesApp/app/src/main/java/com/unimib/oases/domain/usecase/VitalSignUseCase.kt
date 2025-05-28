@@ -10,8 +10,8 @@ import javax.inject.Inject
 data class VitalSignUseCase @Inject constructor (
     private val repo: VitalSignRepository
 ){
-    suspend fun addVitalSign(vitalSing: VitalSign) {
-        repo.addVitalSign(vitalSing)
+    suspend fun addVitalSign(vitalSign: VitalSign) {
+        repo.addVitalSign(vitalSign)
     }
 
     fun deleteVitalSign(vitalSign: VitalSign) {

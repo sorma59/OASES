@@ -40,8 +40,8 @@ import com.unimib.oases.ui.navigation.Screen
 import com.unimib.oases.ui.screen.patient_registration.continue_to_triage.ContinueToTriageDecisionScreen
 import com.unimib.oases.ui.screen.patient_registration.info.PatientInfoScreen
 import com.unimib.oases.ui.screen.patient_registration.past_medical_history.PastHistoryScreen
-import com.unimib.oases.ui.screen.patient_registration.triage.NonRedCodeScreen
-import com.unimib.oases.ui.screen.patient_registration.triage.TriageScreen
+import com.unimib.oases.ui.screen.patient_registration.triage.non_red_code.NonRedCodeScreen
+import com.unimib.oases.ui.screen.patient_registration.triage.red_code.RedCodeScreen
 import com.unimib.oases.ui.screen.patient_registration.visit_history.VisitHistoryScreen
 import com.unimib.oases.ui.screen.patient_registration.vital_signs.VitalSignsScreen
 
@@ -69,14 +69,6 @@ fun RegistrationScreen(
     var currentIndex by remember { mutableIntStateOf(0) }
 
     var isRedCodeSelected by remember { mutableStateOf(false) }
-
-    var sbpValue by remember { mutableStateOf("") }
-    var dbpValue by remember { mutableStateOf("") }
-    var spo2Value by remember { mutableStateOf("") }
-    var hrValue by remember { mutableStateOf("") }
-    var rrValue by remember { mutableStateOf("") }
-    var tempValue by remember { mutableStateOf("") }
-    var rbsValue by remember { mutableStateOf("") }
 
     val nextButtonText = remember(currentIndex, isRedCodeSelected) {
         if (currentIndex == tabs.lastIndex) {
@@ -163,17 +155,23 @@ fun RegistrationScreen(
                     )
                     Tabs.History.title -> VisitHistoryScreen(state.patientInfoState.patient.id)
                     Tabs.PastMedicalHistory.title -> PastHistoryScreen()
-                    Tabs.VitalSigns.title -> VitalSignsScreen()
-                    Tabs.Triage.title -> TriageScreen(
+                    Tabs.VitalSigns.title -> VitalSignsScreen(
+                        onSubmitted = { vitalSigns ->
+                            registrationScreenViewModel.onEvent(RegistrationEvent.VitalSignsSubmitted(vitalSigns))
+                            currentIndex++
+                        },
+                        onBack = { currentIndex-- }
+                    )
+                    Tabs.Triage.title -> RedCodeScreen(
                         onRedCodeSelected = { isRedCodeSelected = it },
-                        sbpValue = sbpValue,
-                        dbpValue = dbpValue
+                        sbpValue = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Systolic Blood Pressure"}?.value ?: "",
+                        dbpValue = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Diastolic Blood Pressure"}?.value ?: ""
                     )
                     Tabs.NonRedCode.title -> NonRedCodeScreen(
-                        spo2Value = spo2Value,
-                        hrValue = hrValue,
-                        rrValue = rrValue,
-                        tempValue = tempValue
+                        spo2Value = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Oxygen Saturation"}?.value ?: "",
+                        hrValue = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Heart Rate"}?.value ?: "",
+                        rrValue = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Respiratory Rate"}?.value ?: "",
+                        tempValue = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Temperature"}?.value ?: "",
                     )
                 }
             }
@@ -181,11 +179,13 @@ fun RegistrationScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(12.dp),
+                    .padding(horizontal = 12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column {
-                    if (tabs[currentIndex] != Tabs.Demographics.title && tabs[currentIndex] != Tabs.ContinueToTriage.title) {
+                    if (tabs[currentIndex] != Tabs.Demographics.title &&
+                        tabs[currentIndex] != Tabs.ContinueToTriage.title &&
+                        tabs[currentIndex] != Tabs.VitalSigns.title) {
                         OutlinedButton(onClick = { currentIndex-- }) {
                             Text("Back")
                         }
@@ -193,7 +193,10 @@ fun RegistrationScreen(
                 }
 
                 Column {
-                    if (tabs[currentIndex] != Tabs.ContinueToTriage.title && tabs[currentIndex] != Tabs.Demographics.title){
+                    if (tabs[currentIndex] != Tabs.ContinueToTriage.title &&
+                        tabs[currentIndex] != Tabs.Demographics.title &&
+                        tabs[currentIndex] != Tabs.VitalSigns.title){
+
                         Button(
                             onClick = {
                                 if (

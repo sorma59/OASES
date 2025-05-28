@@ -97,8 +97,8 @@ object AppModule {
             OasesDatabase::class.java,
             "oases_database"
         )
-        .fallbackToDestructiveMigration(true)
-//        .createFromAsset("databases/users.db")
+//        .fallbackToDestructiveMigration(true)
+        .createFromAsset("databases/oases.db")
         .build()
     }
 

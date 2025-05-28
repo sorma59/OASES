@@ -1,4 +1,4 @@
-package com.unimib.oases.ui.screen.patient_registration.triage
+package com.unimib.oases.ui.screen.patient_registration.triage.non_red_code
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

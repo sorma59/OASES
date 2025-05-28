@@ -9,4 +9,6 @@ import com.unimib.oases.data.local.TableNames
 data class VitalSignEntity(
     @PrimaryKey
     @ColumnInfo(name = "name") var name: String,
+    @ColumnInfo(name = "acronym") var acronym: String,
+    @ColumnInfo(name = "unit") var unit: String,
 )

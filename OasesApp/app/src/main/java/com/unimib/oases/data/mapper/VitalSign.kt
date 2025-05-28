@@ -5,12 +5,16 @@ import com.unimib.oases.domain.model.VitalSign
 
 fun VitalSign.toEntity(): VitalSignEntity {
     return VitalSignEntity(
-        name = name
+        name = name,
+        acronym = acronym,
+        unit = unit
     )
 }
 
 fun VitalSignEntity.toVitalSign(): VitalSign {
     return VitalSign(
-        name = name
+        name = name,
+        acronym = acronym,
+        unit = unit
     )
 }

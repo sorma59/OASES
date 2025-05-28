@@ -48,7 +48,7 @@ class VitalSignsViewModel @Inject constructor(
                     for (vitalSign in vitalSigns.data!!){
                         _state.update {
                             it.copy(
-                                vitalSigns = it.vitalSigns + PatientVitalSignState(vitalSign.name)
+                                vitalSigns = it.vitalSigns + PatientVitalSignState(vitalSign.name, vitalSign.acronym, vitalSign.unit)
                             )
                         }
                     }
@@ -69,7 +69,7 @@ class VitalSignsViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         vitalSigns = it.vitalSigns.map {
-                            if (it.vitalSign == event.vitalSign) {
+                            if (it.name == event.vitalSign) {
                                 it.copy(value = event.value)
                             } else {
                                 it
@@ -87,13 +87,7 @@ class VitalSignsViewModel @Inject constructor(
 
     private fun submitData() {
 
-        if (validate()){
-            TODO("Validate Value: from string to double")
-        }
 
-    }
 
-    private fun validate(): Boolean {
-        return false
     }
 }

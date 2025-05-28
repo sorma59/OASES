@@ -234,7 +234,6 @@ fun PatientInfoScreen(
             ) {
                 Button(
                     onClick = {
-                        // Invia l'evento per INIZIARE la validazione (non il submit finale)
                         patientInfoViewModel.onEvent(PatientInfoEvent.ValidateForm)
                     }
                 ) {

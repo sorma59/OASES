@@ -142,7 +142,26 @@ fun VitalSignManagementScreen(
             OutlinedTextField(
                 value = state.vitalSign.name,
                 onValueChange = { vitalSignsManagementViewModel.onEvent(VitalSignManagementEvent.EnteredVitalSignName(it)) },
-                label = { Text("Vital Sign") },
+                label = { Text("Name") },
+                placeholder = { Text("e.g. Systolic Blood Pressure, ...") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            OutlinedTextField(
+                value = state.vitalSign.acronym,
+                onValueChange = { vitalSignsManagementViewModel.onEvent(VitalSignManagementEvent.EnteredVitalSignAcronym(it)) },
+                label = { Text("Acronym") },
+                placeholder = { Text("e.g. SBP, SpO2, ...") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            OutlinedTextField(
+                value = state.vitalSign.unit,
+                onValueChange = { vitalSignsManagementViewModel.onEvent(VitalSignManagementEvent.EnteredVitalSignUnit(it)) },
+                label = { Text("Unit") },
+                placeholder = { Text("e.g. mmHg, bpm, %, ...") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -163,7 +182,7 @@ fun VitalSignManagementScreen(
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Save VitalSign")
+                Text("Save Vital Sign")
             }
 
 

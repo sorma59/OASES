@@ -18,7 +18,7 @@ interface VisitVitalSignDao {
     @Delete
     suspend fun delete(visitVitalSign: VisitVitalSignEntity)
 
-    @Query("DELETE FROM " + TableNames.VISIT_VITAL_SIGN + " WHERE visit_id = :visitId AND vitalSign_name = :vitalSignName AND timestamp = :timestamp")
+    @Query("DELETE FROM " + TableNames.VISIT_VITAL_SIGN + " WHERE visit_id = :visitId AND vital_sign_name = :vitalSignName AND timestamp = :timestamp")
     suspend fun deleteById(visitId: String, vitalSignName: String, timestamp: String)
 
     @Query("SELECT * FROM " + TableNames.VISIT_VITAL_SIGN + " WHERE visit_id = :visitId ORDER BY timestamp")

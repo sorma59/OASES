@@ -7,7 +7,7 @@ import com.unimib.oases.data.local.TableNames
 
 @Entity(
     tableName = TableNames.VISIT_VITAL_SIGN,
-    primaryKeys = ["visit_id", "vitalSign_name", "timestamp"],
+    primaryKeys = ["visit_id", "vital_sign_name", "timestamp"],
     foreignKeys = [
         ForeignKey(
             entity = VisitEntity::class,
@@ -18,14 +18,14 @@ import com.unimib.oases.data.local.TableNames
         ForeignKey(
             entity = VitalSignEntity::class,
             parentColumns = ["name"],
-            childColumns = ["vitalSign_name"],
+            childColumns = ["vital_sign_name"],
             onDelete = ForeignKey.CASCADE
         )
     ]
 )
 data class VisitVitalSignEntity (
     @ColumnInfo(name = "visit_id") var visitId: String,
-    @ColumnInfo(name = "vitalSign_name") var vitalSignName: String,
+    @ColumnInfo(name = "vital_sign_name") var vitalSignName: String,
     @ColumnInfo(name = "timestamp") var timestamp: String,
     @ColumnInfo(name = "value") var value: Double,
 )
