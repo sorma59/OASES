@@ -55,22 +55,18 @@ fun PatientInfoScreen(
 
     val context = LocalContext.current
 
-    // State per controllare la visibilità dell'alert dialog
     var showAlertDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(key1 = context) {
         patientInfoViewModel.validationEvents.collect { event ->
             when (event) {
-                // Modificato: invece di onSubmitted(), ora mostriamo l'alert.
-                // Il ViewModel ora emetterà questo evento *solo* quando la validazione è OK,
-                // e NON ha ancora salvato sul DB.
                 is PatientInfoViewModel.ValidationEvent.ValidationSuccess -> {
                     showAlertDialog = true
                 }
-                // Nuovo evento per indicare che il salvataggio finale è avvenuto con successo
+
                 is PatientInfoViewModel.ValidationEvent.SubmissionSuccess -> {
                     Log.d("PatientInfoScreen", "Final Submission Success")
-                    onSubmitted(state) // Naviga o esegui l'azione finale solo dopo il salvataggio effettivo
+                    onSubmitted(state)
                 }
             }
         }
@@ -123,7 +119,7 @@ fun PatientInfoScreen(
                         labelText = "Age",
                         isError = state.ageError != null,
                         modifier = Modifier.fillMaxWidth(),
-                        isNumeric = true
+                        isInteger = true
                     )
 
                     if (state.ageError != null)
@@ -243,38 +239,34 @@ fun PatientInfoScreen(
         }
     }
 
-    // Alert Dialog
     if (showAlertDialog) {
         AlertDialog(
             onDismissRequest = {
-                // Chiudi il dialog senza salvare
                 showAlertDialog = false
             },
             title = {
-                Text(text = "Conferma Invio Dati")
+                Text(text = "Confirm patient saving")
             },
             text = {
-                Text(text = "Tutte le informazioni sono valide. Vuoi salvare i dati del paziente nel database?")
+                Text(text = "Do you want to save the patient to the database?")
             },
             confirmButton = {
                 TextButton(
                     onClick = {
-                        // Chiudi il dialog e quindi CHIEDI al ViewModel di fare il salvataggio finale sul DB
                         showAlertDialog = false
                         patientInfoViewModel.onEvent(PatientInfoEvent.ConfirmSubmission)
                     }
                 ) {
-                    Text("Conferma")
+                    Text("Confirm")
                 }
             },
             dismissButton = {
                 TextButton(
                     onClick = {
-                        // Chiudi il dialog senza fare nulla
                         showAlertDialog = false
                     }
                 ) {
-                    Text("Annulla")
+                    Text("Cancel")
                 }
             }
         )

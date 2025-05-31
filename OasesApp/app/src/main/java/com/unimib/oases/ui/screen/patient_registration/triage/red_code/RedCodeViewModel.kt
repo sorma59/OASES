@@ -15,58 +15,58 @@ class RedCodeViewModel @Inject constructor(): ViewModel() {
 
     fun onEvent(event: RedCodeEvent){
         when(event){
-            is RedCodeEvent.OnUnconsciousnessChanged -> {
+            is RedCodeEvent.UnconsciousnessChanged -> {
                 _state.value = _state.value.copy(unconsciousness = event.value)
             }
-            is RedCodeEvent.OnActiveConvulsionsChanged -> {
+            is RedCodeEvent.ActiveConvulsionsChanged -> {
                 _state.value = _state.value.copy(activeConvulsions = event.value)
             }
-            is RedCodeEvent.OnRespiratoryDistressChanged -> {
+            is RedCodeEvent.RespiratoryDistressChanged -> {
                 _state.value = _state.value.copy(respiratoryDistress = event.value)
             }
-            is RedCodeEvent.OnHeavyBleedingChanged -> {
+            is RedCodeEvent.HeavyBleedingChanged -> {
                 _state.value = _state.value.copy(heavyBleeding = event.value)
             }
-            is RedCodeEvent.OnHighRiskTraumaBurnsChanged -> {
+            is RedCodeEvent.HighRiskTraumaBurnsChanged -> {
                 _state.value = _state.value.copy(highRiskTraumaBurns = event.value)
             }
-            is RedCodeEvent.OnThreatenedLimbChanged -> {
+            is RedCodeEvent.ThreatenedLimbChanged -> {
                 _state.value = _state.value.copy(threatenedLimb = event.value)
             }
-            is RedCodeEvent.OnPoisoningIntoxicationChanged -> {
+            is RedCodeEvent.PoisoningIntoxicationChanged -> {
                 _state.value = _state.value.copy(poisoningIntoxication = event.value)
             }
-            is RedCodeEvent.OnSnakeBiteChanged -> {
+            is RedCodeEvent.SnakeBiteChanged -> {
                 _state.value = _state.value.copy(snakeBite = event.value)
             }
-            is RedCodeEvent.OnAggressiveBehaviorChanged -> {
+            is RedCodeEvent.AggressiveBehaviorChanged -> {
                 _state.value = _state.value.copy(aggressiveBehavior = event.value)
             }
-            is RedCodeEvent.OnPregnancyHeavyBleedingChanged -> {
+            is RedCodeEvent.PregnancyHeavyBleedingChanged -> {
                 _state.value = _state.value.copy(pregnancyHeavyBleeding = event.value)
             }
-            is RedCodeEvent.OnSevereAbdominalPainChanged -> {
+            is RedCodeEvent.SevereAbdominalPainChanged -> {
                 _state.value = _state.value.copy(severeAbdominalPain = event.value)
             }
-            is RedCodeEvent.OnSeizuresChanged -> {
+            is RedCodeEvent.SeizuresChanged -> {
                 _state.value = _state.value.copy(seizures = event.value)
             }
-            is RedCodeEvent.OnAlteredMentalStatusChanged -> {
+            is RedCodeEvent.AlteredMentalStatusChanged -> {
                 _state.value = _state.value.copy(alteredMentalStatus = event.value)
             }
-            is RedCodeEvent.OnSevereHeadacheChanged -> {
+            is RedCodeEvent.SevereHeadacheChanged -> {
                 _state.value = _state.value.copy(severeHeadache = event.value)
             }
-            is RedCodeEvent.OnActiveLaborChanged -> {
+            is RedCodeEvent.ActiveLaborChanged -> {
                 _state.value = _state.value.copy(activeLabor = event.value)
             }
-            is RedCodeEvent.OnSbpHighDpbHighChanged -> {
+            is RedCodeEvent.SbpHighDpbHighChanged -> {
                 _state.value = _state.value.copy(sbpHighDpbHigh = event.value)
             }
-            is RedCodeEvent.OnTraumaChanged -> {
+            is RedCodeEvent.TraumaChanged -> {
                 _state.value = _state.value.copy(trauma = event.value)
             }
-            is RedCodeEvent.OnVisualChangesChanged -> {
+            is RedCodeEvent.VisualChangesChanged -> {
                 _state.value = _state.value.copy(visualChanges = event.value)
             }
         }

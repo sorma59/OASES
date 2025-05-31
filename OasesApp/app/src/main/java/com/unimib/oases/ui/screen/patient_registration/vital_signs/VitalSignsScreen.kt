@@ -60,7 +60,8 @@ fun VitalSignsScreen(
                     },
                     labelText = vitalSign.name + " (" + vitalSign.acronym + ", " + vitalSign.unit + ")",
                     isError = vitalSign.error != null,
-                    isNumeric = true,
+                    isInteger = vitalSign.name != "Temperature" && vitalSign.name != "Rapid Blood Sugar", // TODO: de-hardcode this
+                    isDouble = vitalSign.name == "Temperature" || vitalSign.name == "Rapid Blood Sugar", // TODO: de-hardcode this
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
