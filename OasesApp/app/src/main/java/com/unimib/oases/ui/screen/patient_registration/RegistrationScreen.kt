@@ -68,6 +68,7 @@ fun RegistrationScreen(
 
     var currentIndex by remember { mutableIntStateOf(0) }
 
+    var isYellowCodeSelected by remember { mutableStateOf(false) }
     var isRedCodeSelected by remember { mutableStateOf(false) }
 
     val nextButtonText = remember(currentIndex, isRedCodeSelected) {
@@ -168,9 +169,12 @@ fun RegistrationScreen(
                         dbpValue = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Diastolic Blood Pressure"}?.value ?: ""
                     )
                     Tabs.NonRedCode.title -> NonRedCodeScreen(
+                        onYellowCodeSelected = { isYellowCodeSelected = it},
+                        ageInt = state.patientInfoState.patient.age,
                         spo2Value = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Oxygen Saturation"}?.value ?: "",
                         hrValue = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Heart Rate"}?.value ?: "",
                         rrValue = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Respiratory Rate"}?.value ?: "",
+                        sbpValue = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Systolic Blood Pressure"}?.value ?: "",
                         tempValue = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Temperature"}?.value ?: "",
                     )
                 }

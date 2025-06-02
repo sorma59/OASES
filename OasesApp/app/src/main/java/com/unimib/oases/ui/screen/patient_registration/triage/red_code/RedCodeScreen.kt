@@ -43,10 +43,10 @@ fun RedCodeScreen(onRedCodeSelected: (Boolean) -> Unit, sbpValue: String, dbpVal
     val isAnyRedCodeSelected = remember {
         derivedStateOf {
             state.unconsciousness || state.activeConvulsions || state.respiratoryDistress || state.heavyBleeding ||
-                    state.highRiskTraumaBurns || state.threatenedLimb || state.poisoningIntoxication || state.snakeBite ||
-                    state.aggressiveBehavior || state.pregnancyHeavyBleeding || state.severeAbdominalPain || state.seizures ||
-                    state.alteredMentalStatus || state.severeHeadache || state.visualChanges || state.sbpHighDpbHigh ||
-                    state.trauma || state.activeLabor
+            state.highRiskTraumaBurns || state.threatenedLimb || state.poisoningIntoxication || state.snakeBite ||
+            state.aggressiveBehavior || state.pregnancyHeavyBleeding || state.severeAbdominalPain || state.seizures ||
+            state.alteredMentalStatus || state.severeHeadache || state.visualChanges || state.sbpHighDpbHigh ||
+            state.trauma || state.activeLabor
         }
     }
 
@@ -89,7 +89,7 @@ fun RedCodeScreen(onRedCodeSelected: (Boolean) -> Unit, sbpValue: String, dbpVal
                 checked = state.unconsciousness,
                 onCheckedChange = {
                     redCodeViewModel.onEvent(
-                        RedCodeEvent.OnUnconsciousnessChanged(it)
+                        RedCodeEvent.UnconsciousnessChanged(it)
                     )
                 }
             )
@@ -97,20 +97,20 @@ fun RedCodeScreen(onRedCodeSelected: (Boolean) -> Unit, sbpValue: String, dbpVal
                 label = "Active convulsions",
                 checked = state.activeConvulsions,
                 onCheckedChange = { redCodeViewModel.onEvent(
-                    RedCodeEvent.OnActiveConvulsionsChanged(it)
+                    RedCodeEvent.ActiveConvulsionsChanged(it)
                 ) })
             RedCodeCheckbox(
                 label = "Respiratory distress",
                 checked = state.respiratoryDistress,
                 onCheckedChange = { redCodeViewModel.onEvent(
-                    RedCodeEvent.OnRespiratoryDistressChanged(it)
+                    RedCodeEvent.RespiratoryDistressChanged(it)
                 ) })
             RedCodeCheckbox(
                 label = "Heavy bleeding",
                 checked = state.heavyBleeding,
                 onCheckedChange = {
                     redCodeViewModel.onEvent(
-                        RedCodeEvent.OnHeavyBleedingChanged(it)
+                        RedCodeEvent.HeavyBleedingChanged(it)
                     )
                 }
             )
@@ -119,7 +119,7 @@ fun RedCodeScreen(onRedCodeSelected: (Boolean) -> Unit, sbpValue: String, dbpVal
                 checked = state.highRiskTraumaBurns,
                 onCheckedChange = {
                     redCodeViewModel.onEvent(
-                        RedCodeEvent.OnHighRiskTraumaBurnsChanged(it)
+                        RedCodeEvent.HighRiskTraumaBurnsChanged(it)
                     )
                 }
             )
@@ -128,7 +128,7 @@ fun RedCodeScreen(onRedCodeSelected: (Boolean) -> Unit, sbpValue: String, dbpVal
                 checked = state.threatenedLimb,
                 onCheckedChange = {
                     redCodeViewModel.onEvent(
-                        RedCodeEvent.OnThreatenedLimbChanged(it)
+                        RedCodeEvent.ThreatenedLimbChanged(it)
                     )
                 }
             )
@@ -137,7 +137,7 @@ fun RedCodeScreen(onRedCodeSelected: (Boolean) -> Unit, sbpValue: String, dbpVal
                 checked = state.poisoningIntoxication,
                 onCheckedChange = {
                     redCodeViewModel.onEvent(
-                        RedCodeEvent.OnPoisoningIntoxicationChanged(it)
+                        RedCodeEvent.PoisoningIntoxicationChanged(it)
                     )
                 }
             )
@@ -146,7 +146,7 @@ fun RedCodeScreen(onRedCodeSelected: (Boolean) -> Unit, sbpValue: String, dbpVal
                 checked = state.snakeBite,
                 onCheckedChange = {
                     redCodeViewModel.onEvent(
-                        RedCodeEvent.OnSnakeBiteChanged(it)
+                        RedCodeEvent.SnakeBiteChanged(it)
                     )
                 }
             )
@@ -155,7 +155,7 @@ fun RedCodeScreen(onRedCodeSelected: (Boolean) -> Unit, sbpValue: String, dbpVal
                 checked = state.aggressiveBehavior,
                 onCheckedChange = {
                     redCodeViewModel.onEvent(
-                        RedCodeEvent.OnAggressiveBehaviorChanged(it)
+                        RedCodeEvent.AggressiveBehaviorChanged(it)
                     )
                 }
             )
@@ -164,7 +164,7 @@ fun RedCodeScreen(onRedCodeSelected: (Boolean) -> Unit, sbpValue: String, dbpVal
                 checked = state.pregnancyHeavyBleeding,
                 onCheckedChange = {
                     redCodeViewModel.onEvent(
-                        RedCodeEvent.OnPregnancyHeavyBleedingChanged(it)
+                        RedCodeEvent.PregnancyHeavyBleedingChanged(it)
                     )
                 }
             )
@@ -173,7 +173,7 @@ fun RedCodeScreen(onRedCodeSelected: (Boolean) -> Unit, sbpValue: String, dbpVal
                 checked = state.severeAbdominalPain,
                 onCheckedChange = {
                     redCodeViewModel.onEvent(
-                        RedCodeEvent.OnSevereAbdominalPainChanged(it)
+                        RedCodeEvent.SevereAbdominalPainChanged(it)
                     )
                 }
             )
@@ -182,7 +182,7 @@ fun RedCodeScreen(onRedCodeSelected: (Boolean) -> Unit, sbpValue: String, dbpVal
                 checked = state.seizures,
                 onCheckedChange = {
                     redCodeViewModel.onEvent(
-                        RedCodeEvent.OnSeizuresChanged(it)
+                        RedCodeEvent.SeizuresChanged(it)
                     )
                 }
             )
@@ -191,7 +191,7 @@ fun RedCodeScreen(onRedCodeSelected: (Boolean) -> Unit, sbpValue: String, dbpVal
                 checked = state.alteredMentalStatus,
                 onCheckedChange = {
                     redCodeViewModel.onEvent(
-                        RedCodeEvent.OnAlteredMentalStatusChanged(it)
+                        RedCodeEvent.AlteredMentalStatusChanged(it)
                     )
                 }
             )
@@ -200,7 +200,7 @@ fun RedCodeScreen(onRedCodeSelected: (Boolean) -> Unit, sbpValue: String, dbpVal
                 checked = state.severeHeadache,
                 onCheckedChange = {
                     redCodeViewModel.onEvent(
-                        RedCodeEvent.OnSevereHeadacheChanged(it)
+                        RedCodeEvent.SevereHeadacheChanged(it)
                     )
                 }
             )
@@ -209,7 +209,7 @@ fun RedCodeScreen(onRedCodeSelected: (Boolean) -> Unit, sbpValue: String, dbpVal
                 checked = state.visualChanges,
                 onCheckedChange = {
                     redCodeViewModel.onEvent(
-                        RedCodeEvent.OnVisualChangesChanged(it)
+                        RedCodeEvent.VisualChangesChanged(it)
                     )
                 }
             )
@@ -223,7 +223,7 @@ fun RedCodeScreen(onRedCodeSelected: (Boolean) -> Unit, sbpValue: String, dbpVal
                 checked = state.trauma,
                 onCheckedChange = {
                     redCodeViewModel.onEvent(
-                        RedCodeEvent.OnTraumaChanged(it)
+                        RedCodeEvent.TraumaChanged(it)
                     )
                 })
             RedCodeCheckbox(
@@ -231,7 +231,7 @@ fun RedCodeScreen(onRedCodeSelected: (Boolean) -> Unit, sbpValue: String, dbpVal
                 checked = state.activeLabor,
                 onCheckedChange = {
                     redCodeViewModel.onEvent(
-                        RedCodeEvent.OnActiveLaborChanged(it)
+                        RedCodeEvent.ActiveLaborChanged(it)
                     )
                 }
             )

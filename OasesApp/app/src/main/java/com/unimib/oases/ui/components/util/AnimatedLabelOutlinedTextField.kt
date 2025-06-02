@@ -22,21 +22,27 @@ fun AnimatedLabelOutlinedTextField(
     isError: Boolean = false,
     readOnly: Boolean = false,
     trailingIcon: @Composable (() -> Unit)? = null,
-    isNumeric: Boolean = false,
+    isInteger: Boolean = false,
+    isDouble: Boolean = false,
     anchorModifier: Modifier = Modifier
 ) {
     var isFocused by remember { mutableStateOf(false) }
 
     OutlinedTextField(
         value = value,
-        onValueChange = onValueChange,
+        onValueChange = {
+            if (isInteger) {
+                onValueChange(it.filter { char -> char.isDigit() })
+            } else
+                onValueChange(it)
+        },
         label = { Text(labelText) },
         isError = isError,
         modifier = modifier
             .fillMaxWidth()
             .onFocusChanged { isFocused = it.isFocused }
             .then(anchorModifier),
-        keyboardOptions = if (isNumeric) KeyboardOptions(keyboardType = KeyboardType.Number) else KeyboardOptions.Default,
+        keyboardOptions = if (isInteger || isDouble) KeyboardOptions(keyboardType = KeyboardType.Number) else KeyboardOptions.Default,
         readOnly = readOnly,
         trailingIcon = trailingIcon
     )
