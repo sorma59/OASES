@@ -1,5 +1,12 @@
 package com.unimib.oases.ui.navigation
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideIn
+import androidx.compose.foundation.interaction.HoverInteraction
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -21,6 +28,13 @@ import com.unimib.oases.ui.screen.login.AuthViewModel
 import com.unimib.oases.ui.screen.login.LoginScreen
 import com.unimib.oases.ui.screen.medical_visit.MedicalVisitScreen
 import com.unimib.oases.ui.screen.patient_registration.RegistrationScreen
+import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection
+import androidx.compose.animation.core.Ease
+import androidx.compose.animation.core.EaseIn
+import androidx.compose.animation.core.EaseInOut
+import androidx.compose.animation.core.EaseInOut
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.LinearEasing
 
 @Composable
 fun AppNavigation(
@@ -32,9 +46,9 @@ fun AppNavigation(
     val authViewModel: AuthViewModel = hiltViewModel()
 
     NavHost(
-        //  nurse
         navController = navController,
-        startDestination = Screen.LoginScreen.route
+        startDestination = Screen.LoginScreen.route,
+
     ) {
 
         composable(Screen.AdminScreen.route) {
@@ -59,11 +73,71 @@ fun AppNavigation(
             LoginScreen(navController, padding, authViewModel)
         }
 
-        composable(Screen.HomeScreen.route) {
+        composable(Screen.HomeScreen.route,
+            exitTransition = {
+                when (targetState.destination.route) {
+                    Screen.LoginScreen.route ->
+                        slideOutOfContainer(
+                            SlideDirection.Right,
+                            animationSpec = tween(400)
+                        )
+                    else -> null
+                }
+            },
+            popExitTransition = {
+                when (targetState.destination.route) {
+                    Screen.LoginScreen.route ->
+                        slideOutOfContainer(
+                            SlideDirection.Left,
+                            animationSpec = tween(400)
+                        )
+                    else -> null
+                }
+            }) {
             HomeScreen(navController, padding, authViewModel, bluetoothCustomManager)
         }
 
         composable(route = Screen.RegistrationScreen.route + "?patientId={patientId}",
+            enterTransition = {
+                when (initialState.destination.route) {
+                    Screen.HomeScreen.route ->
+                        slideIntoContainer(
+                            SlideDirection.Left,
+                            animationSpec = tween(400)
+                        )
+                    else -> null
+                }
+            },
+            exitTransition = {
+                when (targetState.destination.route) {
+                    Screen.HomeScreen.route ->
+                        slideOutOfContainer(
+                            SlideDirection.Right,
+                            animationSpec = tween(400)
+                        )
+                    else -> null
+                }
+            },
+            popEnterTransition = {
+                when (initialState.destination.route) {
+                    Screen.HomeScreen.route ->
+                        slideIntoContainer(
+                            SlideDirection.Right,
+                            animationSpec = tween(400)
+                        )
+                    else -> null
+                }
+            },
+            popExitTransition = {
+                when (targetState.destination.route) {
+                    Screen.HomeScreen.route ->
+                        slideOutOfContainer(
+                            SlideDirection.Right,
+                            animationSpec = tween(400)
+                        )
+                    else -> null
+                }
+            },
             arguments =  listOf(
                 navArgument(
                     name = "patientId"

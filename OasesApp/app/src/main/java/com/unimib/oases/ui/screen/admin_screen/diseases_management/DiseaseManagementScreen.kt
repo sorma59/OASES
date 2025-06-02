@@ -67,7 +67,6 @@ fun DiseaseManagementScreen(
         remember { SnackbarHostState() } // for hosting snackbars, if I delete a intem I get a snackbar to undo the item
 
     val scope = rememberCoroutineScope()
-    var passwordVisible by remember { mutableStateOf(false) }
 
     LaunchedEffect(key1 = true) {
         diseaseManagementViewModel.getDiseases()
