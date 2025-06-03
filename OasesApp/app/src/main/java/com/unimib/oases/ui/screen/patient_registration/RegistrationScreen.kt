@@ -164,12 +164,15 @@ fun RegistrationScreen(
                         onBack = { currentIndex-- }
                     )
                     Tabs.Triage.title -> RedCodeScreen(
-                        onRedCodeSelected = { registrationScreenViewModel.onEvent(RegistrationEvent.TriageCodeSelected("R"))},
+                        onRedCodeSelected = {
+                            isRedCodeSelected = true
+                            registrationScreenViewModel.onEvent(RegistrationEvent.TriageCodeSelected("R"))},
                         sbpValue = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Systolic Blood Pressure"}?.value ?: "",
                         dbpValue = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Diastolic Blood Pressure"}?.value ?: ""
                     )
                     Tabs.NonRedCode.title -> NonRedCodeScreen(
                         onYellowCodeSelected = {
+                            isYellowCodeSelected = true
                             registrationScreenViewModel.onEvent(RegistrationEvent.TriageCodeSelected("Y"))},
                         ageInt = state.patientInfoState.patient.age,
                         spo2Value = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Oxygen Saturation"}?.value ?: "",
