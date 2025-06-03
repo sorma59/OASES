@@ -8,5 +8,7 @@ data class RegistrationState (
     val patientInfoState: PatientInfoState = PatientInfoState(),
     val pastHistoryState: PastHistoryState = PastHistoryState(),
     val vitalSignsState: VitalSignsState = VitalSignsState(),
+    val triageCode: String = "G",
+    val error : String? = null,
     // Other state properties
 )

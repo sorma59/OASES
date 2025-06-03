@@ -25,6 +25,10 @@ class PatientUseCase @Inject constructor(
        return patientRepository.deletePatient(patient)
     }
 
+     suspend fun updateTriageState(patient: Patient, triageState: String): Resource<Unit> {
+        return patientRepository.updateTriageState(patient, triageState)
+    }
+
     fun getPatientVisits(patientId: String): Flow<Resource<List<Visit>>> {
         return visitRepository.getVisits(patientId)
     }

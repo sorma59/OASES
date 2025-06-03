@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.unimib.oases.ui.screen.patient_registration.RegistrationEvent
 
 @Composable
 fun RedCodeScreen(onRedCodeSelected: (Boolean) -> Unit, sbpValue: String, dbpValue: String) {
@@ -51,7 +52,7 @@ fun RedCodeScreen(onRedCodeSelected: (Boolean) -> Unit, sbpValue: String, dbpVal
     }
 
     LaunchedEffect(isAnyRedCodeSelected.value) {
-        onRedCodeSelected(isAnyRedCodeSelected.value)
+      if(isAnyRedCodeSelected.value) onRedCodeSelected(isAnyRedCodeSelected.value)
     }
 
     Column(

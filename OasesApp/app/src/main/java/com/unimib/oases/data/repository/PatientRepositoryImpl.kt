@@ -120,4 +120,14 @@ class PatientRepositoryImpl @Inject constructor(
         Log.e("PatientRepositoryImpl", "Error getting patients: ${e.message}")
         emit(Resource.Error(e.localizedMessage ?: "Unknown error occurred"))
     }
+
+    override suspend fun updateTriageState(patient: Patient, triageState: String): Resource<Unit> {
+        return try {
+            roomDataSource.updateTriageState(patient.toEntity(), triageState)
+            Resource.Success(Unit)
+        } catch (e: Exception) {
+            Resource.Error(e.message ?: "An error occurred")
+        }
+    }
+
 }

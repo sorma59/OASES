@@ -138,8 +138,6 @@ fun PatientCard(
             Column(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 10.dp)
             ) {
-
-
                 Text(
                     text = patient.name,
                     style = MaterialTheme.typography.titleSmall,
@@ -181,11 +179,12 @@ fun PatientCard(
                         Icon(
                             imageVector = Icons.Default.Circle,
                             contentDescription = "",
-//                            tint = when (patient.state) {
-//                                "Y" -> Color.Yellow
-//                                "R" -> Color.Red
-//                                else -> Color.Green
-//                            },
+                            tint = when (patient.status) {
+                                "Y" -> Color.Yellow
+                                "R" -> Color.Red
+                                "" -> Color.Gray
+                                else -> Color.Green
+                            },
                             modifier = Modifier.size(10.dp)
                         )
                     }

@@ -62,7 +62,7 @@ fun NonRedCodeScreen(
     }
 
     LaunchedEffect(isAnyYellowCodeSelected.value) {
-        onYellowCodeSelected(isAnyYellowCodeSelected.value)
+        if(isAnyYellowCodeSelected.value) onYellowCodeSelected(isAnyYellowCodeSelected.value)
     }
 
     Column(

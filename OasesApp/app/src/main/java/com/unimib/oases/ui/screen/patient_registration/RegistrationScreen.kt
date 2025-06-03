@@ -164,12 +164,13 @@ fun RegistrationScreen(
                         onBack = { currentIndex-- }
                     )
                     Tabs.Triage.title -> RedCodeScreen(
-                        onRedCodeSelected = { isRedCodeSelected = it },
+                        onRedCodeSelected = { registrationScreenViewModel.onEvent(RegistrationEvent.TriageCodeSelected("R"))},
                         sbpValue = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Systolic Blood Pressure"}?.value ?: "",
                         dbpValue = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Diastolic Blood Pressure"}?.value ?: ""
                     )
                     Tabs.NonRedCode.title -> NonRedCodeScreen(
-                        onYellowCodeSelected = { isYellowCodeSelected = it},
+                        onYellowCodeSelected = {
+                            registrationScreenViewModel.onEvent(RegistrationEvent.TriageCodeSelected("Y"))},
                         ageInt = state.patientInfoState.patient.age,
                         spo2Value = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Oxygen Saturation"}?.value ?: "",
                         hrValue = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Heart Rate"}?.value ?: "",
@@ -207,6 +208,7 @@ fun RegistrationScreen(
                                     currentIndex == tabs.lastIndex ||
                                     (tabs[currentIndex] == Tabs.Triage.title && isRedCodeSelected)
                                 ) {
+                                    registrationScreenViewModel.onEvent(RegistrationEvent.Submit)
                                     navController.navigate(Screen.HomeScreen.route) {
                                         popUpTo(0) { inclusive = true }
                                     }
