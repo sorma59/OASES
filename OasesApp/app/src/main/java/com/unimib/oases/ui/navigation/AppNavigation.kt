@@ -1,12 +1,7 @@
 package com.unimib.oases.ui.navigation
 
-import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideIn
-import androidx.compose.foundation.interaction.HoverInteraction
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -28,13 +23,6 @@ import com.unimib.oases.ui.screen.login.AuthViewModel
 import com.unimib.oases.ui.screen.login.LoginScreen
 import com.unimib.oases.ui.screen.medical_visit.MedicalVisitScreen
 import com.unimib.oases.ui.screen.patient_registration.RegistrationScreen
-import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection
-import androidx.compose.animation.core.Ease
-import androidx.compose.animation.core.EaseIn
-import androidx.compose.animation.core.EaseInOut
-import androidx.compose.animation.core.EaseInOut
-import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.LinearEasing
 
 @Composable
 fun AppNavigation(

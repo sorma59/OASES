@@ -4,9 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unimib.oases.di.ApplicationScope
 import com.unimib.oases.di.IoDispatcher
-import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.domain.usecase.PatientUseCase
-import com.unimib.oases.domain.usecase.UserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler

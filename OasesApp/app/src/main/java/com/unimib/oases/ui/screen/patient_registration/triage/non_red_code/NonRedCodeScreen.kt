@@ -43,7 +43,7 @@ fun NonRedCodeScreen(
 ) {
     val nonRedCodeViewModel: NonRedCodeViewModel = hiltViewModel()
 
-    nonRedCodeViewModel.updateVitalSignsAndAge(ageInt, spo2Value, hrValue, rrValue, sbpValue, tempValue)
+    nonRedCodeViewModel.updateVitalSignsAndAge(ageInt, spo2Value, rrValue, hrValue, sbpValue, tempValue)
 
     val state by nonRedCodeViewModel.state.collectAsState()
 
