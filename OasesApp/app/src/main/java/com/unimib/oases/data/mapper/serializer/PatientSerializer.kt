@@ -1,9 +1,10 @@
-package com.unimib.oases.data.mapper
+package com.unimib.oases.data.mapper.serializer
 
 import android.util.Log
 import com.unimib.oases.data.model.PatientStatus
 import com.unimib.oases.domain.model.Patient
 import java.nio.ByteBuffer
+import java.nio.ByteOrder
 
 object PatientSerializer {
 
@@ -33,7 +34,7 @@ object PatientSerializer {
                     4 + contactBytes.size +
                     4 + statusBytes.size +
                     4 + imageBytes.size
-        ).order(java.nio.ByteOrder.BIG_ENDIAN)
+        ).order(ByteOrder.BIG_ENDIAN)
 
         buffer.putInt(patient.age)
 
@@ -112,24 +113,22 @@ object PatientSerializer {
         )
     }
 
-    private fun ByteBuffer.readString(): String {
-        Log.d("PatientSerializer", "Before reading length: position=${this.position()}, limit=${this.limit()}, remaining=${this.remaining()}")
-        val length = this.int
-        Log.d("PatientSerializer", "Read length: $length, position=${this.position()}, limit=${this.limit()}, remaining=${this.remaining()}")
-        if (length < 0 || length > 1024 * 10) { // 10KB max (adjust as needed)
-            throw IllegalStateException("Invalid string length: $length")
-        }
-        if (this.remaining() < length){
-            throw IllegalStateException("Not enough bytes left in the buffer, length: $length, remaining: ${this.remaining()}")
-        }
-        val bytes = ByteArray(length)
-        this.get(bytes)
-        return String(bytes, Charsets.UTF_8)
-    }
-
     // ----------------Testing--------------------
     fun test() {
-        val original = Patient("test", "John", 30, "M", "Kampala", "Central", "Wakiso", "UG", "Jane", "123456", PatientStatus.WAITING_FOR_TRIAGE.name, null)
+        val original = Patient(
+            "test",
+            "John",
+            30,
+            "M",
+            "Kampala",
+            "Central",
+            "Wakiso",
+            "UG",
+            "Jane",
+            "123456",
+            PatientStatus.WAITING_FOR_TRIAGE.name,
+            null
+        )
         Log.d("PatientSerializer", "Original: $original")
         val bytes = serialize(original)
         val recovered = deserialize(bytes)

@@ -23,6 +23,7 @@ import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -37,6 +38,7 @@ import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberTopAppBarState
@@ -65,6 +67,7 @@ import androidx.navigation.NavController
 import com.unimib.oases.R
 import com.unimib.oases.data.bluetooth.BluetoothCustomManager
 import com.unimib.oases.data.model.Role
+import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.ui.components.SearchBar
 import com.unimib.oases.ui.components.patients.PatientList
 import com.unimib.oases.ui.components.patients.RecentlyReceivedPatientList
@@ -95,7 +98,9 @@ fun HomeScreen(
 
     val state by homeScreenViewModel.state.collectAsState()
 
+    var showAlertDialog by remember { mutableStateOf(false) }
 
+    var patientToDelete by remember { mutableStateOf<Patient?>(null) }
 
     var searchText by remember { mutableStateOf("") }
     var active by remember { mutableStateOf(false) }
@@ -348,7 +353,10 @@ fun HomeScreen(
                             PatientList(
                                 patients = filteredItems,
                                 navController = navController,
-                                homeScreenViewModel = homeScreenViewModel
+                                onDeleteButtonPressed = {
+                                    patientToDelete = it
+                                    showAlertDialog = true
+                                }
                             )
                         }
                         if (state.errorMessage != null){
@@ -374,39 +382,38 @@ fun HomeScreen(
         }
     }
 
-}
+    if (showAlertDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showAlertDialog = false
+            },
+            title = {
+                Text(text = "Confirm deletion of ${patientToDelete?.name}")
+            },
+            text = {
+                Text(text = "Are you sure you want to delete this patient? All the records related to this patient will be deleted.")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        homeScreenViewModel.onEvent(HomeScreenEvent.Delete(patientToDelete!!))
+                        showAlertDialog = false
+                        patientToDelete = null
+                    }
+                ) {
+                    Text("Confirm")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showAlertDialog = false
+                    }
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
 
-//@Composable
-//fun PatientLists(
-//    navController: NavController,
-//    homeScreenViewModel: HomeScreenViewModel,
-//    modifier: Modifier = Modifier
-//) {
-//
-//    val patients = homeScreenViewModel.patients.collectAsState()
-//
-//    val receivedPatients = homeScreenViewModel.receivedPatients.collectAsState()
-//
-//    Column(
-//        modifier = modifier.fillMaxWidth(),
-//        horizontalAlignment = Alignment.CenterHorizontally
-//    ) {
-//        RecentlyReceivedPatientList(receivedPatients.value, navController)
-//
-//        when (patients.value) {
-//            is Resource.Error<*> -> {
-//                GenericErrorBoxAndText((patients.value as Resource.Error).message)
-//            }
-//
-//            is Resource.Loading<*> -> CustomCircularProgressIndicator()
-//            is Resource.None<*> -> {}
-//            is Resource.Success<*> ->
-//
-//                PatientList(
-//                    patients.value.data as List<Patient>,
-//                    navController
-//                )
-//        }
-//    }
-//
-//}
+}

@@ -3,7 +3,8 @@ package com.unimib.oases.domain.usecase
 import android.bluetooth.BluetoothDevice
 import com.unimib.oases.data.bluetooth.BluetoothCustomManager
 import com.unimib.oases.data.bluetooth.BluetoothEnvelope
-import com.unimib.oases.data.mapper.PatientSerializer
+import com.unimib.oases.data.bluetooth.BluetoothEnvelopeType
+import com.unimib.oases.data.mapper.serializer.PatientSerializer
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.util.Resource
 import kotlinx.coroutines.Dispatchers
@@ -31,7 +32,7 @@ class SendPatientViaBluetoothUseCase @Inject constructor(
                             // Connection was successful
                             val patientBytes = PatientSerializer.serialize(patient)
                             val envelope = BluetoothEnvelope(
-                                type = "data",
+                                type = BluetoothEnvelopeType.PATIENT.name,
                                 payload = patientBytes
                             )
                             val jsonEnvelope = Json.encodeToString(BluetoothEnvelope.serializer(), envelope)

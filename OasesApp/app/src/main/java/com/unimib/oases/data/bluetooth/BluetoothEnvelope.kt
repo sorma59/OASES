@@ -26,3 +26,11 @@ data class BluetoothEnvelope(
     }
 }
 
+enum class BluetoothEnvelopeType() {
+    PATIENT(),
+    VISIT(),
+    PATIENT_DISEASE(),
+    VISIT_VITAL_SIGN(),
+    COMMAND()
+}
+

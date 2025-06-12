@@ -38,6 +38,7 @@ class MainActivity : ComponentActivity() {
 
         bluetoothCustomManager.setEnableBluetoothLauncher(enableBluetoothLauncher)
 
+        // Define an ActivityResultLauncher for Bluetooth discoverability
         val discoverableBluetoothLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 // Handle the result from Bluetooth enable request

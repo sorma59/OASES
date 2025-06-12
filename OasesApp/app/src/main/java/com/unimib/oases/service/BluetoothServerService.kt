@@ -20,8 +20,9 @@ import com.unimib.oases.OasesApp
 import com.unimib.oases.R
 import com.unimib.oases.data.bluetooth.BluetoothCustomManager
 import com.unimib.oases.data.bluetooth.BluetoothEnvelope
+import com.unimib.oases.data.bluetooth.BluetoothEnvelopeType
 import com.unimib.oases.data.bluetooth.PatientHandler
-import com.unimib.oases.data.mapper.PatientSerializer
+import com.unimib.oases.data.mapper.serializer.PatientSerializer
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -228,12 +229,12 @@ class BluetoothServerService () : Service() {
                 val envelope = Json.decodeFromString(BluetoothEnvelope.serializer(), line)
 
                 when (envelope.type) {
-                    "data" -> {
+                    BluetoothEnvelopeType.PATIENT.name -> {
                         val patient = PatientSerializer.deserialize(envelope.payload)
                         Log.d("BluetoothServer", "Received patient: $patient")
                         patientHandler.onPatientReceived(patient)
                     }
-                    "code" -> {
+                    BluetoothEnvelopeType.COMMAND.name -> {
                         when (val command = envelope.payload.toString(Charsets.UTF_8)) {
 //                            disconnectCode -> {
 //                                Log.d("BluetoothServer", "Disconnection request received")
