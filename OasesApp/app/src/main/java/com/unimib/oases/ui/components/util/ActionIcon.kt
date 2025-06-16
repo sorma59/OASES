@@ -1,4 +1,4 @@
-package com.unimib.oases.ui.components
+package com.unimib.oases.ui.components.util
 
 import androidx.compose.foundation.background
 import androidx.compose.material3.Icon

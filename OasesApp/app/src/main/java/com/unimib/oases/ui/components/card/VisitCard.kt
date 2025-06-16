@@ -1,6 +1,6 @@
 @file:JvmName("VisitCardKt")
 
-package com.unimib.oases.ui.home_page.components.card
+package com.unimib.oases.ui.components.card
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row

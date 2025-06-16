@@ -1,4 +1,4 @@
-package com.unimib.oases.ui.home_page.components.card
+package com.unimib.oases.ui.components.card
 
 data class VisitUi (
     val visitNumber: Int,

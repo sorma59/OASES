@@ -1,6 +1,6 @@
 @file:JvmName("ChronicConditionCardKt")
 
-package com.unimib.oases.ui.home_page.components.card
+package com.unimib.oases.ui.components.card
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween

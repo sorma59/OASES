@@ -13,7 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.unimib.oases.domain.model.Visit
-import com.unimib.oases.ui.home_page.components.card.VisitCard
+import com.unimib.oases.ui.components.card.VisitCard
 
 @Composable
 fun VisitHistoryScreen(
