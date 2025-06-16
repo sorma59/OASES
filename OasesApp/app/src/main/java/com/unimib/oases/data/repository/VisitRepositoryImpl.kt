@@ -49,4 +49,14 @@ class VisitRepositoryImpl @Inject constructor(
 
     }
 
+    override fun getCurrentVisit(patientId: String): Visit? {
+        return try {
+            val visit = roomDataSource.getCurrentVisit(patientId)
+            visit?.toVisit()
+        } catch (e: Exception) {
+            Log.e("VisitRepository", "Error getting visits: ${e.message}")
+            null
+        }
+    }
+
 }

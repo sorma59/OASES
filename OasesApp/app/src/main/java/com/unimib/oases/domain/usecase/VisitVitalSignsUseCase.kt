@@ -1,4 +1,15 @@
 package com.unimib.oases.domain.usecase
 
-class VisitVitalSignsUseCase {
+import com.unimib.oases.domain.model.VisitVitalSign
+import com.unimib.oases.domain.repository.VisitVitalSignRepository
+import com.unimib.oases.util.Resource
+import jakarta.inject.Inject
+
+class VisitVitalSignsUseCase @Inject constructor(
+    private val visitVitalSignRepository: VisitVitalSignRepository
+){
+    suspend fun addVisitVitalSign(visitVitalSign: VisitVitalSign): Resource<Unit> {
+        return visitVitalSignRepository.addVisitVitalSign(visitVitalSign)
+    }
+
 }

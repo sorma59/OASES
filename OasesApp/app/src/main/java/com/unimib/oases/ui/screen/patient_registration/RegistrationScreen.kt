@@ -155,7 +155,13 @@ fun RegistrationScreen(
                         }
                     )
                     Tabs.History.title -> VisitHistoryScreen(state.patientInfoState.patient.id)
-                    Tabs.PastMedicalHistory.title -> PastHistoryScreen()
+                    Tabs.PastMedicalHistory.title -> PastHistoryScreen(
+                        onSubmitted = { pastHistory ->
+                            registrationScreenViewModel.onEvent(RegistrationEvent.PastMedicalHistoryNext(pastHistory))
+                            currentIndex++
+                        },
+                        onBack = { currentIndex-- }
+                    )
                     Tabs.VitalSigns.title -> VitalSignsScreen(
                         onSubmitted = { vitalSigns ->
                             registrationScreenViewModel.onEvent(RegistrationEvent.VitalSignsSubmitted(vitalSigns))
@@ -193,7 +199,8 @@ fun RegistrationScreen(
                 Column {
                     if (tabs[currentIndex] != Tabs.Demographics.title &&
                         tabs[currentIndex] != Tabs.ContinueToTriage.title &&
-                        tabs[currentIndex] != Tabs.VitalSigns.title) {
+                        tabs[currentIndex] != Tabs.VitalSigns.title &&
+                        tabs[currentIndex] != Tabs.PastMedicalHistory.title) {
                         OutlinedButton(onClick = { currentIndex-- }) {
                             Text("Back")
                         }
@@ -203,7 +210,8 @@ fun RegistrationScreen(
                 Column {
                     if (tabs[currentIndex] != Tabs.ContinueToTriage.title &&
                         tabs[currentIndex] != Tabs.Demographics.title &&
-                        tabs[currentIndex] != Tabs.VitalSigns.title){
+                        tabs[currentIndex] != Tabs.VitalSigns.title &&
+                        tabs[currentIndex] != Tabs.PastMedicalHistory.title){
 
                         Button(
                             onClick = {

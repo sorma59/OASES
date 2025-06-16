@@ -9,6 +9,7 @@ import com.unimib.oases.data.model.User
     entities = [User::class],
     version = 1
 )
+// If modified, assets database must be modified too
 abstract class AuthDatabase: RoomDatabase() {
     abstract fun userDao(): UserDao
 }

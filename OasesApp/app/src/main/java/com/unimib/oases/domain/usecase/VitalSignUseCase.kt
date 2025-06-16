@@ -7,7 +7,7 @@ import com.unimib.oases.util.Resource
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-data class VitalSignUseCase @Inject constructor (
+class VitalSignUseCase @Inject constructor (
     private val repo: VitalSignRepository
 ){
     suspend fun addVitalSign(vitalSign: VitalSign) {

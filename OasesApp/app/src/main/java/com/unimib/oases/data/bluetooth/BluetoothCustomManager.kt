@@ -19,7 +19,10 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.core.content.ContextCompat
 import com.unimib.oases.OasesApp
 import com.unimib.oases.R
+import com.unimib.oases.data.transfer.PatientFullData
 import com.unimib.oases.domain.model.Patient
+import com.unimib.oases.domain.usecase.HandleReceivedPatientUseCase
+import com.unimib.oases.domain.usecase.HandleReceivedPatientWithTriageDataUseCase
 import com.unimib.oases.service.BluetoothServerService
 import com.unimib.oases.util.PermissionHelper
 import kotlinx.coroutines.CoroutineScope
@@ -43,7 +46,10 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class BluetoothCustomManager @Inject constructor(): PatientHandler{
+class BluetoothCustomManager @Inject constructor(
+    private val handleReceivedPatientWithTriageDataUseCase: HandleReceivedPatientWithTriageDataUseCase,
+    private val handleReceivedPatientUseCase: HandleReceivedPatientUseCase,
+): PatientHandler{
 
     private val appContext = OasesApp.getAppContext()
     private val bluetoothAdapter: BluetoothAdapter? by lazy {
@@ -527,7 +533,12 @@ class BluetoothCustomManager @Inject constructor(): PatientHandler{
         return bluetoothAdapter != null
     }
 
-    override fun onPatientReceived(patient: Patient) {
+    override suspend fun onPatientReceived(patient: Patient) {
         _receivedPatients.tryEmit(patient)
+        handleReceivedPatientUseCase.invoke(patient)
+    }
+
+    override suspend fun onPatientWithTriageDataReceived(patientWithTriageData: PatientFullData) {
+        handleReceivedPatientWithTriageDataUseCase.invoke(patientWithTriageData)
     }
 }

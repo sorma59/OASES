@@ -68,9 +68,9 @@ import com.unimib.oases.R
 import com.unimib.oases.data.bluetooth.BluetoothCustomManager
 import com.unimib.oases.data.model.Role
 import com.unimib.oases.domain.model.Patient
-import com.unimib.oases.ui.components.search.SearchBar
 import com.unimib.oases.ui.components.patients.PatientList
 import com.unimib.oases.ui.components.patients.RecentlyReceivedPatientList
+import com.unimib.oases.ui.components.search.SearchBar
 import com.unimib.oases.ui.components.util.BluetoothPermissionHandler
 import com.unimib.oases.ui.components.util.NoPermissionMessage
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator

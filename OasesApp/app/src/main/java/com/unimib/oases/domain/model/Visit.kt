@@ -1,21 +1,26 @@
 package com.unimib.oases.domain.model
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 import java.util.UUID
 
-@Parcelize
+@Serializable
 data class Visit(
     val id: String = UUID.randomUUID().toString(),
     val patientId: String,
     val triageCode: String = TriageCode.GREEN.name,
     val date: String = "",
     val description: String = "",
-): Parcelable
+    val status: String = VisitStatus.OPEN.name
+)
 
-enum class TriageCode(val code: String)
+enum class TriageCode()
 {
-    RED("RED"),
-    YELLOW("YELLOW"),
-    GREEN("GREEN")
+    RED(),
+    YELLOW(),
+    GREEN()
+}
+
+enum class VisitStatus(){
+    OPEN(),
+    CLOSED()
 }

@@ -17,6 +17,7 @@ import com.unimib.oases.data.model.User
 import com.unimib.oases.data.model.VisitEntity
 import com.unimib.oases.data.model.VisitVitalSignEntity
 import com.unimib.oases.data.model.VitalSignEntity
+import com.unimib.oases.domain.model.VisitStatus
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -84,7 +85,7 @@ class RoomDataSource @Inject constructor(
         patientDiseaseDao.delete(patientId, diseaseName)
     }
 
-    fun getPatientDiseases(patientId: String): Flow<List<DiseaseEntity>> {
+    fun getPatientDiseases(patientId: String): Flow<List<PatientDiseaseEntity>> {
         return patientDiseaseDao.getPatientDiseases(patientId)
     }
 
@@ -117,6 +118,10 @@ class RoomDataSource @Inject constructor(
 
     fun getVisits(patientId: String): Flow<List<VisitEntity>> {
         return visitDao.getVisits(patientId)
+    }
+
+    fun getCurrentVisit(patientId: String): VisitEntity? {
+        return visitDao.getCurrentVisit(patientId, VisitStatus.CLOSED.name)
     }
 
     // ----------------Visits Vital Signs----------------

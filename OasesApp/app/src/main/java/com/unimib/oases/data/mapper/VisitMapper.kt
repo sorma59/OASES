@@ -9,7 +9,8 @@ fun Visit.toEntity(): VisitEntity {
         patientId = patientId,
         triageCode = triageCode,
         date = date,
-        description = description
+        description = description,
+        status = status
     )
 }
 
@@ -19,6 +20,7 @@ fun VisitEntity.toVisit(): Visit {
         patientId = patientId,
         triageCode = triageCode,
         date = date,
-        description = description
+        description = description,
+        status = status
     )
 }

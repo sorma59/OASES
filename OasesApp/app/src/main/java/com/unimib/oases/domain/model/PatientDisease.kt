@@ -1,12 +1,11 @@
 package com.unimib.oases.domain.model
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
-@Parcelize
+@Serializable
 data class PatientDisease(
     val patientId: String,
     val diseaseName: String,
     val diagnosisDate: String = "",
     val additionalInfo: String = ""
-): Parcelable
+)

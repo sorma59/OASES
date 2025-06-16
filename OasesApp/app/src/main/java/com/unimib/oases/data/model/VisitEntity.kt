@@ -24,4 +24,5 @@ data class VisitEntity(
     @ColumnInfo("triage_code") val triageCode: String,
     @ColumnInfo("date") val date: String,
     @ColumnInfo("description") val description: String,
+    @ColumnInfo("status") val status: String
 )

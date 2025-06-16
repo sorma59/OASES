@@ -4,7 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unimib.oases.di.ApplicationScope
 import com.unimib.oases.di.IoDispatcher
+import com.unimib.oases.domain.model.PatientDisease
+import com.unimib.oases.domain.model.Visit
+import com.unimib.oases.domain.model.VisitStatus
+import com.unimib.oases.domain.model.VisitVitalSign
+import com.unimib.oases.domain.usecase.PatientDiseaseUseCase
 import com.unimib.oases.domain.usecase.PatientUseCase
+import com.unimib.oases.domain.usecase.VisitUseCase
+import com.unimib.oases.domain.usecase.VisitVitalSignsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -13,11 +20,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
 class RegistrationScreenViewModel @Inject constructor(
     private val patientUseCase: PatientUseCase,
+    private val visitUseCase: VisitUseCase,
+    private val patientDiseaseUseCase: PatientDiseaseUseCase,
+    private val visitVitalSignsUseCase: VisitVitalSignsUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
     @IoDispatcher private val dispatcher: CoroutineDispatcher
 ): ViewModel() {
@@ -63,12 +74,55 @@ class RegistrationScreenViewModel @Inject constructor(
 
             is RegistrationEvent.Submit -> {
                 val patient = _state.value.patientInfoState.patient
-                val pastHistory = _state.value.pastHistoryState.diseases
                 val vitalSigns = _state.value.vitalSignsState.vitalSigns.filter {it.value.isNotEmpty()}
                 val triageCode = _state.value.triageCode
 
+                val visit = Visit(
+                    patientId = patient.id,
+                    triageCode = triageCode,
+                    date = LocalDate.now().toString(),
+                    description = "",
+                    status = VisitStatus.OPEN.name
+                )
+
                 viewModelScope.launch(dispatcher + errorHandler) {
-                    patientUseCase.updateTriageState(patient , triageCode)
+                    visitUseCase.addVisit(visit)
+                }
+
+                viewModelScope.launch(dispatcher + errorHandler) {
+                    _state.value.pastHistoryState.diseases.forEach {
+                        if (it.isChecked) {
+                            val patientDisease = PatientDisease(
+                                patientId = patient.id,
+                                diseaseName = it.disease,
+                                additionalInfo = it.additionalInfo,
+                                diagnosisDate = it.date
+                            )
+                            patientDiseaseUseCase.addPatientDisease(patientDisease)
+                        } else {
+                            patientDiseaseUseCase.deletePatientDisease(it.disease, patient.id)
+                        }
+                    }
+
+                }
+
+                viewModelScope.launch(dispatcher + errorHandler) {
+                    vitalSigns.forEach {
+
+                        val visitVitalSign = VisitVitalSign(
+                            visitId = visit.id,
+                            vitalSignName = it.name,
+                            timestamp = System.currentTimeMillis().toString(),
+                            value = it.value.toDouble()
+                        )
+                        visitVitalSignsUseCase.addVisitVitalSign(visitVitalSign)
+
+                    }
+                }
+
+
+                viewModelScope.launch(dispatcher + errorHandler) {
+                    patientUseCase.updateTriageState(patient, triageCode)
                 }
 
             }

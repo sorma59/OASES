@@ -23,11 +23,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.unimib.oases.domain.model.Patient
+import com.unimib.oases.ui.components.card.PatientCard
+import com.unimib.oases.ui.components.card.PatientUi
 import com.unimib.oases.ui.components.util.ActionIcon
 import com.unimib.oases.ui.components.util.CenteredText
 import com.unimib.oases.ui.components.util.SmallGrayText
-import com.unimib.oases.ui.components.card.PatientCard
-import com.unimib.oases.ui.components.card.PatientUi
 import com.unimib.oases.ui.navigation.Screen
 
 @Composable

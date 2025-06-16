@@ -1,7 +1,6 @@
 package com.unimib.oases.ui.screen.patient_registration.past_medical_history
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,7 +11,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -26,13 +27,45 @@ import com.unimib.oases.ui.components.util.AnimatedLabelOutlinedTextField
 import com.unimib.oases.ui.components.util.DateSelector
 
 @Composable
-fun PastHistoryScreen() {
+fun PastHistoryScreen(
+    onSubmitted: (PastHistoryState) -> Unit,
+    onBack: () -> Unit
+) {
 
     val pastHistoryViewModel: PastHistoryViewModel = hiltViewModel()
 
-    Box(Modifier.fillMaxSize()) {
-        ChronicConditionsCheckboxes(pastHistoryViewModel)
+    val state by pastHistoryViewModel.state.collectAsState()
+
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Bottom
+    ){
+        ChronicConditionsCheckboxes(
+            pastHistoryViewModel,
+            modifier = Modifier.weight(1f)
+        )
+
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 12.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            OutlinedButton(onClick = { onBack() }) {
+                Text("Back")
+            }
+
+            Button(
+                onClick = {
+                    onSubmitted(state)
+                }
+            ) {
+                Text("Next")
+            }
+        }
     }
+
 }
 
 @Composable
@@ -77,7 +110,10 @@ fun CheckboxInputWithDateAndText(
 }
 
 @Composable
-fun ChronicConditionsCheckboxes(pastHistoryViewModel: PastHistoryViewModel){
+fun ChronicConditionsCheckboxes(
+    pastHistoryViewModel: PastHistoryViewModel,
+    modifier: Modifier = Modifier
+){
 
     val state by pastHistoryViewModel.state.collectAsState()
 
@@ -85,7 +121,7 @@ fun ChronicConditionsCheckboxes(pastHistoryViewModel: PastHistoryViewModel){
 
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = Modifier
+        modifier = modifier
             .padding(horizontal = 16.dp)
             .fillMaxWidth()
             .verticalScroll(scrollState)

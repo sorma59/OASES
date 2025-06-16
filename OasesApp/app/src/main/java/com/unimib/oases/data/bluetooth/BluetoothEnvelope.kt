@@ -28,9 +28,7 @@ data class BluetoothEnvelope(
 
 enum class BluetoothEnvelopeType() {
     PATIENT(),
-    VISIT(),
-    PATIENT_DISEASE(),
-    VISIT_VITAL_SIGN(),
+    PATIENT_WITH_TRIAGE_DATA(),
     COMMAND()
 }
 

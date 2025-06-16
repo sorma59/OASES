@@ -21,4 +21,7 @@ interface VisitDao {
     @Query("SELECT * FROM " + TableNames.VISIT + " WHERE patient_id = :patientId")
     fun getVisits(patientId: String): Flow<List<VisitEntity>>
 
+    @Query("SELECT * FROM " + TableNames.VISIT + " WHERE patient_id = :patientId AND status <> :excludedStatus ORDER BY date DESC LIMIT 1")
+    fun getCurrentVisit(patientId: String, excludedStatus: String): VisitEntity?
+
 }
