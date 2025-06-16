@@ -7,6 +7,7 @@ plugins {
     id("com.google.devtools.ksp") version "2.1.20-2.0.0"
     id("kotlin-parcelize")
     id("com.google.dagger.hilt.android")
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -61,6 +62,7 @@ dependencies {
     implementation(libs.androidx.animation.core.android)
     implementation(libs.firebase.storage.ktx)
     implementation(libs.firebase.database.ktx)
+    implementation(libs.firebase.firestore)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

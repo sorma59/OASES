@@ -31,6 +31,7 @@ firebaseStorageKtx = "21.0.1"
 firebaseDatabaseKtx = "21.0.0"
 
 kotlinxSerializationJson = "1.6.3"
+firebaseFirestore = "25.1.4"
 
 
 [libraries]
@@ -75,6 +76,7 @@ androidx-animation-core-android = { group = "androidx.compose.animation", name =
 firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage-ktx", version.ref = "firebaseStorageKtx" }
 firebase-database-ktx = { group = "com.google.firebase", name = "firebase-database-ktx", version.ref = "firebaseDatabaseKtx" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
