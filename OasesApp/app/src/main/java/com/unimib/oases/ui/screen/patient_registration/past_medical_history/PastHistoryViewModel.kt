@@ -1,9 +1,11 @@
 package com.unimib.oases.ui.screen.patient_registration.past_medical_history
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.usecase.DiseaseUseCase
+import com.unimib.oases.domain.usecase.PatientDiseaseUseCase
 import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -17,7 +19,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PastHistoryViewModel @Inject constructor(
-    private val useCases: DiseaseUseCase,
+    private val diseaseUseCases: DiseaseUseCase,
+    private val patientDiseaseUseCases: PatientDiseaseUseCase,
+    savedStateHandle: SavedStateHandle,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ): ViewModel() {
 
@@ -34,6 +38,9 @@ class PastHistoryViewModel @Inject constructor(
 
     init {
         loadDiseases()
+        savedStateHandle.get<String>("patientId")?.let { id ->
+            loadPatientDiseases(id)
+        }
     }
 
     private fun loadDiseases() {
@@ -41,7 +48,7 @@ class PastHistoryViewModel @Inject constructor(
 
             _state.update { it.copy(isLoading = true) }
 
-            useCases.getDiseases().collect { diseases ->
+            diseaseUseCases.getDiseases().collect { diseases ->
 
                 if (diseases is Resource.Success){
 
@@ -60,6 +67,47 @@ class PastHistoryViewModel @Inject constructor(
                 _state.update { it.copy(isLoading = false) }
             }
 
+        }
+    }
+
+    private fun loadPatientDiseases(patientId: String) {
+        viewModelScope.launch(ioDispatcher + errorHandler) {
+            _state.update { it.copy(isLoading = true) } // You might want to move this isLoading update earlier
+
+            patientDiseaseUseCases.getPatientDiseases(patientId).collect { patientDiseasesResource ->
+                if (patientDiseasesResource is Resource.Success) {
+                    val patientDiseasesFromDb = patientDiseasesResource.data!! // List<com.unimib.oases.domain.model.PatientDisease>
+                    val patientDiseaseDbMap = patientDiseasesFromDb.associateBy { it.diseaseName }
+
+                    _state.update { currentState ->
+                        val updatedDiseasesList = currentState.diseases.map { existingUiDiseaseState -> // existingUiDiseaseState is PatientDiseaseState
+                            val patientSpecificDiseaseData = patientDiseaseDbMap[existingUiDiseaseState.disease]
+
+                            if (patientSpecificDiseaseData != null) {
+                                // This disease from the UI list is also a disease recorded for the patient
+                                existingUiDiseaseState.copy(
+                                    isChecked = true,
+                                    additionalInfo = patientSpecificDiseaseData.additionalInfo,
+                                    date = patientSpecificDiseaseData.diagnosisDate
+                                )
+                            } else {
+                                // This disease from the UI list is NOT recorded for this specific patient in the DB.
+                                // Reset its patient-specific details or return it as is if its default is unchecked.
+                                existingUiDiseaseState
+                            }
+                        }
+                        currentState.copy(diseases = updatedDiseasesList, isLoading = false) // Update isLoading here too
+                    }
+                } else if (patientDiseasesResource is Resource.Error) {
+                    _state.update {
+                        it.copy(
+                            error = patientDiseasesResource.message,
+                            isLoading = false
+                        )
+                    }
+                }
+                 _state.update { it.copy(isLoading = false) }
+            }
         }
     }
 

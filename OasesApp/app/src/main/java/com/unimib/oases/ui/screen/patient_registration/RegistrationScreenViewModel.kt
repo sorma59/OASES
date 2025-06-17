@@ -1,7 +1,6 @@
 package com.unimib.oases.ui.screen.patient_registration
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.unimib.oases.di.ApplicationScope
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.model.PatientDisease
@@ -73,23 +72,22 @@ class RegistrationScreenViewModel @Inject constructor(
             }
 
             is RegistrationEvent.Submit -> {
-                val patient = _state.value.patientInfoState.patient
-                val vitalSigns = _state.value.vitalSignsState.vitalSigns.filter {it.value.isNotEmpty()}
-                val triageCode = _state.value.triageCode
+                applicationScope.launch(dispatcher + errorHandler) {
+                    val patient = _state.value.patientInfoState.patient
+                    val vitalSigns =
+                        _state.value.vitalSignsState.vitalSigns.filter { it.value.isNotEmpty() }
+                    val triageCode = _state.value.triageCode
 
-                val visit = Visit(
-                    patientId = patient.id,
-                    triageCode = triageCode,
-                    date = LocalDate.now().toString(),
-                    description = "",
-                    status = VisitStatus.OPEN.name
-                )
+                    val visit = Visit(
+                        patientId = patient.id,
+                        triageCode = triageCode,
+                        date = LocalDate.now().toString(),
+                        description = "",
+                        status = VisitStatus.OPEN.name
+                    )
 
-                viewModelScope.launch(dispatcher + errorHandler) {
                     visitUseCase.addVisit(visit)
-                }
 
-                viewModelScope.launch(dispatcher + errorHandler) {
                     _state.value.pastHistoryState.diseases.forEach {
                         if (it.isChecked) {
                             val patientDisease = PatientDisease(
@@ -104,9 +102,6 @@ class RegistrationScreenViewModel @Inject constructor(
                         }
                     }
 
-                }
-
-                viewModelScope.launch(dispatcher + errorHandler) {
                     vitalSigns.forEach {
 
                         val visitVitalSign = VisitVitalSign(
@@ -118,13 +113,9 @@ class RegistrationScreenViewModel @Inject constructor(
                         visitVitalSignsUseCase.addVisitVitalSign(visitVitalSign)
 
                     }
-                }
 
-
-                viewModelScope.launch(dispatcher + errorHandler) {
                     patientUseCase.updateTriageState(patient, triageCode)
                 }
-
             }
         }
     }

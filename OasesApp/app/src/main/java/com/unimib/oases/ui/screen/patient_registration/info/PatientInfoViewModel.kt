@@ -33,8 +33,6 @@ class PatientInfoViewModel @Inject constructor(
     private val _state = MutableStateFlow(PatientInfoState())
     val state: StateFlow<PatientInfoState> = _state.asStateFlow()
 
-    // Abbiamo bisogno di due tipi di eventi di validazione per distinguere
-    // tra validazione del form e successo della sottomissione finale.
     private val validationEventsChannel = Channel<ValidationEvent>()
     val validationEvents = validationEventsChannel.receiveAsFlow()
 
@@ -46,7 +44,6 @@ class PatientInfoViewModel @Inject constructor(
             error = e.message,
             isLoading = false
         )
-        // In caso di errore nel salvataggio finale, potresti voler mostrare una Snackbar
         viewModelScope.launch {
             _eventFlow.emit(
                 UiEvent.showSnackbar(
