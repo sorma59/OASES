@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.unimib.oases.ui.components.util.AnimatedLabelOutlinedTextField
 import com.unimib.oases.ui.components.util.DateSelector
+import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 
 @Composable
 fun PastHistoryScreen(
@@ -41,10 +42,36 @@ fun PastHistoryScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Bottom
     ){
-        ChronicConditionsCheckboxes(
-            pastHistoryViewModel,
-            modifier = Modifier.weight(1f)
-        )
+
+        if (state.error != null){
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .weight(1f)
+            ){
+                Text(text = state.error!!)
+
+                Button(
+                    onClick = {
+                        pastHistoryViewModel.onEvent(PastHistoryEvent.Retry)
+                    }
+                ) {
+                    Text("Retry")
+                }
+            }
+        }
+        else if (state.isLoading){
+            CustomCircularProgressIndicator()
+        }
+        else {
+
+            ChronicConditionsCheckboxes(
+                pastHistoryViewModel,
+                modifier = Modifier.weight(1f)
+            )
+        }
 
         Row(
             modifier = Modifier

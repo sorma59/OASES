@@ -53,7 +53,6 @@ class SendPatientViaBluetoothUseCase @Inject constructor(
                                 // Get the patient's current visit's vital signs
                                 val vitalSignsDeferred = async(Dispatchers.IO) {
                                     try {
-                                        Log.d("Prova", "Vital signs for visit ${currentVisit.id}")
                                         val resource = visitVitalSignRepository.getVisitVitalSigns(currentVisit.id)
                                             .first { it is Resource.Success || it is Resource.Error } // Wait for Success or Error
                                         resource.data ?: emptyList<VisitVitalSign>()
@@ -71,7 +70,6 @@ class SendPatientViaBluetoothUseCase @Inject constructor(
 
                                 val diseasesDeferred = async(Dispatchers.IO) {
                                     try {
-                                        Log.d("SendPatient", "Diseases for patient ${patient.id}")
                                         val resource = patientDiseaseRepository.getPatientDiseases(patient.id)
                                             .first { it is Resource.Success || it is Resource.Error } // Wait for Success or Error
                                         resource.data ?: emptyList<PatientDisease>()

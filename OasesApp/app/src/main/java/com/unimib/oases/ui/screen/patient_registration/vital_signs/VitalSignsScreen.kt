@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.unimib.oases.ui.components.util.AnimatedLabelOutlinedTextField
+import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 
 @Composable
 fun VitalSignsScreen(
@@ -39,32 +40,56 @@ fun VitalSignsScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Bottom
     ){
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-                .verticalScroll(scrollState)
-                .weight(1f)
-        ) {
+        if (state.error != null){
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .weight(1f)
+            ){
+                Text(text = state.error!!)
 
-            for (vitalSign in state.vitalSigns) {
-                AnimatedLabelOutlinedTextField(
-                    value = vitalSign.value.toString(),
-                    onValueChange = {
-                        vitalSignsViewModel.onEvent(
-                            VitalSignsEvent.ValueChanged(
-                                vitalSign.name,
-                                it
+                Button(
+                    onClick = {
+                        vitalSignsViewModel.onEvent(VitalSignsEvent.Retry)
+                    }
+                ) {
+                    Text("Retry")
+                }
+            }
+        }
+        else if (state.isLoading){
+            CustomCircularProgressIndicator()
+        }
+        else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+                    .verticalScroll(scrollState)
+                    .weight(1f)
+            ) {
+
+                for (vitalSign in state.vitalSigns) {
+                    AnimatedLabelOutlinedTextField(
+                        value = vitalSign.value.toString(),
+                        onValueChange = {
+                            vitalSignsViewModel.onEvent(
+                                VitalSignsEvent.ValueChanged(
+                                    vitalSign.name,
+                                    it
+                                )
                             )
-                        )
-                    },
-                    labelText = vitalSign.name + " (" + vitalSign.acronym + ", " + vitalSign.unit + ")",
-                    isError = vitalSign.error != null,
-                    isInteger = vitalSign.name != "Temperature" && vitalSign.name != "Rapid Blood Sugar", // TODO: de-hardcode this
-                    isDouble = vitalSign.name == "Temperature" || vitalSign.name == "Rapid Blood Sugar", // TODO: de-hardcode this
-                )
+                        },
+                        labelText = vitalSign.name + " (" + vitalSign.acronym + ", " + vitalSign.unit + ")",
+                        isError = vitalSign.error != null,
+                        isInteger = vitalSign.name != "Temperature" && vitalSign.name != "Rapid Blood Sugar", // Hardcoded, to fix later
+                        isDouble = vitalSign.name == "Temperature" || vitalSign.name == "Rapid Blood Sugar", // Hardcoded, to fix later
+                    )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
             }
         }
 
@@ -88,14 +113,3 @@ fun VitalSignsScreen(
         }
     }
 }
-
-fun isInteger(string: String):Boolean{
-    return string.all{ch -> ch.isDigit()} || string.isEmpty()
-}
-
-fun isDecimal(string: String):Boolean{
-    return string.matches(Regex("^\\d*\\.?\\d*$")  ) || string.isEmpty()
-}
-
-//Regex("^\\d*\\.?\\d* $ " )
-//Regex("^\\d+\\.?\\d+$|^\\d+$")

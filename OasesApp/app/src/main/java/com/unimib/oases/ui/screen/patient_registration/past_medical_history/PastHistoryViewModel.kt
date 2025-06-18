@@ -13,6 +13,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -21,7 +22,7 @@ import javax.inject.Inject
 class PastHistoryViewModel @Inject constructor(
     private val diseaseUseCases: DiseaseUseCase,
     private val patientDiseaseUseCases: PatientDiseaseUseCase,
-    savedStateHandle: SavedStateHandle,
+    private val savedStateHandle: SavedStateHandle,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ): ViewModel() {
 
@@ -37,55 +38,86 @@ class PastHistoryViewModel @Inject constructor(
     val state: StateFlow<PastHistoryState> = _state.asStateFlow()
 
     init {
-        loadDiseases()
-        savedStateHandle.get<String>("patientId")?.let { id ->
-            loadPatientDiseases(id)
+        refresh()
+    }
+
+    private fun refresh(){
+        _state.value = _state.value.copy(
+            error = null,
+            isLoading = true
+        )
+        val patientId = savedStateHandle.get<String>("patientId")
+        viewModelScope.launch(ioDispatcher + errorHandler) {
+            if (patientId != null) {
+                loadDiseases()
+                loadPatientDiseases(patientId)
+            } else
+                loadDiseases()
         }
     }
 
-    private fun loadDiseases() {
-        viewModelScope.launch(ioDispatcher + errorHandler) {
+    private suspend fun loadDiseases() {
 
-            _state.update { it.copy(isLoading = true) }
+        _state.update { it.copy(isLoading = true) }
 
-            diseaseUseCases.getDiseases().collect { diseases ->
-
-                if (diseases is Resource.Success){
-
-                    for (disease in diseases.data!!){
-                        _state.update {
-                            it.copy(
-                                diseases = it.diseases + PatientDiseaseState(disease.name)
-                            )
-                        }
-                    }
-
-                } else if (diseases is Resource.Error){
-                    _state.update { it.copy(error = diseases.message) }
-                }
-
-                _state.update { it.copy(isLoading = false) }
+        try {
+            val diseasesResource = diseaseUseCases.getDiseases().first {
+                it is Resource.Success || it is Resource.Error
             }
 
+            if (diseasesResource is Resource.Success) {
+                val diseasesData = diseasesResource.data
+
+                if (diseasesData != null) {
+                    val newStates = diseasesData.map { disease -> // More efficient mapping
+                        PatientDiseaseState(disease.name)
+                    }
+                    _state.update {
+                        it.copy(
+                            diseases = newStates, // Set the list, don't append if it's initial load
+                            error = null // Clear previous error
+                        )
+                    }
+                } else {
+                    // Handle case where Resource.Success has null data, if possible
+                    _state.update { it.copy(error = "Successful fetch but no data.") }
+                }
+            } else if (diseasesResource is Resource.Error) {
+                _state.update { it.copy(error = diseasesResource.message) }
+            }
+        } catch (e: Exception){
+            // This can catch NoSuchElementException if the Flow completes
+            // or any other exception from the Flow upstream or the first() operator itself.
+            _state.update { it.copy(error = e.message ?: "An unexpected error occurred") }
+        } finally {
+            _state.update { it.copy(isLoading = false) } // Ensure isLoading is false in all cases
         }
     }
 
-    private fun loadPatientDiseases(patientId: String) {
-        viewModelScope.launch(ioDispatcher + errorHandler) {
-            _state.update { it.copy(isLoading = true) } // You might want to move this isLoading update earlier
+    private suspend fun loadPatientDiseases(patientId: String) {
 
-            patientDiseaseUseCases.getPatientDiseases(patientId).collect { patientDiseasesResource ->
-                if (patientDiseasesResource is Resource.Success) {
-                    val patientDiseasesFromDb = patientDiseasesResource.data!! // List<com.unimib.oases.domain.model.PatientDisease>
-                    val patientDiseaseDbMap = patientDiseasesFromDb.associateBy { it.diseaseName }
+        _state.update { it.copy(isLoading = true) }
 
-                    _state.update { currentState ->
-                        val updatedDiseasesList = currentState.diseases.map { existingUiDiseaseState -> // existingUiDiseaseState is PatientDiseaseState
-                            val patientSpecificDiseaseData = patientDiseaseDbMap[existingUiDiseaseState.disease]
+        try {
+            val patientDiseases = patientDiseaseUseCases.getPatientDiseases(patientId).first {
+                it is Resource.Success || it is Resource.Error
+            }
+
+            if (patientDiseases is Resource.Success) {
+
+                val patientDiseasesFromDb = patientDiseases.data!!
+                val patientDiseasesDbMap = patientDiseasesFromDb.associateBy { it.diseaseName }
+
+                _state.update { currentState ->
+
+                    val updatedDiseasesList =
+                        currentState.diseases.map { uiState -> // uiState is PatientDiseaseState
+
+                            val patientSpecificDiseaseData = patientDiseasesDbMap[uiState.disease]
 
                             if (patientSpecificDiseaseData != null) {
                                 // This disease from the UI list is also a disease recorded for the patient
-                                existingUiDiseaseState.copy(
+                                uiState.copy(
                                     isChecked = true,
                                     additionalInfo = patientSpecificDiseaseData.additionalInfo,
                                     date = patientSpecificDiseaseData.diagnosisDate
@@ -93,21 +125,20 @@ class PastHistoryViewModel @Inject constructor(
                             } else {
                                 // This disease from the UI list is NOT recorded for this specific patient in the DB.
                                 // Reset its patient-specific details or return it as is if its default is unchecked.
-                                existingUiDiseaseState
+                                uiState
                             }
                         }
-                        currentState.copy(diseases = updatedDiseasesList, isLoading = false) // Update isLoading here too
-                    }
-                } else if (patientDiseasesResource is Resource.Error) {
-                    _state.update {
-                        it.copy(
-                            error = patientDiseasesResource.message,
-                            isLoading = false
-                        )
-                    }
+                    currentState.copy(diseases = updatedDiseasesList, isLoading = false)
                 }
-                 _state.update { it.copy(isLoading = false) }
+            } else if (patientDiseases is Resource.Error) {
+                _state.update { it.copy(error = patientDiseases.message) }
             }
+        } catch (e: Exception) {
+            // This can catch NoSuchElementException if the Flow completes
+            // or any other exception from the Flow upstream or the first() operator itself.
+            _state.update { it.copy(error = e.message ?: "An unexpected error occurred") }
+        } finally {
+            _state.update { it.copy(isLoading = false) }
         }
     }
 
@@ -156,6 +187,9 @@ class PastHistoryViewModel @Inject constructor(
                 }
             }
 
+            is PastHistoryEvent.Retry -> {
+                refresh()
+            }
         }
     }
 }
