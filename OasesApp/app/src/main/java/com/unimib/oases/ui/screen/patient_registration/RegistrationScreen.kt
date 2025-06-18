@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.unimib.oases.domain.model.TriageCode
 import com.unimib.oases.ui.navigation.Screen
 import com.unimib.oases.ui.screen.patient_registration.continue_to_triage.ContinueToTriageDecisionScreen
 import com.unimib.oases.ui.screen.patient_registration.info.PatientInfoScreen
@@ -172,14 +173,24 @@ fun RegistrationScreen(
                     Tabs.Triage.title -> RedCodeScreen(
                         onRedCodeSelected = {
                             isRedCodeSelected = true
-                            registrationScreenViewModel.onEvent(RegistrationEvent.TriageCodeSelected("R"))},
+                            registrationScreenViewModel.onEvent(
+                                RegistrationEvent.TriageCodeSelected(
+                                    TriageCode.RED.name
+                                )
+                            )
+                        },
                         sbpValue = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Systolic Blood Pressure"}?.value ?: "",
                         dbpValue = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Diastolic Blood Pressure"}?.value ?: ""
                     )
                     Tabs.NonRedCode.title -> NonRedCodeScreen(
                         onYellowCodeSelected = {
                             isYellowCodeSelected = true
-                            registrationScreenViewModel.onEvent(RegistrationEvent.TriageCodeSelected("Y"))},
+                            registrationScreenViewModel.onEvent(
+                                RegistrationEvent.TriageCodeSelected(
+                                    TriageCode.YELLOW.name
+                                )
+                            )
+                        },
                         ageInt = state.patientInfoState.patient.age,
                         spo2Value = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Oxygen Saturation"}?.value ?: "",
                         hrValue = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Heart Rate"}?.value ?: "",

@@ -31,7 +31,7 @@ fun VisitCard(visit: Visit) {
         TriageCode.GREEN.name -> Color.Green
         TriageCode.YELLOW.name -> Color.Yellow
         TriageCode.RED.name -> Color.Red
-        else -> Color.Gray // Colore di default se non riconosciuto
+        else -> Color.Gray
     }
     val textColor = MaterialTheme.colorScheme.onPrimaryContainer
     val cardBackgroundColor = MaterialTheme.colorScheme.primaryContainer
@@ -49,7 +49,7 @@ fun VisitCard(visit: Visit) {
                 .padding(16.dp)
         ) {
             Text(
-                text = "Visita del " + visit.date,
+                text = "Visit on " + visit.date,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = textColor
@@ -59,14 +59,14 @@ fun VisitCard(visit: Visit) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Data: " + visit.date,
+                    text = "Status: " + visit.status,
                     style = MaterialTheme.typography.bodyMedium,
                     color = textColor
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Icon(
                     imageVector = Icons.Filled.Circle,
-                    contentDescription = "Stato Visita",
+                    contentDescription = "Visit Triage Code",
                     tint = statusColor,
                     modifier = Modifier.size(16.dp)
                 )

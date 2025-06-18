@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.unimib.oases.domain.model.Patient
+import com.unimib.oases.domain.model.TriageCode
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -136,7 +137,9 @@ fun PatientCard(
         ) {
 
             Column(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 10.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 10.dp, vertical = 10.dp)
             ) {
                 Text(
                     text = patient.name,
@@ -145,15 +148,13 @@ fun PatientCard(
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 0.sp,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier
-                        .fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                     maxLines = 1
                 )
                 Spacer(modifier = Modifier.height(10.dp))
 
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -180,16 +181,15 @@ fun PatientCard(
                             imageVector = Icons.Default.Circle,
                             contentDescription = "",
                             tint = when (patient.status) {
-                                "Y" -> Color.Yellow
-                                "R" -> Color.Red
-                                "" -> Color.Gray
-                                else -> Color.Green
+                                TriageCode.YELLOW.name -> Color.Yellow
+                                TriageCode.RED.name -> Color.Red
+                                TriageCode.GREEN.name -> Color.Green
+                                else -> Color.Gray
                             },
                             modifier = Modifier.size(10.dp)
                         )
                     }
                 }
-
             }
         }
     }
