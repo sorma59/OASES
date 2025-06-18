@@ -1,6 +1,6 @@
 package com.unimib.oases.data.mapper
 
-import com.unimib.oases.data.model.VitalSignEntity
+import com.unimib.oases.data.local.model.VitalSignEntity
 import com.unimib.oases.domain.model.VitalSign
 
 fun VitalSign.toEntity(): VitalSignEntity {

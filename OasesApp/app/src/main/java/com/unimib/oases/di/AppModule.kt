@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.unimib.oases.data.local.db.AuthDatabase
 import com.unimib.oases.data.local.db.OasesDatabase
+import com.unimib.oases.data.util.FirestoreManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -86,6 +87,13 @@ object AppModule {
 //            """.trimIndent())
 //        }
 //    }
+
+    @Provides
+    @Singleton
+    @ApplicationScope
+    fun provideFirestoreManager(): FirestoreManager = FirestoreManager()
+
+
 
     @Provides
     @Singleton

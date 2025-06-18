@@ -6,7 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Upsert
 import com.unimib.oases.data.local.TableNames
-import com.unimib.oases.data.model.VisitEntity
+import com.unimib.oases.data.local.model.VisitEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

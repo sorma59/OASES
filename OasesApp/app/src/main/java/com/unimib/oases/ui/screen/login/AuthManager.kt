@@ -1,7 +1,7 @@
 package com.unimib.oases.ui.screen.login
 
 import android.content.Context
-import com.unimib.oases.data.model.User
+import com.unimib.oases.data.local.model.User
 import com.unimib.oases.util.UserPreferences
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject

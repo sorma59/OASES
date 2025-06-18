@@ -1,8 +1,8 @@
 package com.unimib.oases.data.repository
 
 import com.unimib.oases.data.local.RoomDataSource
-import com.unimib.oases.data.model.Role
-import com.unimib.oases.data.model.User
+import com.unimib.oases.data.local.model.Role
+import com.unimib.oases.data.local.model.User
 import com.unimib.oases.domain.repository.UserRepository
 import com.unimib.oases.util.PasswordUtils
 import com.unimib.oases.util.Resource

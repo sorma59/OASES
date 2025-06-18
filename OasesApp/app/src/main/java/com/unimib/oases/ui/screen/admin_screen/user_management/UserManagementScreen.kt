@@ -51,8 +51,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.unimib.oases.data.model.Role
-import com.unimib.oases.data.model.User
+import com.unimib.oases.data.local.model.Role
+import com.unimib.oases.data.local.model.User
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 import com.unimib.oases.ui.navigation.Screen
 import kotlinx.coroutines.launch

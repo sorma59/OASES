@@ -1,7 +1,7 @@
 package com.unimib.oases.ui.screen.admin_screen.user_management
 
-import com.unimib.oases.data.model.Role
-import com.unimib.oases.data.model.User
+import com.unimib.oases.data.local.model.Role
+import com.unimib.oases.data.local.model.User
 
 sealed class UserManagementEvent {
     data class EnteredUsername(val value: String) : UserManagementEvent()

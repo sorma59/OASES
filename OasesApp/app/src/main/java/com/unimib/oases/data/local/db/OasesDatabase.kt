@@ -10,12 +10,12 @@ import com.unimib.oases.data.local.dao.PatientDiseaseDao
 import com.unimib.oases.data.local.dao.VisitDao
 import com.unimib.oases.data.local.dao.VisitVitalSignDao
 import com.unimib.oases.data.local.dao.VitalSignsDao
-import com.unimib.oases.data.model.DiseaseEntity
-import com.unimib.oases.data.model.PatientDiseaseEntity
-import com.unimib.oases.data.model.PatientEntity
-import com.unimib.oases.data.model.VisitEntity
-import com.unimib.oases.data.model.VisitVitalSignEntity
-import com.unimib.oases.data.model.VitalSignEntity
+import com.unimib.oases.data.local.model.DiseaseEntity
+import com.unimib.oases.data.local.model.PatientDiseaseEntity
+import com.unimib.oases.data.local.model.PatientEntity
+import com.unimib.oases.data.local.model.VisitEntity
+import com.unimib.oases.data.local.model.VisitVitalSignEntity
+import com.unimib.oases.data.local.model.VitalSignEntity
 
 @Database(
     entities = [

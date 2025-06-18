@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.unimib.oases.data.model.User
+import com.unimib.oases.data.local.model.User
 import com.unimib.oases.domain.repository.UserRepository
 import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel

@@ -6,7 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.unimib.oases.data.local.TableNames
-import com.unimib.oases.data.model.VitalSignEntity
+import com.unimib.oases.data.local.model.VitalSignEntity
 import kotlinx.coroutines.flow.Flow
 
 

@@ -2,7 +2,7 @@ package com.unimib.oases.ui.screen.admin_screen.user_management
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.unimib.oases.data.model.User
+import com.unimib.oases.data.local.model.User
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.usecase.UserUseCase
 import com.unimib.oases.util.Resource

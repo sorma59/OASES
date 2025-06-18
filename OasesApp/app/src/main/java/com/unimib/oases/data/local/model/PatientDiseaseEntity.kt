@@ -1,4 +1,4 @@
-package com.unimib.oases.data.model
+package com.unimib.oases.data.local.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

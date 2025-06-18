@@ -5,7 +5,7 @@ import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Upsert
 import com.unimib.oases.data.local.TableNames
-import com.unimib.oases.data.model.PatientEntity
+import com.unimib.oases.data.local.model.PatientEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

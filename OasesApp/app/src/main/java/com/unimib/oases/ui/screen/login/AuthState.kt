@@ -1,6 +1,6 @@
 package com.unimib.oases.ui.screen.login
 
-import com.unimib.oases.data.model.User
+import com.unimib.oases.data.local.model.User
 
 sealed class AuthState {
     data object Uninitialized: AuthState()

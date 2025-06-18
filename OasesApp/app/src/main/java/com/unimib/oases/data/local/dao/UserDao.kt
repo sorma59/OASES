@@ -6,8 +6,8 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.unimib.oases.data.local.TableNames
-import com.unimib.oases.data.model.Role
-import com.unimib.oases.data.model.User
+import com.unimib.oases.data.local.model.Role
+import com.unimib.oases.data.local.model.User
 import kotlinx.coroutines.flow.Flow
 
 @Dao

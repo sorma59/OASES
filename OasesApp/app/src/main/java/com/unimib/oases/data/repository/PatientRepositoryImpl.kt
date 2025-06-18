@@ -1,12 +1,21 @@
 package com.unimib.oases.data.repository
 
 import android.util.Log
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.lifecycle.LifecycleOwner
 import com.unimib.oases.data.local.RoomDataSource
 import com.unimib.oases.data.mapper.toEntity
 import com.unimib.oases.data.mapper.toPatient
+import com.unimib.oases.data.util.FirestoreManager
+import com.unimib.oases.di.ApplicationScope
+import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.util.Resource
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,14 +24,18 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class PatientRepositoryImpl @Inject constructor(
     private val roomDataSource: RoomDataSource,
 //    private val bluetoothCustomManager: BluetoothCustomManager,
-//    @ApplicationScope private val applicationScope: CoroutineScope
+    @ApplicationScope private val applicationScope: CoroutineScope,
+    private val firestoreManager: FirestoreManager,
 ) : PatientRepository {
 
     private val _receivedPatients = MutableStateFlow<List<Patient>>(emptyList())
@@ -30,6 +43,7 @@ class PatientRepositoryImpl @Inject constructor(
 
     private val _newPatientEvents = MutableSharedFlow<Patient>()
     override val newPatientEvents: SharedFlow<Patient> = _newPatientEvents.asSharedFlow()
+
 
 //    init {
 //        listenForPatients()
@@ -91,7 +105,6 @@ class PatientRepositoryImpl @Inject constructor(
 
     override suspend fun getPatientById(patientId: String): Flow<Resource<Patient?>> = flow {
         emit(Resource.Loading())
-
         try {
             roomDataSource.getPatientById(patientId).collect {
                 emit(Resource.Success(it?.toPatient()))
@@ -103,6 +116,8 @@ class PatientRepositoryImpl @Inject constructor(
     }
 
     override fun getPatients(): Flow<Resource<List<Patient>>> = flow {
+
+
         emit(Resource.Loading())
         roomDataSource.getPatients().collect {
                 it.forEach { patient ->

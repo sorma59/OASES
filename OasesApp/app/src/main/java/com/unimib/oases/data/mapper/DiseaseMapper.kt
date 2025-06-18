@@ -1,6 +1,6 @@
 package com.unimib.oases.data.mapper
 
-import com.unimib.oases.data.model.DiseaseEntity
+import com.unimib.oases.data.local.model.DiseaseEntity
 import com.unimib.oases.domain.model.Disease
 
 fun Disease.toEntity(): DiseaseEntity {

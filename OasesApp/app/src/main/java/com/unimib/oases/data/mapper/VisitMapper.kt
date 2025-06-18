@@ -1,6 +1,6 @@
 package com.unimib.oases.data.mapper
 
-import com.unimib.oases.data.model.VisitEntity
+import com.unimib.oases.data.local.model.VisitEntity
 import com.unimib.oases.domain.model.Visit
 
 fun Visit.toEntity(): VisitEntity {

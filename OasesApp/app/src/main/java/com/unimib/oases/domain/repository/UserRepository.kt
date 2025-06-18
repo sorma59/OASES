@@ -1,7 +1,7 @@
 package com.unimib.oases.domain.repository
 
-import com.unimib.oases.data.model.Role
-import com.unimib.oases.data.model.User
+import com.unimib.oases.data.local.model.Role
+import com.unimib.oases.data.local.model.User
 import com.unimib.oases.util.Resource
 import kotlinx.coroutines.flow.Flow
 

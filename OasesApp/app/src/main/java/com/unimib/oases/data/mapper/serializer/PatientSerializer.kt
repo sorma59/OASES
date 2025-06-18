@@ -1,7 +1,7 @@
 package com.unimib.oases.data.mapper.serializer
 
 import android.util.Log
-import com.unimib.oases.data.model.PatientStatus
+import com.unimib.oases.data.local.model.PatientStatus
 import com.unimib.oases.domain.model.Patient
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
