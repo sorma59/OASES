@@ -78,13 +78,18 @@ class RegistrationScreenViewModel @Inject constructor(
                         _state.value.vitalSignsState.vitalSigns.filter { it.value.isNotEmpty() }
                     val triageCode = _state.value.triageCode
 
-                    val visit = Visit(
-                        patientId = patient.id,
-                        triageCode = triageCode,
-                        date = LocalDate.now().toString(),
-                        description = "",
-                        status = VisitStatus.OPEN.name
-                    )
+                    var visit = visitUseCase.getCurrentVisit(patient.id)
+
+                    if (visit == null){
+                        visit = Visit(
+                            patientId = patient.id,
+                            triageCode = triageCode,
+                            date = LocalDate.now().toString(),
+                            description = "",
+                            status = VisitStatus.OPEN.name
+                        )
+                    }
+
 
                     visitUseCase.addVisit(visit)
 

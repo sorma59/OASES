@@ -11,13 +11,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
-import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
@@ -37,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.unimib.oases.domain.model.TriageCode
+import com.unimib.oases.ui.components.util.BottomButtons
 import com.unimib.oases.ui.navigation.Screen
 import com.unimib.oases.ui.screen.patient_registration.continue_to_triage.ContinueToTriageDecisionScreen
 import com.unimib.oases.ui.screen.patient_registration.info.PatientInfoScreen
@@ -201,48 +200,28 @@ fun RegistrationScreen(
                 }
             }
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 12.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Column {
-                    if (tabs[currentIndex] != Tabs.Demographics.title &&
-                        tabs[currentIndex] != Tabs.ContinueToTriage.title &&
-                        tabs[currentIndex] != Tabs.VitalSigns.title &&
-                        tabs[currentIndex] != Tabs.PastMedicalHistory.title) {
-                        OutlinedButton(onClick = { currentIndex-- }) {
-                            Text("Back")
-                        }
-                    }
-                }
-
-                Column {
-                    if (tabs[currentIndex] != Tabs.ContinueToTriage.title &&
-                        tabs[currentIndex] != Tabs.Demographics.title &&
-                        tabs[currentIndex] != Tabs.VitalSigns.title &&
-                        tabs[currentIndex] != Tabs.PastMedicalHistory.title){
-
-                        Button(
-                            onClick = {
-                                if (
-                                    currentIndex == tabs.lastIndex ||
-                                    (tabs[currentIndex] == Tabs.Triage.title && isRedCodeSelected)
-                                ) {
-                                    registrationScreenViewModel.onEvent(RegistrationEvent.Submit)
-                                    navController.navigate(Screen.HomeScreen.route) {
-                                        popUpTo(0) { inclusive = true }
-                                    }
-                                } else {
-                                    currentIndex++
-                                }
-                            }
+            if (tabs[currentIndex] != Tabs.Demographics.title &&
+                tabs[currentIndex] != Tabs.ContinueToTriage.title &&
+                tabs[currentIndex] != Tabs.VitalSigns.title &&
+                tabs[currentIndex] != Tabs.PastMedicalHistory.title) {
+                BottomButtons(
+                    onCancel = { currentIndex-- },
+                    onConfirm = {
+                        if (
+                            currentIndex == tabs.lastIndex ||
+                            (tabs[currentIndex] == Tabs.Triage.title && isRedCodeSelected)
                         ) {
-                            Text(text = nextButtonText)
+                            registrationScreenViewModel.onEvent(RegistrationEvent.Submit)
+                            navController.navigate(Screen.HomeScreen.route) {
+                                popUpTo(0) { inclusive = true }
+                            }
+                        } else {
+                            currentIndex++
                         }
-                    }
-                }
+                    },
+                    cancelButtonText = "Back",
+                    confirmButtonText = nextButtonText
+                )
             }
         }
     }

@@ -2,16 +2,15 @@ package com.unimib.oases.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Upsert
 import com.unimib.oases.data.local.TableNames
 import com.unimib.oases.data.local.model.DiseaseEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface DiseaseDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Upsert
     suspend fun insert(disease: DiseaseEntity)
 
     @Delete

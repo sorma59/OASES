@@ -17,12 +17,13 @@ import androidx.compose.ui.unit.dp
 fun BottomButtons(
     onCancel: () -> Unit,
     onConfirm: () -> Unit,
+    modifier: Modifier = Modifier,
     cancelButtonText: String = "Cancel",
     confirmButtonText: String = "Save"
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier.fillMaxWidth().padding(16.dp)
+        modifier = modifier.fillMaxWidth().padding(24.dp)
     ) {
         OutlinedButton(
             onClick = {

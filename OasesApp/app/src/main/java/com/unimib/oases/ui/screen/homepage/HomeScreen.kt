@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
@@ -213,44 +214,90 @@ fun HomeScreen(
 
                     HorizontalDivider()
 
-                    Row(modifier = Modifier, horizontalArrangement = Arrangement.Start) {
+                    // Buttons
 
-                        Button(
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                    ){
+                        Row(modifier = Modifier) {
 
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(0.dp),
-                            shape = RoundedCornerShape(0),
-                            colors = ButtonDefaults.buttonColors(Color.Transparent),
-                            border = BorderStroke(0.dp, Color.Transparent),
-                            contentPadding = PaddingValues(0.dp),
+                            Button(
 
-                            onClick = {
-                                authViewModel.signout()
-                            },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(0.dp),
+                                shape = RoundedCornerShape(0),
+                                colors = ButtonDefaults.buttonColors(Color.Transparent),
+                                border = BorderStroke(0.dp, Color.Transparent),
+                                contentPadding = PaddingValues(0.dp),
 
-                            ) {
+                                onClick = {
+                                    authViewModel.signout()
+                                },
 
-                            Row(
+                                ) {
+
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.Start
+                                ) {
+                                    Icon(
+                                        modifier = Modifier
+                                            .size(40.dp)
+                                            .padding(10.dp),
+                                        tint = MaterialTheme.colorScheme.onBackground,
+                                        imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                                        contentDescription = "ContentDescriptions.Exit"
+                                    )
+
+                                    Text(
+                                        "Logout",
+                                        fontSize = 20.sp,
+                                        fontWeight = FontWeight.Normal,
+                                        color = MaterialTheme.colorScheme.onBackground
+                                    )
+                                }
+                            }
+                        }
+
+                        Row(modifier = Modifier) {
+
+                            Button(
+
                                 modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.Start
-                            ) {
-                                Icon(
-                                    modifier = Modifier
-                                        .size(40.dp)
-                                        .padding(10.dp),
-                                    tint = MaterialTheme.colorScheme.onBackground,
-                                    imageVector = Icons.AutoMirrored.Filled.ExitToApp,
-                                    contentDescription = "ContentDescriptions.Exit"
-                                )
+                                shape = RoundedCornerShape(0),
+                                colors = ButtonDefaults.buttonColors(Color.Transparent),
+                                border = BorderStroke(0.dp, Color.Transparent),
+                                contentPadding = PaddingValues(0.dp),
 
-                                Text(
-                                    "Logout",
-                                    fontSize = 20.sp,
-                                    fontWeight = FontWeight.Normal,
-                                    color = MaterialTheme.colorScheme.onBackground
-                                )
+                                onClick = {
+                                    navController.navigate(Screen.PairDevice.route)
+                                },
+
+                            ) {
+
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    Icon(
+                                        modifier = Modifier
+                                            .size(40.dp)
+                                            .padding(10.dp),
+                                        tint = MaterialTheme.colorScheme.onBackground,
+                                        imageVector = Icons.Default.Bluetooth,
+                                        contentDescription = "Bluetooth"
+                                    )
+
+                                    Text(
+                                        "Bluetooth",
+                                        fontSize = 20.sp,
+                                        fontWeight = FontWeight.Normal,
+                                        color = MaterialTheme.colorScheme.onBackground
+                                    )
+                                }
                             }
                         }
                     }

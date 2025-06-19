@@ -224,7 +224,7 @@ fun PatientInfoScreen(
             }
             Row(
                 modifier = Modifier
-                    .padding(12.dp)
+                    .padding(24.dp)
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
             ) {

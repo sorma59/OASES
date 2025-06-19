@@ -13,7 +13,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -24,6 +23,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.unimib.oases.ui.components.util.AnimatedLabelOutlinedTextField
+import com.unimib.oases.ui.components.util.BottomButtons
 import com.unimib.oases.ui.components.util.DateSelector
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 
@@ -73,24 +73,31 @@ fun PastHistoryScreen(
             )
         }
 
-        Row(
-            modifier = Modifier
-                .padding(horizontal = 12.dp)
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            OutlinedButton(onClick = { onBack() }) {
-                Text("Back")
-            }
+        BottomButtons(
+            onCancel = { onBack() },
+            onConfirm = { onSubmitted(state) },
+            cancelButtonText = "Back",
+            confirmButtonText = "Next"
+        )
 
-            Button(
-                onClick = {
-                    onSubmitted(state)
-                }
-            ) {
-                Text("Next")
-            }
-        }
+//        Row(
+//            modifier = Modifier
+//                .padding(horizontal = 12.dp)
+//                .fillMaxWidth(),
+//            horizontalArrangement = Arrangement.SpaceBetween,
+//        ) {
+//            OutlinedButton(onClick = { onBack() }) {
+//                Text("Back")
+//            }
+//
+//            Button(
+//                onClick = {
+//                    onSubmitted(state)
+//                }
+//            ) {
+//                Text("Next")
+//            }
+//        }
     }
 
 }
