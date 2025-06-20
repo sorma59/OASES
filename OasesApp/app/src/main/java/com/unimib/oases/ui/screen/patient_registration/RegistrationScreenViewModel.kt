@@ -1,6 +1,7 @@
 package com.unimib.oases.ui.screen.patient_registration
 
 import androidx.lifecycle.ViewModel
+import com.unimib.oases.data.local.model.PatientStatus
 import com.unimib.oases.di.ApplicationScope
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.model.PatientDisease
@@ -120,6 +121,8 @@ class RegistrationScreenViewModel @Inject constructor(
                     }
 
                     patientUseCase.updateTriageState(patient, triageCode)
+
+                    patientUseCase.updateStatus(patient, PatientStatus.WAITING_FOR_VISIT.name)
                 }
             }
         }

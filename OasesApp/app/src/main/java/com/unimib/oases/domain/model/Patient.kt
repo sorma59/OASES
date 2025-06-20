@@ -1,6 +1,7 @@
 package com.unimib.oases.domain.model
 
 import android.os.Parcelable
+import com.unimib.oases.util.PasswordUtils
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import java.util.UUID
@@ -9,6 +10,7 @@ import java.util.UUID
 @Serializable
 data class Patient(
     val id: String = UUID.randomUUID().toString(),
+    val publicId: String = PasswordUtils.generateShortId(),
     var name: String,
     var age: Int,
     var sex: String,

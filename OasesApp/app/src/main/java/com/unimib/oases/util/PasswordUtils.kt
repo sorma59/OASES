@@ -1,5 +1,6 @@
 package com.unimib.oases.util
 
+import java.security.MessageDigest
 import java.security.SecureRandom
 import java.security.spec.KeySpec
 import java.util.Base64
@@ -25,5 +26,12 @@ object PasswordUtils {
     fun verifyPassword(inputPassword: String, storedHash: String, storedSalt: String): Boolean {
         val inputHash = hashPassword(inputPassword, storedSalt)
         return inputHash == storedHash
+    }
+
+    fun generateShortId(): String {
+        val input = "${System.currentTimeMillis()}-${(1000..9999).random()}"
+        val hash = MessageDigest.getInstance("SHA-256")
+            .digest(input.toByteArray())
+        return hash.joinToString("") { "%02x".format(it) }.take(7)
     }
 }

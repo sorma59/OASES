@@ -1,5 +1,6 @@
 package com.unimib.oases.ui.screen.patient_registration.info
 
+import com.unimib.oases.data.local.model.PatientStatus
 import com.unimib.oases.domain.model.Patient
 
 data class PatientInfoState(
@@ -13,7 +14,7 @@ data class PatientInfoState(
         district = "",
         nextOfKin = "",
         contact = "",
-        status = "",
+        status = PatientStatus.WAITING_FOR_TRIAGE.name,
         image = null
     ),
     val isLoading: Boolean = true,

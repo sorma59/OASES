@@ -6,6 +6,7 @@ import com.unimib.oases.domain.model.Patient
 fun PatientEntity.toPatient(): Patient {
     return Patient(
         id = id,
+        publicId = publicId,
         name = name,
         age = age,
         sex = sex,
@@ -23,6 +24,7 @@ fun PatientEntity.toPatient(): Patient {
 fun Patient.toEntity(): PatientEntity {
     return PatientEntity(
         id = id,
+        publicId = publicId,
         name = name,
         age = age,
         sex = sex,

@@ -24,7 +24,6 @@ import javax.inject.Inject
 
 class PatientRepositoryImpl @Inject constructor(
     private val roomDataSource: RoomDataSource,
-//    private val bluetoothCustomManager: BluetoothCustomManager,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val firestoreManager: FirestoreManager,
 ) : PatientRepository {
@@ -34,36 +33,6 @@ class PatientRepositoryImpl @Inject constructor(
 
     private val _newPatientEvents = MutableSharedFlow<Patient>()
     override val newPatientEvents: SharedFlow<Patient> = _newPatientEvents.asSharedFlow()
-
-
-//    init {
-//        listenForPatients()
-//    }
-//
-//    private fun listenForPatients() {
-//        // Listening for Bluetooth patients
-//        applicationScope.launch(Dispatchers.IO) {
-//            bluetoothCustomManager.receivedPatients.collect { patient ->
-//                var result = addPatient(patient)
-//                if (result is Resource.Error) {
-//                    // Try once more
-//                    result = addPatient(patient)
-//                    if (result is Resource.Error) {
-//                        // Failed twice, log the error
-//                        return@collect
-//                    }
-//                }
-//                val currentPatients = _receivedPatients.firstOrNull() ?: emptyList()
-//
-//                val updatedPatients = emptyList<Patient>() + patient + currentPatients
-//
-//                // Emit the updated list
-//                _receivedPatients.emit(updatedPatients)
-//                Log.d("PatientRepositoryImpl", "Received patient: $patient")
-//                _newPatientEvents.emit(patient)
-//            }
-//        }
-//    }
 
     override suspend fun addPatient(patient: Patient): Resource<Unit> {
         return try {
@@ -125,6 +94,15 @@ class PatientRepositoryImpl @Inject constructor(
     override suspend fun updateTriageState(patient: Patient, triageState: String): Resource<Unit> {
         return try {
             roomDataSource.updateTriageState(patient.toEntity(), triageState)
+            Resource.Success(Unit)
+        } catch (e: Exception) {
+            Resource.Error(e.message ?: "An error occurred")
+        }
+    }
+
+    override suspend fun updateStatus(patient: Patient, status: String): Resource<Unit> {
+        return try {
+            roomDataSource.updateStatus(patient.toEntity(), status)
             Resource.Success(Unit)
         } catch (e: Exception) {
             Resource.Error(e.message ?: "An error occurred")

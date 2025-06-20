@@ -10,6 +10,7 @@ object PatientSerializer {
 
     fun serialize(patient: Patient): ByteArray {
         val idBytes = patient.id.toByteArray(Charsets.UTF_8)
+        val publicIdBytes = patient.publicId.toByteArray(Charsets.UTF_8)
         val nameBytes = patient.name.toByteArray(Charsets.UTF_8)
         val sexBytes = patient.sex.toByteArray(Charsets.UTF_8)
         val villageBytes = patient.village.toByteArray(Charsets.UTF_8)
@@ -24,6 +25,7 @@ object PatientSerializer {
         val buffer = ByteBuffer.allocate(
             4 + // age
                     4 + idBytes.size +
+                    4 + publicIdBytes.size +
                     4 + nameBytes.size +
                     4 + sexBytes.size +
                     4 + villageBytes.size +
@@ -40,6 +42,9 @@ object PatientSerializer {
 
         buffer.putInt(idBytes.size)
         buffer.put(idBytes)
+
+        buffer.putInt(publicIdBytes.size)
+        buffer.put(publicIdBytes)
 
         buffer.putInt(nameBytes.size)
         buffer.put(nameBytes)
@@ -80,6 +85,7 @@ object PatientSerializer {
         val age = buffer.int
 
         val id = buffer.readString()
+        val publicId = buffer.readString()
         val name = buffer.readString()
         val sex = buffer.readString()
         val village = buffer.readString()
@@ -99,6 +105,7 @@ object PatientSerializer {
 
         return Patient(
             id = id,
+            publicId = publicId,
             name = name,
             age = age,
             sex = sex,
@@ -116,18 +123,16 @@ object PatientSerializer {
     // ----------------Testing--------------------
     fun test() {
         val original = Patient(
-            "test",
-            "John",
-            30,
-            "M",
-            "Kampala",
-            "Central",
-            "Wakiso",
-            "UG",
-            "Jane",
-            "123456",
-            PatientStatus.WAITING_FOR_TRIAGE.name,
-            null
+            name = "John Doe",
+            age = 30,
+            sex = "Male",
+            village = "Village",
+            parish = "Parish",
+            subCounty = "Sub-county",
+            district = "District",
+            nextOfKin = "Next of kin",
+            contact = "123456789",
+            status = PatientStatus.WAITING_FOR_TRIAGE.name
         )
         Log.d("PatientSerializer", "Original: $original")
         val bytes = serialize(original)

@@ -142,7 +142,7 @@ fun PatientCard(
                     .padding(horizontal = 10.dp, vertical = 10.dp)
             ) {
                 Text(
-                    text = patient.name,
+                    text = patient.name + ", " + patient.age,
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.surface,
                     fontWeight = FontWeight.Bold,
@@ -159,7 +159,7 @@ fun PatientCard(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Last Visit: ",
+                        text = patient.publicId,
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.surface,
                         fontWeight = FontWeight.Normal,

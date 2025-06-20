@@ -14,6 +14,7 @@ interface PatientRepository {
     suspend fun deletePatient(patient: Patient): Resource<Unit>
     suspend fun getPatientById(patientId: String): Flow<Resource<Patient?>>
     suspend fun updateTriageState(patient: Patient, triageState: String): Resource<Unit>
+    suspend fun updateStatus(patient: Patient, status: String): Resource<Unit>
     fun getPatients(): Flow<Resource<List<Patient>>>
 
 }

@@ -126,13 +126,11 @@ class PatientInfoViewModel @Inject constructor(
                 _state.value = _state.value.copy(patient = _state.value.patient.copy(contact = event.contact))
             }
 
-            // Nuovo evento: solo per validare il form
             is PatientInfoEvent.ValidateForm -> {
                 Log.d("PatientInfoViewModel", "ValidateForm event received")
                 validateAndPrepareForSubmission()
             }
 
-            // Nuovo evento: per la sottomissione finale dopo la conferma dell'alert
             is PatientInfoEvent.ConfirmSubmission -> {
                 Log.d("PatientInfoViewModel", "ConfirmSubmission event received, proceeding to save data.")
                 savePatientData()
@@ -172,23 +170,19 @@ class PatientInfoViewModel @Inject constructor(
         }
     }
 
-    // Funzione per salvare i dati del paziente nel database
     private fun savePatientData() {
         viewModelScope.launch(dispatcher + errorHandler) {
             _state.value = _state.value.copy(isLoading = true)
             Log.d("PatientInfoViewModel", "savePatientData called, saving patient: ${_state.value.patient.name}")
 
             try {
-                // Esegui l'inserimento/aggiornamento del paziente nel database
                 insertPatientLocallyUseCase(_state.value.patient)
 
-                // Notifica alla UI che il salvataggio finale è avvenuto con successo
                 Log.d("PatientInfoViewModel", "Patient data saved successfully, sending SubmissionSuccess event.")
                 validationEventsChannel.send(ValidationEvent.SubmissionSuccess)
 
             } catch (e: Exception) {
                 Log.e("PatientInfoViewModel", "Error saving patient data: ${e.message}", e)
-                // Gestisci l'errore, magari inviando un evento snackbar
                 _eventFlow.emit(UiEvent.showSnackbar(message = "Failed to save patient data: ${e.message}"))
             } finally {
                 _state.value = _state.value.copy(isLoading = false)

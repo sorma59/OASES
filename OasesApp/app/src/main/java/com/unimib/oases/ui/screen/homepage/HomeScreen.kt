@@ -109,7 +109,8 @@ fun HomeScreen(
 
 
     val filteredItems = state.patients.filter { item ->
-        item.name.contains(searchText, ignoreCase = true)
+        item.publicId.contains(searchText, ignoreCase = true) || // Public id
+        item.name.contains(searchText, ignoreCase = true)        // Name
     }
 
 
