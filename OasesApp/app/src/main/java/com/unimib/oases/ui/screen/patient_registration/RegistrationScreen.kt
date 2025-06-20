@@ -170,25 +170,39 @@ fun RegistrationScreen(
                         onBack = { currentIndex-- }
                     )
                     Tabs.Triage.title -> RedCodeScreen(
-                        onRedCodeSelected = {
-                            isRedCodeSelected = true
-                            registrationScreenViewModel.onEvent(
-                                RegistrationEvent.TriageCodeSelected(
-                                    TriageCode.RED.name
+                        onRedCodeSelected = { redCode ->
+                            isRedCodeSelected = redCode
+                            if (redCode){
+                                registrationScreenViewModel.onEvent(
+                                    RegistrationEvent.TriageCodeSelected(
+                                        TriageCode.RED.name
+                                    )
                                 )
-                            )
+                            } else
+                                registrationScreenViewModel.onEvent(
+                                    RegistrationEvent.TriageCodeSelected(
+                                        TriageCode.GREEN.name
+                                    )
+                                )
                         },
                         sbpValue = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Systolic Blood Pressure"}?.value ?: "",
                         dbpValue = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Diastolic Blood Pressure"}?.value ?: ""
                     )
                     Tabs.NonRedCode.title -> NonRedCodeScreen(
-                        onYellowCodeSelected = {
-                            isYellowCodeSelected = true
-                            registrationScreenViewModel.onEvent(
-                                RegistrationEvent.TriageCodeSelected(
-                                    TriageCode.YELLOW.name
+                        onYellowCodeSelected = { yellowCode ->
+                            isYellowCodeSelected = yellowCode
+                            if (yellowCode){
+                                registrationScreenViewModel.onEvent(
+                                    RegistrationEvent.TriageCodeSelected(
+                                        TriageCode.YELLOW.name
+                                    )
                                 )
-                            )
+                            } else
+                                registrationScreenViewModel.onEvent(
+                                    RegistrationEvent.TriageCodeSelected(
+                                        TriageCode.GREEN.name
+                                    )
+                                )
                         },
                         ageInt = state.patientInfoState.patient.age,
                         spo2Value = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Oxygen Saturation"}?.value ?: "",

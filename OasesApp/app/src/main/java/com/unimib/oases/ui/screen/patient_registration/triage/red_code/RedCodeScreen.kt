@@ -51,7 +51,7 @@ fun RedCodeScreen(onRedCodeSelected: (Boolean) -> Unit, sbpValue: String, dbpVal
     }
 
     LaunchedEffect(isAnyRedCodeSelected.value) {
-      if(isAnyRedCodeSelected.value) onRedCodeSelected(isAnyRedCodeSelected.value)
+        onRedCodeSelected(isAnyRedCodeSelected.value)
     }
 
     Column(

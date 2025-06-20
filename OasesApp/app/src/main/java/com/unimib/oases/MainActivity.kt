@@ -11,11 +11,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.navigation.compose.rememberNavController
 import com.unimib.oases.data.bluetooth.BluetoothCustomManager
 import com.unimib.oases.data.util.FirestoreManager
-import com.unimib.oases.di.BluetoothManagerEntryPoint
 import com.unimib.oases.ui.components.scaffold.MainScaffold
 import com.unimib.oases.ui.theme.OasesTheme
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.EntryPointAccessors
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -24,22 +22,16 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var firestoreManager: FirestoreManager
 
-    private lateinit var bluetoothCustomManager: BluetoothCustomManager
+    @Inject
+    lateinit var bluetoothCustomManager: BluetoothCustomManager
 
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
-
         // start listener
         firestoreManager.startListener()
-
-        bluetoothCustomManager = EntryPointAccessors.fromActivity(
-            this,
-            BluetoothManagerEntryPoint::class.java
-        ).bluetoothCustomManager()
 
         // Define an ActivityResultLauncher for enabling Bluetooth
         val enableBluetoothLauncher =
