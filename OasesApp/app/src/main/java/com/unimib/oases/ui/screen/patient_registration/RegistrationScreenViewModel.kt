@@ -79,7 +79,7 @@ class RegistrationScreenViewModel @Inject constructor(
                         _state.value.vitalSignsState.vitalSigns.filter { it.value.isNotEmpty() }
                     val triageCode = _state.value.triageCode
 
-                    var visit = visitUseCase.getCurrentVisit(patient.id)
+                    var visit = getCurrentVisit(patient.id)
 
                     if (visit == null){
                         visit = Visit(
@@ -92,7 +92,7 @@ class RegistrationScreenViewModel @Inject constructor(
                     }
 
 
-                    visitUseCase.addVisit(visit)
+                    visitUseCase.addVisit(visit.copy(triageCode = triageCode))
 
                     _state.value.pastHistoryState.diseases.forEach {
                         if (it.isChecked) {
@@ -120,11 +120,13 @@ class RegistrationScreenViewModel @Inject constructor(
 
                     }
 
-                    patientUseCase.updateTriageState(patient, triageCode)
+//                    patientUseCase.updateTriageState(patient, triageCode)
 
                     patientUseCase.updateStatus(patient, PatientStatus.WAITING_FOR_VISIT.name)
                 }
             }
         }
     }
+
+    fun getCurrentVisit(patientId: String) = visitUseCase.getCurrentVisit(patientId)
 }

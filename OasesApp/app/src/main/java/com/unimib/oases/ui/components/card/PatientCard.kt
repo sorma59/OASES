@@ -17,13 +17,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,7 +41,6 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.unimib.oases.domain.model.Patient
-import com.unimib.oases.domain.model.TriageCode
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -170,23 +165,12 @@ fun PatientCard(
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            text = "State:",
+                            text = "State: " + patient.status,
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.surface,
                             fontWeight = FontWeight.Normal,
                             overflow = TextOverflow.Ellipsis,
                             maxLines = 1
-                        )
-                        Icon(
-                            imageVector = Icons.Default.Circle,
-                            contentDescription = "",
-                            tint = when (patient.status) {
-                                TriageCode.YELLOW.name -> Color.Yellow
-                                TriageCode.RED.name -> Color.Red
-                                TriageCode.GREEN.name -> Color.Green
-                                else -> Color.Gray
-                            },
-                            modifier = Modifier.size(10.dp)
                         )
                     }
                 }

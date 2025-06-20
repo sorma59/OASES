@@ -1,4 +1,4 @@
-package com.unimib.oases.ui.screen.patient_registration.continue_to_triage
+package com.unimib.oases.ui.screen.patient_registration.transitionscreens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,9 +14,9 @@ import androidx.compose.ui.unit.sp
 import com.unimib.oases.ui.components.util.CenteredText
 
 @Composable
-fun ContinueToTriageDecisionScreen(
-    onContinueToTriage: () -> Unit,
-    onSkipTriage: () -> Unit
+fun ReevaluateTriageCodeDecisionScreen(
+    onConfirm: () -> Unit,
+    onDenial: () -> Unit
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -24,7 +24,7 @@ fun ContinueToTriageDecisionScreen(
     ){
 
         CenteredText(
-            "The patient was saved, you will be able to edit it later on.\nDo you want to continue with their triage or go back to home?",
+            "Do you want to also reevaluate the triage code?",
             fontSize = 20.sp
         )
 
@@ -34,27 +34,27 @@ fun ContinueToTriageDecisionScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ){
-            ContinueToTriageButton(onClick = onContinueToTriage)
-            SkipTriageButton(onClick = onSkipTriage)
+            ReevaluateTriageCodeButton(onClick = onConfirm)
+            DoNotReevaluateTriageCodeButton(onClick = onDenial)
         }
 
     }
 }
 
 @Composable
-fun SkipTriageButton(onClick: () -> Unit) {
+fun DoNotReevaluateTriageCodeButton(onClick: () -> Unit) {
     Button(
         onClick = onClick
     ){
-        Text("Go to Home")
+        Text("Save changes")
     }
 }
 
 @Composable
-fun ContinueToTriageButton(onClick: () -> Unit) {
+fun ReevaluateTriageCodeButton(onClick: () -> Unit) {
     Button(
         onClick = onClick
     ){
-        Text("Continue to triage")
+        Text("Reevaluate triage")
     }
 }

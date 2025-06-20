@@ -50,9 +50,9 @@ class RoomDataSource @Inject constructor(
         return patientDao.getPatientById(id)
     }
 
-    fun updateTriageState(patient: PatientEntity, triageState: String) {
-        patientDao.updateTriageState(patient.id, triageState)
-    }
+//    fun updateTriageState(patient: PatientEntity, triageState: String) {
+//        patientDao.updateTriageState(patient.id, triageState)
+//    }
 
     fun updateStatus(patient: PatientEntity, status: String) {
         patientDao.updateStatus(patient.id, status)
