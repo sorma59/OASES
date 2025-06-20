@@ -92,7 +92,8 @@ class RegistrationScreenViewModel @Inject constructor(
                     }
 
 
-                    visitUseCase.addVisit(visit.copy(triageCode = triageCode))
+                    if (event.reevaluateTriageCode)
+                        visitUseCase.addVisit(visit.copy(triageCode = triageCode))
 
                     _state.value.pastHistoryState.diseases.forEach {
                         if (it.isChecked) {

@@ -189,7 +189,7 @@ fun RegistrationScreen(
                     Tabs.ReevaluateTriageCode.title -> ReevaluateTriageCodeDecisionScreen(
                         onConfirm = { currentIndex++ },
                         onDenial = {
-                            registrationScreenViewModel.onEvent(RegistrationEvent.Submit)
+                            registrationScreenViewModel.onEvent(RegistrationEvent.Submit(false))
                             navController.navigate(Screen.HomeScreen.route) {
                                 popUpTo(0) { inclusive = true }
                             }
@@ -219,7 +219,7 @@ fun RegistrationScreen(
                         },
                         onSubmitted = {
                             if (isRedCodeSelected){
-                                registrationScreenViewModel.onEvent(RegistrationEvent.Submit)
+                                registrationScreenViewModel.onEvent(RegistrationEvent.Submit(true))
                                 navController.navigate(Screen.HomeScreen.route) {
                                     popUpTo(0) { inclusive = true }
                                 }
@@ -265,7 +265,7 @@ fun RegistrationScreen(
                     onCancel = { currentIndex-- },
                     onConfirm = {
                         if (currentIndex == tabs.lastIndex) {
-                            registrationScreenViewModel.onEvent(RegistrationEvent.Submit)
+                            registrationScreenViewModel.onEvent(RegistrationEvent.Submit(true))
                             navController.navigate(Screen.HomeScreen.route) {
                                 popUpTo(0) { inclusive = true }
                             }
