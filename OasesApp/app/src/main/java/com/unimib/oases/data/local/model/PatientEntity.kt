@@ -26,9 +26,9 @@ data class PatientEntity (
 /**
  * Represents the different states a patient can be in during their hospital visit.
  */
-enum class PatientStatus {
-    WAITING_FOR_TRIAGE,
-    WAITING_FOR_VISIT,
-    WAITING_FOR_TESTS_RESULTS,
-    DISMISSED
+enum class PatientStatus(val displayValue: String) {
+    WAITING_FOR_TRIAGE("Waiting for triage"),
+    WAITING_FOR_VISIT("Waiting for visit"),
+    WAITING_FOR_TESTS_RESULTS("Waiting for test results"),
+    DISMISSED("Dismissed")
 }

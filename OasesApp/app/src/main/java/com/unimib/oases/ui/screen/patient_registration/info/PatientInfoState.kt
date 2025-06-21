@@ -14,7 +14,7 @@ data class PatientInfoState(
         district = "",
         nextOfKin = "",
         contact = "",
-        status = PatientStatus.WAITING_FOR_TRIAGE.name,
+        status = PatientStatus.WAITING_FOR_TRIAGE.displayValue,
         image = null
     ),
     val isLoading: Boolean = true,

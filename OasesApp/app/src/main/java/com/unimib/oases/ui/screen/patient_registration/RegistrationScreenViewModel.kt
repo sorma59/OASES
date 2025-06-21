@@ -126,7 +126,7 @@ class RegistrationScreenViewModel @Inject constructor(
 
 //                    patientUseCase.updateTriageState(patient, triageCode)
 
-                    patientUseCase.updateStatus(patient, PatientStatus.WAITING_FOR_VISIT.name)
+                    patientUseCase.updateStatus(patient, PatientStatus.WAITING_FOR_VISIT.displayValue)
                 }
             }
         }
