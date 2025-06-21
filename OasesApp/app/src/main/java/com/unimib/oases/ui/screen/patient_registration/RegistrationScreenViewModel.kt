@@ -49,9 +49,12 @@ class RegistrationScreenViewModel @Inject constructor(
         when (event) {
 
             is RegistrationEvent.PatientSubmitted -> {
-                _state.value = _state.value.copy(
-                    patientInfoState = event.patientInfoState
-                )
+                applicationScope.launch(dispatcher + errorHandler) {
+                    _state.value = _state.value.copy(
+                        patientInfoState = event.patientInfoState,
+                        currentVisit = getCurrentVisit(event.patientInfoState.patient.id)
+                    )
+                }
             }
 
             is RegistrationEvent.PastMedicalHistoryNext -> {
@@ -129,5 +132,6 @@ class RegistrationScreenViewModel @Inject constructor(
         }
     }
 
+    // Call in a coroutine
     fun getCurrentVisit(patientId: String) = visitUseCase.getCurrentVisit(patientId)
 }
