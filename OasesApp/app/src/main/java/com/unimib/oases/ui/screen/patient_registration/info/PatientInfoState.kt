@@ -6,6 +6,7 @@ import com.unimib.oases.domain.model.Patient
 data class PatientInfoState(
     val patient: Patient = Patient(
         name = "",
+        birthDate = "",
         age = 0,
         sex = Sex.Unspecified.displayName,
         village = "",

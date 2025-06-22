@@ -18,7 +18,8 @@ fun DateSelector(
     onDateSelected: (String) -> Unit,
     modifier: Modifier = Modifier,
     context: Context,
-    readOnly: Boolean = false
+    readOnly: Boolean = false,
+    labelText: String = "Date"
 ) {
     val calendar = Calendar.getInstance()
     val year = calendar.get(Calendar.YEAR)
@@ -41,13 +42,14 @@ fun DateSelector(
     AnimatedLabelOutlinedTextField(
         value = selectedDate,
         onValueChange = {  },
-        labelText = "Date",
+        labelText = labelText,
         modifier = modifier,
         readOnly = true,
         trailingIcon = {
-            IconButton(onClick = { if (!readOnly)datePickerDialog.show() }) {
+            IconButton(onClick = { if (!readOnly) datePickerDialog.show() }) {
                 Icon(Icons.Filled.CalendarMonth, contentDescription = "Insert a date")
             }
-        }
+        },
+        onClick = { if (!readOnly) datePickerDialog.show() }
     )
 }

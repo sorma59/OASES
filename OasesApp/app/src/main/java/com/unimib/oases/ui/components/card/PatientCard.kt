@@ -165,7 +165,7 @@ fun PatientCard(
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            text = "State: " + patient.status,
+                            text = patient.status,
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.surface,
                             fontWeight = FontWeight.Normal,

@@ -12,6 +12,7 @@ object PatientSerializer {
         val idBytes = patient.id.toByteArray(Charsets.UTF_8)
         val publicIdBytes = patient.publicId.toByteArray(Charsets.UTF_8)
         val nameBytes = patient.name.toByteArray(Charsets.UTF_8)
+        val birthDateBytes = patient.birthDate.toByteArray(Charsets.UTF_8)
         val sexBytes = patient.sex.toByteArray(Charsets.UTF_8)
         val villageBytes = patient.village.toByteArray(Charsets.UTF_8)
         val parishBytes = patient.parish.toByteArray(Charsets.UTF_8)
@@ -27,6 +28,7 @@ object PatientSerializer {
                     4 + idBytes.size +
                     4 + publicIdBytes.size +
                     4 + nameBytes.size +
+                    4 + birthDateBytes.size +
                     4 + sexBytes.size +
                     4 + villageBytes.size +
                     4 + parishBytes.size +
@@ -48,6 +50,9 @@ object PatientSerializer {
 
         buffer.putInt(nameBytes.size)
         buffer.put(nameBytes)
+
+        buffer.putInt(birthDateBytes.size)
+        buffer.put(birthDateBytes)
 
         buffer.putInt(sexBytes.size)
         buffer.put(sexBytes)
@@ -87,6 +92,7 @@ object PatientSerializer {
         val id = buffer.readString()
         val publicId = buffer.readString()
         val name = buffer.readString()
+        val birthDate = buffer.readString()
         val sex = buffer.readString()
         val village = buffer.readString()
         val parish = buffer.readString()
@@ -107,6 +113,7 @@ object PatientSerializer {
             id = id,
             publicId = publicId,
             name = name,
+            birthDate = birthDate,
             age = age,
             sex = sex,
             village = village,
@@ -124,6 +131,7 @@ object PatientSerializer {
     fun test() {
         val original = Patient(
             name = "John Doe",
+            birthDate = "1990-01-01",
             age = 30,
             sex = "Male",
             village = "Village",

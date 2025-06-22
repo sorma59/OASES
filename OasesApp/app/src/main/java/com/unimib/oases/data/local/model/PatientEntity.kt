@@ -10,6 +10,7 @@ data class PatientEntity (
     @PrimaryKey val id: String,
     @ColumnInfo(name = "public_id") var publicId: String,
     @ColumnInfo(name = "name") var name: String,
+    @ColumnInfo(name = "birth_date") var birthDate: String,
     @ColumnInfo(name = "age") var age: Int,
     @ColumnInfo(name = "sex") var sex: String,
     @ColumnInfo(name = "village") var village: String,

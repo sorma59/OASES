@@ -8,6 +8,7 @@ import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.usecase.InsertPatientLocallyUseCase
 import com.unimib.oases.domain.usecase.PatientUseCase
 import com.unimib.oases.domain.usecase.ValidatePatientInfoFormUseCase
+import com.unimib.oases.util.DateTimeFormatter
 import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -101,8 +102,15 @@ class PatientInfoViewModel @Inject constructor(
             is PatientInfoEvent.NameChanged -> {
                 _state.value = _state.value.copy(patient = _state.value.patient.copy(name = event.name), nameError = null)
             }
+            is PatientInfoEvent.BirthDateChanged -> {
+                val age = DateTimeFormatter().calculateAge(event.birthDate)
+                if (age != null)
+                    _state.value = _state.value.copy(patient = _state.value.patient.copy(age = age), ageError = null)
+                _state.value = _state.value.copy(patient = _state.value.patient.copy(birthDate = event.birthDate))
+            }
             is PatientInfoEvent.AgeChanged -> {
-                _state.value = _state.value.copy(patient = _state.value.patient.copy(age = event.age), ageError = null)
+                if (_state.value.patient.birthDate.isBlank()) // Only update age if birth date is not empty
+                    _state.value = _state.value.copy(patient = _state.value.patient.copy(age = event.age), ageError = null)
             }
             is PatientInfoEvent.SexChanged -> {
                 _state.value = _state.value.copy(patient = _state.value.patient.copy(sex = event.sex))

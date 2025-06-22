@@ -3,6 +3,7 @@ package com.unimib.oases.ui.screen.patient_registration.info
 sealed class PatientInfoEvent {
 
     data class NameChanged(val name: String): PatientInfoEvent()
+    data class BirthDateChanged(val birthDate: String): PatientInfoEvent()
     data class AgeChanged(val age: Int): PatientInfoEvent()
     data class SexChanged(val sex: String): PatientInfoEvent()
     data class VillageChanged(val village: String): PatientInfoEvent()

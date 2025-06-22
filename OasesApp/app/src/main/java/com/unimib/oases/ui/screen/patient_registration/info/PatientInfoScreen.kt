@@ -37,6 +37,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.unimib.oases.ui.components.util.AnimatedLabelOutlinedTextField
+import com.unimib.oases.ui.components.util.DateSelector
 import com.unimib.oases.ui.components.util.FadeOverlay
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 import java.text.SimpleDateFormat
@@ -106,6 +107,17 @@ fun PatientInfoScreen(
                             text = state.nameError!!,
                             color = MaterialTheme.colorScheme.error
                         )
+
+                    DateSelector(
+                        selectedDate = state.patient.birthDate,
+                        onDateSelected = {
+                            patientInfoViewModel.onEvent(
+                                PatientInfoEvent.BirthDateChanged(it)
+                            )
+                        },
+                        context = context,
+                        labelText = "Date of Birth"
+                    )
 
                     AnimatedLabelOutlinedTextField(
                         value = if (state.patient.age == -1) "" else state.patient.age.toString(),

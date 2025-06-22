@@ -1,5 +1,8 @@
 package com.unimib.oases.ui.components.util
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
@@ -24,26 +27,45 @@ fun AnimatedLabelOutlinedTextField(
     trailingIcon: @Composable (() -> Unit)? = null,
     isInteger: Boolean = false,
     isDouble: Boolean = false,
-    anchorModifier: Modifier = Modifier
+    anchorModifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null
 ) {
     var isFocused by remember { mutableStateOf(false) }
 
-    OutlinedTextField(
-        value = value,
-        onValueChange = {
-            if (isInteger) {
-                onValueChange(it.filter { char -> char.isDigit() })
-            } else
-                onValueChange(it)
-        },
-        label = { Text(labelText) },
-        isError = isError,
+    Box(
         modifier = modifier
             .fillMaxWidth()
-            .onFocusChanged { isFocused = it.isFocused }
-            .then(anchorModifier),
-        keyboardOptions = if (isInteger || isDouble) KeyboardOptions(keyboardType = KeyboardType.Number) else KeyboardOptions.Default,
-        readOnly = readOnly,
-        trailingIcon = trailingIcon
-    )
+            .then(anchorModifier)
+    ) {
+        OutlinedTextField(
+            value = value,
+            onValueChange = {
+                if (isInteger) {
+                    onValueChange(it.filter { char -> char.isDigit() })
+                } else {
+                    onValueChange(it)
+                }
+            },
+            label = { Text(labelText) },
+            isError = isError,
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged { isFocused = it.isFocused },
+            keyboardOptions = when {
+                isInteger || isDouble -> KeyboardOptions(keyboardType = KeyboardType.Number)
+                else -> KeyboardOptions.Default
+            },
+            readOnly = readOnly,
+            trailingIcon = trailingIcon
+        )
+
+        // Overlay a transparent clickable box on top of the entire text field
+        if (readOnly && onClick != null) {
+            Spacer(
+                modifier = Modifier
+                    .matchParentSize()
+                    .clickable { onClick() }
+            )
+        }
+    }
 }

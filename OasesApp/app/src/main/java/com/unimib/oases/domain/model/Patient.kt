@@ -12,6 +12,7 @@ data class Patient(
     val id: String = UUID.randomUUID().toString(),
     val publicId: String = PasswordUtils.generateShortId(),
     var name: String,
+    var birthDate: String,
     var age: Int,
     var sex: String,
     var village: String,
