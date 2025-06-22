@@ -13,7 +13,7 @@ data class Patient(
     val publicId: String = PasswordUtils.generateShortId(),
     var name: String,
     var birthDate: String,
-    var age: Int,
+    var ageInMonths: Int,
     var sex: String,
     var village: String,
     var parish: String,

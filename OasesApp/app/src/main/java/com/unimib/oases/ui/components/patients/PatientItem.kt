@@ -49,7 +49,7 @@ fun PatientItem(
                 modifier = Modifier.padding(horizontal = 8.dp)
             ) {
                 TitleText(patient.name, color = MaterialTheme.colorScheme.onPrimary)
-                Text(patient.age.toString() + ", " + patient.sex, color = MaterialTheme.colorScheme.onPrimary)
+                Text(patient.ageInMonths.toString() + ", " + patient.sex, color = MaterialTheme.colorScheme.onPrimary)
             }
 
             if (!hideBluetoothButton)

@@ -1,6 +1,5 @@
 package com.unimib.oases.ui.screen.patient_registration.info
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -47,7 +46,7 @@ class PatientInfoViewModel @Inject constructor(
         )
         viewModelScope.launch {
             _eventFlow.emit(
-                UiEvent.showSnackbar(
+                UiEvent.ShowSnackbar(
                     message = e.message ?: "An unexpected error occurred during submission."
                 )
             )
@@ -60,16 +59,24 @@ class PatientInfoViewModel @Inject constructor(
                 viewModelScope.launch(dispatcher + errorHandler) {
                     useCases.getPatient(id).also { result ->
                         result.collect { resource ->
-                            when (resource) {
+                            when(resource){
                                 is Resource.Loading -> {
-                                    _state.value = _state.value.copy(isLoading = true)
+                                    _state.value = _state.value.copy(
+                                        isLoading = true
+                                    )
                                 }
                                 is Resource.Success -> {
+                                    val patient = resource.data!!
                                     _state.value = _state.value.copy(
-                                        patient = resource.data!!,
+                                        patient = patient,
                                         isLoading = false
                                     )
                                     currentPatientId = id
+                                    if (patient.birthDate.isNotBlank()){
+                                        val newAgeInMonths = DateTimeFormatter().calculateAgeInMonths(patient.birthDate)
+                                        if (newAgeInMonths != null)
+                                            _state.value.patient.copy(ageInMonths = newAgeInMonths)
+                                    }
                                 }
                                 is Resource.Error -> {
                                     _state.value = _state.value.copy(
@@ -77,7 +84,7 @@ class PatientInfoViewModel @Inject constructor(
                                         isLoading = false
                                     )
                                 }
-                                is Resource.None -> {}
+                                else -> {}
                             }
                         }
                     }
@@ -92,7 +99,7 @@ class PatientInfoViewModel @Inject constructor(
     }
 
     sealed class UiEvent {
-        data class showSnackbar(val message: String) : UiEvent()
+        data class ShowSnackbar(val message: String) : UiEvent()
     }
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
@@ -103,14 +110,17 @@ class PatientInfoViewModel @Inject constructor(
                 _state.value = _state.value.copy(patient = _state.value.patient.copy(name = event.name), nameError = null)
             }
             is PatientInfoEvent.BirthDateChanged -> {
-                val age = DateTimeFormatter().calculateAge(event.birthDate)
-                if (age != null)
-                    _state.value = _state.value.copy(patient = _state.value.patient.copy(age = age), ageError = null)
+                val ageInMonths = DateTimeFormatter().calculateAgeInMonths(event.birthDate)
+                if (ageInMonths != null){
+                    _state.value = _state.value.copy(patient = _state.value.patient.copy(ageInMonths = ageInMonths), ageError = null)
+                }
                 _state.value = _state.value.copy(patient = _state.value.patient.copy(birthDate = event.birthDate))
             }
             is PatientInfoEvent.AgeChanged -> {
-                if (_state.value.patient.birthDate.isBlank()) // Only update age if birth date is not empty
-                    _state.value = _state.value.copy(patient = _state.value.patient.copy(age = event.age), ageError = null)
+                if (_state.value.patient.birthDate.isEmpty())
+                    _state.value = _state.value.copy(patient = _state.value.patient.copy(ageInMonths = event.ageInMonths), ageError = null)
+                //else
+                    //TODO
             }
             is PatientInfoEvent.SexChanged -> {
                 _state.value = _state.value.copy(patient = _state.value.patient.copy(sex = event.sex))
@@ -135,45 +145,38 @@ class PatientInfoViewModel @Inject constructor(
             }
 
             is PatientInfoEvent.ValidateForm -> {
-                Log.d("PatientInfoViewModel", "ValidateForm event received")
                 validateAndPrepareForSubmission()
             }
 
             is PatientInfoEvent.ConfirmSubmission -> {
-                Log.d("PatientInfoViewModel", "ConfirmSubmission event received, proceeding to save data.")
                 savePatientData()
             }
 
         }
     }
 
-    // Funzione per validare i dati e, se validi, chiedere conferma all'utente
+    // Validates the form and prepares it for submission
     private fun validateAndPrepareForSubmission() {
         viewModelScope.launch(dispatcher + errorHandler) {
-            Log.d("PatientInfoViewModel", "validateAndPrepareForSubmission called")
 
-            // Esegui qui la validazione del form
+            // Validate
             val result = validatePatientInfoFormUseCase.invoke(
                 name = _state.value.patient.name,
-                age = _state.value.patient.age
-                // Aggiungi qui tutti gli altri campi da validare
+                age = _state.value.patient.ageInMonths
             )
 
-            // Aggiorna lo stato con gli errori di validazione
+            // Update state with errors
             _state.value = _state.value.copy(
                 nameError = result.nameErrorMessage,
                 ageError = result.ageErrorMessage
-                // Aggiorna anche gli errori per gli altri campi
             )
 
-            // Se la validazione non ha avuto successo, non procedere oltre
+            // If there are errors, stop here
             if (!result.successful) {
-                Log.d("PatientInfoViewModel", "Validation failed, showing errors.")
-                return@launch // Esci dalla coroutine
+                return@launch // Exit the function early
             }
 
-            // Se la validazione ha successo, notifica la UI di mostrare l'AlertDialog
-            Log.d("PatientInfoViewModel", "Validation successful, sending ValidationSuccess event.")
+            // Validation succeeded, communicate it to the UI
             validationEventsChannel.send(ValidationEvent.ValidationSuccess)
         }
     }
@@ -181,26 +184,22 @@ class PatientInfoViewModel @Inject constructor(
     private fun savePatientData() {
         viewModelScope.launch(dispatcher + errorHandler) {
             _state.value = _state.value.copy(isLoading = true)
-            Log.d("PatientInfoViewModel", "savePatientData called, saving patient: ${_state.value.patient.name}")
 
             try {
                 insertPatientLocallyUseCase(_state.value.patient)
 
-                Log.d("PatientInfoViewModel", "Patient data saved successfully, sending SubmissionSuccess event.")
                 validationEventsChannel.send(ValidationEvent.SubmissionSuccess)
 
             } catch (e: Exception) {
-                Log.e("PatientInfoViewModel", "Error saving patient data: ${e.message}", e)
-                _eventFlow.emit(UiEvent.showSnackbar(message = "Failed to save patient data: ${e.message}"))
+                _eventFlow.emit(UiEvent.ShowSnackbar(message = "Failed to save patient data: ${e.message}"))
             } finally {
                 _state.value = _state.value.copy(isLoading = false)
             }
         }
     }
 
-    // Modifica la classe ValidationEvent per distinguere i due tipi di successo
     sealed class ValidationEvent {
-        data object ValidationSuccess : ValidationEvent() // Validazione del form completata con successo
-        data object SubmissionSuccess : ValidationEvent() // Salvataggio finale sul DB completato con successo
+        data object ValidationSuccess : ValidationEvent() // Successful validation
+        data object SubmissionSuccess : ValidationEvent() // Successful submission to the db
     }
 }

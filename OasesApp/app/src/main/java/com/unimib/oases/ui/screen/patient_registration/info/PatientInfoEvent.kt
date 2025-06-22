@@ -4,7 +4,7 @@ sealed class PatientInfoEvent {
 
     data class NameChanged(val name: String): PatientInfoEvent()
     data class BirthDateChanged(val birthDate: String): PatientInfoEvent()
-    data class AgeChanged(val age: Int): PatientInfoEvent()
+    data class AgeChanged(val ageInMonths: Int): PatientInfoEvent()
     data class SexChanged(val sex: String): PatientInfoEvent()
     data class VillageChanged(val village: String): PatientInfoEvent()
     data class ParishChanged(val parish: String): PatientInfoEvent()
@@ -15,5 +15,4 @@ sealed class PatientInfoEvent {
 
     data object ValidateForm : PatientInfoEvent()
     data object ConfirmSubmission : PatientInfoEvent()
-
 }

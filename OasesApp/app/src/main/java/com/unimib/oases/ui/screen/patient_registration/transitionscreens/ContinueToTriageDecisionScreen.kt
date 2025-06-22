@@ -2,7 +2,9 @@ package com.unimib.oases.ui.screen.patient_registration.transitionscreens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -24,18 +26,26 @@ fun ContinueToTriageDecisionScreen(
     ){
 
         CenteredText(
-            "The patient was saved, you will be able to edit it later on.\nDo you want to continue with their triage or go back to home?",
+            "The patient was saved, you will be able to edit it later on.",
+            fontSize = 20.sp
+        )
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        CenteredText(
+            "Do you want to continue with their triage or go back to home?",
             fontSize = 20.sp
         )
 
         Spacer(modifier = Modifier.height(64.dp))
 
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+        Row(
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
         ){
-            ContinueToTriageButton(onClick = onContinueToTriage)
             SkipTriageButton(onClick = onSkipTriage)
+            ContinueToTriageButton(onClick = onContinueToTriage)
         }
 
     }
@@ -46,7 +56,7 @@ fun SkipTriageButton(onClick: () -> Unit) {
     Button(
         onClick = onClick
     ){
-        Text("Go to Home")
+        Text("Home")
     }
 }
 
@@ -55,6 +65,6 @@ fun ContinueToTriageButton(onClick: () -> Unit) {
     Button(
         onClick = onClick
     ){
-        Text("Continue to triage")
+        Text("Triage")
     }
 }

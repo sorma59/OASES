@@ -234,7 +234,7 @@ fun RegistrationScreen(
                                     )
                                 )
                         },
-                        ageInt = state.patientInfoState.patient.age,
+                        ageInt = state.patientInfoState.patient.ageInMonths,
                         spo2Value = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Oxygen Saturation"}?.value ?: "",
                         hrValue = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Heart Rate"}?.value ?: "",
                         rrValue = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Respiratory Rate"}?.value ?: "",

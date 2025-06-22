@@ -137,7 +137,7 @@ fun PatientCard(
                     .padding(horizontal = 10.dp, vertical = 10.dp)
             ) {
                 Text(
-                    text = patient.name + ", " + patient.age,
+                    text = patient.name + ", " + (patient.ageInMonths / 12),
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.surface,
                     fontWeight = FontWeight.Bold,

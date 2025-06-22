@@ -40,7 +40,7 @@ object PatientSerializer {
                     4 + imageBytes.size
         ).order(ByteOrder.BIG_ENDIAN)
 
-        buffer.putInt(patient.age)
+        buffer.putInt(patient.ageInMonths)
 
         buffer.putInt(idBytes.size)
         buffer.put(idBytes)
@@ -87,7 +87,7 @@ object PatientSerializer {
     fun deserialize(bytes: ByteArray): Patient {
         val buffer = ByteBuffer.wrap(bytes)
 
-        val age = buffer.int
+        val ageInMonths = buffer.int
 
         val id = buffer.readString()
         val publicId = buffer.readString()
@@ -114,7 +114,7 @@ object PatientSerializer {
             publicId = publicId,
             name = name,
             birthDate = birthDate,
-            age = age,
+            ageInMonths = ageInMonths,
             sex = sex,
             village = village,
             parish = parish,
@@ -132,7 +132,7 @@ object PatientSerializer {
         val original = Patient(
             name = "John Doe",
             birthDate = "1990-01-01",
-            age = 30,
+            ageInMonths = 30,
             sex = "Male",
             village = "Village",
             parish = "Parish",

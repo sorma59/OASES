@@ -7,7 +7,7 @@ data class PatientInfoState(
     val patient: Patient = Patient(
         name = "",
         birthDate = "",
-        age = 0,
+        ageInMonths = 0 * 12,
         sex = Sex.Unspecified.displayName,
         village = "",
         parish = "",
