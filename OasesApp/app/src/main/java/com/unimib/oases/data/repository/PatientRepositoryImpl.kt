@@ -80,10 +80,6 @@ class PatientRepositoryImpl @Inject constructor(
 
         emit(Resource.Loading())
         roomDataSource.getPatients().collect {
-                it.forEach { patient ->
-                    println(patient)
-                }
-
             emit(Resource.Success(it.asReversed().map { entity -> entity.toPatient() }))
         }
     }.catch { e ->
@@ -108,5 +104,4 @@ class PatientRepositoryImpl @Inject constructor(
             Resource.Error(e.message ?: "An error occurred")
         }
     }
-
 }

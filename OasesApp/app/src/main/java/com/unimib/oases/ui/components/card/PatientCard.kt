@@ -70,6 +70,12 @@ fun PatientCard(
         }
     }
 
+    val age =
+        if (patient.ageInMonths < 12)
+            patient.ageInMonths.toString() + " months old"
+        else
+            (patient.ageInMonths / 12).toString()
+
     Box(
 
         modifier = modifier
@@ -137,7 +143,7 @@ fun PatientCard(
                     .padding(horizontal = 10.dp, vertical = 10.dp)
             ) {
                 Text(
-                    text = patient.name + ", " + (patient.ageInMonths / 12),
+                    text = patient.name + ", " + age,
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.surface,
                     fontWeight = FontWeight.Bold,

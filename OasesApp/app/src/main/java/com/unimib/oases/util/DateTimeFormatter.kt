@@ -32,4 +32,11 @@ class DateTimeFormatter {
         }
     }
 
+    fun calculateBirthDate(ageInMonths: Int, formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")): String? {
+        if (ageInMonths < 0)
+            return null
+        val currentDate = LocalDate.now()
+        val birthDate = currentDate.minusMonths(ageInMonths.toLong())
+        return birthDate.format(formatter)
+    }
 }

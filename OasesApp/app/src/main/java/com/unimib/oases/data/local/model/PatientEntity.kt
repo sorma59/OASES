@@ -11,7 +11,6 @@ data class PatientEntity (
     @ColumnInfo(name = "public_id") var publicId: String,
     @ColumnInfo(name = "name") var name: String,
     @ColumnInfo(name = "birth_date") var birthDate: String,
-    @ColumnInfo(name = "age_in_months") var ageInMonths: Int,
     @ColumnInfo(name = "sex") var sex: String,
     @ColumnInfo(name = "village") var village: String,
     @ColumnInfo(name = "parish") var parish: String,

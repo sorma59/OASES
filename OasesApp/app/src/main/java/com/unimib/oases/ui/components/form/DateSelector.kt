@@ -1,4 +1,4 @@
-package com.unimib.oases.ui.components.util
+package com.unimib.oases.ui.components.form
 
 import android.app.DatePickerDialog
 import android.content.Context
@@ -8,6 +8,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.unimib.oases.ui.components.util.AnimatedLabelOutlinedTextField
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -19,7 +20,8 @@ fun DateSelector(
     modifier: Modifier = Modifier,
     context: Context,
     readOnly: Boolean = false,
-    labelText: String = "Date"
+    labelText: String = "Date",
+    isError: Boolean = false,
 ) {
     val calendar = Calendar.getInstance()
     val year = calendar.get(Calendar.YEAR)
@@ -37,11 +39,14 @@ fun DateSelector(
         year,
         month,
         day
-    )
+    ).apply {
+        // Prevent selecting future dates
+        datePicker.maxDate = System.currentTimeMillis()
+    }
 
     AnimatedLabelOutlinedTextField(
         value = selectedDate,
-        onValueChange = {  },
+        onValueChange = { },
         labelText = labelText,
         modifier = modifier,
         readOnly = true,
@@ -50,6 +55,7 @@ fun DateSelector(
                 Icon(Icons.Filled.CalendarMonth, contentDescription = "Insert a date")
             }
         },
-        onClick = { if (!readOnly) datePickerDialog.show() }
+        onClick = { if (!readOnly) datePickerDialog.show() },
+        isError = isError
     )
 }
