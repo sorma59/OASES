@@ -54,7 +54,7 @@ class RoomDataSource @Inject constructor(
 //        patientDao.updateTriageState(patient.id, triageState)
 //    }
 
-    fun updateStatus(patient: PatientEntity, status: String) {
+    suspend fun updateStatus(patient: PatientEntity, status: String) {
         patientDao.updateStatus(patient.id, status)
     }
 

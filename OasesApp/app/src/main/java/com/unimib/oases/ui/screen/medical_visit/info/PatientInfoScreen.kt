@@ -16,8 +16,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.unimib.oases.ui.components.form.DateSelector
 import com.unimib.oases.ui.components.util.AnimatedLabelOutlinedTextField
-import com.unimib.oases.ui.components.util.DateSelector
 import com.unimib.oases.ui.components.util.TimeSelector
 import java.text.SimpleDateFormat
 import java.util.Calendar

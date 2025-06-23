@@ -72,11 +72,6 @@ class PatientInfoViewModel @Inject constructor(
                                         isLoading = false
                                     )
                                     currentPatientId = id
-                                    if (patient.birthDate.isNotBlank()){
-                                        val newAgeInMonths = DateTimeFormatter().calculateAgeInMonths(patient.birthDate)
-                                        if (newAgeInMonths != null)
-                                            _state.value.patient.copy(ageInMonths = newAgeInMonths)
-                                    }
                                 }
                                 is Resource.Error -> {
                                     _state.value = _state.value.copy(
@@ -112,15 +107,15 @@ class PatientInfoViewModel @Inject constructor(
             is PatientInfoEvent.BirthDateChanged -> {
                 val ageInMonths = DateTimeFormatter().calculateAgeInMonths(event.birthDate)
                 if (ageInMonths != null){
-                    _state.value = _state.value.copy(patient = _state.value.patient.copy(ageInMonths = ageInMonths), ageError = null)
+                    _state.value = _state.value.copy(patient = _state.value.patient.copy(ageInMonths = ageInMonths), birthDateError = null)
                 }
                 _state.value = _state.value.copy(patient = _state.value.patient.copy(birthDate = event.birthDate))
             }
             is PatientInfoEvent.AgeChanged -> {
-                if (_state.value.patient.birthDate.isEmpty())
-                    _state.value = _state.value.copy(patient = _state.value.patient.copy(ageInMonths = event.ageInMonths), ageError = null)
-                //else
-                    //TODO
+                _state.value = _state.value.copy(patient = _state.value.patient.copy(ageInMonths = event.ageInMonths), birthDateError = null)
+                val newBirthDate = DateTimeFormatter().calculateBirthDate(event.ageInMonths)
+                if (newBirthDate != null)
+                    _state.value = _state.value.copy(patient = _state.value.patient.copy(birthDate = newBirthDate))
             }
             is PatientInfoEvent.SexChanged -> {
                 _state.value = _state.value.copy(patient = _state.value.patient.copy(sex = event.sex))
@@ -162,13 +157,13 @@ class PatientInfoViewModel @Inject constructor(
             // Validate
             val result = validatePatientInfoFormUseCase.invoke(
                 name = _state.value.patient.name,
-                age = _state.value.patient.ageInMonths
+                birthDate = _state.value.patient.birthDate
             )
 
             // Update state with errors
             _state.value = _state.value.copy(
                 nameError = result.nameErrorMessage,
-                ageError = result.ageErrorMessage
+                birthDateError = result.birthDateErrorMessage
             )
 
             // If there are errors, stop here

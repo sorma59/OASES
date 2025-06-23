@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Timer
@@ -23,7 +22,6 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -36,13 +34,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.unimib.oases.ui.components.form.AgeInputField
+import com.unimib.oases.ui.components.form.DateSelector
 import com.unimib.oases.ui.components.util.AnimatedLabelOutlinedTextField
-import com.unimib.oases.ui.components.util.DateSelector
 import com.unimib.oases.ui.components.util.FadeOverlay
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 import java.text.SimpleDateFormat
@@ -121,8 +117,15 @@ fun PatientInfoScreen(
                             )
                         },
                         context = context,
-                        labelText = "Date of Birth"
+                        labelText = "Date of Birth",
+                        isError = state.birthDateError != null
                     )
+
+                    if (state.birthDateError != null)
+                        Text(
+                            text = state.birthDateError!!,
+                            color = MaterialTheme.colorScheme.error
+                        )
 
                     AgeInputField(
                         ageInMonths = state.patient.ageInMonths,
@@ -132,15 +135,8 @@ fun PatientInfoScreen(
                                     if (it.toString().isEmpty()) -1 else it.toInt()
                                 )
                             )
-                        },
-                        isError = state.ageError != null
+                        }
                     )
-
-                    if (state.ageError != null)
-                        Text(
-                            text = state.ageError!!,
-                            color = MaterialTheme.colorScheme.error
-                        )
 
                     SexDropdown(
                         selectedSex = state.patient.sex,
@@ -331,61 +327,6 @@ fun SexDropdown(
         }
     }
 }
-
-@Composable
-fun AgeInputField(
-    ageInMonths: Int?,
-    onAgeChange: (Int) -> Unit,
-    modifier: Modifier = Modifier,
-    isError: Boolean = true
-) {
-    var isMonths by remember { mutableStateOf(false) }
-    var inputText by remember { mutableStateOf(TextFieldValue("")) }
-
-    LaunchedEffect(ageInMonths, isMonths) {
-        inputText = TextFieldValue(
-            ageInMonths?.let {
-                if (isMonths) it.toString() else (it / 12).toString()
-            } ?: ""
-        )
-    }
-
-    Box(modifier = modifier){
-
-        OutlinedTextField(
-            value = inputText,
-            onValueChange = {
-                val raw = it.text.toIntOrNull()
-                if (raw != null && raw >= 0) {
-                    onAgeChange(if (isMonths) raw else raw * 12)
-                }
-            },
-            label = { Text(if (isMonths) "Age (months)" else "Age (years)") },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Done
-            ),
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            isError = isError
-        )
-
-        TextButton(
-            onClick = {
-                isMonths = !isMonths
-                // Update the field with converted value
-                val current = inputText.text.toIntOrNull() ?: 0
-                val newValue = if (isMonths) current * 12 else current / 12
-                inputText = TextFieldValue(newValue.toString())
-                onAgeChange(if (isMonths) newValue else newValue * 12)
-            },
-            modifier = Modifier.align(Alignment.CenterEnd)
-        ) {
-            Text(if (isMonths) "Switch to years" else "Infant?")
-        }
-    }
-}
-
 
 @SuppressLint("DefaultLocale")
 @Composable

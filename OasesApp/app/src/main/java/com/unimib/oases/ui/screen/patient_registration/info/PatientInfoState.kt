@@ -20,6 +20,6 @@ data class PatientInfoState(
     ),
     val isLoading: Boolean = true,
     val nameError: String?= null,
-    val ageError: String?= null,
+    val birthDateError: String?= null,
     val error: String?= null,
 )

@@ -23,7 +23,7 @@ interface PatientDao {
 //    fun updateTriageState(patientId: String, triageState: String)
 
     @Query("UPDATE " + TableNames.PATIENT + " SET status = :status WHERE id = :patientId")
-    fun updateStatus(patientId: String, status: String)
+    suspend fun updateStatus(patientId: String, status: String)
 
     @Query("SELECT * FROM " + TableNames.PATIENT + " WHERE id = :id")
     fun getPatientById(id: String): Flow<PatientEntity?>

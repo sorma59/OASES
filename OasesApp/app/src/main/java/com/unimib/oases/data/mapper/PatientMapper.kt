@@ -2,14 +2,16 @@ package com.unimib.oases.data.mapper
 
 import com.unimib.oases.data.local.model.PatientEntity
 import com.unimib.oases.domain.model.Patient
+import com.unimib.oases.util.DateTimeFormatter
 
 fun PatientEntity.toPatient(): Patient {
+    val ageInMonths = DateTimeFormatter().calculateAgeInMonths(birthDate)
     return Patient(
         id = id,
         publicId = publicId,
         name = name,
         birthDate = birthDate,
-        ageInMonths = ageInMonths,
+        ageInMonths = ageInMonths ?: 0,
         sex = sex,
         village = village,
         parish = parish,
@@ -28,7 +30,6 @@ fun Patient.toEntity(): PatientEntity {
         publicId = publicId,
         name = name,
         birthDate = birthDate,
-        ageInMonths = ageInMonths,
         sex = sex,
         village = village,
         parish = parish,
