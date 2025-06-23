@@ -24,9 +24,9 @@ import javax.inject.Inject
 
 class PatientRepositoryImpl @Inject constructor(
     private val roomDataSource: RoomDataSource,
-    @ApplicationScope private val applicationScope: CoroutineScope,
-    private val firestoreManager: FirestoreManager,
 ) : PatientRepository {
+
+
 
     private val _receivedPatients = MutableStateFlow<List<Patient>>(emptyList())
     override val receivedPatients: StateFlow<List<Patient>> = _receivedPatients.asStateFlow()
@@ -53,14 +53,12 @@ class PatientRepositoryImpl @Inject constructor(
     }
 
     override suspend fun deletePatient(patient: Patient): Resource<Unit> {
-
         return try {
             roomDataSource.deletePatient(patient.toEntity())
             Resource.Success(Unit)
         } catch (e: Exception) {
             Resource.Error(e.message ?: "An error occurred")
         }
-
     }
 
     override suspend fun getPatientById(patientId: String): Flow<Resource<Patient?>> = flow {
@@ -75,8 +73,15 @@ class PatientRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getPatients(): Flow<Resource<List<Patient>>> = flow {
+    override fun doOnlineTasks(){
+        println("Doing Online tasks")
+    }
 
+    override fun doOfflineTasks(){
+        println("Doing Offline tasks")
+    }
+
+    override fun getPatients(): Flow<Resource<List<Patient>>> = flow {
 
         emit(Resource.Loading())
         roomDataSource.getPatients().collect {

@@ -2,17 +2,15 @@ package com.unimib.oases.data.util
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.MetadataChanges
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import com.unimib.oases.domain.repository.PatientRepository
 import javax.inject.Inject
 
 
-class FirestoreManager @Inject constructor() {
+class FirestoreManager @Inject constructor(
+    private val patientRepository: PatientRepository,
+) {
     private val db = FirebaseFirestore.getInstance()
 
-    private val _onlineStatus = MutableStateFlow(false)
-    val onlineStatus: StateFlow<Boolean> = _onlineStatus.asStateFlow()
 
 
     fun startListener() {
@@ -24,17 +22,16 @@ class FirestoreManager @Inject constructor() {
                     return@addSnapshotListener
                 }
 
-
                 if (snapshot != null) {
                     if (snapshot.metadata.isFromCache) {
                         println("FIRESTORE SERVER OFFLINE")
-                        _onlineStatus.value = false
+                        patientRepository.doOfflineTasks()
                     } else {
                         println("FIRESTORE SERVER ONLINE")
-                        _onlineStatus.value = true
+                        patientRepository.doOnlineTasks()
+
                     }
                 }
-
             }
         println("CLOUD LISTENER SUCCESSFULLY STARTED")
     }

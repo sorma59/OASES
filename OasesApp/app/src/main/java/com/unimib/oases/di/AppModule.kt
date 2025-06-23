@@ -88,10 +88,10 @@ object AppModule {
 //        }
 //    }
 
-    @Provides
-    @Singleton
-    @ApplicationScope
-    fun provideFirestoreManager(): FirestoreManager = FirestoreManager()
+//    @Provides
+//    @Singleton
+//    @ApplicationScope
+//    fun provideFirestoreManager(): FirestoreManager = FirestoreManager()
 
 
 

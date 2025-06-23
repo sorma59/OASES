@@ -5,6 +5,7 @@ import com.unimib.oases.data.local.RoomDataSource
 import com.unimib.oases.data.mapper.toDisease
 import com.unimib.oases.data.mapper.toEntity
 import com.unimib.oases.data.util.FirestoreManager
+import com.unimib.oases.di.ApplicationScope
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.model.Disease
 import com.unimib.oases.domain.repository.DiseaseRepository
@@ -12,6 +13,8 @@ import com.unimib.oases.util.Resource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
@@ -21,9 +24,8 @@ import javax.inject.Inject
 
 class DiseaseRepositoryImpl @Inject constructor(
     private val roomDataSource: RoomDataSource,
-    @IoDispatcher private val dispatcher: CoroutineDispatcher,
-    private val firestoreManager: FirestoreManager
 ): DiseaseRepository {
+
 
 
 
