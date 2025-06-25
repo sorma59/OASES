@@ -1,5 +1,10 @@
 package com.unimib.oases.di
 
+import com.google.firebase.firestore.FirebaseFirestore
+import com.unimib.oases.data.local.RoomDataSource
+import com.unimib.oases.data.local.db.OasesDatabase
+import com.unimib.oases.data.remote.FirebaseFirestoreSource
+import com.unimib.oases.data.remote.FirebaseFirestoreSourceImpl
 import com.unimib.oases.data.repository.DiseaseRepositoryImpl
 import com.unimib.oases.data.repository.PatientDiseaseRepositoryImpl
 import com.unimib.oases.data.repository.PatientRepositoryImpl
@@ -7,6 +12,8 @@ import com.unimib.oases.data.repository.UserRepositoryImpl
 import com.unimib.oases.data.repository.VisitRepositoryImpl
 import com.unimib.oases.data.repository.VisitVitalSignRepositoryImpl
 import com.unimib.oases.data.repository.VitalSignRepositoryImpl
+import com.unimib.oases.data.util.FirestoreManager
+import com.unimib.oases.data.util.FirestoreManagerInterface
 import com.unimib.oases.domain.repository.DiseaseRepository
 import com.unimib.oases.domain.repository.PatientDiseaseRepository
 import com.unimib.oases.domain.repository.PatientRepository
@@ -16,8 +23,10 @@ import com.unimib.oases.domain.repository.VisitVitalSignRepository
 import com.unimib.oases.domain.repository.VitalSignRepository
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Singleton
 
 @Module
@@ -65,5 +74,9 @@ abstract class RepositoryModule {
     abstract fun bindVitalSignRepository(
         vitalSignRepositoryImpl: VitalSignRepositoryImpl // Hilt knows how to create this due to @Inject constructor
     ): VitalSignRepository // Return the interface
+
+
+
+
 
 }

@@ -1,15 +1,22 @@
 package com.unimib.oases.data.repository
 
 import android.util.Log
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import com.unimib.oases.data.local.RoomDataSource
 import com.unimib.oases.data.mapper.toEntity
 import com.unimib.oases.data.mapper.toPatient
+import com.unimib.oases.data.remote.FirebaseFirestoreSource
 import com.unimib.oases.data.util.FirestoreManager
+import com.unimib.oases.data.util.FirestoreManagerInterface
 import com.unimib.oases.di.ApplicationScope
+import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.util.Resource
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,13 +25,31 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class PatientRepositoryImpl @Inject constructor(
     private val roomDataSource: RoomDataSource,
+    private val firestoreApi: FirebaseFirestoreSource,
+    private val firestoreManager: FirestoreManager,
+    @IoDispatcher private val dispatcher: CoroutineDispatcher
 ) : PatientRepository {
+
+
+    init {
+        CoroutineScope(dispatcher).launch {
+            firestoreManager.onlineStatus.collect { isOnline ->
+                if (isOnline) {
+                    doOnlineTasks()
+                } else {
+                    doOfflineTasks()
+                }
+            }
+        }
+    }
 
 
 
@@ -35,9 +60,18 @@ class PatientRepositoryImpl @Inject constructor(
     override val newPatientEvents: SharedFlow<Patient> = _newPatientEvents.asSharedFlow()
 
     override suspend fun addPatient(patient: Patient): Resource<Unit> {
+
         return try {
             Log.e("PatientRepositoryImpl", "Adding patient: $patient")
             roomDataSource.insertPatient(patient.toEntity())
+
+            if(firestoreManager.isOnline()){
+                Log.e("PatientRepositoryImpl", "Adding patient to firestore: $patient")
+                //firestoreManager.addPatient(patient.toEntity())
+            } else {
+                Log.e("PatientRepositoryImpl", "Adding patient to queue: $patient")
+            }
+
             Resource.Success(Unit)
         } catch (e: Exception) {
             Resource.Error(e.message ?: "An error occurred")

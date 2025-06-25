@@ -33,6 +33,7 @@ class MainActivity : ComponentActivity() {
         // start listener
         firestoreManager.startListener()
 
+
         // Define an ActivityResultLauncher for enabling Bluetooth
         val enableBluetoothLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->

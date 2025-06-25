@@ -16,8 +16,6 @@ interface PatientRepository {
 //    suspend fun updateTriageState(patient: Patient, triageState: String): Resource<Unit>
     suspend fun updateStatus(patient: Patient, status: String): Resource<Unit>
     fun getPatients(): Flow<Resource<List<Patient>>>
-     fun doOnlineTasks()
-     fun doOfflineTasks()
-
-
+    fun doOnlineTasks()
+    fun doOfflineTasks()
 }
