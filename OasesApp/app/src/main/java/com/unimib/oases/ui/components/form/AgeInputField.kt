@@ -1,6 +1,5 @@
 package com.unimib.oases.ui.components.form
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -13,7 +12,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -21,7 +19,6 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-
 
 @Composable
 fun AgeInputField(
@@ -39,7 +36,6 @@ fun AgeInputField(
 
     LaunchedEffect(ageInMonths, isMonths) {
         inputText = updateInputText(ageInMonths, isMonths)
-
     }
 
     LaunchedEffect(isFocused) {
@@ -47,44 +43,41 @@ fun AgeInputField(
             inputText = updateInputText(ageInMonths, isMonths)
     }
 
-    Box(modifier = modifier){
-
-        OutlinedTextField(
-            value = inputText,
-            onValueChange = {
-                if (it.length <= 3 && it.all { it.isDigit() }){ // Update only if all characters are digits
-                    inputText = it
-                    val raw = it.toIntOrNull()
-                    if (raw != null) {
-                        onAgeChange(if (isMonths) raw else raw * 12)
-                    }
+    OutlinedTextField(
+        value = inputText,
+        onValueChange = {
+            if (it.length <= 3 && it.all { it.isDigit() }){ // Update only if all characters are digits
+                inputText = it
+                val raw = it.toIntOrNull()
+                if (raw != null) {
+                    onAgeChange(if (isMonths) raw else raw * 12)
                 }
+            }
+        },
+        label = { Text(if (isMonths) "Age (months)" else "Age (years)") },
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Number,
+            imeAction = ImeAction.Done
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = { focusManager.clearFocus() }
+        ),
+        singleLine = true,
+        modifier = modifier
+            .fillMaxWidth()
+            .focusRequester(focusRequester)
+            .onFocusChanged { focusState ->
+                isFocused = focusState.isFocused
             },
-            label = { Text(if (isMonths) "Age (months)" else "Age (years)") },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Done
-            ),
-            keyboardActions = KeyboardActions(onDone = {
-                focusManager.clearFocus()
-            }),
-            singleLine = true,
-            modifier = Modifier
-                .fillMaxWidth()
-                .focusRequester(focusRequester)
-                .onFocusChanged { focusState ->
-                    isFocused = focusState.isFocused
-                },
-            isError = isError
-        )
-
-        TextButton(
-            onClick = { isMonths = !isMonths },
-            modifier = Modifier.align(Alignment.CenterEnd)
-        ) {
-            Text(if (isMonths) "Switch to years" else "Infant?")
+        isError = isError,
+        trailingIcon = {
+            TextButton(
+                onClick = { isMonths = !isMonths }
+            ) {
+                Text( if (isMonths) "Switch to years" else "Infant?" )
+            }
         }
-    }
+    )
 }
 
 private fun updateInputText(ageInMonths: Int?, isMonths: Boolean): String {

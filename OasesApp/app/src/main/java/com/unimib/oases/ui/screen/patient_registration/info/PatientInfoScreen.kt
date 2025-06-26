@@ -93,9 +93,7 @@ fun PatientInfoScreen(
                         value = state.patient.name,
                         onValueChange = {
                             patientInfoViewModel.onEvent(
-                                PatientInfoEvent.NameChanged(
-                                    it
-                                )
+                                PatientInfoEvent.NameChanged( it )
                             )
                         },
                         labelText = "Name",
@@ -131,9 +129,7 @@ fun PatientInfoScreen(
                         ageInMonths = state.patient.ageInMonths,
                         onAgeChange = {
                             patientInfoViewModel.onEvent(
-                                PatientInfoEvent.AgeChanged(
-                                    if (it.toString().isEmpty()) -1 else it.toInt()
-                                )
+                                PatientInfoEvent.AgeChanged( it.toInt() )
                             )
                         }
                     )
@@ -185,7 +181,7 @@ fun PatientInfoScreen(
                                 )
                             )
                         },
-                        labelText = "Sub Country",
+                        labelText = "Sub County",
                         modifier = Modifier.fillMaxWidth()
                     )
 
