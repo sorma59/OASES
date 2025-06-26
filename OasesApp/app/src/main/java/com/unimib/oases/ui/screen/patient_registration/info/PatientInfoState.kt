@@ -21,5 +21,6 @@ data class PatientInfoState(
     val isLoading: Boolean = true,
     val nameError: String?= null,
     val birthDateError: String?= null,
+    val edited: Boolean = false,
     val error: String?= null,
 )

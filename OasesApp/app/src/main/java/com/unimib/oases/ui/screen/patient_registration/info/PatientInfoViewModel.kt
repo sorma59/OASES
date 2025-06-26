@@ -102,49 +102,59 @@ class PatientInfoViewModel @Inject constructor(
     fun onEvent(event: PatientInfoEvent) {
         when(event) {
             is PatientInfoEvent.NameChanged -> {
-                _state.value = _state.value.copy(patient = _state.value.patient.copy(name = event.name), nameError = null)
+                _state.value = _state.value.copy(patient = _state.value.patient.copy(name = event.name), nameError = null, edited = true)
             }
             is PatientInfoEvent.BirthDateChanged -> {
                 val ageInMonths = DateTimeFormatter().calculateAgeInMonths(event.birthDate)
                 if (ageInMonths != null){
                     _state.value = _state.value.copy(patient = _state.value.patient.copy(ageInMonths = ageInMonths), birthDateError = null)
                 }
-                _state.value = _state.value.copy(patient = _state.value.patient.copy(birthDate = event.birthDate))
+                _state.value = _state.value.copy(patient = _state.value.patient.copy(birthDate = event.birthDate), birthDateError = null, edited = true)
             }
             is PatientInfoEvent.AgeChanged -> {
-                _state.value = _state.value.copy(patient = _state.value.patient.copy(ageInMonths = event.ageInMonths), birthDateError = null)
+                _state.value = _state.value.copy(patient = _state.value.patient.copy(ageInMonths = event.ageInMonths), birthDateError = null, edited = true)
                 val newBirthDate = DateTimeFormatter().calculateBirthDate(event.ageInMonths)
                 if (newBirthDate != null)
                     _state.value = _state.value.copy(patient = _state.value.patient.copy(birthDate = newBirthDate))
             }
             is PatientInfoEvent.SexChanged -> {
-                _state.value = _state.value.copy(patient = _state.value.patient.copy(sex = event.sex))
+                _state.value = _state.value.copy(patient = _state.value.patient.copy(sex = event.sex), edited = true)
             }
             is PatientInfoEvent.VillageChanged -> {
-                _state.value = _state.value.copy(patient = _state.value.patient.copy(village = event.village))
+                _state.value = _state.value.copy(patient = _state.value.patient.copy(village = event.village), edited = true)
             }
             is PatientInfoEvent.ParishChanged -> {
-                _state.value = _state.value.copy(patient = _state.value.patient.copy(parish = event.parish))
+                _state.value = _state.value.copy(patient = _state.value.patient.copy(parish = event.parish), edited = true)
             }
             is PatientInfoEvent.SubCountyChanged -> {
-                _state.value = _state.value.copy(patient = _state.value.patient.copy(subCounty = event.subCounty))
+                _state.value = _state.value.copy(patient = _state.value.patient.copy(subCounty = event.subCounty), edited = true)
             }
             is PatientInfoEvent.DistrictChanged -> {
-                _state.value = _state.value.copy(patient = _state.value.patient.copy(district = event.district))
+                _state.value = _state.value.copy(patient = _state.value.patient.copy(district = event.district), edited = true)
             }
             is PatientInfoEvent.NextOfKinChanged -> {
-                _state.value = _state.value.copy(patient = _state.value.patient.copy(nextOfKin = event.nextOfKin))
+                _state.value = _state.value.copy(patient = _state.value.patient.copy(nextOfKin = event.nextOfKin), edited = true)
             }
             is PatientInfoEvent.ContactChanged -> {
-                _state.value = _state.value.copy(patient = _state.value.patient.copy(contact = event.contact))
+                _state.value = _state.value.copy(patient = _state.value.patient.copy(contact = event.contact), edited = true)
             }
 
             is PatientInfoEvent.ValidateForm -> {
-                validateAndPrepareForSubmission()
+                if (_state.value.edited)
+                    validateAndPrepareForSubmission()
+                else
+                    viewModelScope.launch {
+                        validationEventsChannel.send(ValidationEvent.ValidationSuccess)
+                    }
             }
 
             is PatientInfoEvent.ConfirmSubmission -> {
-                savePatientData()
+                if (_state.value.edited)
+                    savePatientData()
+                else
+                    viewModelScope.launch {
+                        validationEventsChannel.send(ValidationEvent.SubmissionSuccess)
+                    }
             }
 
         }

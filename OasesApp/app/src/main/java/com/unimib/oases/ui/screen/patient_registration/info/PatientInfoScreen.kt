@@ -1,7 +1,6 @@
 package com.unimib.oases.ui.screen.patient_registration.info
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -55,9 +54,69 @@ fun PatientInfoScreen(
 
     val state by patientInfoViewModel.state.collectAsState()
 
+    var showAlertDialog by remember { mutableStateOf(false) }
+
+    // Destructuring state
+    val name = state.patient.name
+    val birthDate = state.patient.birthDate
+    val ageInMonths = state.patient.ageInMonths
+    val sex = state.patient.sex
+    val village = state.patient.village
+    val parish = state.patient.parish
+    val subCounty = state.patient.subCounty
+    val district = state.patient.district
+    val nextOfKin = state.patient.nextOfKin
+    val contact = state.patient.contact
+    val nameError = state.nameError
+    val birthDateError = state.birthDateError
+    val isLoading = state.isLoading
+    val edited =state.edited
+
+    // --- Remembered Lambdas --- to avoid recomposition,
+    val onNameChange = remember<(String) -> Unit> {
+        { newName -> patientInfoViewModel.onEvent(PatientInfoEvent.NameChanged(newName)) }
+    }
+    val onBirthDateChange = remember<(String) -> Unit> {
+        { newDate -> patientInfoViewModel.onEvent(PatientInfoEvent.BirthDateChanged(newDate)) }
+    }
+    val onAgeChange = remember<(Int) -> Unit> {
+        { newAge -> patientInfoViewModel.onEvent(PatientInfoEvent.AgeChanged(newAge)) }
+    }
+    val onSexChange = remember<(String) -> Unit> {
+        { newSex -> patientInfoViewModel.onEvent(PatientInfoEvent.SexChanged(newSex)) }
+    }
+    val onVillageChange = remember<(String) -> Unit> {
+        { newVillage -> patientInfoViewModel.onEvent(PatientInfoEvent.VillageChanged(newVillage)) }
+    }
+    val onParishChange = remember<(String) -> Unit> {
+        { newParish -> patientInfoViewModel.onEvent(PatientInfoEvent.ParishChanged(newParish)) }
+    }
+    val onSubCountyChange = remember<(String) -> Unit> {
+        { newSubCounty -> patientInfoViewModel.onEvent(PatientInfoEvent.SubCountyChanged(newSubCounty)) }
+    }
+    val onDistrictChange = remember<(String) -> Unit> {
+        { newDistrict -> patientInfoViewModel.onEvent(PatientInfoEvent.DistrictChanged(newDistrict)) }
+    }
+    val onNextOfKinChange = remember<(String) -> Unit> {
+        { newNextOfKin -> patientInfoViewModel.onEvent(PatientInfoEvent.NextOfKinChanged(newNextOfKin)) }
+    }
+    val onContactChange = remember<(String) -> Unit> {
+        { newContact -> patientInfoViewModel.onEvent(PatientInfoEvent.ContactChanged(newContact)) }
+    }
+
+    val onValidateForm = remember {
+        { patientInfoViewModel.onEvent(PatientInfoEvent.ValidateForm) }
+    }
+    val onConfirmSubmission = remember {
+        {
+            showAlertDialog = false
+            patientInfoViewModel.onEvent(PatientInfoEvent.ConfirmSubmission)
+        }
+    }
+
     val context = LocalContext.current
 
-    var showAlertDialog by remember { mutableStateOf(false) }
+
 
     LaunchedEffect(key1 = context) {
         patientInfoViewModel.validationEvents.collect { event ->
@@ -67,7 +126,6 @@ fun PatientInfoScreen(
                 }
 
                 is PatientInfoViewModel.ValidationEvent.SubmissionSuccess -> {
-                    Log.d("PatientInfoScreen", "Final Submission Success")
                     onSubmitted(state)
                 }
             }
@@ -76,7 +134,7 @@ fun PatientInfoScreen(
 
     val scrollState = rememberScrollState()
 
-    if (state.isLoading)
+    if (isLoading)
         CustomCircularProgressIndicator()
     else {
         Column {
@@ -90,136 +148,82 @@ fun PatientInfoScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     AnimatedLabelOutlinedTextField(
-                        value = state.patient.name,
-                        onValueChange = {
-                            patientInfoViewModel.onEvent(
-                                PatientInfoEvent.NameChanged( it )
-                            )
-                        },
+                        value = name,
+                        onValueChange = onNameChange,
                         labelText = "Name",
-                        isError = state.nameError != null,
+                        isError = nameError != null,
                         modifier = Modifier.fillMaxWidth()
                     )
 
-                    if (state.nameError != null)
+                    if (nameError != null)
                         Text(
-                            text = state.nameError!!,
+                            text = nameError,
                             color = MaterialTheme.colorScheme.error
                         )
 
                     DateSelector(
-                        selectedDate = state.patient.birthDate,
-                        onDateSelected = {
-                            patientInfoViewModel.onEvent(
-                                PatientInfoEvent.BirthDateChanged(it)
-                            )
-                        },
+                        selectedDate = birthDate,
+                        onDateSelected = onBirthDateChange,
                         context = context,
                         labelText = "Date of Birth",
-                        isError = state.birthDateError != null
+                        isError = birthDateError != null
                     )
 
-                    if (state.birthDateError != null)
+                    if (birthDateError != null)
                         Text(
-                            text = state.birthDateError!!,
+                            text = birthDateError,
                             color = MaterialTheme.colorScheme.error
                         )
 
                     AgeInputField(
-                        ageInMonths = state.patient.ageInMonths,
-                        onAgeChange = {
-                            patientInfoViewModel.onEvent(
-                                PatientInfoEvent.AgeChanged( it.toInt() )
-                            )
-                        }
+                        ageInMonths = ageInMonths,
+                        onAgeChange = onAgeChange
                     )
 
                     SexDropdown(
-                        selectedSex = state.patient.sex,
-                        onSexSelected = {
-                            patientInfoViewModel.onEvent(
-                                PatientInfoEvent.SexChanged(
-                                    it
-                                )
-                            )
-                        },
+                        selectedSex = sex,
+                        onSexSelected = onSexChange,
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     AnimatedLabelOutlinedTextField(
-                        value = state.patient.village,
-                        onValueChange = {
-                            patientInfoViewModel.onEvent(
-                                PatientInfoEvent.VillageChanged(
-                                    it
-                                )
-                            )
-                        },
+                        value = village,
+                        onValueChange = onVillageChange,
                         labelText = "Village",
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     AnimatedLabelOutlinedTextField(
-                        value = state.patient.parish,
-                        onValueChange = {
-                            patientInfoViewModel.onEvent(
-                                PatientInfoEvent.ParishChanged(
-                                    it
-                                )
-                            )
-                        },
+                        value = parish,
+                        onValueChange = onParishChange,
                         labelText = "Parish",
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     AnimatedLabelOutlinedTextField(
-                        value = state.patient.subCounty,
-                        onValueChange = {
-                            patientInfoViewModel.onEvent(
-                                PatientInfoEvent.SubCountyChanged(
-                                    it
-                                )
-                            )
-                        },
+                        value = subCounty,
+                        onValueChange = onSubCountyChange,
                         labelText = "Sub County",
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     AnimatedLabelOutlinedTextField(
-                        value = state.patient.district,
-                        onValueChange = {
-                            patientInfoViewModel.onEvent(
-                                PatientInfoEvent.DistrictChanged(
-                                    it
-                                )
-                            )
-                        },
+                        value = district,
+                        onValueChange = onDistrictChange,
                         labelText = "District",
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     AnimatedLabelOutlinedTextField(
-                        value = state.patient.nextOfKin,
-                        onValueChange = {
-                            patientInfoViewModel.onEvent(
-                                PatientInfoEvent.NextOfKinChanged(
-                                    it
-                                )
-                            )
-                        },
+                        value = nextOfKin,
+                        onValueChange = onNextOfKinChange,
                         labelText = "Next of Kin",
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     AnimatedLabelOutlinedTextField(
-                        value = state.patient.contact,
-                        onValueChange = {
-                            patientInfoViewModel.onEvent(
-                                PatientInfoEvent.ContactChanged(
-                                    it
-                                )
-                            )
-                        },
+                        value = contact,
+                        onValueChange = onContactChange,
                         labelText = "Contact",
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -235,11 +239,9 @@ fun PatientInfoScreen(
                 horizontalArrangement = Arrangement.End
             ) {
                 Button(
-                    onClick = {
-                        patientInfoViewModel.onEvent(PatientInfoEvent.ValidateForm)
-                    }
+                    onClick = onValidateForm
                 ) {
-                    Text("Submit")
+                    Text(if (edited) "Submit" else "Next")
                 }
             }
         }
@@ -258,10 +260,7 @@ fun PatientInfoScreen(
             },
             confirmButton = {
                 TextButton(
-                    onClick = {
-                        showAlertDialog = false
-                        patientInfoViewModel.onEvent(PatientInfoEvent.ConfirmSubmission)
-                    }
+                    onClick = onConfirmSubmission
                 ) {
                     Text("Confirm")
                 }

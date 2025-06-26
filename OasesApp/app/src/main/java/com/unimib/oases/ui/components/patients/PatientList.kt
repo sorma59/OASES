@@ -74,7 +74,6 @@ fun PatientList(
                 content = {
 
                     items(wrappedPatientList) { patient ->
-                        //PatientItem(patient, navController, onClick = onItemClick)
                         PatientCard(
                             patient = patient.item,
                             isRevealed = patient.isOptionsRevealed,

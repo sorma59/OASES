@@ -3,7 +3,9 @@ package com.unimib.oases.ui.components.patients
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -40,7 +42,9 @@ fun PatientItem(
     Card(
         onClick = {onClick(patient)},
         shape = RoundedCornerShape(20.dp),
-        modifier = modifier.padding(vertical = 2.dp),
+        modifier = modifier
+            .height(80.dp)
+            .padding(vertical = 2.dp),
         colors = CardDefaults.cardColors()
             .copy(containerColor = MaterialTheme.colorScheme.primary),
     ){
@@ -52,7 +56,9 @@ fun PatientItem(
             verticalAlignment = Alignment.CenterVertically
         ){
             Column(
-                modifier = Modifier.padding(horizontal = 8.dp),
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .padding(horizontal = 8.dp),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
 
@@ -67,7 +73,9 @@ fun PatientItem(
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .padding(horizontal = 2.dp)
+                        .fillMaxWidth()
                 ){
                     Text(patient.publicId, color = MaterialTheme.colorScheme.onPrimary)
                     Text(patient.status, color = MaterialTheme.colorScheme.onPrimary)
