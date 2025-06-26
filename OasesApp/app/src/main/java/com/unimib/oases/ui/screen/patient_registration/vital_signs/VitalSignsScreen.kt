@@ -1,6 +1,7 @@
 package com.unimib.oases.ui.screen.patient_registration.vital_signs
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.unimib.oases.ui.components.util.AnimatedLabelOutlinedTextField
 import com.unimib.oases.ui.components.util.BottomButtons
+import com.unimib.oases.ui.components.util.FadeOverlay
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 
 @Composable
@@ -38,57 +40,57 @@ fun VitalSignsScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Bottom
     ){
-        if (state.error != null){
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .weight(1f)
-            ){
-                Text(text = state.error!!)
-
-                Button(
-                    onClick = {
-                        vitalSignsViewModel.onEvent(VitalSignsEvent.Retry)
-                    }
+        Box(modifier = Modifier.weight(1f)){
+            if (state.error != null) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier
+                        .fillMaxSize()
                 ) {
-                    Text("Retry")
-                }
-            }
-        }
-        else if (state.isLoading){
-            CustomCircularProgressIndicator()
-        }
-        else {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
-                    .verticalScroll(scrollState)
-                    .weight(1f)
-            ) {
+                    Text(text = state.error!!)
 
-                for (vitalSign in state.vitalSigns) {
-                    AnimatedLabelOutlinedTextField(
-                        value = vitalSign.value.toString(),
-                        onValueChange = {
-                            vitalSignsViewModel.onEvent(
-                                VitalSignsEvent.ValueChanged(
-                                    vitalSign.name,
-                                    it
+                    Button(
+                        onClick = {
+                            vitalSignsViewModel.onEvent(VitalSignsEvent.Retry)
+                        }
+                    ) {
+                        Text("Retry")
+                    }
+                }
+            } else if (state.isLoading) {
+                CustomCircularProgressIndicator()
+            } else {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
+                        .verticalScroll(scrollState)
+                ) {
+
+                    for (vitalSign in state.vitalSigns) {
+                        AnimatedLabelOutlinedTextField(
+                            value = vitalSign.value.toString(),
+                            onValueChange = {
+                                vitalSignsViewModel.onEvent(
+                                    VitalSignsEvent.ValueChanged(
+                                        vitalSign.name,
+                                        it
+                                    )
                                 )
-                            )
-                        },
-                        labelText = vitalSign.name + " (" + vitalSign.acronym + ", " + vitalSign.unit + ")",
-                        isError = vitalSign.error != null,
-                        isInteger = vitalSign.name != "Temperature" && vitalSign.name != "Rapid Blood Sugar", // Hardcoded, to fix later
-                        isDouble = vitalSign.name == "Temperature" || vitalSign.name == "Rapid Blood Sugar", // Hardcoded, to fix later
-                    )
+                            },
+                            labelText = vitalSign.name + " (" + vitalSign.acronym + ", " + vitalSign.unit + ")",
+                            isError = vitalSign.error != null,
+                            isInteger = vitalSign.name != "Temperature" && vitalSign.name != "Rapid Blood Sugar", // Hardcoded, to fix later
+                            isDouble = vitalSign.name == "Temperature" || vitalSign.name == "Rapid Blood Sugar", // Hardcoded, to fix later
+                        )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
                 }
             }
+
+            FadeOverlay(Modifier.align(Alignment.BottomCenter))
         }
 
         BottomButtons(
@@ -97,24 +99,5 @@ fun VitalSignsScreen(
             cancelButtonText = "Back",
             confirmButtonText = "Next",
         )
-
-//        Row(
-//            modifier = Modifier
-//                .padding(horizontal = 12.dp)
-//                .fillMaxWidth(),
-//            horizontalArrangement = Arrangement.SpaceBetween,
-//        ) {
-//            OutlinedButton(onClick = { onBack() }) {
-//                Text("Back")
-//            }
-//
-//            Button(
-//                onClick = {
-//                    onSubmitted(state)
-//                }
-//            ) {
-//                Text("Next")
-//            }
-//        }
     }
 }

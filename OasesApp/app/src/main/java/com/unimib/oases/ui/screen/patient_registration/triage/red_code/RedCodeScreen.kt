@@ -1,11 +1,13 @@
 package com.unimib.oases.ui.screen.patient_registration.triage.red_code
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -31,6 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.unimib.oases.ui.components.util.BottomButtons
+import com.unimib.oases.ui.components.util.FadeOverlay
 
 @Composable
 fun RedCodeScreen(
@@ -100,166 +103,173 @@ fun RedCodeScreen(
                     fontWeight = FontWeight.Bold
                 )
             }
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .verticalScroll(scrollState)
-            ) {
-                RedCodeCheckbox(
-                    label = "Unconsciousness",
-                    checked = state.unconsciousness,
-                    onCheckedChange = {
-                        redCodeViewModel.onEvent(
-                            RedCodeEvent.UnconsciousnessChanged(it)
-                        )
-                    }
-                )
-                RedCodeCheckbox(
-                    label = "Active convulsions",
-                    checked = state.activeConvulsions,
-                    onCheckedChange = {
-                        redCodeViewModel.onEvent(
-                            RedCodeEvent.ActiveConvulsionsChanged(it)
-                        )
-                    })
-                RedCodeCheckbox(
-                    label = "Respiratory distress",
-                    checked = state.respiratoryDistress,
-                    onCheckedChange = {
-                        redCodeViewModel.onEvent(
-                            RedCodeEvent.RespiratoryDistressChanged(it)
-                        )
-                    })
-                RedCodeCheckbox(
-                    label = "Heavy bleeding",
-                    checked = state.heavyBleeding,
-                    onCheckedChange = {
-                        redCodeViewModel.onEvent(
-                            RedCodeEvent.HeavyBleedingChanged(it)
-                        )
-                    }
-                )
-                RedCodeCheckbox(
-                    label = "High-risk trauma/burns",
-                    checked = state.highRiskTraumaBurns,
-                    onCheckedChange = {
-                        redCodeViewModel.onEvent(
-                            RedCodeEvent.HighRiskTraumaBurnsChanged(it)
-                        )
-                    }
-                )
-                RedCodeCheckbox(
-                    label = "Threatened limb",
-                    checked = state.threatenedLimb,
-                    onCheckedChange = {
-                        redCodeViewModel.onEvent(
-                            RedCodeEvent.ThreatenedLimbChanged(it)
-                        )
-                    }
-                )
-                RedCodeCheckbox(
-                    label = "Poisoning/intoxication",
-                    checked = state.poisoningIntoxication,
-                    onCheckedChange = {
-                        redCodeViewModel.onEvent(
-                            RedCodeEvent.PoisoningIntoxicationChanged(it)
-                        )
-                    }
-                )
-                RedCodeCheckbox(
-                    label = "Snake bite",
-                    checked = state.snakeBite,
-                    onCheckedChange = {
-                        redCodeViewModel.onEvent(
-                            RedCodeEvent.SnakeBiteChanged(it)
-                        )
-                    }
-                )
-                RedCodeCheckbox(
-                    label = "Aggressive behavior",
-                    checked = state.aggressiveBehavior,
-                    onCheckedChange = {
-                        redCodeViewModel.onEvent(
-                            RedCodeEvent.AggressiveBehaviorChanged(it)
-                        )
-                    }
-                )
-                RedCodeCheckbox(
-                    label = "Pregnancy with any of Heavy bleeding",
-                    checked = state.pregnancyHeavyBleeding,
-                    onCheckedChange = {
-                        redCodeViewModel.onEvent(
-                            RedCodeEvent.PregnancyHeavyBleedingChanged(it)
-                        )
-                    }
-                )
-                RedCodeCheckbox(
-                    label = "Severe abdominal pain",
-                    checked = state.severeAbdominalPain,
-                    onCheckedChange = {
-                        redCodeViewModel.onEvent(
-                            RedCodeEvent.SevereAbdominalPainChanged(it)
-                        )
-                    }
-                )
-                RedCodeCheckbox(
-                    label = "Seizures",
-                    checked = state.seizures,
-                    onCheckedChange = {
-                        redCodeViewModel.onEvent(
-                            RedCodeEvent.SeizuresChanged(it)
-                        )
-                    }
-                )
-                RedCodeCheckbox(
-                    label = "Altered mental status",
-                    checked = state.alteredMentalStatus,
-                    onCheckedChange = {
-                        redCodeViewModel.onEvent(
-                            RedCodeEvent.AlteredMentalStatusChanged(it)
-                        )
-                    }
-                )
-                RedCodeCheckbox(
-                    label = "Severe headache",
-                    checked = state.severeHeadache,
-                    onCheckedChange = {
-                        redCodeViewModel.onEvent(
-                            RedCodeEvent.SevereHeadacheChanged(it)
-                        )
-                    }
-                )
-                RedCodeCheckbox(
-                    label = "Visual changes",
-                    checked = state.visualChanges,
-                    onCheckedChange = {
-                        redCodeViewModel.onEvent(
-                            RedCodeEvent.VisualChangesChanged(it)
-                        )
-                    }
-                )
-                RedCodeCheckbox(
-                    label = "SBP ≥160 or DBP ≥110",
-                    checked = state.sbpHighDpbHigh,
-                    onCheckedChange = { }
-                )
-                RedCodeCheckbox(
-                    label = "Trauma",
-                    checked = state.trauma,
-                    onCheckedChange = {
-                        redCodeViewModel.onEvent(
-                            RedCodeEvent.TraumaChanged(it)
-                        )
-                    })
-                RedCodeCheckbox(
-                    label = "Active labor",
-                    checked = state.activeLabor,
-                    onCheckedChange = {
-                        redCodeViewModel.onEvent(
-                            RedCodeEvent.ActiveLaborChanged(it)
-                        )
-                    }
-                )
+            Box(
+
+            ){
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(scrollState)
+                ) {
+                    RedCodeCheckbox(
+                        label = "Unconsciousness",
+                        checked = state.unconsciousness,
+                        onCheckedChange = {
+                            redCodeViewModel.onEvent(
+                                RedCodeEvent.UnconsciousnessChanged(it)
+                            )
+                        }
+                    )
+                    RedCodeCheckbox(
+                        label = "Active convulsions",
+                        checked = state.activeConvulsions,
+                        onCheckedChange = {
+                            redCodeViewModel.onEvent(
+                                RedCodeEvent.ActiveConvulsionsChanged(it)
+                            )
+                        })
+                    RedCodeCheckbox(
+                        label = "Respiratory distress",
+                        checked = state.respiratoryDistress,
+                        onCheckedChange = {
+                            redCodeViewModel.onEvent(
+                                RedCodeEvent.RespiratoryDistressChanged(it)
+                            )
+                        })
+                    RedCodeCheckbox(
+                        label = "Heavy bleeding",
+                        checked = state.heavyBleeding,
+                        onCheckedChange = {
+                            redCodeViewModel.onEvent(
+                                RedCodeEvent.HeavyBleedingChanged(it)
+                            )
+                        }
+                    )
+                    RedCodeCheckbox(
+                        label = "High-risk trauma/burns",
+                        checked = state.highRiskTraumaBurns,
+                        onCheckedChange = {
+                            redCodeViewModel.onEvent(
+                                RedCodeEvent.HighRiskTraumaBurnsChanged(it)
+                            )
+                        }
+                    )
+                    RedCodeCheckbox(
+                        label = "Threatened limb",
+                        checked = state.threatenedLimb,
+                        onCheckedChange = {
+                            redCodeViewModel.onEvent(
+                                RedCodeEvent.ThreatenedLimbChanged(it)
+                            )
+                        }
+                    )
+                    RedCodeCheckbox(
+                        label = "Poisoning/intoxication",
+                        checked = state.poisoningIntoxication,
+                        onCheckedChange = {
+                            redCodeViewModel.onEvent(
+                                RedCodeEvent.PoisoningIntoxicationChanged(it)
+                            )
+                        }
+                    )
+                    RedCodeCheckbox(
+                        label = "Snake bite",
+                        checked = state.snakeBite,
+                        onCheckedChange = {
+                            redCodeViewModel.onEvent(
+                                RedCodeEvent.SnakeBiteChanged(it)
+                            )
+                        }
+                    )
+                    RedCodeCheckbox(
+                        label = "Aggressive behavior",
+                        checked = state.aggressiveBehavior,
+                        onCheckedChange = {
+                            redCodeViewModel.onEvent(
+                                RedCodeEvent.AggressiveBehaviorChanged(it)
+                            )
+                        }
+                    )
+                    RedCodeCheckbox(
+                        label = "Pregnancy with any of Heavy bleeding",
+                        checked = state.pregnancyHeavyBleeding,
+                        onCheckedChange = {
+                            redCodeViewModel.onEvent(
+                                RedCodeEvent.PregnancyHeavyBleedingChanged(it)
+                            )
+                        }
+                    )
+                    RedCodeCheckbox(
+                        label = "Severe abdominal pain",
+                        checked = state.severeAbdominalPain,
+                        onCheckedChange = {
+                            redCodeViewModel.onEvent(
+                                RedCodeEvent.SevereAbdominalPainChanged(it)
+                            )
+                        }
+                    )
+                    RedCodeCheckbox(
+                        label = "Seizures",
+                        checked = state.seizures,
+                        onCheckedChange = {
+                            redCodeViewModel.onEvent(
+                                RedCodeEvent.SeizuresChanged(it)
+                            )
+                        }
+                    )
+                    RedCodeCheckbox(
+                        label = "Altered mental status",
+                        checked = state.alteredMentalStatus,
+                        onCheckedChange = {
+                            redCodeViewModel.onEvent(
+                                RedCodeEvent.AlteredMentalStatusChanged(it)
+                            )
+                        }
+                    )
+                    RedCodeCheckbox(
+                        label = "Severe headache",
+                        checked = state.severeHeadache,
+                        onCheckedChange = {
+                            redCodeViewModel.onEvent(
+                                RedCodeEvent.SevereHeadacheChanged(it)
+                            )
+                        }
+                    )
+                    RedCodeCheckbox(
+                        label = "Visual changes",
+                        checked = state.visualChanges,
+                        onCheckedChange = {
+                            redCodeViewModel.onEvent(
+                                RedCodeEvent.VisualChangesChanged(it)
+                            )
+                        }
+                    )
+                    RedCodeCheckbox(
+                        label = "SBP ≥160 or DBP ≥110",
+                        checked = state.sbpHighDpbHigh,
+                        onCheckedChange = { }
+                    )
+                    RedCodeCheckbox(
+                        label = "Trauma",
+                        checked = state.trauma,
+                        onCheckedChange = {
+                            redCodeViewModel.onEvent(
+                                RedCodeEvent.TraumaChanged(it)
+                            )
+                        })
+                    RedCodeCheckbox(
+                        label = "Active labor",
+                        checked = state.activeLabor,
+                        onCheckedChange = {
+                            redCodeViewModel.onEvent(
+                                RedCodeEvent.ActiveLaborChanged(it)
+                            )
+                        }
+                    )
+                    Spacer(Modifier.height(48.dp))
+                }
+
+                FadeOverlay(Modifier.align(Alignment.BottomCenter))
             }
         }
 

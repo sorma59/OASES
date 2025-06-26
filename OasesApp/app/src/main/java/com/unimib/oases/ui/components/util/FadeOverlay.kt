@@ -16,7 +16,7 @@ fun FadeOverlay(modifier: Modifier){
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(48.dp)
+            .height(64.dp)
             .background(
                 Brush.verticalGradient(
                     colors = listOf(

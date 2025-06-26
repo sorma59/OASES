@@ -31,6 +31,12 @@ fun PatientItem(
     hideBluetoothButton: Boolean = false,
     onClick: (Patient) -> Unit = {}
 ){
+    val age =
+        if (patient.ageInMonths < 12)
+            patient.ageInMonths.toString() + " months old"
+        else
+            (patient.ageInMonths / 12).toString()
+
     Card(
         onClick = {onClick(patient)},
         shape = RoundedCornerShape(20.dp),
@@ -46,10 +52,26 @@ fun PatientItem(
             verticalAlignment = Alignment.CenterVertically
         ){
             Column(
-                modifier = Modifier.padding(horizontal = 8.dp)
+                modifier = Modifier.padding(horizontal = 8.dp),
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
-                TitleText(patient.name, color = MaterialTheme.colorScheme.onPrimary)
-                Text(patient.ageInMonths.toString() + ", " + patient.sex, color = MaterialTheme.colorScheme.onPrimary)
+
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ){
+                    TitleText(patient.name + ", " + age, color = MaterialTheme.colorScheme.onPrimary)
+                }
+
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ){
+                    Text(patient.publicId, color = MaterialTheme.colorScheme.onPrimary)
+                    Text(patient.status, color = MaterialTheme.colorScheme.onPrimary)
+                }
             }
 
             if (!hideBluetoothButton)

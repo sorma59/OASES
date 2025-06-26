@@ -1,6 +1,7 @@
 package com.unimib.oases.ui.screen.patient_registration.past_medical_history
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -25,6 +26,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.unimib.oases.ui.components.form.DateSelector
 import com.unimib.oases.ui.components.util.AnimatedLabelOutlinedTextField
 import com.unimib.oases.ui.components.util.BottomButtons
+import com.unimib.oases.ui.components.util.FadeOverlay
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 
 @Composable
@@ -43,34 +45,35 @@ fun PastHistoryScreen(
         verticalArrangement = Arrangement.Bottom
     ){
 
-        if (state.error != null){
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .weight(1f)
-            ){
-                Text(text = state.error!!)
-
-                Button(
-                    onClick = {
-                        pastHistoryViewModel.onEvent(PastHistoryEvent.Retry)
-                    }
+        Box(
+            modifier = Modifier.weight(1f)
+        ){
+            if (state.error != null) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxSize()
                 ) {
-                    Text("Retry")
-                }
-            }
-        }
-        else if (state.isLoading){
-            CustomCircularProgressIndicator()
-        }
-        else {
+                    Text(text = state.error!!)
 
-            ChronicConditionsCheckboxes(
-                pastHistoryViewModel,
-                modifier = Modifier.weight(1f)
-            )
+                    Button(
+                        onClick = {
+                            pastHistoryViewModel.onEvent(PastHistoryEvent.Retry)
+                        }
+                    ) {
+                        Text("Retry")
+                    }
+                }
+            } else if (state.isLoading) {
+                CustomCircularProgressIndicator()
+            } else {
+
+                ChronicConditionsCheckboxes(
+                    pastHistoryViewModel,
+                )
+            }
+
+            FadeOverlay(Modifier.align(Alignment.BottomCenter))
         }
 
         BottomButtons(
