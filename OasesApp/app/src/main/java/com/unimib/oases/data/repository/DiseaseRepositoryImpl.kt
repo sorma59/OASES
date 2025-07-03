@@ -4,17 +4,11 @@ import android.util.Log
 import com.unimib.oases.data.local.RoomDataSource
 import com.unimib.oases.data.mapper.toDisease
 import com.unimib.oases.data.mapper.toEntity
-import com.unimib.oases.data.util.FirestoreManager
-import com.unimib.oases.di.ApplicationScope
-import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.model.Disease
 import com.unimib.oases.domain.repository.DiseaseRepository
 import com.unimib.oases.util.Resource
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
@@ -25,12 +19,6 @@ import javax.inject.Inject
 class DiseaseRepositoryImpl @Inject constructor(
     private val roomDataSource: RoomDataSource,
 ): DiseaseRepository {
-
-
-
-
-
-
 
     override suspend fun addDisease(disease: Disease): Resource<Unit> {
 
@@ -54,6 +42,13 @@ class DiseaseRepositoryImpl @Inject constructor(
             Resource.Success(Unit)
         } catch (e: Exception) {
             Resource.Error(e.message ?: "Unknown error")
+        }
+    }
+
+    override fun getFilteredDiseases(sex: String, age: String): Flow<Resource<List<Disease>>> = flow {
+        emit(Resource.Loading())
+        roomDataSource.getFilteredDiseases(sex, age).collect {
+            emit(Resource.Success(it.map { entity -> entity.toDisease() }))
         }
     }
 

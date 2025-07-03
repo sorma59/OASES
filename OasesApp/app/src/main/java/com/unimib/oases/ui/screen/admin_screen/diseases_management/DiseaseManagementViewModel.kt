@@ -74,6 +74,21 @@ class DiseaseManagementViewModel @Inject constructor(
                 )
             }
 
+            is DiseaseManagementEvent.EnteredSexSpecificity -> {
+                _state.value = _state.value.copy(
+                    disease = _state.value.disease.copy(
+                        sexSpecificity = event.value
+                    )
+                )
+            }
+
+            is DiseaseManagementEvent.EnteredAgeSpecificity -> {
+                _state.value = _state.value.copy(
+                    disease = _state.value.disease.copy(
+                        ageSpecificity = event.value
+                    )
+                )
+            }
 
             DiseaseManagementEvent.UndoDelete -> {
                 viewModelScope.launch(dispatcher + errorHandler) {
@@ -94,7 +109,9 @@ class DiseaseManagementViewModel @Inject constructor(
 
                         _state.value = _state.value.copy(isLoading = false,
                             disease = state.value.disease.copy(
-                                name = ""
+                                name = "",
+                                sexSpecificity = "",
+                                ageSpecificity = ""
                             ))
                         // _eventFlow.emit(UiEvent.SaveUser) // I emit it into the screen then
                         // in the screen we handle it and we go back to the list
@@ -105,7 +122,7 @@ class DiseaseManagementViewModel @Inject constructor(
                         )
                         _eventFlow.emit(
                             UiEvent.showSnackbar(
-                                message = e.message ?: "ERROR"
+                                message = "Error adding disease " + e.message
                             )
                         )
                     }

@@ -2,14 +2,8 @@ package com.unimib.oases.di
 
 import android.content.Context
 import androidx.room.Room
-import com.google.firebase.firestore.FirebaseFirestore
 import com.unimib.oases.data.local.db.AuthDatabase
 import com.unimib.oases.data.local.db.OasesDatabase
-import com.unimib.oases.data.remote.FirebaseFirestoreSource
-import com.unimib.oases.data.remote.FirebaseFirestoreSourceImpl
-import com.unimib.oases.data.util.FirestoreManager
-import com.unimib.oases.data.util.FirestoreManagerInterface
-import com.unimib.oases.domain.repository.PatientRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

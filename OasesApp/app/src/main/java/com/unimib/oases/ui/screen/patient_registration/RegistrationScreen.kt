@@ -54,6 +54,7 @@ fun RegistrationScreen(
 ) {
 
     val registrationScreenViewModel: RegistrationScreenViewModel = hiltViewModel()
+    val pastHistoryState = registrationScreenViewModel.state.collectAsState().value.pastHistoryState
 
     val state by registrationScreenViewModel.state.collectAsState()
 
@@ -158,10 +159,9 @@ fun RegistrationScreen(
                     )
                     Tabs.History.title -> VisitHistoryScreen(state.patientInfoState.patient.id)
                     Tabs.PastMedicalHistory.title -> PastHistoryScreen(
-                        onSubmitted = { pastHistory ->
-                            registrationScreenViewModel.onEvent(RegistrationEvent.PastMedicalHistoryNext(pastHistory))
-                            currentIndex++
-                        },
+                        state = pastHistoryState,
+                        onEvent = registrationScreenViewModel::onPastHistoryEvent,
+                        onSubmitted = { currentIndex++ },
                         onBack = { currentIndex-- }
                     )
                     Tabs.VitalSigns.title -> VitalSignsScreen(

@@ -19,6 +19,9 @@ interface DiseaseDao {
     @Query("SELECT * FROM " + TableNames.DISEASE + " WHERE name = :disease")
     fun getDisease(disease: String): Flow<DiseaseEntity?>
 
+    @Query("SELECT * FROM " + TableNames.DISEASE + " WHERE (sex_specificity = :sex OR sex_specificity = 'ALL') AND (age_specificity = 'ALL' OR age_specificity = :age)")
+    fun getFilteredDiseases(sex: String, age: String): Flow<List<DiseaseEntity>>
+
     @Query("SELECT * FROM " + TableNames.DISEASE)
     fun getAllDiseases(): Flow<List<DiseaseEntity>>
 }

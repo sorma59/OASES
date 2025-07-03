@@ -1,13 +1,9 @@
 package com.unimib.oases.di
 
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.firestore
 import com.unimib.oases.data.remote.FirebaseFirestoreSource
 import com.unimib.oases.data.remote.FirebaseFirestoreSourceImpl
 import com.unimib.oases.data.util.FirestoreManager
 import com.unimib.oases.data.util.FirestoreManagerInterface
-import com.unimib.oases.domain.repository.PatientRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

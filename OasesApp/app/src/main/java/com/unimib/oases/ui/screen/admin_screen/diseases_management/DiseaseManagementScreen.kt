@@ -43,7 +43,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.unimib.oases.domain.model.AgeSpecificity
 import com.unimib.oases.domain.model.Disease
+import com.unimib.oases.domain.model.SexSpecificity
+import com.unimib.oases.ui.components.util.OutlinedDropdown
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 import com.unimib.oases.ui.navigation.Screen
 import kotlinx.coroutines.launch
@@ -141,6 +144,22 @@ fun DiseaseManagementScreen(
                 onValueChange = { diseaseManagementViewModel.onEvent(DiseaseManagementEvent.EnteredDiseaseName(it)) },
                 label = { Text("Disease") },
                 singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            OutlinedDropdown(
+                selected = state.disease.sexSpecificity,
+                onSelected = { diseaseManagementViewModel.onEvent(DiseaseManagementEvent.EnteredSexSpecificity(it)) },
+                options = SexSpecificity.entries.map {it.displayName},
+                labelText = "Sex specificity",
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            OutlinedDropdown(
+                selected = state.disease.ageSpecificity,
+                onSelected = { diseaseManagementViewModel.onEvent(DiseaseManagementEvent.EnteredAgeSpecificity(it)) },
+                options = AgeSpecificity.entries.map {it.displayName},
+                labelText = "Age specificity",
                 modifier = Modifier.fillMaxWidth()
             )
 

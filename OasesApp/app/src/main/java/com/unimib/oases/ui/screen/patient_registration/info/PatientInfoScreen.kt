@@ -15,10 +15,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -39,6 +35,7 @@ import com.unimib.oases.ui.components.form.AgeInputField
 import com.unimib.oases.ui.components.form.DateSelector
 import com.unimib.oases.ui.components.util.AnimatedLabelOutlinedTextField
 import com.unimib.oases.ui.components.util.FadeOverlay
+import com.unimib.oases.ui.components.util.OutlinedDropdown
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -69,6 +66,7 @@ fun PatientInfoScreen(
     val contact = state.patient.contact
     val nameError = state.nameError
     val birthDateError = state.birthDateError
+    val sexError = state.sexError
     val isLoading = state.isLoading
     val edited =state.edited
 
@@ -180,11 +178,20 @@ fun PatientInfoScreen(
                         onAgeChange = onAgeChange
                     )
 
-                    SexDropdown(
-                        selectedSex = sex,
-                        onSexSelected = onSexChange,
-                        modifier = Modifier.fillMaxWidth()
+                    OutlinedDropdown(
+                        selected = sex,
+                        onSelected = onSexChange,
+                        options = Sex.entries.map { it.displayName },
+                        labelText = "Sex",
+                        modifier = Modifier.fillMaxWidth(),
+                        isError = sexError != null
                     )
+
+                    if (sexError != null)
+                        Text(
+                            text = sexError,
+                            color = MaterialTheme.colorScheme.error
+                        )
 
                     AnimatedLabelOutlinedTextField(
                         value = village,
@@ -278,51 +285,6 @@ fun PatientInfoScreen(
     }
 }
 
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun SexDropdown(
-    selectedSex: String,
-    onSexSelected: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var expanded by remember { mutableStateOf(false) }
-    val sexOptions = Sex.entries
-
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = !expanded },
-        modifier = modifier
-    ) {
-        AnimatedLabelOutlinedTextField(
-            value = selectedSex,
-            onValueChange = { },
-            labelText = "Sex",
-            modifier = Modifier.fillMaxWidth(),
-            readOnly = true,
-            trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-            },
-            anchorModifier = Modifier.menuAnchor()
-        )
-
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            sexOptions.forEach { option ->
-                DropdownMenuItem(
-                    text = { Text(text = option.displayName) },
-                    onClick = {
-                        onSexSelected(option.displayName)
-                        expanded = false
-                    }
-                )
-            }
-        }
-    }
-}
-
 @SuppressLint("DefaultLocale")
 @Composable
 fun CurrentTimeDisplay(
@@ -352,7 +314,23 @@ fun CurrentTimeDisplay(
 }
 
 enum class Sex(val displayName: String) {
-    Male("Male"),
-    Female("Female"),
-    Unspecified("Unspecified")
+    MALE("Male"),
+    FEMALE("Female"),
+    UNSPECIFIED("Unspecified");
+
+    // Optional: Function to get enum from display name (useful for UI)
+    companion object {
+        fun fromDisplayName(displayName: String): Sex {
+            return entries.find { it.displayName == displayName } ?: UNSPECIFIED
+        }
+
+        // Optional: Function to get enum from stored name (robust)
+        fun fromStoredName(storedName: String): Sex? {
+            return try {
+                valueOf(storedName)
+            } catch (e: IllegalArgumentException) {
+                null // Handle cases where the stored name might be invalid
+            }
+        }
+    }
 }

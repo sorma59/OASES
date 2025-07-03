@@ -5,7 +5,9 @@ import com.unimib.oases.domain.model.Disease
 
 data class DiseaseManagementState(
     val disease: Disease = Disease(
-        name = ""
+        name = "",
+        sexSpecificity = "",
+        ageSpecificity = ""
     ),
     val diseases: List<Disease> = emptyList(),
     val isLoading: Boolean = false,

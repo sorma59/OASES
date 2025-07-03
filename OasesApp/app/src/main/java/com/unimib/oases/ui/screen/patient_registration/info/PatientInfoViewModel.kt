@@ -118,7 +118,7 @@ class PatientInfoViewModel @Inject constructor(
                     _state.value = _state.value.copy(patient = _state.value.patient.copy(birthDate = newBirthDate))
             }
             is PatientInfoEvent.SexChanged -> {
-                _state.value = _state.value.copy(patient = _state.value.patient.copy(sex = event.sex), edited = true)
+                _state.value = _state.value.copy(patient = _state.value.patient.copy(sex = event.sex),sexError = null, edited = true)
             }
             is PatientInfoEvent.VillageChanged -> {
                 _state.value = _state.value.copy(patient = _state.value.patient.copy(village = event.village), edited = true)
@@ -167,13 +167,15 @@ class PatientInfoViewModel @Inject constructor(
             // Validate
             val result = validatePatientInfoFormUseCase.invoke(
                 name = _state.value.patient.name,
-                birthDate = _state.value.patient.birthDate
+                birthDate = _state.value.patient.birthDate,
+                sex = _state.value.patient.sex
             )
 
             // Update state with errors
             _state.value = _state.value.copy(
                 nameError = result.nameErrorMessage,
-                birthDateError = result.birthDateErrorMessage
+                birthDateError = result.birthDateErrorMessage,
+                sexError = result.sexErrorMessage
             )
 
             // If there are errors, stop here

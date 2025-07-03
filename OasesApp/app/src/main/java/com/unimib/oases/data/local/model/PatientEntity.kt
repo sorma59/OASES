@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.unimib.oases.data.local.TableNames
+import com.unimib.oases.ui.screen.patient_registration.info.Sex
 
 @Entity(tableName = TableNames.PATIENT)
 data class PatientEntity (
@@ -11,7 +12,7 @@ data class PatientEntity (
     @ColumnInfo(name = "public_id") var publicId: String,
     @ColumnInfo(name = "name") var name: String,
     @ColumnInfo(name = "birth_date") var birthDate: String,
-    @ColumnInfo(name = "sex") var sex: String,
+    @ColumnInfo(name = "sex") var sex: Sex,
     @ColumnInfo(name = "village") var village: String,
     @ColumnInfo(name = "parish") var parish: String,
     @ColumnInfo(name = "sub_county") var subCounty: String,

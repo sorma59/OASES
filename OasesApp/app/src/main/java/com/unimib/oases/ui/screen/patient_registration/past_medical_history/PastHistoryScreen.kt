@@ -16,13 +16,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.unimib.oases.ui.components.form.DateSelector
 import com.unimib.oases.ui.components.util.AnimatedLabelOutlinedTextField
 import com.unimib.oases.ui.components.util.BottomButtons
@@ -31,13 +28,15 @@ import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircu
 
 @Composable
 fun PastHistoryScreen(
-    onSubmitted: (PastHistoryState) -> Unit,
-    onBack: () -> Unit
+    state: PastHistoryState,
+    onEvent: (PastHistoryEvent) -> Unit,
+    onSubmitted: () -> Unit,
+    onBack: () -> Unit,
 ) {
 
-    val pastHistoryViewModel: PastHistoryViewModel = hiltViewModel()
-
-    val state by pastHistoryViewModel.state.collectAsState()
+//    val pastHistoryViewModel: PastHistoryViewModel = hiltViewModel()
+//
+//    val state by pastHistoryViewModel.state.collectAsState()
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -58,7 +57,7 @@ fun PastHistoryScreen(
 
                     Button(
                         onClick = {
-                            pastHistoryViewModel.onEvent(PastHistoryEvent.Retry)
+                            onEvent(PastHistoryEvent.Retry)
                         }
                     ) {
                         Text("Retry")
@@ -69,7 +68,8 @@ fun PastHistoryScreen(
             } else {
 
                 ChronicConditionsCheckboxes(
-                    pastHistoryViewModel,
+                    state = state,
+                    onEvent = onEvent
                 )
             }
 
@@ -78,7 +78,7 @@ fun PastHistoryScreen(
 
         BottomButtons(
             onCancel = { onBack() },
-            onConfirm = { onSubmitted(state) },
+            onConfirm = { onSubmitted() },
             cancelButtonText = "Back",
             confirmButtonText = "Next"
         )
@@ -148,11 +148,10 @@ fun CheckboxInputWithDateAndText(
 
 @Composable
 fun ChronicConditionsCheckboxes(
-    pastHistoryViewModel: PastHistoryViewModel,
+    state: PastHistoryState,
+    onEvent: (PastHistoryEvent) -> Unit,
     modifier: Modifier = Modifier
 ){
-
-    val state by pastHistoryViewModel.state.collectAsState()
 
     val scrollState = rememberScrollState()
 
@@ -168,11 +167,11 @@ fun ChronicConditionsCheckboxes(
             CheckboxInputWithDateAndText(
                 label = disease.disease,
                 checked = disease.isChecked,
-                onCheckedChange = { pastHistoryViewModel.onEvent(PastHistoryEvent.CheckChanged(disease.disease)) },
+                onCheckedChange = { onEvent(PastHistoryEvent.CheckChanged(disease.disease)) },
                 date = disease.date,
-                onDateChange = { pastHistoryViewModel.onEvent(PastHistoryEvent.DateChanged(disease.disease, it)) },
+                onDateChange = { onEvent(PastHistoryEvent.DateChanged(disease.disease, it)) },
                 additionalInfo = disease.additionalInfo,
-                onAdditionalInfoChange = { pastHistoryViewModel.onEvent(PastHistoryEvent.AdditionalInfoChanged(disease.disease, it)) }
+                onAdditionalInfoChange = { onEvent(PastHistoryEvent.AdditionalInfoChanged(disease.disease, it)) }
             )
         }
 

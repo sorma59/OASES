@@ -98,6 +98,10 @@ class RoomDataSource @Inject constructor(
         diseaseDao.insert(disease)
     }
 
+    fun getFilteredDiseases(sex: String, age: String): Flow<List<DiseaseEntity>> {
+        return diseaseDao.getFilteredDiseases(sex, age)
+    }
+
     fun getAllDiseases(): Flow<List<DiseaseEntity>> {
         return diseaseDao.getAllDiseases()
     }

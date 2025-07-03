@@ -8,7 +8,7 @@ data class PatientInfoState(
         name = "",
         birthDate = "",
         ageInMonths = 0 * 12,
-        sex = Sex.Unspecified.displayName,
+        sex = Sex.UNSPECIFIED.displayName,
         village = "",
         parish = "",
         subCounty = "",
@@ -21,6 +21,7 @@ data class PatientInfoState(
     val isLoading: Boolean = true,
     val nameError: String?= null,
     val birthDateError: String?= null,
+    val sexError: String?= null,
     val edited: Boolean = false,
     val error: String?= null,
 )
