@@ -37,5 +37,4 @@ abstract class OasesDatabase : RoomDatabase() {
     abstract fun visitDao(): VisitDao
     abstract fun visitVitalSignDao(): VisitVitalSignDao
     abstract fun vitalSignDao(): VitalSignsDao
-    // ... other DAOs
 }

@@ -5,9 +5,9 @@ import android.util.Log
 import com.unimib.oases.data.bluetooth.BluetoothCustomManager
 import com.unimib.oases.data.bluetooth.BluetoothEnvelope
 import com.unimib.oases.data.bluetooth.BluetoothEnvelopeType
+import com.unimib.oases.data.bluetooth.transfer.PatientFullData
 import com.unimib.oases.data.mapper.serializer.PatientFullDataSerializer
 import com.unimib.oases.data.mapper.serializer.PatientSerializer.serialize
-import com.unimib.oases.data.transfer.PatientFullData
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.domain.model.PatientDisease
 import com.unimib.oases.domain.model.VisitVitalSign

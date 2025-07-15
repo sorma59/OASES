@@ -167,24 +167,22 @@ class BluetoothServerService () : Service() {
 
         if (isBluetoothSupported()){
             try {
-                if (isBluetoothSupported() && isBluetoothEnabled()) {
+                if (isBluetoothEnabled()) {
                     serverSocket = bluetoothAdapter?.listenUsingRfcommWithServiceRecord(appName, appUuid)
                     isServerRunning = true
-                    Log.d("BluetoothServer", "Server started, waiting for client...")
-                    delay(1000)
+                    // Server started, waiting for client...
                     val socket = acceptClientConnection()
 
                     if (socket != null) {
-                        listenForData(socket) // Pass the new socket explicitly
+                        listenForData(socket)
                     }
-
                 }
             } catch (e: SecurityException) {
                 Log.e("BluetoothServer", "Permission denied: ${e.message}")
             } catch (e: IOException) {
                 Log.e("BluetoothServer", "Server socket error: ${e.message}")
             } finally {
-                serverSocket?.close() // Always close server socket after accepting
+                serverSocket?.close() // Always close server socket after accepting: one connection at a time
             }
         }
     }

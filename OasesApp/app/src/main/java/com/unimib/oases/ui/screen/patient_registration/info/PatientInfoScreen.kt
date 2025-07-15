@@ -210,7 +210,7 @@ fun PatientInfoScreen(
                     AnimatedLabelOutlinedTextField(
                         value = subCounty,
                         onValueChange = onSubCountyChange,
-                        labelText = "Sub County",
+                        labelText = "Sub-County",
                         modifier = Modifier.fillMaxWidth()
                     )
 
@@ -224,7 +224,7 @@ fun PatientInfoScreen(
                     AnimatedLabelOutlinedTextField(
                         value = nextOfKin,
                         onValueChange = onNextOfKinChange,
-                        labelText = "Next of Kin",
+                        labelText = "Next-of-Kin",
                         modifier = Modifier.fillMaxWidth()
                     )
 

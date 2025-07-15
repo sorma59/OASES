@@ -11,8 +11,6 @@ class FirebaseFirestoreSourceImpl @Inject constructor(
 ) :
     FirebaseFirestoreSource {
 
-
-
     private
     companion object {
         private const val PATIENTS_COLLECTION = "patients"

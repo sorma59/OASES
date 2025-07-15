@@ -1,8 +1,8 @@
 package com.unimib.oases.data.mapper.serializer
 
+import com.unimib.oases.data.bluetooth.transfer.PatientFullData
 import com.unimib.oases.data.mapper.serializer.PatientDiseaseSerializer.serialize
 import com.unimib.oases.data.mapper.serializer.VisitVitalSignSerializer.serialize
-import com.unimib.oases.data.transfer.PatientFullData
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 

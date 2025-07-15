@@ -1,7 +1,7 @@
 package com.unimib.oases.domain.usecase
 
 import android.util.Log
-import com.unimib.oases.data.transfer.PatientFullData
+import com.unimib.oases.data.bluetooth.transfer.PatientFullData
 import com.unimib.oases.domain.repository.PatientDiseaseRepository
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.domain.repository.VisitRepository

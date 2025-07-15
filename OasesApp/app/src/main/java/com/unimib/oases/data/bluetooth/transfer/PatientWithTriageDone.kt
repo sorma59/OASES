@@ -1,4 +1,4 @@
-package com.unimib.oases.data.transfer
+package com.unimib.oases.data.bluetooth.transfer
 
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.domain.model.PatientDisease

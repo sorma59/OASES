@@ -19,7 +19,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.core.content.ContextCompat
 import com.unimib.oases.OasesApp
 import com.unimib.oases.R
-import com.unimib.oases.data.transfer.PatientFullData
+import com.unimib.oases.data.bluetooth.transfer.PatientFullData
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.domain.usecase.HandleReceivedPatientUseCase
 import com.unimib.oases.domain.usecase.HandleReceivedPatientWithTriageDataUseCase
