@@ -24,6 +24,7 @@ import androidx.navigation.NavController
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.ui.components.util.TitleText
 import com.unimib.oases.ui.navigation.Screen
+import com.unimib.oases.util.StringFormatHelper.getAgeWithSuffix
 
 @Composable
 fun PatientItem(
@@ -33,11 +34,7 @@ fun PatientItem(
     hideBluetoothButton: Boolean = false,
     onClick: (Patient) -> Unit = {}
 ){
-    val age =
-        if (patient.ageInMonths < 12)
-            patient.ageInMonths.toString() + " months old"
-        else
-            (patient.ageInMonths / 12).toString()
+    val ageString = getAgeWithSuffix(patient.ageInMonths)
 
     Card(
         onClick = {onClick(patient)},
@@ -67,7 +64,7 @@ fun PatientItem(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()
                 ){
-                    TitleText(patient.name + ", " + age, color = MaterialTheme.colorScheme.onPrimary)
+                    TitleText(patient.name + ", " + ageString, color = MaterialTheme.colorScheme.onPrimary)
                 }
 
                 Row(

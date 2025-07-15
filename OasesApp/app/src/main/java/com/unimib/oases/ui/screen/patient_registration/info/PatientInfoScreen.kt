@@ -1,6 +1,5 @@
 package com.unimib.oases.ui.screen.patient_registration.info
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,11 +10,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -37,10 +33,6 @@ import com.unimib.oases.ui.components.util.AnimatedLabelOutlinedTextField
 import com.unimib.oases.ui.components.util.FadeOverlay
 import com.unimib.oases.ui.components.util.OutlinedDropdown
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
-import java.util.TimeZone
 
 @Composable
 fun PatientInfoScreen(
@@ -52,23 +44,6 @@ fun PatientInfoScreen(
     val state by patientInfoViewModel.state.collectAsState()
 
     var showAlertDialog by remember { mutableStateOf(false) }
-
-    // Destructuring state
-    val name = state.patient.name
-    val birthDate = state.patient.birthDate
-    val ageInMonths = state.patient.ageInMonths
-    val sex = state.patient.sex
-    val village = state.patient.village
-    val parish = state.patient.parish
-    val subCounty = state.patient.subCounty
-    val district = state.patient.district
-    val nextOfKin = state.patient.nextOfKin
-    val contact = state.patient.contact
-    val nameError = state.nameError
-    val birthDateError = state.birthDateError
-    val sexError = state.sexError
-    val isLoading = state.isLoading
-    val edited =state.edited
 
     // --- Remembered Lambdas --- to avoid recomposition,
     val onNameChange = remember<(String) -> Unit> {
@@ -114,13 +89,14 @@ fun PatientInfoScreen(
 
     val context = LocalContext.current
 
-
-
     LaunchedEffect(key1 = context) {
         patientInfoViewModel.validationEvents.collect { event ->
             when (event) {
                 is PatientInfoViewModel.ValidationEvent.ValidationSuccess -> {
-                    showAlertDialog = true
+                    if (state.edited)
+                        showAlertDialog = true
+                    else
+                        onSubmitted(state)
                 }
 
                 is PatientInfoViewModel.ValidationEvent.SubmissionSuccess -> {
@@ -132,7 +108,7 @@ fun PatientInfoScreen(
 
     val scrollState = rememberScrollState()
 
-    if (isLoading)
+    if (state.isLoading)
         CustomCircularProgressIndicator()
     else {
         Column {
@@ -146,90 +122,90 @@ fun PatientInfoScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     AnimatedLabelOutlinedTextField(
-                        value = name,
+                        value = state.patient.name,
                         onValueChange = onNameChange,
                         labelText = "Name",
-                        isError = nameError != null,
+                        isError = state.nameError != null,
                         modifier = Modifier.fillMaxWidth()
                     )
 
-                    if (nameError != null)
+                    if (state.nameError != null)
                         Text(
-                            text = nameError,
+                            text = state.nameError!!,
                             color = MaterialTheme.colorScheme.error
                         )
 
                     DateSelector(
-                        selectedDate = birthDate,
+                        selectedDate = state.patient.birthDate,
                         onDateSelected = onBirthDateChange,
                         context = context,
                         labelText = "Date of Birth",
-                        isError = birthDateError != null
+                        isError = state.birthDateError != null
                     )
 
-                    if (birthDateError != null)
+                    if (state.birthDateError != null)
                         Text(
-                            text = birthDateError,
+                            text = state.birthDateError!!,
                             color = MaterialTheme.colorScheme.error
                         )
 
                     AgeInputField(
-                        ageInMonths = ageInMonths,
+                        ageInMonths = state.patient.ageInMonths,
                         onAgeChange = onAgeChange
                     )
 
                     OutlinedDropdown(
-                        selected = sex,
+                        selected = state.patient.sex,
                         onSelected = onSexChange,
                         options = Sex.entries.map { it.displayName },
                         labelText = "Sex",
                         modifier = Modifier.fillMaxWidth(),
-                        isError = sexError != null
+                        isError = state.sexError != null
                     )
 
-                    if (sexError != null)
+                    if (state.sexError != null)
                         Text(
-                            text = sexError,
+                            text = state.sexError!!,
                             color = MaterialTheme.colorScheme.error
                         )
 
                     AnimatedLabelOutlinedTextField(
-                        value = village,
+                        value = state.patient.village,
                         onValueChange = onVillageChange,
                         labelText = "Village",
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     AnimatedLabelOutlinedTextField(
-                        value = parish,
+                        value = state.patient.parish,
                         onValueChange = onParishChange,
                         labelText = "Parish",
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     AnimatedLabelOutlinedTextField(
-                        value = subCounty,
+                        value = state.patient.subCounty,
                         onValueChange = onSubCountyChange,
                         labelText = "Sub-County",
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     AnimatedLabelOutlinedTextField(
-                        value = district,
+                        value = state.patient.district,
                         onValueChange = onDistrictChange,
                         labelText = "District",
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     AnimatedLabelOutlinedTextField(
-                        value = nextOfKin,
+                        value = state.patient.nextOfKin,
                         onValueChange = onNextOfKinChange,
                         labelText = "Next-of-Kin",
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     AnimatedLabelOutlinedTextField(
-                        value = contact,
+                        value = state.patient.contact,
                         onValueChange = onContactChange,
                         labelText = "Contact",
                         modifier = Modifier.fillMaxWidth()
@@ -248,7 +224,7 @@ fun PatientInfoScreen(
                 Button(
                     onClick = onValidateForm
                 ) {
-                    Text(if (edited) "Submit" else "Next")
+                    Text(if (state.edited) "Submit" else "Next")
                 }
             }
         }
@@ -285,46 +261,18 @@ fun PatientInfoScreen(
     }
 }
 
-@SuppressLint("DefaultLocale")
-@Composable
-fun CurrentTimeDisplay(
-    onTimeChanged: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var time by remember { mutableStateOf("") }
-    val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-        .apply { timeZone = TimeZone.getTimeZone("Europe/Rome") }
-
-    LaunchedEffect(key1 = Unit) {
-        val calendar = Calendar.getInstance(TimeZone.getTimeZone("Europe/Rome"))
-        time = timeFormat.format(calendar.time)
-        onTimeChanged(time)
-    }
-
-    AnimatedLabelOutlinedTextField(
-        value = time,
-        onValueChange = { },
-        labelText = "Time",
-        modifier = modifier,
-        readOnly = true,
-        trailingIcon = {
-            Icon(Icons.Filled.Timer, contentDescription = "Current time")
-        }
-    )
-}
-
 enum class Sex(val displayName: String) {
     MALE("Male"),
     FEMALE("Female"),
     UNSPECIFIED("Unspecified");
 
-    // Optional: Function to get enum from display name (useful for UI)
     companion object {
+        // Function to get enum from display name (useful for UI)
         fun fromDisplayName(displayName: String): Sex {
             return entries.find { it.displayName == displayName } ?: UNSPECIFIED
         }
 
-        // Optional: Function to get enum from stored name (robust)
+        // Function to get enum from stored name (robust)
         fun fromStoredName(storedName: String): Sex? {
             return try {
                 valueOf(storedName)

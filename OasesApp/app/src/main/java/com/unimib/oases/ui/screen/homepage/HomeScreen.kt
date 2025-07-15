@@ -234,7 +234,7 @@ fun HomeScreen(
                                 contentPadding = PaddingValues(0.dp),
 
                                 onClick = {
-                                    authViewModel.signout()
+                                    authViewModel.signOut()
                                 },
 
                                 ) {

@@ -107,7 +107,7 @@ class NonRedCodeViewModel @Inject constructor(): ViewModel(){
         }
     }
 
-    fun updateVitalSignsAndAge(ageInt: Int, spo2: String, rr: String, hr: String, sbp: String, temp: String){
+    fun updateVitalSignsAndAge(ageInMonths: Int, spo2: String, rr: String, hr: String, sbp: String, temp: String){
         val spo2Int = spo2.toDoubleOrNull() ?: EMPTY_FIELD
         val rrInt = rr.toDoubleOrNull() ?: EMPTY_FIELD
         val hrInt = hr.toDoubleOrNull() ?: EMPTY_FIELD
@@ -115,7 +115,7 @@ class NonRedCodeViewModel @Inject constructor(): ViewModel(){
         val tempDouble = temp.toDoubleOrNull() ?: EMPTY_FIELD
 
         _state.value = _state.value.copy(
-            ageOver80Years = ageInt >= 80,
+            ageOver80Years = (ageInMonths / 12) >= 80,
             alteredVitalSignsSpo2 = if (spo2Int != EMPTY_FIELD) spo2Int < 92 else state.value.alteredVitalSignsSpo2,
             alteredVitalSignsRrLow = if (rrInt != EMPTY_FIELD) rrInt < 10 else state.value.alteredVitalSignsRrLow,
             alteredVitalSignsRrHigh = if (rrInt != EMPTY_FIELD) rrInt > 30 else state.value.alteredVitalSignsRrHigh,

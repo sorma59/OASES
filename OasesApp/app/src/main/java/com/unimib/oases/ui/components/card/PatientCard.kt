@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.unimib.oases.domain.model.Patient
+import com.unimib.oases.util.StringFormatHelper.getAgeWithSuffix
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -70,13 +71,10 @@ fun PatientCard(
         }
     }
 
-    val age =
-        if (patient.ageInMonths < 12)
-            patient.ageInMonths.toString() + " months old"
-        else
-            (patient.ageInMonths / 12).toString()
+    val ageString = getAgeWithSuffix(ageInMonths = patient.ageInMonths)
 
     Box(
+
 
         modifier = modifier
             .fillMaxWidth()
@@ -143,7 +141,7 @@ fun PatientCard(
                     .padding(horizontal = 10.dp, vertical = 10.dp)
             ) {
                 Text(
-                    text = patient.name + ", " + age,
+                    text = patient.name + ", " + ageString,
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.surface,
                     fontWeight = FontWeight.Bold,

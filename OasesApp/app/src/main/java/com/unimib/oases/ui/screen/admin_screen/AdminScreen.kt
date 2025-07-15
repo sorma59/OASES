@@ -91,7 +91,7 @@ fun AdminScreen(
             ),
             navigationIcon = {
                 IconButton(onClick = {
-                    authViewModel.signout()
+                    authViewModel.signOut()
                 }) {
                     Icon(
                         imageVector = Icons.Filled.ArrowBackIosNew,

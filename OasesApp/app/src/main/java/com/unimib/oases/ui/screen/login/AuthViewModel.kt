@@ -36,9 +36,6 @@ class AuthViewModel @Inject constructor(
     }
 
 
-
-
-
     private fun checkAuthStatus() {
 
         if (auth.currentUser == null) {
@@ -50,7 +47,7 @@ class AuthViewModel @Inject constructor(
 
 
 
-    fun signout() {
+    fun signOut() {
         _authState.value = AuthState.Unauthenticated
         auth.logout()
     }

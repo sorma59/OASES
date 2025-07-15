@@ -36,7 +36,7 @@ import com.unimib.oases.ui.components.util.TitleText
 @Composable
 fun NonRedCodeScreen(
     onYellowCodeSelected: (Boolean) -> Unit,
-    ageInt: Int,
+    ageInMonths: Int,
     spo2Value: String,
     hrValue: String,
     rrValue: String,
@@ -45,7 +45,7 @@ fun NonRedCodeScreen(
 ) {
     val nonRedCodeViewModel: NonRedCodeViewModel = hiltViewModel()
 
-    nonRedCodeViewModel.updateVitalSignsAndAge(ageInt, spo2Value, rrValue, hrValue, sbpValue, tempValue)
+    nonRedCodeViewModel.updateVitalSignsAndAge(ageInMonths, spo2Value, rrValue, hrValue, sbpValue, tempValue)
 
     val state by nonRedCodeViewModel.state.collectAsState()
 

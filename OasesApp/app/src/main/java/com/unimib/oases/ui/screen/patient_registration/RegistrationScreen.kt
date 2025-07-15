@@ -61,12 +61,12 @@ fun RegistrationScreen(
     val tabs = arrayOf(
         Tabs.Demographics.title,
         Tabs.ContinueToTriage.title,
-        Tabs.History.title,
         Tabs.PastMedicalHistory.title,
         Tabs.VitalSigns.title,
         Tabs.ReevaluateTriageCode.title,
         Tabs.Triage.title,
-        Tabs.NonRedCode.title
+        Tabs.NonRedCode.title,
+        Tabs.History.title,
     )
 
     var currentIndex by remember { mutableIntStateOf(0) }
@@ -74,14 +74,11 @@ fun RegistrationScreen(
     var isYellowCodeSelected by remember { mutableStateOf(false) }
     var isRedCodeSelected by remember { mutableStateOf(false) }
 
-    val nextButtonText = remember(currentIndex, isRedCodeSelected) {
-        if (currentIndex == tabs.lastIndex) {
+    val nextButtonText = remember(currentIndex) {
+        if (currentIndex == tabs.lastIndex)
             "Submit"
-        } else if (tabs[currentIndex] == Tabs.Triage.title && isRedCodeSelected) {
-            "Submit"
-        } else {
+        else
             "Next"
-        }
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -157,7 +154,6 @@ fun RegistrationScreen(
                             navController.popBackStack()
                         }
                     )
-                    Tabs.History.title -> VisitHistoryScreen(state.patientInfoState.patient.id)
                     Tabs.PastMedicalHistory.title -> PastHistoryScreen(
                         state = pastHistoryState,
                         onEvent = registrationScreenViewModel::onPastHistoryEvent,
@@ -208,10 +204,7 @@ fun RegistrationScreen(
                         },
                         onSubmitted = {
                             if (isRedCodeSelected){
-                                registrationScreenViewModel.onEvent(RegistrationEvent.Submit(true))
-                                navController.navigate(Screen.HomeScreen.route) {
-                                    popUpTo(0) { inclusive = true }
-                                }
+                                currentIndex = currentIndex + 2
                             } else
                                 currentIndex++
                         },
@@ -234,13 +227,14 @@ fun RegistrationScreen(
                                     )
                                 )
                         },
-                        ageInt = state.patientInfoState.patient.ageInMonths,
+                        ageInMonths = state.patientInfoState.patient.ageInMonths,
                         spo2Value = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Oxygen Saturation"}?.value ?: "",
                         hrValue = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Heart Rate"}?.value ?: "",
                         rrValue = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Respiratory Rate"}?.value ?: "",
                         sbpValue = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Systolic Blood Pressure"}?.value ?: "",
                         tempValue = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Temperature"}?.value ?: "",
                     )
+                    Tabs.History.title -> VisitHistoryScreen(state.patientInfoState.patient.id)
                 }
             }
 
