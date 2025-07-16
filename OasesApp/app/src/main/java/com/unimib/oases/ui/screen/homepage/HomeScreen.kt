@@ -221,6 +221,46 @@ fun HomeScreen(
                         modifier = Modifier.fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                     ){
+
+
+                        Row(modifier = Modifier) {
+
+                            Button(
+
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(0),
+                                colors = ButtonDefaults.buttonColors(Color.Transparent),
+                                border = BorderStroke(0.dp, Color.Transparent),
+                                contentPadding = PaddingValues(0.dp),
+
+                                onClick = {
+                                    navController.navigate(Screen.PairDevice.route)
+                                },
+
+                            ) {
+
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    Icon(
+                                        modifier = Modifier
+                                            .size(40.dp)
+                                            .padding(10.dp),
+                                        tint = MaterialTheme.colorScheme.onBackground,
+                                        imageVector = Icons.Default.Bluetooth,
+                                        contentDescription = "Bluetooth"
+                                    )
+
+                                    Text(
+                                        "Bluetooth",
+                                        fontSize = 20.sp,
+                                        fontWeight = FontWeight.Normal,
+                                        color = MaterialTheme.colorScheme.onBackground
+                                    )
+                                }
+                            }
+                        }
                         Row(modifier = Modifier) {
 
                             Button(
@@ -255,45 +295,6 @@ fun HomeScreen(
 
                                     Text(
                                         "Logout",
-                                        fontSize = 20.sp,
-                                        fontWeight = FontWeight.Normal,
-                                        color = MaterialTheme.colorScheme.onBackground
-                                    )
-                                }
-                            }
-                        }
-
-                        Row(modifier = Modifier) {
-
-                            Button(
-
-                                modifier = Modifier.fillMaxWidth(),
-                                shape = RoundedCornerShape(0),
-                                colors = ButtonDefaults.buttonColors(Color.Transparent),
-                                border = BorderStroke(0.dp, Color.Transparent),
-                                contentPadding = PaddingValues(0.dp),
-
-                                onClick = {
-                                    navController.navigate(Screen.PairDevice.route)
-                                },
-
-                            ) {
-
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                ) {
-                                    Icon(
-                                        modifier = Modifier
-                                            .size(40.dp)
-                                            .padding(10.dp),
-                                        tint = MaterialTheme.colorScheme.onBackground,
-                                        imageVector = Icons.Default.Bluetooth,
-                                        contentDescription = "Bluetooth"
-                                    )
-
-                                    Text(
-                                        "Bluetooth",
                                         fontSize = 20.sp,
                                         fontWeight = FontWeight.Normal,
                                         color = MaterialTheme.colorScheme.onBackground

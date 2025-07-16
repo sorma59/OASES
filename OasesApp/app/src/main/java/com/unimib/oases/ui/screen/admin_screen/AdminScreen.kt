@@ -1,6 +1,9 @@
 package com.unimib.oases.ui.screen.admin_screen
 
+import android.content.res.Configuration
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -28,11 +31,15 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.unimib.oases.ui.components.text.AutoResizedText
 import com.unimib.oases.ui.navigation.Screen
 import com.unimib.oases.ui.screen.login.AuthState
 import com.unimib.oases.ui.screen.login.AuthViewModel
@@ -44,6 +51,13 @@ fun AdminScreen(
     padding: PaddingValues,
     authViewModel: AuthViewModel,
 ) {
+
+    val configuration = LocalConfiguration.current
+//    val gridColumns = when (configuration.orientation) {
+//        Configuration.ORIENTATION_PORTRAIT -> 3
+//        Configuration.ORIENTATION_LANDSCAPE -> 3
+//        else -> 3
+//    }
 
 
     val authState = authViewModel.authState.observeAsState()
@@ -108,112 +122,124 @@ fun AdminScreen(
             modifier = Modifier
                 .padding(horizontal = 10.dp)
                 .fillMaxSize()
+
                 .padding(bottom = padding.calculateBottomPadding()),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
 
-            LazyVerticalGrid(
-                columns = GridCells.Adaptive(minSize = 110.dp),
-                contentPadding = PaddingValues(0.dp),
-                horizontalArrangement = Arrangement.Center
-            ) {
-
-
-                item {
-                    Button(
-                        onClick = { navController.navigate(Screen.UserManagementScreen.route) },
-                        shape = MaterialTheme.shapes.extraSmall,
-                        modifier = Modifier.padding(5.dp)
-                    ) {
-                        Column(
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Row {
-                                Icon(
-                                    imageVector = Icons.Default.Person,
-
-                                    contentDescription = "",
-                                    modifier = Modifier.size(50.dp)
-
-
-                                )
-                            }
-
-                            Row {
-                                Text(text = "Users")
-                            }
-
-
-                        }
-
-                    }
-                }
-
-                item {
-                    Button(
-                        onClick = { navController.navigate(Screen.DiseaseManagementScreen.route) },
-                        shape = MaterialTheme.shapes.extraSmall,
-                        modifier = Modifier.padding(5.dp)
-                    ) {
-                        Column(
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Row {
-                                Icon(
-                                    imageVector = Icons.Default.MedicalInformation,
-
-                                    contentDescription = "",
-                                    modifier = Modifier.size(50.dp)
-
-
-                                )
-                            }
-
-                            Row {
-                                Text(text = "Diseases")
-                            }
-
-
-                        }
-
-                    }
-                }
-
-                item {
-                    Button(
-                        onClick = { navController.navigate(Screen.VitalSignsManagementScreen.route) },
-                        shape = MaterialTheme.shapes.extraSmall,
-                        modifier = Modifier.padding(5.dp)
-                    ) {
-                        Column(
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Row {
-                                Icon(
-                                    imageVector = Icons.Default.Bloodtype,
-
-                                    contentDescription = "",
-                                    modifier = Modifier.size(50.dp)
-
-
-                                )
-                            }
-
-                            Row {
-                                Text(text = "Vital Signs")
-                            }
-
-
-                        }
-
-                    }
+            BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                val itemSize = when (configuration.orientation) {
+                    Configuration.ORIENTATION_PORTRAIT -> DpSize(maxWidth * 1f, maxHeight * 0.20f)
+                    Configuration.ORIENTATION_LANDSCAPE -> DpSize(maxWidth * 0.4f, maxHeight * 0.3f)
+                    else -> DpSize(maxWidth * 0.3f, maxHeight * 0.4f)
                 }
 
 
+
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(3),
+                    contentPadding = PaddingValues(2.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+
+
+                    item {
+                        Button(
+                            onClick = { navController.navigate(Screen.UserManagementScreen.route) },
+                            shape = MaterialTheme.shapes.extraSmall,
+                            modifier = Modifier.padding(5.dp).size(itemSize)
+                        ) {
+                            Column(
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                            ) {
+                                Row {
+                                    Icon(
+                                        imageVector = Icons.Default.Person,
+
+                                        contentDescription = "",
+                                        modifier = Modifier.size(itemSize/2)
+
+
+                                    )
+                                }
+
+                                Row {
+                                    AutoResizedText(text = "Users", style = MaterialTheme.typography.bodyLarge)
+                                }
+
+
+                            }
+
+                        }
+                    }
+
+                    item {
+                        Button(
+                            onClick = { navController.navigate(Screen.DiseaseManagementScreen.route) },
+                            shape = MaterialTheme.shapes.extraSmall,
+                            modifier = Modifier.padding(5.dp).size(itemSize)
+                        ) {
+                            Column(
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally,
+
+                            ) {
+                                Row {
+                                    Icon(
+                                        imageVector = Icons.Default.MedicalInformation,
+
+                                        contentDescription = "",
+                                        modifier = Modifier.size(itemSize/2)
+
+
+                                    )
+                                }
+
+                                Row {
+                                    AutoResizedText(text = "Diseases", style = MaterialTheme.typography.bodyLarge)
+                                }
+
+
+                            }
+
+                        }
+                    }
+
+                    item {
+                        Button(
+                            onClick = { navController.navigate(Screen.VitalSignsManagementScreen.route) },
+                            shape = MaterialTheme.shapes.extraSmall,
+                            modifier = Modifier.padding(5.dp).size(itemSize)
+                        ) {
+                            Column(
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally,
+
+                            ) {
+                                Row {
+                                    Icon(
+                                        imageVector = Icons.Default.Bloodtype,
+                                        contentDescription = "",
+                                        modifier = Modifier.size(itemSize/2)
+
+
+                                    )
+                                }
+
+                                Row {
+                                    AutoResizedText(text = "Vital Signs", style = MaterialTheme.typography.bodyLarge)
+                                }
+
+
+                            }
+
+                        }
+                    }
+
+
+                }
             }
         }
     }
