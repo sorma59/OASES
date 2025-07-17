@@ -9,12 +9,12 @@ import com.unimib.oases.data.local.TableNames
 data class User(
     @PrimaryKey val username: String,
     @ColumnInfo(name = "pw_hash") val pwHash: String,
-    @ColumnInfo(name = "role") val role: Role = Role.Nurse,
+    @ColumnInfo(name = "role") val role: Role = Role.NURSE,
     @ColumnInfo(name = "salt") val salt: String,
 )
 
 enum class Role(val displayName: String) {
-    Doctor("Doctor"),
-    Nurse("Nurse"),
-    Admin("Admin")
+    DOCTOR("Doctor"),
+    NURSE("Nurse"),
+    ADMIN("Admin")
 }

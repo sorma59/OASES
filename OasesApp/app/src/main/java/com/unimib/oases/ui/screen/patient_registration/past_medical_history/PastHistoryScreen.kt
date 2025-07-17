@@ -13,9 +13,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.Checkbox
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -25,6 +27,7 @@ import com.unimib.oases.ui.components.util.AnimatedLabelOutlinedTextField
 import com.unimib.oases.ui.components.util.BottomButtons
 import com.unimib.oases.ui.components.util.FadeOverlay
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
+import com.unimib.oases.ui.util.ToastUtils
 
 @Composable
 fun PastHistoryScreen(
@@ -32,11 +35,19 @@ fun PastHistoryScreen(
     onEvent: (PastHistoryEvent) -> Unit,
     onSubmitted: () -> Unit,
     onBack: () -> Unit,
+    confirmButtonText: String = "Next",
+    cancelButtonText: String = "Back",
+    readOnly: Boolean = false
 ) {
 
-//    val pastHistoryViewModel: PastHistoryViewModel = hiltViewModel()
-//
-//    val state by pastHistoryViewModel.state.collectAsState()
+    val context = LocalContext.current
+
+    LaunchedEffect(state.toastMessage) {
+        state.toastMessage?.let { message ->
+            ToastUtils.showToast(context, message)
+        }
+        onEvent(PastHistoryEvent.ToastShown)
+    }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -66,10 +77,10 @@ fun PastHistoryScreen(
             } else if (state.isLoading) {
                 CustomCircularProgressIndicator()
             } else {
-
-                ChronicConditionsCheckboxes(
+                ChronicConditionsForm(
                     state = state,
-                    onEvent = onEvent
+                    onEvent = onEvent,
+                    readOnly = readOnly
                 )
             }
 
@@ -79,67 +90,64 @@ fun PastHistoryScreen(
         BottomButtons(
             onCancel = { onBack() },
             onConfirm = { onSubmitted() },
-            cancelButtonText = "Back",
-            confirmButtonText = "Next"
+            cancelButtonText = cancelButtonText,
+            confirmButtonText = confirmButtonText
         )
-
-//        Row(
-//            modifier = Modifier
-//                .padding(horizontal = 12.dp)
-//                .fillMaxWidth(),
-//            horizontalArrangement = Arrangement.SpaceBetween,
-//        ) {
-//            OutlinedButton(onClick = { onBack() }) {
-//                Text("Back")
-//            }
-//
-//            Button(
-//                onClick = {
-//                    onSubmitted(state)
-//                }
-//            ) {
-//                Text("Next")
-//            }
-//        }
     }
-
 }
 
 @Composable
-fun CheckboxInputWithDateAndText(
+fun RadioButtonsInputWithDateAndText(
     label: String,
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
+    isDiagnosed: Boolean?,
+    onSelected: (Boolean) -> Unit,
     date: String,
     onDateChange: (String) -> Unit,
     additionalInfo: String,
-    onAdditionalInfoChange: (String) -> Unit
+    onAdditionalInfoChange: (String) -> Unit,
+    readOnly: Boolean = false,
+    onReadOnlyClick: () -> Unit = {}
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ){
         Row(
             verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.End
         ) {
-            Checkbox(checked = checked, onCheckedChange = onCheckedChange)
+            Text(
+                text = label,
+                modifier = Modifier.weight(1f),
+            )
             Spacer(modifier = Modifier.width(8.dp))
-            Text(text = label)
+            RadioButton( // "Yes" button
+                selected = isDiagnosed == true,
+                onClick = { if (!readOnly) onSelected(true) else onReadOnlyClick()},
+            )
+            RadioButton( // "No"  button
+                selected = isDiagnosed == false,
+                onClick = { if (!readOnly) onSelected(false) else onReadOnlyClick()},
+            )
         }
 
-        if (checked){
+        if (isDiagnosed == true){
             Column(
                 modifier = Modifier.padding(horizontal = 16.dp),
             ) {
                 DateSelector(
                     selectedDate = date,
                     onDateSelected = { onDateChange(it) },
-                    context = LocalContext.current
+                    context = LocalContext.current,
+                    readOnly = readOnly,
+                    onReadOnlyClick = onReadOnlyClick
                 )
 
                 AnimatedLabelOutlinedTextField(
                     value = additionalInfo,
                     onValueChange = { onAdditionalInfoChange(it) },
                     labelText = "Additional Info",
+                    readOnly = readOnly,
+                    onClick = if (readOnly) onReadOnlyClick else null
                 )
             }
         }
@@ -147,34 +155,80 @@ fun CheckboxInputWithDateAndText(
 }
 
 @Composable
-fun ChronicConditionsCheckboxes(
+fun ChronicConditionsForm(
     state: PastHistoryState,
     onEvent: (PastHistoryEvent) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    readOnly: Boolean = false
 ){
 
     val scrollState = rememberScrollState()
 
     Column(
-        verticalArrangement = Arrangement.spacedBy(16.dp),
         modifier = modifier
             .padding(horizontal = 16.dp)
             .fillMaxWidth()
-            .verticalScroll(scrollState)
     ) {
 
-        for (disease in state.diseases){
-            CheckboxInputWithDateAndText(
-                label = disease.disease,
-                checked = disease.isChecked,
-                onCheckedChange = { onEvent(PastHistoryEvent.CheckChanged(disease.disease)) },
-                date = disease.date,
-                onDateChange = { onEvent(PastHistoryEvent.DateChanged(disease.disease, it)) },
-                additionalInfo = disease.additionalInfo,
-                onAdditionalInfoChange = { onEvent(PastHistoryEvent.AdditionalInfoChanged(disease.disease, it)) }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth(),
+        ){
+            Text(
+                text = "Is the patient affected by the following disease?",
+                modifier = Modifier.weight(1f)
             )
+
+            Text("  Yes    No  ")
         }
 
-        Spacer(modifier = Modifier.height(60.dp)) // Adds breathing room before bottom buttons
+        HorizontalDivider()
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = modifier
+                .fillMaxWidth()
+                .verticalScroll(scrollState)
+        ) {
+            for (disease in state.diseases) {
+                RadioButtonsInputWithDateAndText(
+                    label = disease.disease,
+                    isDiagnosed = disease.isDiagnosed,
+                    onSelected = { isDiagnosed ->
+                        onEvent(
+                            PastHistoryEvent.RadioButtonClicked(
+                                disease.disease,
+                                isDiagnosed
+                            )
+                        )
+                    },
+                    date = disease.date,
+                    onDateChange = {
+                        onEvent(
+                            PastHistoryEvent.DateChanged(
+                                disease.disease,
+                                it
+                            )
+                        )
+                    },
+                    additionalInfo = disease.additionalInfo,
+                    onAdditionalInfoChange = {
+                        onEvent(
+                            PastHistoryEvent.AdditionalInfoChanged(
+                                disease.disease,
+                                it
+                            )
+                        )
+                    },
+                    readOnly = readOnly,
+                    onReadOnlyClick = {
+                        onEvent(PastHistoryEvent.NurseClicked)
+                    }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(60.dp)) // Adds breathing room before bottom buttons
+        }
     }
 }

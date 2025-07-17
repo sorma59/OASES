@@ -35,7 +35,7 @@ import com.unimib.oases.ui.components.util.TitleText
 
 @Composable
 fun NonRedCodeScreen(
-    onYellowCodeSelected: (Boolean) -> Unit,
+    onSymptomsChange: (Boolean) -> Unit,
     ageInMonths: Int,
     spo2Value: String,
     hrValue: String,
@@ -64,7 +64,7 @@ fun NonRedCodeScreen(
     }
 
     LaunchedEffect(isAnyYellowCodeSelected.value) {
-        onYellowCodeSelected(isAnyYellowCodeSelected.value)
+        onSymptomsChange(isAnyYellowCodeSelected.value)
     }
 
     Column(

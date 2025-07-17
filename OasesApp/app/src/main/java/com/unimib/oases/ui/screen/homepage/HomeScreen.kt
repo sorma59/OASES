@@ -1,6 +1,5 @@
 package com.unimib.oases.ui.screen.homepage
 
-import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -78,6 +77,7 @@ import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircu
 import com.unimib.oases.ui.navigation.Screen
 import com.unimib.oases.ui.screen.login.AuthState
 import com.unimib.oases.ui.screen.login.AuthViewModel
+import com.unimib.oases.ui.util.ToastUtils
 import kotlinx.coroutines.launch
 
 
@@ -137,7 +137,7 @@ fun HomeScreen(
 
     LaunchedEffect(state.toastMessage) {
         state.toastMessage?.let { message ->
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+            ToastUtils.showToast(context, message)
         }
         homeScreenViewModel.onToastMessageShown()
     }
@@ -413,7 +413,7 @@ fun HomeScreen(
                         }
 
                     }
-                    if (authViewModel.currentUser()?.role == Role.Nurse) {
+                    if (authViewModel.currentUser()?.role == Role.NURSE) {
                         FloatingActionButton(
                             onClick = { navController.navigate(Screen.RegistrationScreen.route) },
                             modifier = Modifier.padding(30.dp),

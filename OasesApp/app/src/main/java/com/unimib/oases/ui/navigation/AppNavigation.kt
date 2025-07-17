@@ -136,7 +136,7 @@ fun AppNavigation(
                         ""
                 }
             )) {
-            RegistrationScreen(navController, padding)
+            RegistrationScreen(navController, padding, authViewModel)
         }
 
         composable(Screen.SendPatient.route){

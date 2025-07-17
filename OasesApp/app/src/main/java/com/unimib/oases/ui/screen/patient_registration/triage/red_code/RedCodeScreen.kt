@@ -24,7 +24,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,7 +36,7 @@ import com.unimib.oases.ui.components.util.FadeOverlay
 
 @Composable
 fun RedCodeScreen(
-    onRedCodeSelected: (Boolean) -> Unit,
+    onSymptomsChange: (Boolean) -> Unit,
     onBack: () -> Unit,
     onSubmitted: () -> Unit,
     sbpValue: String,
@@ -52,8 +51,6 @@ fun RedCodeScreen(
 
     val scrollState = rememberScrollState()
 
-    var nextButtonText = remember { mutableStateOf("Next") }
-
     val isAnyRedCodeSelected = remember {
         derivedStateOf {
             state.unconsciousness || state.activeConvulsions || state.respiratoryDistress || state.heavyBleeding ||
@@ -65,11 +62,7 @@ fun RedCodeScreen(
     }
 
     LaunchedEffect(isAnyRedCodeSelected.value) {
-        onRedCodeSelected(isAnyRedCodeSelected.value)
-        if (isAnyRedCodeSelected.value)
-            nextButtonText.value = "Submit"
-        else
-            nextButtonText.value = "Next"
+        onSymptomsChange(isAnyRedCodeSelected.value)
     }
 
     Column(
@@ -277,7 +270,7 @@ fun RedCodeScreen(
             onCancel = { onBack() },
             onConfirm = { onSubmitted() },
             cancelButtonText = "Back",
-            confirmButtonText = nextButtonText.value,
+            confirmButtonText = "Next",
         )
     }
 }

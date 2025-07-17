@@ -1,6 +1,5 @@
 package com.unimib.oases.ui.screen.login
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -43,6 +42,7 @@ import androidx.navigation.NavController
 import com.unimib.oases.data.local.model.Role
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 import com.unimib.oases.ui.navigation.Screen
+import com.unimib.oases.ui.util.ToastUtils
 import com.unimib.oases.util.AuthStrings
 
 @Composable
@@ -58,7 +58,7 @@ fun LoginScreen(
 
     if (authViewModel.currentUser() != null) {
         when (authViewModel.currentUser()?.role) {
-            Role.Admin -> navController.navigate(Screen.AdminScreen.route) {
+            Role.ADMIN -> navController.navigate(Screen.AdminScreen.route) {
                 popUpTo(Screen.LoginScreen.route) { inclusive = true }
             }
 
@@ -80,14 +80,11 @@ fun LoginScreen(
         when (authState.value) {
             is AuthState.Authenticated ->
                 when (authViewModel.currentUser()?.role) {
-                    Role.Admin -> navController.navigate(Screen.AdminScreen.route)
+                    Role.ADMIN -> navController.navigate(Screen.AdminScreen.route)
                     else -> navController.navigate(Screen.HomeScreen.route)
                 }
 
-            is AuthState.Error -> Toast.makeText(
-                context,
-                (authState.value as AuthState.Error).message, Toast.LENGTH_SHORT
-            ).show()
+            is AuthState.Error -> ToastUtils.showToast(context, (authState.value as AuthState.Error).message)
 
             else -> Unit
         }

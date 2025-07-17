@@ -10,5 +10,5 @@ sealed class RegistrationEvent {
     data class TriageCodeSelected(val triageCode: String) : RegistrationEvent()
     // Other next events
 
-    data class Submit(val reevaluateTriageCode: Boolean) : RegistrationEvent()
+    object Submit : RegistrationEvent()
 }

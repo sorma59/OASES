@@ -8,12 +8,16 @@ data class PastHistoryState (
     var sex: SexSpecificity = SexSpecificity.ALL,
     var age: AgeSpecificity = AgeSpecificity.ALL,
     var isLoading: Boolean = false,
-    var error: String? = null
-)
+    var error: String? = null,
+    var toastMessage: String? = null,
+){
+    val hasBeenFilledIn: Boolean
+        get() = diseases.any { it.isDiagnosed != null }
+}
 
 data class PatientDiseaseState(
     var disease: String,
-    var isChecked: Boolean = false,
+    var isDiagnosed: Boolean? = null, // null means not answered
     var additionalInfo: String = "",
     var date: String = ""
 )

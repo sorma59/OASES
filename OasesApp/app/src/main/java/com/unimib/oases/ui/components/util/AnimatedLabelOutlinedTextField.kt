@@ -60,11 +60,11 @@ fun AnimatedLabelOutlinedTextField(
         )
 
         // Overlay a transparent clickable box on top of the entire text field
-        if (readOnly && onClick != null) {
+        if (readOnly) {
             Spacer(
                 modifier = Modifier
                     .matchParentSize()
-                    .clickable { onClick() }
+                    .clickable { if (onClick != null) onClick() }
             )
         }
     }

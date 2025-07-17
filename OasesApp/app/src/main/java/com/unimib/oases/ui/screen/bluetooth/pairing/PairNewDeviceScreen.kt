@@ -1,6 +1,5 @@
 package com.unimib.oases.ui.screen.bluetooth.pairing
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,6 +31,7 @@ import com.unimib.oases.ui.components.bluetooth.devices.DeviceList
 import com.unimib.oases.ui.components.util.BottomButtons
 import com.unimib.oases.ui.components.util.CenteredText
 import com.unimib.oases.ui.components.util.circularprogressindicator.SmallCircularProgressIndicator
+import com.unimib.oases.ui.util.ToastUtils
 
 @Composable
 fun PairNewDeviceScreen(
@@ -56,12 +56,12 @@ fun PairNewDeviceScreen(
 
     LaunchedEffect(toastMessage) {
         if (toastMessage.isNotEmpty())
-            Toast.makeText(context, toastMessage, Toast.LENGTH_SHORT).show()
+            ToastUtils.showToast(context, toastMessage)
     }
 
     LaunchedEffect(pairingResult) {
         if (pairingResult.isNotEmpty())
-            Toast.makeText(context, pairingResult, Toast.LENGTH_SHORT).show()
+            ToastUtils.showToast(context, toastMessage)
     }
 
     Column(

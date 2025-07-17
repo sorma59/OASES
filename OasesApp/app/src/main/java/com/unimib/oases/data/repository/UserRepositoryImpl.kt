@@ -90,7 +90,7 @@ class UserRepositoryImpl @Inject constructor(
 
         emit(Resource.Loading())
         try {
-            roomDataSource.getAllUsersByRole(Role.Nurse).collect {
+            roomDataSource.getAllUsersByRole(Role.NURSE).collect {
                 emit(Resource.Success(it))
             }
         } catch (e: Exception) {
@@ -102,7 +102,7 @@ class UserRepositoryImpl @Inject constructor(
 
         emit(Resource.Loading())
         try {
-            roomDataSource.getAllUsersByRole(Role.Doctor).collect {
+            roomDataSource.getAllUsersByRole(Role.DOCTOR).collect {
                 emit(Resource.Success(it))
             }
         } catch (e: Exception) {

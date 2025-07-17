@@ -21,10 +21,12 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,13 +36,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.unimib.oases.data.local.model.Role
 import com.unimib.oases.domain.model.TriageCode
 import com.unimib.oases.ui.components.util.BottomButtons
 import com.unimib.oases.ui.navigation.Screen
+import com.unimib.oases.ui.screen.login.AuthViewModel
 import com.unimib.oases.ui.screen.patient_registration.info.PatientInfoScreen
 import com.unimib.oases.ui.screen.patient_registration.past_medical_history.PastHistoryScreen
 import com.unimib.oases.ui.screen.patient_registration.transitionscreens.ContinueToTriageDecisionScreen
-import com.unimib.oases.ui.screen.patient_registration.transitionscreens.ReevaluateTriageCodeDecisionScreen
 import com.unimib.oases.ui.screen.patient_registration.triage.non_red_code.NonRedCodeScreen
 import com.unimib.oases.ui.screen.patient_registration.triage.red_code.RedCodeScreen
 import com.unimib.oases.ui.screen.patient_registration.visit_history.VisitHistoryScreen
@@ -50,7 +53,8 @@ import com.unimib.oases.ui.screen.patient_registration.vital_signs.VitalSignsScr
 @Composable
 fun RegistrationScreen(
     navController: NavController,
-    padding: PaddingValues
+    padding: PaddingValues,
+    authViewModel: AuthViewModel
 ) {
 
     val registrationScreenViewModel: RegistrationScreenViewModel = hiltViewModel()
@@ -58,24 +62,31 @@ fun RegistrationScreen(
 
     val state by registrationScreenViewModel.state.collectAsState()
 
+    val userRole = authViewModel.currentUser()?.role
+
     val tabs = arrayOf(
-        Tabs.Demographics.title,
-        Tabs.ContinueToTriage.title,
-        Tabs.PastMedicalHistory.title,
-        Tabs.VitalSigns.title,
-        Tabs.ReevaluateTriageCode.title,
-        Tabs.Triage.title,
-        Tabs.NonRedCode.title,
-        Tabs.History.title,
+        Tabs.DEMOGRAPHICS.title,
+        Tabs.CONTINUE_TO_TRIAGE.title,
+        Tabs.VITAL_SIGNS.title,
+        Tabs.TRIAGE.title,
+        Tabs.NON_RED_CODE.title,
+        Tabs.HISTORY.title,
+        Tabs.PAST_MEDICAL_HISTORY.title,
     )
 
-    var currentIndex by remember { mutableIntStateOf(0) }
+    var currentIndex by rememberSaveable { mutableIntStateOf(0) }
 
-    var isYellowCodeSelected by remember { mutableStateOf(false) }
-    var isRedCodeSelected by remember { mutableStateOf(false) }
+    var isYellowCode by remember { mutableStateOf(false) }
+    var isRedCode by remember { mutableStateOf(false) }
+    var mustSkipPastMedicalHistory = remember {
+        derivedStateOf {
+            userRole == Role.NURSE && !state.pastHistoryState.hasBeenFilledIn
+        }
+    }
 
     val nextButtonText = remember(currentIndex) {
-        if (currentIndex == tabs.lastIndex)
+        if (currentIndex == tabs.lastIndex ||
+            (mustSkipPastMedicalHistory.value && currentIndex == tabs.lastIndex - 1))
             "Submit"
         else
             "Next"
@@ -142,48 +153,33 @@ fun RegistrationScreen(
                 contentAlignment = Alignment.Center
             ) {
                 when (tabs[currentIndex]) {
-                    Tabs.Demographics.title -> PatientInfoScreen(
+                    Tabs.DEMOGRAPHICS.title -> PatientInfoScreen(
                         onSubmitted = { patientInfoState ->
                             registrationScreenViewModel.onEvent(RegistrationEvent.PatientSubmitted(patientInfoState))
                             currentIndex++
                         }
                     )
-                    Tabs.ContinueToTriage.title -> ContinueToTriageDecisionScreen(
-                        onContinueToTriage = { currentIndex++ },
+                    Tabs.CONTINUE_TO_TRIAGE.title -> ContinueToTriageDecisionScreen(
+                        onContinueToTriage = {
+                            currentIndex++
+                        },
                         onSkipTriage = {
                             navController.popBackStack()
                         }
                     )
-                    Tabs.PastMedicalHistory.title -> PastHistoryScreen(
-                        state = pastHistoryState,
-                        onEvent = registrationScreenViewModel::onPastHistoryEvent,
-                        onSubmitted = { currentIndex++ },
-                        onBack = { currentIndex-- }
-                    )
-                    Tabs.VitalSigns.title -> VitalSignsScreen(
+                    Tabs.VITAL_SIGNS.title -> VitalSignsScreen(
                         onSubmitted = { vitalSigns ->
                             registrationScreenViewModel.onEvent(RegistrationEvent.VitalSignsSubmitted(vitalSigns))
-                            if (state.currentVisit != null) // If there is an open visit, go to triage reevaluation page
-                                currentIndex++
-                            else                     // If there is no open visit, go to triage page
-                                currentIndex = currentIndex + 2
+                            currentIndex++
                         },
-                        onBack = { currentIndex-- }
-                    )
-                    Tabs.ReevaluateTriageCode.title -> ReevaluateTriageCodeDecisionScreen(
-                        visit = state.currentVisit!!,
-                        onConfirm = { currentIndex++ },
-                        onDenial = {
-                            registrationScreenViewModel.onEvent(RegistrationEvent.Submit(false))
-                            navController.navigate(Screen.HomeScreen.route) {
-                                popUpTo(0) { inclusive = true }
-                            }
+                        onBack = {
+                            currentIndex--
                         }
                     )
-                    Tabs.Triage.title -> RedCodeScreen(
-                        onRedCodeSelected = { redCode ->
-                            isRedCodeSelected = redCode
-                            if (redCode){
+                    Tabs.TRIAGE.title -> RedCodeScreen(
+                        onSymptomsChange = { isRedCodeSelected ->
+                            isRedCode = isRedCodeSelected
+                            if (isRedCode){
                                 registrationScreenViewModel.onEvent(
                                     RegistrationEvent.TriageCodeSelected(
                                         TriageCode.RED.name
@@ -197,24 +193,21 @@ fun RegistrationScreen(
                                 )
                         },
                         onBack = {
-                            if (state.currentVisit != null) // There is an open visit, go back to decision page
-                                currentIndex--
-                            else                      // There is not an open visit, go back to vital signs
-                                currentIndex = currentIndex - 2
+                            currentIndex--
                         },
                         onSubmitted = {
-                            if (isRedCodeSelected){
+                            if (isRedCode){ // Red code: skip yellow code
                                 currentIndex = currentIndex + 2
-                            } else
+                            } else                  // Not a red code, check for yellow code
                                 currentIndex++
                         },
                         sbpValue = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Systolic Blood Pressure"}?.value ?: "",
                         dbpValue = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Diastolic Blood Pressure"}?.value ?: ""
                     )
-                    Tabs.NonRedCode.title -> NonRedCodeScreen(
-                        onYellowCodeSelected = { yellowCode ->
-                            isYellowCodeSelected = yellowCode
-                            if (yellowCode){
+                    Tabs.NON_RED_CODE.title -> NonRedCodeScreen(
+                        onSymptomsChange = { isYellowCodeSelected ->
+                            isYellowCode = isYellowCodeSelected
+                            if (isYellowCode){
                                 registrationScreenViewModel.onEvent(
                                     RegistrationEvent.TriageCodeSelected(
                                         TriageCode.YELLOW.name
@@ -234,20 +227,43 @@ fun RegistrationScreen(
                         sbpValue = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Systolic Blood Pressure"}?.value ?: "",
                         tempValue = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Temperature"}?.value ?: "",
                     )
-                    Tabs.History.title -> VisitHistoryScreen(state.patientInfoState.patient.id)
+                    Tabs.HISTORY.title -> VisitHistoryScreen(
+                        state.visitHistoryState,
+                        registrationScreenViewModel::onVisitHistoryEvent
+                    )
+                    Tabs.PAST_MEDICAL_HISTORY.title ->
+                        PastHistoryScreen(
+                            state = pastHistoryState,
+                            onEvent = registrationScreenViewModel::onPastHistoryEvent,
+                            onSubmitted = {
+                                registrationScreenViewModel.onEvent(RegistrationEvent.Submit)
+                                navController.popBackStack()
+                            },
+                            onBack = { currentIndex-- },
+                            confirmButtonText = nextButtonText,
+                            readOnly = userRole == Role.NURSE
+                        )
                 }
             }
 
-            if (tabs[currentIndex] == Tabs.History.title || tabs[currentIndex] == Tabs.NonRedCode.title) {
+            if (tabs[currentIndex] == Tabs.HISTORY.title || tabs[currentIndex] == Tabs.NON_RED_CODE.title) {
                 BottomButtons(
-                    onCancel = { currentIndex-- },
+                    onCancel = {
+                        if (tabs[currentIndex] == Tabs.HISTORY.title && isRedCode)
+                            currentIndex = currentIndex - 2
+                        else
+                            currentIndex--
+                    },
                     onConfirm = {
                         if (currentIndex == tabs.lastIndex) {
-                            registrationScreenViewModel.onEvent(RegistrationEvent.Submit(true))
-                            navController.navigate(Screen.HomeScreen.route) {
-                                popUpTo(0) { inclusive = true }
-                            }
-                        } else {
+                            registrationScreenViewModel.onEvent(RegistrationEvent.Submit)
+                            navController.popBackStack()
+                        }
+                        else if (tabs[currentIndex] == Tabs.HISTORY.title && mustSkipPastMedicalHistory.value){
+                            registrationScreenViewModel.onEvent(RegistrationEvent.Submit)
+                            navController.popBackStack()
+                        }
+                        else {
                             currentIndex++
                         }
                     },
@@ -260,12 +276,11 @@ fun RegistrationScreen(
 }
 
 enum class Tabs(val title: String){
-    Demographics("Demographics"),
-    ContinueToTriage("Continue to Triage?"),
-    History("History"),
-    PastMedicalHistory("Past Medical History"),
-    VitalSigns("Vital Signs"),
-    ReevaluateTriageCode("Reevaluate Triage Code?"),
-    Triage("Triage"),
-    NonRedCode("Non Red Code")
+    DEMOGRAPHICS("Demographics"),
+    CONTINUE_TO_TRIAGE("Continue to Triage?"),
+    VITAL_SIGNS("Vital Signs"),
+    TRIAGE("Triage"),
+    NON_RED_CODE("Non Red Code"),
+    PAST_MEDICAL_HISTORY("Past Medical History"),
+    HISTORY("History"),
 }

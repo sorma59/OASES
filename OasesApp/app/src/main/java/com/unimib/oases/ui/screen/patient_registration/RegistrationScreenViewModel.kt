@@ -18,6 +18,8 @@ import com.unimib.oases.domain.usecase.VisitVitalSignsUseCase
 import com.unimib.oases.ui.screen.patient_registration.past_medical_history.PastHistoryEvent
 import com.unimib.oases.ui.screen.patient_registration.past_medical_history.PastHistoryState
 import com.unimib.oases.ui.screen.patient_registration.past_medical_history.PatientDiseaseState
+import com.unimib.oases.ui.screen.patient_registration.visit_history.VisitHistoryEvent
+import com.unimib.oases.ui.screen.patient_registration.visit_history.VisitHistoryState
 import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -76,15 +78,10 @@ class RegistrationScreenViewModel @Inject constructor(
                             )
                         )
                     }
+                    refreshVisitHistory(event.patientInfoState.patient.id)
                     refreshPastHistory(event.patientInfoState.patient.id)
                 }
             }
-
-//            is RegistrationEvent.PastMedicalHistoryNext -> {
-//                _state.value = _state.value.copy(
-//                    pastHistoryState = event.pastHistoryState
-//                )
-//            }
 
             is RegistrationEvent.VitalSignsSubmitted -> {
                 _state.update {
@@ -121,11 +118,10 @@ class RegistrationScreenViewModel @Inject constructor(
                         )
                     }
 
-                    if (event.reevaluateTriageCode)
-                        visitUseCase.addVisit(visit.copy(triageCode = triageCode))
+                    visitUseCase.addVisit(visit.copy(triageCode = triageCode))
 
                     _state.value.pastHistoryState.diseases.forEach {
-                        if (it.isChecked) {
+                        if (it.isDiagnosed == true) {
                             val patientDisease = PatientDisease(
                                 patientId = patient.id,
                                 diseaseName = it.disease,
@@ -161,14 +157,41 @@ class RegistrationScreenViewModel @Inject constructor(
     // Call in a coroutine
     fun getCurrentVisit(patientId: String) = visitUseCase.getCurrentVisit(patientId)
 
+    // --------------Visit History------------------
+
+    fun onVisitHistoryEvent(event: VisitHistoryEvent) {
+        when (event) {
+            is VisitHistoryEvent.Retry -> {
+                refreshVisitHistory(state.value.patientInfoState.patient.id)
+            }
+        }
+    }
+
+    fun refreshVisitHistory(patientId: String) {
+        updateVisitHistoryState { it.copy(error = null, isLoading = true) }
+
+        applicationScope.launch(dispatcher + errorHandler) {
+            loadVisits(patientId)
+        }
+    }
+
+    private suspend fun loadVisits(patientId: String) {
+
+        patientUseCase.getPatientVisits(patientId).collect { visits ->
+            updateVisitHistoryState { it.copy(visits = visits.data ?: emptyList(), isLoading = false) }
+        }
+
+    }
+
     // --------------PastHistory--------------------
 
     fun onPastHistoryEvent(event: PastHistoryEvent) {
         when (event) {
-            is PastHistoryEvent.CheckChanged -> {
+
+            is PastHistoryEvent.RadioButtonClicked -> {
                 updatePastHistoryState {
                     it.copy(diseases = it.diseases.map { d ->
-                        if (d.disease == event.disease) d.copy(isChecked = !d.isChecked) else d
+                        if (d.disease == event.disease) d.copy(isDiagnosed = event.isDiagnosed) else d
                     })
                 }
             }
@@ -192,20 +215,26 @@ class RegistrationScreenViewModel @Inject constructor(
             is PastHistoryEvent.Retry -> {
                 refreshPastHistory(state.value.patientInfoState.patient.id)
             }
+
+            is PastHistoryEvent.NurseClicked -> {
+                updatePastHistoryState {
+                    it.copy(toastMessage = "Only doctors can edit PMH")
+                }
+            }
+
+            is PastHistoryEvent.ToastShown -> {
+                updatePastHistoryState { it.copy(toastMessage = null) }
+            }
         }
     }
 
 
-    fun refreshPastHistory(patientId: String?) {
+    fun refreshPastHistory(patientId: String) {
         updatePastHistoryState { it.copy(error = null, isLoading = true) }
 
         applicationScope.launch(dispatcher + errorHandler) { // applicationScope?
-            if (patientId != null) {
                 loadDiseases()
                 loadPatientDiseases(patientId)
-            } else {
-                loadDiseases()
-            }
         }
     }
 
@@ -259,7 +288,7 @@ class RegistrationScreenViewModel @Inject constructor(
                     val updatedDiseases = currentState.diseases.map { diseaseUi ->
                         dbMap[diseaseUi.disease]?.let { dbEntry ->
                             diseaseUi.copy(
-                                isChecked = true,
+                                isDiagnosed = true,
                                 additionalInfo = dbEntry.additionalInfo,
                                 date = dbEntry.diagnosisDate
                             )
@@ -280,5 +309,9 @@ class RegistrationScreenViewModel @Inject constructor(
 
     private fun updatePastHistoryState(update: (PastHistoryState) -> PastHistoryState) {
         _state.update { it.copy(pastHistoryState = update(it.pastHistoryState)) }
+    }
+
+    private fun updateVisitHistoryState(update: (VisitHistoryState) -> VisitHistoryState) {
+        _state.update { it.copy(visitHistoryState = update(it.visitHistoryState)) }
     }
 }

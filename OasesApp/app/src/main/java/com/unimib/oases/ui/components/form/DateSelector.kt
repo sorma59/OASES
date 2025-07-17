@@ -20,6 +20,7 @@ fun DateSelector(
     modifier: Modifier = Modifier,
     context: Context,
     readOnly: Boolean = false,
+    onReadOnlyClick: () -> Unit = {},
     labelText: String = "Date",
     isError: Boolean = false,
 ) {
@@ -51,11 +52,11 @@ fun DateSelector(
         modifier = modifier,
         readOnly = true,
         trailingIcon = {
-            IconButton(onClick = { if (!readOnly) datePickerDialog.show() }) {
+            IconButton(onClick = { if (!readOnly) datePickerDialog.show() else onReadOnlyClick}) {
                 Icon(Icons.Filled.CalendarMonth, contentDescription = "Insert a date")
             }
         },
-        onClick = { if (!readOnly) datePickerDialog.show() },
+        onClick = { if (readOnly) onReadOnlyClick() else datePickerDialog.show() },
         isError = isError
     )
 }
