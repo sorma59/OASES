@@ -19,4 +19,25 @@ data class RedCodeState(
     var sbpHighDpbHigh: Boolean = false,
     var trauma: Boolean = false,
     var activeLabor: Boolean = false,
-)
+) {
+    val isRedCode: Boolean
+        get() = unconsciousness ||
+                activeConvulsions ||
+                respiratoryDistress ||
+                heavyBleeding ||
+                highRiskTraumaBurns ||
+                threatenedLimb ||
+                poisoningIntoxication ||
+                snakeBite ||
+                aggressiveBehavior ||
+                pregnancyHeavyBleeding ||
+                severeAbdominalPain ||
+                seizures ||
+                alteredMentalStatus ||
+                severeHeadache ||
+                visualChanges ||
+                sbpHighDpbHigh ||
+                trauma ||
+                activeLabor
+
+}

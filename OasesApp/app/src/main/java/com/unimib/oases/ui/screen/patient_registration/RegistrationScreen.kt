@@ -177,7 +177,7 @@ fun RegistrationScreen(
                         }
                     )
                     Tabs.TRIAGE.title -> RedCodeScreen(
-                        onSymptomsChange = { isRedCodeSelected ->
+                        onRedCodeToggle = { isRedCodeSelected ->
                             isRedCode = isRedCodeSelected
                             if (isRedCode){
                                 registrationScreenViewModel.onEvent(
@@ -205,7 +205,7 @@ fun RegistrationScreen(
                         dbpValue = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Diastolic Blood Pressure"}?.value ?: ""
                     )
                     Tabs.NON_RED_CODE.title -> NonRedCodeScreen(
-                        onSymptomsChange = { isYellowCodeSelected ->
+                        onYellowCodeToggle = { isYellowCodeSelected ->
                             isYellowCode = isYellowCodeSelected
                             if (isYellowCode){
                                 registrationScreenViewModel.onEvent(

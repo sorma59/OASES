@@ -28,4 +28,13 @@ data class NonRedCodeState(
     var alteredVitalSignsSbpHigh: Boolean = false,
     var alteredVitalSignsTempLow: Boolean = false,
     var alteredVitalSignsTempHigh: Boolean = false,
-)
+){
+    val isYellowCode: Boolean
+        get() = airwaySwellingMass || ongoingBleeding || severePallor || ongoingSevereVomitingDiarrhea ||
+                unableToFeedOrDrink || recentFainting || lethargyConfusionAgitation || focalNeurologicVisualDeficit
+                || headacheWithStiffNeck || severePain || acuteTesticularScrotalPainPriapism || unableToPassUrine ||
+                acuteLimbDeformityOpenFracture || otherTraumaBurns || sexualAssault || animalBiteNeedlestickPuncture ||
+                otherPregnancyRelatedComplaints || ageOver80Years || alteredVitalSignsSpo2 || alteredVitalSignsRrLow ||
+                alteredVitalSignsRrHigh || alteredVitalSignsHrLow || alteredVitalSignsHrHigh || alteredVitalSignsSbpLow ||
+                alteredVitalSignsSbpHigh || alteredVitalSignsTempLow || alteredVitalSignsTempHigh
+}

@@ -21,9 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,7 +33,7 @@ import com.unimib.oases.ui.components.util.TitleText
 
 @Composable
 fun NonRedCodeScreen(
-    onSymptomsChange: (Boolean) -> Unit,
+    onYellowCodeToggle: (Boolean) -> Unit,
     ageInMonths: Int,
     spo2Value: String,
     hrValue: String,
@@ -51,20 +49,8 @@ fun NonRedCodeScreen(
 
     val scrollState = rememberScrollState()
 
-    val isAnyYellowCodeSelected = remember {
-        derivedStateOf {
-            state.airwaySwellingMass || state.ongoingBleeding || state.severePallor || state.ongoingSevereVomitingDiarrhea ||
-            state.unableToFeedOrDrink || state.recentFainting || state.lethargyConfusionAgitation || state.focalNeurologicVisualDeficit ||
-            state.headacheWithStiffNeck || state.severePain || state.acuteTesticularScrotalPainPriapism || state.unableToPassUrine ||
-            state.acuteLimbDeformityOpenFracture || state.otherTraumaBurns || state.sexualAssault || state.animalBiteNeedlestickPuncture ||
-            state.otherPregnancyRelatedComplaints || state.ageOver80Years || state.alteredVitalSignsSpo2 || state.alteredVitalSignsRrLow ||
-            state.alteredVitalSignsRrHigh || state.alteredVitalSignsHrLow || state.alteredVitalSignsHrHigh || state.alteredVitalSignsTempLow ||
-            state.alteredVitalSignsTempHigh
-        }
-    }
-
-    LaunchedEffect(isAnyYellowCodeSelected.value) {
-        onSymptomsChange(isAnyYellowCodeSelected.value)
+    LaunchedEffect(state.isYellowCode) {
+        onYellowCodeToggle(state.isYellowCode)
     }
 
     Column(

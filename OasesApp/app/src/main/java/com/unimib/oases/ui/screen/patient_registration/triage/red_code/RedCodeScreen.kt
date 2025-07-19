@@ -22,9 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,7 +34,7 @@ import com.unimib.oases.ui.components.util.FadeOverlay
 
 @Composable
 fun RedCodeScreen(
-    onSymptomsChange: (Boolean) -> Unit,
+    onRedCodeToggle: (Boolean) -> Unit,
     onBack: () -> Unit,
     onSubmitted: () -> Unit,
     sbpValue: String,
@@ -51,18 +49,8 @@ fun RedCodeScreen(
 
     val scrollState = rememberScrollState()
 
-    val isAnyRedCodeSelected = remember {
-        derivedStateOf {
-            state.unconsciousness || state.activeConvulsions || state.respiratoryDistress || state.heavyBleeding ||
-            state.highRiskTraumaBurns || state.threatenedLimb || state.poisoningIntoxication || state.snakeBite ||
-            state.aggressiveBehavior || state.pregnancyHeavyBleeding || state.severeAbdominalPain || state.seizures ||
-            state.alteredMentalStatus || state.severeHeadache || state.visualChanges || state.sbpHighDpbHigh ||
-            state.trauma || state.activeLabor
-        }
-    }
-
-    LaunchedEffect(isAnyRedCodeSelected.value) {
-        onSymptomsChange(isAnyRedCodeSelected.value)
+    LaunchedEffect(state.isRedCode) {
+        onRedCodeToggle(state.isRedCode)
     }
 
     Column(
