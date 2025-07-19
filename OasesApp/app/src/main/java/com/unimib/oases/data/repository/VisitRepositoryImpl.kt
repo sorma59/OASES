@@ -2,8 +2,8 @@ package com.unimib.oases.data.repository
 
 import android.util.Log
 import com.unimib.oases.data.local.RoomDataSource
+import com.unimib.oases.data.mapper.toDomain
 import com.unimib.oases.data.mapper.toEntity
-import com.unimib.oases.data.mapper.toVisit
 import com.unimib.oases.domain.model.Visit
 import com.unimib.oases.domain.repository.VisitRepository
 import com.unimib.oases.util.Resource
@@ -40,7 +40,7 @@ class VisitRepositoryImpl @Inject constructor(
         try {
             emit(Resource.Loading())
             roomDataSource.getVisits(patientId).collect {
-                emit(Resource.Success(it.map { entity -> entity.toVisit() }))
+                emit(Resource.Success(it.map { entity -> entity.toDomain() }))
             }
         } catch (e: Exception) {
             Log.e("VisitRepository", "Error getting visits: ${e.message}")
@@ -52,7 +52,7 @@ class VisitRepositoryImpl @Inject constructor(
     override fun getCurrentVisit(patientId: String): Visit? {
         return try {
             val visit = roomDataSource.getCurrentVisit(patientId)
-            visit?.toVisit()
+            visit?.toDomain()
         } catch (e: Exception) {
             Log.e("VisitRepository", "Error getting visits: ${e.message}")
             null

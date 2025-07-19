@@ -3,7 +3,7 @@ package com.unimib.oases.data.mapper
 import com.unimib.oases.data.local.model.PatientDiseaseEntity
 import com.unimib.oases.domain.model.PatientDisease
 
-fun PatientDiseaseEntity.toPatientDisease(): PatientDisease {
+fun PatientDiseaseEntity.toDomain(): PatientDisease {
     return PatientDisease(
         patientId = patientId,
         diseaseName = diseaseName,

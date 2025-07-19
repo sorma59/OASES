@@ -14,7 +14,7 @@ fun Visit.toEntity(): VisitEntity {
     )
 }
 
-fun VisitEntity.toVisit(): Visit {
+fun VisitEntity.toDomain(): Visit {
     return Visit(
         id = id,
         patientId = patientId,

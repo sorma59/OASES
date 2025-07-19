@@ -2,8 +2,8 @@ package com.unimib.oases.data.repository
 
 import android.util.Log
 import com.unimib.oases.data.local.RoomDataSource
+import com.unimib.oases.data.mapper.toDomain
 import com.unimib.oases.data.mapper.toEntity
-import com.unimib.oases.data.mapper.toPatient
 import com.unimib.oases.data.remote.FirebaseFirestoreSource
 import com.unimib.oases.data.util.FirestoreManager
 import com.unimib.oases.di.IoDispatcher
@@ -93,7 +93,7 @@ class PatientRepositoryImpl @Inject constructor(
         emit(Resource.Loading())
         try {
             roomDataSource.getPatientById(patientId).collect {
-                emit(Resource.Success(it?.toPatient()))
+                emit(Resource.Success(it?.toDomain()))
             }
         } catch
             (e: Exception) {
@@ -113,7 +113,7 @@ class PatientRepositoryImpl @Inject constructor(
 
         emit(Resource.Loading())
         roomDataSource.getPatients().collect {
-            emit(Resource.Success(it.asReversed().map { entity -> entity.toPatient() }))
+            emit(Resource.Success(it.asReversed().map { entity -> entity.toDomain() }))
         }
     }.catch { e ->
         Log.e("PatientRepositoryImpl", "Error getting patients: ${e.message}")

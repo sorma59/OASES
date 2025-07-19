@@ -13,7 +13,7 @@ fun Disease.toEntity(): DiseaseEntity {
     )
 }
 
-fun DiseaseEntity.toDisease(): Disease {
+fun DiseaseEntity.toDomain(): Disease {
     return Disease(
         name = name,
         sexSpecificity = sexSpecificity.displayName,

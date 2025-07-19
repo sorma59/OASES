@@ -11,7 +11,7 @@ fun VitalSign.toEntity(): VitalSignEntity {
     )
 }
 
-fun VitalSignEntity.toVitalSign(): VitalSign {
+fun VitalSignEntity.toDomain(): VitalSign {
     return VitalSign(
         name = name,
         acronym = acronym,

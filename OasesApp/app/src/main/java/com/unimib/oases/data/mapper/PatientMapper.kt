@@ -5,7 +5,7 @@ import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.ui.screen.patient_registration.info.Sex.Companion.fromDisplayName
 import com.unimib.oases.util.DateTimeFormatter
 
-fun PatientEntity.toPatient(): Patient {
+fun PatientEntity.toDomain(): Patient {
     val ageInMonths = DateTimeFormatter().calculateAgeInMonths(birthDate)
     return Patient(
         id = id,

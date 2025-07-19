@@ -3,6 +3,7 @@ package com.unimib.oases.data.local
 import com.unimib.oases.data.local.dao.DiseaseDao
 import com.unimib.oases.data.local.dao.PatientDao
 import com.unimib.oases.data.local.dao.PatientDiseaseDao
+import com.unimib.oases.data.local.dao.TriageEvaluationDao
 import com.unimib.oases.data.local.dao.UserDao
 import com.unimib.oases.data.local.dao.VisitDao
 import com.unimib.oases.data.local.dao.VisitVitalSignDao
@@ -13,6 +14,7 @@ import com.unimib.oases.data.local.model.DiseaseEntity
 import com.unimib.oases.data.local.model.PatientDiseaseEntity
 import com.unimib.oases.data.local.model.PatientEntity
 import com.unimib.oases.data.local.model.Role
+import com.unimib.oases.data.local.model.TriageEvaluationEntity
 import com.unimib.oases.data.local.model.User
 import com.unimib.oases.data.local.model.VisitEntity
 import com.unimib.oases.data.local.model.VisitVitalSignEntity
@@ -29,6 +31,7 @@ class RoomDataSource @Inject constructor(
     private val userDao: UserDao get() = authDatabase.userDao()
     private val patientDiseaseDao: PatientDiseaseDao get() = appDatabase.patientDiseaseDao()
     private val diseaseDao: DiseaseDao get() = appDatabase.diseaseDao()
+    private val triageEvaluationDao: TriageEvaluationDao get() = appDatabase.triageEvaluationDao()
     private val visitDao: VisitDao get() = appDatabase.visitDao()
     private val visitVitalSignDao: VisitVitalSignDao get() = appDatabase.visitVitalSignDao()
     private val vitalSignDao: VitalSignsDao get() = appDatabase.vitalSignDao()
@@ -112,6 +115,15 @@ class RoomDataSource @Inject constructor(
 
     suspend fun deleteDisease(disease: DiseaseEntity) {
         diseaseDao.delete(disease)
+    }
+
+    // -------------------Triage Evaluation-------------------
+    suspend fun insertTriageEvaluation(triageEvaluation: TriageEvaluationEntity) {
+        triageEvaluationDao.insert(triageEvaluation)
+    }
+
+    fun getTriageEvaluation(visitId: String): TriageEvaluationEntity {
+        return triageEvaluationDao.getTriageEvaluation(visitId)
     }
 
     // -----------------Visits--------------------

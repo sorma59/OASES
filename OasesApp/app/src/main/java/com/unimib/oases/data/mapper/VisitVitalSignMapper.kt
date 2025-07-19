@@ -12,7 +12,7 @@ fun VisitVitalSign.toEntity(): VisitVitalSignEntity {
     )
 }
 
-fun VisitVitalSignEntity.toVisitVitalSign(): VisitVitalSign {
+fun VisitVitalSignEntity.toDomain(): VisitVitalSign {
     return VisitVitalSign(
         visitId = visitId,
         timestamp = timestamp,

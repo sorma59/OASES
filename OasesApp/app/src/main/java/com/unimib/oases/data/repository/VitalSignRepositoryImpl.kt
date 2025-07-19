@@ -2,8 +2,8 @@ package com.unimib.oases.data.repository
 
 import android.util.Log
 import com.unimib.oases.data.local.RoomDataSource
+import com.unimib.oases.data.mapper.toDomain
 import com.unimib.oases.data.mapper.toEntity
-import com.unimib.oases.data.mapper.toVitalSign
 import com.unimib.oases.domain.model.VitalSign
 import com.unimib.oases.domain.repository.VitalSignRepository
 import com.unimib.oases.util.Resource
@@ -47,7 +47,7 @@ class VitalSignRepositoryImpl @Inject constructor(
     override fun getAllVitalSigns(): Flow<Resource<List<VitalSign>>> = flow {
         emit(Resource.Loading())
         roomDataSource.getAllVitalSigns().collect {
-            emit(Resource.Success(it.map { entity -> entity.toVitalSign() }))
+            emit(Resource.Success(it.map { entity -> entity.toDomain() }))
         }
     }
 }

@@ -8,4 +8,5 @@ object TableNames {
     const val VISIT = "visits"
     const val VISIT_VITAL_SIGN = "visits_vital_signs"
     const val VITAL_SIGN = "vital_signs"
+    const val TRIAGE_EVALUATION = "triage_evaluation"
 }
