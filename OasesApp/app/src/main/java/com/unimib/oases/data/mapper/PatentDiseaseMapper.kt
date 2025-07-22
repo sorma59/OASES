@@ -7,6 +7,7 @@ fun PatientDiseaseEntity.toDomain(): PatientDisease {
     return PatientDisease(
         patientId = patientId,
         diseaseName = diseaseName,
+        isDiagnosed = isDiagnosed,
         diagnosisDate = diagnosisDate,
         additionalInfo = additionalInfo
     )
@@ -16,6 +17,7 @@ fun PatientDisease.toEntity(): PatientDiseaseEntity {
     return PatientDiseaseEntity(
         patientId = patientId,
         diseaseName = diseaseName,
+        isDiagnosed = isDiagnosed,
         diagnosisDate = diagnosisDate,
         additionalInfo = additionalInfo
     )

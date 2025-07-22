@@ -1,0 +1,42 @@
+package com.unimib.oases.ui.screen.patient_registration.triage
+
+sealed class TriageEvent {
+    // Red Code
+    data class UnconsciousnessChanged(val value: Boolean) : TriageEvent()
+    data class ActiveConvulsionsChanged(val value: Boolean) : TriageEvent()
+    data class RespiratoryDistressChanged(val value: Boolean) : TriageEvent()
+    data class HeavyBleedingChanged(val value: Boolean) : TriageEvent()
+    data class HighRiskTraumaBurnsChanged(val value: Boolean) : TriageEvent()
+    data class ThreatenedLimbChanged(val value: Boolean) : TriageEvent()
+    data class PoisoningIntoxicationChanged(val value: Boolean) : TriageEvent()
+    data class SnakeBiteChanged(val value: Boolean) : TriageEvent()
+    data class AggressiveBehaviorChanged(val value: Boolean) : TriageEvent()
+    data class PregnancyHeavyBleedingChanged(val value: Boolean) : TriageEvent()
+    data class SevereAbdominalPainChanged(val value: Boolean) : TriageEvent()
+    data class SeizuresChanged(val value: Boolean) : TriageEvent()
+    data class AlteredMentalStatusChanged(val value: Boolean) : TriageEvent()
+    data class SevereHeadacheChanged(val value: Boolean) : TriageEvent()
+    data class VisualChangesChanged(val value: Boolean) : TriageEvent()
+    data class SbpHighDpbHighChanged(val value: Boolean) : TriageEvent()
+    data class TraumaChanged(val value: Boolean) : TriageEvent()
+    data class ActiveLaborChanged(val value: Boolean) : TriageEvent()
+
+    // Yellow Code
+    data class AirwaySwellingMassChanged(val value: Boolean): TriageEvent()
+    data class OngoingBleedingChanged(val value: Boolean): TriageEvent()
+    data class SeverePallorChanged(val value: Boolean): TriageEvent()
+    data class OngoingSevereVomitingDiarrheaChanged(val value: Boolean): TriageEvent()
+    data class UnableToFeedOrDrinkChanged(val value: Boolean): TriageEvent()
+    data class RecentFaintingChanged(val value: Boolean): TriageEvent()
+    data class LethargyConfusionAgitationChanged(val value: Boolean): TriageEvent()
+    data class FocalNeurologicVisualDeficitChanged(val value: Boolean): TriageEvent()
+    data class HeadacheWithStiffNeckChanged(val value: Boolean): TriageEvent()
+    data class SeverePainChanged(val value: Boolean): TriageEvent()
+    data class AcuteTesticularScrotalPainPriapismChanged(val value: Boolean): TriageEvent()
+    data class UnableToPassUrineChanged(val value: Boolean): TriageEvent()
+    data class AcuteLimbDeformityOpenFractureChanged(val value: Boolean): TriageEvent()
+    data class OtherTraumaBurnsChanged(val value: Boolean): TriageEvent()
+    data class SexualAssaultChanged(val value: Boolean): TriageEvent()
+    data class AnimalBiteNeedlestickPunctureChanged(val value: Boolean): TriageEvent()
+    data class OtherPregnancyRelatedComplaintsChanged(val value: Boolean): TriageEvent()
+}

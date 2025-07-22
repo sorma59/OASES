@@ -10,12 +10,14 @@ object PatientDiseaseSerializer {
     fun serialize(patientDisease: PatientDisease): ByteArray {
         val patientIdBytes = patientDisease.patientId.toByteArray(Charsets.UTF_8)
         val diseaseNameBytes = patientDisease.diseaseName.toByteArray(Charsets.UTF_8)
+        val isDiagnosedBytes = patientDisease.isDiagnosed.toString().toByteArray(Charsets.UTF_8)
         val diagnosisDateBytes = patientDisease.diagnosisDate.toByteArray(Charsets.UTF_8)
         val additionalInfoBytes = patientDisease.additionalInfo.toByteArray(Charsets.UTF_8)
 
         val buffer = ByteBuffer.allocate(
                 4 + patientIdBytes.size +
                 4 + diseaseNameBytes.size +
+                4 + isDiagnosedBytes.size +
                 4 + diagnosisDateBytes.size +
                 4 + additionalInfoBytes.size
         ).order(ByteOrder.BIG_ENDIAN)
@@ -25,6 +27,9 @@ object PatientDiseaseSerializer {
 
         buffer.putInt(diseaseNameBytes.size)
         buffer.put(diseaseNameBytes)
+
+        buffer.putInt(isDiagnosedBytes.size)
+        buffer.put(isDiagnosedBytes)
 
         buffer.putInt(diagnosisDateBytes.size)
         buffer.put(diagnosisDateBytes)
@@ -40,12 +45,14 @@ object PatientDiseaseSerializer {
 
         val patientId = buffer.readString()
         val diseaseName = buffer.readString()
+        val isDiagnosed = buffer.readString().toBooleanStrict()
         val diagnosisDate = buffer.readString()
         val additionalInfo = buffer.readString()
 
         return PatientDisease(
             patientId = patientId,
             diseaseName = diseaseName,
+            isDiagnosed = isDiagnosed,
             diagnosisDate = diagnosisDate,
             additionalInfo = additionalInfo
         )
@@ -56,6 +63,7 @@ object PatientDiseaseSerializer {
         val original = PatientDisease(
             patientId = "id",
             diseaseName = "name",
+            isDiagnosed = true,
             diagnosisDate = "date",
             additionalInfo = "info"
         )

@@ -10,6 +10,7 @@ import com.unimib.oases.domain.model.SexSpecificity.Companion.fromSexSpecificity
 import com.unimib.oases.domain.model.Visit
 import com.unimib.oases.domain.model.VisitStatus
 import com.unimib.oases.domain.model.VisitVitalSign
+import com.unimib.oases.domain.repository.TriageEvaluationRepository
 import com.unimib.oases.domain.usecase.DiseaseUseCase
 import com.unimib.oases.domain.usecase.PatientDiseaseUseCase
 import com.unimib.oases.domain.usecase.PatientUseCase
@@ -18,6 +19,10 @@ import com.unimib.oases.domain.usecase.VisitVitalSignsUseCase
 import com.unimib.oases.ui.screen.patient_registration.past_medical_history.PastHistoryEvent
 import com.unimib.oases.ui.screen.patient_registration.past_medical_history.PastHistoryState
 import com.unimib.oases.ui.screen.patient_registration.past_medical_history.PatientDiseaseState
+import com.unimib.oases.ui.screen.patient_registration.triage.TriageEvent
+import com.unimib.oases.ui.screen.patient_registration.triage.TriageState
+import com.unimib.oases.ui.screen.patient_registration.triage.mapToTriageEvaluation
+import com.unimib.oases.ui.screen.patient_registration.triage.mapToTriageState
 import com.unimib.oases.ui.screen.patient_registration.visit_history.VisitHistoryEvent
 import com.unimib.oases.ui.screen.patient_registration.visit_history.VisitHistoryState
 import com.unimib.oases.util.Resource
@@ -41,6 +46,7 @@ class RegistrationScreenViewModel @Inject constructor(
     private val diseaseUseCase: DiseaseUseCase,
     private val patientDiseaseUseCase: PatientDiseaseUseCase,
     private val visitVitalSignsUseCase: VisitVitalSignsUseCase,
+    private val triageEvaluationRepository: TriageEvaluationRepository,
     @ApplicationScope private val applicationScope: CoroutineScope,
     @IoDispatcher private val dispatcher: CoroutineDispatcher
 ): ViewModel() {
@@ -67,26 +73,46 @@ class RegistrationScreenViewModel @Inject constructor(
                     _state.update {
                         _state.value.copy(
                             patientInfoState = event.patientInfoState,
-                            currentVisit = getCurrentVisit(event.patientInfoState.patient.id),
-                            pastHistoryState = _state.value.pastHistoryState.copy(
-                                age =
-                                    if (age >= 12)
-                                        AgeSpecificity.ADULTS
-                                    else
-                                        AgeSpecificity.CHILDREN,
-                                sex = sex
-                            )
+                            currentVisit = getCurrentVisit(event.patientInfoState.patient.id)
                         )
+                    }
+                    updatePastHistoryState {
+                        it.copy(
+                            age =
+                                if (age >= 12)
+                                    AgeSpecificity.ADULTS
+                                else
+                                    AgeSpecificity.CHILDREN,
+                            sex = sex
+                        )
+                    }
+                    updateTriageState {
+                        it.copy( age = age )
                     }
                     refreshVisitHistory(event.patientInfoState.patient.id)
                     refreshPastHistory(event.patientInfoState.patient.id)
+                    val currentVisit = _state.value.currentVisit
+                    if (currentVisit != null)
+                        refreshTriage(currentVisit.id)
                 }
             }
+
+
 
             is RegistrationEvent.VitalSignsSubmitted -> {
                 _state.update {
                     _state.value.copy(
-                        vitalSignsState = event.vitalSignsState
+                        vitalSignsState = event.vitalSignsState,
+                    )
+                }
+                updateTriageState {
+                    it.copy(
+                        sbp = event.vitalSignsState.vitalSigns.firstOrNull { it.name == "Systolic Blood Pressure" }?.value?.toDouble()?.toInt(),
+                        dbp = event.vitalSignsState.vitalSigns.firstOrNull { it.name == "Diastolic Blood Pressure" }?.value?.toDouble()?.toInt(),
+                        hr = event.vitalSignsState.vitalSigns.firstOrNull { it.name == "Heart Rate" }?.value?.toDouble()?.toInt(),
+                        rr = event.vitalSignsState.vitalSigns.firstOrNull { it.name == "Respiratory Rate" }?.value?.toDouble()?.toInt(),
+                        spo2 = event.vitalSignsState.vitalSigns.firstOrNull { it.name == "Oxygen Saturation" }?.value?.toDouble()?.toInt(),
+                        temp = event.vitalSignsState.vitalSigns.firstOrNull { it.name == "Temperature" }?.value?.toDouble()
                     )
                 }
             }
@@ -106,31 +132,29 @@ class RegistrationScreenViewModel @Inject constructor(
                         _state.value.vitalSignsState.vitalSigns.filter { it.value.isNotEmpty() }
                     val triageCode = _state.value.triageCode
 
-                    var visit = getCurrentVisit(patient.id)
+                    val currentVisit = _state.value.currentVisit
 
-                    if (visit == null){
-                        visit = Visit(
-                            patientId = patient.id,
-                            triageCode = triageCode,
-                            date = LocalDate.now().toString(),
-                            description = "",
-                            status = VisitStatus.OPEN.name
-                        )
-                    }
-
-                    visitUseCase.addVisit(visit.copy(triageCode = triageCode))
+                    val visit =
+                        currentVisit?.copy(triageCode = triageCode)
+                            ?: Visit(
+                                patientId = patient.id,
+                                triageCode = triageCode,
+                                date = LocalDate.now().toString(),
+                                description = "",
+                                status = VisitStatus.OPEN.name
+                            )
+                    visitUseCase.addVisit(visit)
 
                     _state.value.pastHistoryState.diseases.forEach {
-                        if (it.isDiagnosed == true) {
+                        if (it.isDiagnosed != null) {
                             val patientDisease = PatientDisease(
                                 patientId = patient.id,
                                 diseaseName = it.disease,
+                                isDiagnosed = it.isDiagnosed == true,
                                 additionalInfo = it.additionalInfo,
                                 diagnosisDate = it.date
                             )
                             patientDiseaseUseCase.addPatientDisease(patientDisease)
-                        } else {
-                            patientDiseaseUseCase.deletePatientDisease(it.disease, patient.id)
                         }
                     }
 
@@ -149,6 +173,9 @@ class RegistrationScreenViewModel @Inject constructor(
 //                    patientUseCase.updateTriageState(patient, triageCode)
 
                     patientUseCase.updateStatus(patient, PatientStatus.WAITING_FOR_VISIT.displayValue)
+
+
+                    triageEvaluationRepository.insertTriageEvaluation(_state.value.triageState.mapToTriageEvaluation(visit.id))
                 }
             }
         }
@@ -156,6 +183,210 @@ class RegistrationScreenViewModel @Inject constructor(
 
     // Call in a coroutine
     fun getCurrentVisit(patientId: String) = visitUseCase.getCurrentVisit(patientId)
+
+    // -----------------Triage----------------------
+
+    fun onTriageEvent(event: TriageEvent) {
+        when(event){
+            // Red Code
+            is TriageEvent.UnconsciousnessChanged -> {
+                updateTriageState {
+                    it.copy(unconsciousness = event.value)
+                }
+            }
+            is TriageEvent.ActiveConvulsionsChanged -> {
+                updateTriageState {
+                    it.copy(activeConvulsions = event.value)
+                }
+            }
+            is TriageEvent.RespiratoryDistressChanged -> {
+                updateTriageState {
+                    it.copy(respiratoryDistress = event.value)
+                }
+            }
+            is TriageEvent.HeavyBleedingChanged -> {
+                updateTriageState {
+                    it.copy(heavyBleeding = event.value)
+                }
+            }
+            is TriageEvent.HighRiskTraumaBurnsChanged -> {
+                updateTriageState {
+                    it.copy(highRiskTraumaBurns = event.value)
+                }
+            }
+            is TriageEvent.ThreatenedLimbChanged -> {
+                updateTriageState {
+                    it.copy(threatenedLimb = event.value)
+                }
+            }
+            is TriageEvent.PoisoningIntoxicationChanged -> {
+                updateTriageState {
+                    it.copy(poisoningIntoxication = event.value)
+                }
+            }
+            is TriageEvent.SnakeBiteChanged -> {
+                updateTriageState {
+                    it.copy(snakeBite = event.value)
+                }
+            }
+            is TriageEvent.AggressiveBehaviorChanged -> {
+                updateTriageState {
+                    it.copy(aggressiveBehavior = event.value)
+                }
+            }
+            is TriageEvent.PregnancyHeavyBleedingChanged -> {
+                updateTriageState {
+                    it.copy(pregnancyWithHeavyBleeding = event.value)
+                }
+            }
+            is TriageEvent.SevereAbdominalPainChanged -> {
+                updateTriageState {
+                    it.copy(pregnancyWithSevereAbdominalPain = event.value)
+                }
+            }
+            is TriageEvent.SeizuresChanged -> {
+                updateTriageState {
+                    it.copy(pregnancyWithSeizures = event.value)
+                }
+            }
+            is TriageEvent.AlteredMentalStatusChanged -> {
+                updateTriageState {
+                     it.copy(pregnancyWithAlteredMentalStatus = event.value)
+                }
+            }
+            is TriageEvent.SevereHeadacheChanged -> {
+                updateTriageState {
+                    it.copy(pregnancyWithSevereHeadache = event.value)
+                }
+            }
+            is TriageEvent.VisualChangesChanged -> {
+                updateTriageState {
+                    it.copy(pregnancyWithVisualChanges = event.value)
+                }
+            }
+            is TriageEvent.SbpHighDpbHighChanged -> {
+                updateTriageState {
+                    it.copy(pregnancyWithSbpHighDpbHigh = event.value)
+                }
+            }
+            is TriageEvent.TraumaChanged -> {
+                updateTriageState {
+                    it.copy(pregnancyWithTrauma = event.value)
+                }
+            }
+            is TriageEvent.ActiveLaborChanged -> {
+                updateTriageState {
+                    it.copy(pregnancyWithActiveLabor = event.value)
+                }
+            }
+
+            // Yellow Code
+
+            is TriageEvent.AcuteLimbDeformityOpenFractureChanged -> {
+                updateTriageState {
+                    it.copy(acuteLimbDeformityOpenFracture = event.value)
+                }
+            }
+            is TriageEvent.AcuteTesticularScrotalPainPriapismChanged -> {
+                updateTriageState {
+                    it.copy(acuteTesticularScrotalPainPriapism = event.value)
+                }
+            }
+            is TriageEvent.AirwaySwellingMassChanged -> {
+                updateTriageState {
+                    it.copy(airwaySwellingMass = event.value)
+                }
+            }
+            is TriageEvent.AnimalBiteNeedlestickPunctureChanged -> {
+                updateTriageState {
+                    it.copy(animalBiteNeedlestickPuncture = event.value)
+                }
+            }
+            is TriageEvent.FocalNeurologicVisualDeficitChanged -> {
+                updateTriageState {
+                    it.copy(focalNeurologicVisualDeficit = event.value)
+                }
+            }
+            is TriageEvent.HeadacheWithStiffNeckChanged -> {
+                updateTriageState {
+                    it.copy(headacheWithStiffNeck = event.value)
+                }
+            }
+            is TriageEvent.LethargyConfusionAgitationChanged -> {
+                updateTriageState {
+                    it.copy(lethargyConfusionAgitation = event.value)
+                }
+            }
+            is TriageEvent.OngoingBleedingChanged -> {
+                updateTriageState {
+                    it.copy(ongoingBleeding = event.value)
+                }
+            }
+            is TriageEvent.OngoingSevereVomitingDiarrheaChanged -> {
+                updateTriageState {
+                    it.copy(ongoingSevereVomitingDiarrhea = event.value)
+                }
+            }
+            is TriageEvent.OtherPregnancyRelatedComplaintsChanged -> {
+                updateTriageState {
+                    it.copy(otherPregnancyRelatedComplaints = event.value)
+                }
+            }
+            is TriageEvent.OtherTraumaBurnsChanged -> {
+                updateTriageState {
+                    it.copy(otherTraumaBurns = event.value)
+                }
+            }
+            is TriageEvent.RecentFaintingChanged -> {
+                updateTriageState {
+                    it.copy(recentFainting = event.value)
+                }
+            }
+            is TriageEvent.SeverePainChanged -> {
+                updateTriageState {
+                    it.copy(severePain = event.value)
+                }
+            }
+            is TriageEvent.SeverePallorChanged -> {
+                updateTriageState {
+                    it.copy(severePallor = event.value)
+                }
+            }
+            is TriageEvent.SexualAssaultChanged -> {
+                updateTriageState {
+                    it.copy(sexualAssault = event.value)
+                }
+            }
+            is TriageEvent.UnableToFeedOrDrinkChanged -> {
+                updateTriageState {
+                    it.copy(unableToFeedOrDrink = event.value)
+                }
+            }
+            is TriageEvent.UnableToPassUrineChanged -> {
+                updateTriageState {
+                    it.copy(unableToPassUrine = event.value)
+                }
+            }
+        }
+    }
+
+    fun refreshTriage(visitId: String) {
+        updateTriageState { it.copy(error = null, isLoading = true) }
+
+        applicationScope.launch(dispatcher + errorHandler) {
+            loadPatientSymptoms(visitId)
+        }
+    }
+
+    private fun loadPatientSymptoms(visitId: String){
+        val triageEvaluationResource = triageEvaluationRepository.getTriageEvaluation(visitId)
+        if (triageEvaluationResource is Resource.Success)
+            updateTriageState {
+                return@updateTriageState triageEvaluationResource.data!!.mapToTriageState()
+            }
+        else
+            updateTriageState { it.copy(error = triageEvaluationResource.message) }
+    }
 
     // --------------Visit History------------------
 
@@ -233,8 +464,8 @@ class RegistrationScreenViewModel @Inject constructor(
         updatePastHistoryState { it.copy(error = null, isLoading = true) }
 
         applicationScope.launch(dispatcher + errorHandler) { // applicationScope?
-                loadDiseases()
-                loadPatientDiseases(patientId)
+            loadDiseases()
+            loadPatientDiseases(patientId)
         }
     }
 
@@ -288,7 +519,7 @@ class RegistrationScreenViewModel @Inject constructor(
                     val updatedDiseases = currentState.diseases.map { diseaseUi ->
                         dbMap[diseaseUi.disease]?.let { dbEntry ->
                             diseaseUi.copy(
-                                isDiagnosed = true,
+                                isDiagnosed = dbEntry.isDiagnosed,
                                 additionalInfo = dbEntry.additionalInfo,
                                 date = dbEntry.diagnosisDate
                             )
@@ -306,6 +537,14 @@ class RegistrationScreenViewModel @Inject constructor(
             updatePastHistoryState { it.copy(isLoading = false) }
         }
     }
+
+    private fun updateTriageState(update: (TriageState) -> TriageState) {
+        _state.update { it.copy(triageState = update(it.triageState)) }
+    }
+
+//    private fun updateTriageState(triageState: TriageState) {
+//        _state.update { it.copy(triageState = triageState) }
+//    }
 
     private fun updatePastHistoryState(update: (PastHistoryState) -> PastHistoryState) {
         _state.update { it.copy(pastHistoryState = update(it.pastHistoryState)) }

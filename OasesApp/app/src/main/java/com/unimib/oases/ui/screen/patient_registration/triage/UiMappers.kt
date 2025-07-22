@@ -1,11 +1,9 @@
-package com.unimib.oases.data.mapper
+package com.unimib.oases.ui.screen.patient_registration.triage
 
-import com.unimib.oases.data.local.model.TriageEvaluationEntity
 import com.unimib.oases.domain.model.TriageEvaluation
 
-fun TriageEvaluation.toEntity(): TriageEvaluationEntity {
-    return TriageEvaluationEntity(
-        visitId = visitId,
+fun TriageEvaluation.mapToTriageState(): TriageState{
+    return TriageState(
         unconsciousness = unconsciousness,
         activeConvulsions = activeConvulsions,
         respiratoryDistress = respiratoryDistress,
@@ -15,15 +13,16 @@ fun TriageEvaluation.toEntity(): TriageEvaluationEntity {
         poisoningIntoxication = poisoningIntoxication,
         snakeBite = snakeBite,
         aggressiveBehavior = aggressiveBehavior,
-        pregnancyHeavyBleeding = pregnancyWithHeavyBleeding,
-        severeAbdominalPain = pregnancyWithSevereAbdominalPain,
-        seizures = pregnancyWithSeizures,
-        alteredMentalStatus = pregnancyWithAlteredMentalStatus,
-        severeHeadache = pregnancyWithSevereHeadache,
-        visualChanges = pregnancyWithVisualChanges,
-        sbpHighDpbHigh = pregnancyWithSbpHighDpbHigh,
-        trauma = pregnancyWithTrauma,
-        activeLabor = pregnancyWithActiveLabor,
+        pregnancyWithHeavyBleeding = pregnancyWithHeavyBleeding,
+        pregnancyWithSevereAbdominalPain = pregnancyWithSevereAbdominalPain,
+        pregnancyWithSeizures = pregnancyWithSeizures,
+        pregnancyWithAlteredMentalStatus = pregnancyWithAlteredMentalStatus,
+        pregnancyWithSevereHeadache = pregnancyWithSevereHeadache,
+        pregnancyWithVisualChanges = pregnancyWithVisualChanges,
+        pregnancyWithSbpHighDpbHigh = pregnancyWithSbpHighDpbHigh,
+        pregnancyWithTrauma = pregnancyWithTrauma,
+        pregnancyWithActiveLabor = pregnancyWithActiveLabor,
+
         airwaySwellingMass = airwaySwellingMass,
         ongoingBleeding = ongoingBleeding,
         severePallor = severePallor,
@@ -41,20 +40,11 @@ fun TriageEvaluation.toEntity(): TriageEvaluationEntity {
         sexualAssault = sexualAssault,
         animalBiteNeedlestickPuncture = animalBiteNeedlestickPuncture,
         otherPregnancyRelatedComplaints = otherPregnancyRelatedComplaints,
-        ageOver80Years = ageOver80Years,
-        alteredVitalSignsSpo2 = alteredVitalSignsSpo2,
-        alteredVitalSignsRrLow = alteredVitalSignsRrLow,
-        alteredVitalSignsRrHigh = alteredVitalSignsRrHigh,
-        alteredVitalSignsHrLow = alteredVitalSignsHrLow,
-        alteredVitalSignsHrHigh = alteredVitalSignsHrHigh,
-        alteredVitalSignsSbpLow = alteredVitalSignsSbpLow,
-        alteredVitalSignsSbpHigh = alteredVitalSignsSbpHigh,
-        alteredVitalSignsTempLow = alteredVitalSignsTempLow,
-        alteredVitalSignsTempHigh = alteredVitalSignsTempHigh
+
     )
 }
 
-fun TriageEvaluationEntity.toDomain(): TriageEvaluation {
+fun TriageState.mapToTriageEvaluation(visitId: String): TriageEvaluation{
     return TriageEvaluation(
         visitId = visitId,
         unconsciousness = unconsciousness,
@@ -66,15 +56,16 @@ fun TriageEvaluationEntity.toDomain(): TriageEvaluation {
         poisoningIntoxication = poisoningIntoxication,
         snakeBite = snakeBite,
         aggressiveBehavior = aggressiveBehavior,
-        pregnancyWithHeavyBleeding = pregnancyHeavyBleeding,
-        pregnancyWithSevereAbdominalPain = severeAbdominalPain,
-        pregnancyWithSeizures = seizures,
-        pregnancyWithAlteredMentalStatus = alteredMentalStatus,
-        pregnancyWithSevereHeadache = severeHeadache,
-        pregnancyWithVisualChanges = visualChanges,
-        pregnancyWithSbpHighDpbHigh = sbpHighDpbHigh,
-        pregnancyWithTrauma = trauma,
-        pregnancyWithActiveLabor = activeLabor,
+        pregnancyWithHeavyBleeding = pregnancyWithHeavyBleeding,
+        pregnancyWithSevereAbdominalPain = pregnancyWithSevereAbdominalPain,
+        pregnancyWithSeizures = pregnancyWithSeizures,
+        pregnancyWithAlteredMentalStatus = pregnancyWithAlteredMentalStatus,
+        pregnancyWithSevereHeadache = pregnancyWithSevereHeadache,
+        pregnancyWithVisualChanges = pregnancyWithVisualChanges,
+        pregnancyWithSbpHighDpbHigh = pregnancyWithSbpHighDpbHigh,
+        pregnancyWithTrauma = pregnancyWithTrauma,
+        pregnancyWithActiveLabor = pregnancyWithActiveLabor,
+
         airwaySwellingMass = airwaySwellingMass,
         ongoingBleeding = ongoingBleeding,
         severePallor = severePallor,
@@ -92,15 +83,5 @@ fun TriageEvaluationEntity.toDomain(): TriageEvaluation {
         sexualAssault = sexualAssault,
         animalBiteNeedlestickPuncture = animalBiteNeedlestickPuncture,
         otherPregnancyRelatedComplaints = otherPregnancyRelatedComplaints,
-        ageOver80Years = ageOver80Years,
-        alteredVitalSignsSpo2 = alteredVitalSignsSpo2,
-        alteredVitalSignsRrLow = alteredVitalSignsRrLow,
-        alteredVitalSignsRrHigh = alteredVitalSignsRrHigh,
-        alteredVitalSignsHrLow = alteredVitalSignsHrLow,
-        alteredVitalSignsHrHigh = alteredVitalSignsHrHigh,
-        alteredVitalSignsSbpLow = alteredVitalSignsSbpLow,
-        alteredVitalSignsSbpHigh = alteredVitalSignsSbpHigh,
-        alteredVitalSignsTempLow = alteredVitalSignsTempLow,
-        alteredVitalSignsTempHigh = alteredVitalSignsTempHigh
     )
 }

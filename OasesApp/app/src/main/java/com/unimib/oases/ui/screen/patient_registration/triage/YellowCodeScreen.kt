@@ -1,4 +1,4 @@
-package com.unimib.oases.ui.screen.patient_registration.triage.non_red_code
+package com.unimib.oases.ui.screen.patient_registration.triage
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,38 +14,26 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Circle
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import com.unimib.oases.ui.components.input.LabeledCheckbox
 import com.unimib.oases.ui.components.util.FadeOverlay
 import com.unimib.oases.ui.components.util.TitleText
 
 @Composable
-fun NonRedCodeScreen(
+fun YellowCodeScreen(
+    state: TriageState,
+    onEvent: (TriageEvent) -> Unit,
     onYellowCodeToggle: (Boolean) -> Unit,
-    ageInMonths: Int,
-    spo2Value: String,
-    hrValue: String,
-    rrValue: String,
-    sbpValue: String,
-    tempValue: String
 ) {
-    val nonRedCodeViewModel: NonRedCodeViewModel = hiltViewModel()
-
-    nonRedCodeViewModel.updateVitalSignsAndAge(ageInMonths, spo2Value, rrValue, hrValue, sbpValue, tempValue)
-
-    val state by nonRedCodeViewModel.state.collectAsState()
 
     val scrollState = rememberScrollState()
 
@@ -67,7 +55,7 @@ fun NonRedCodeScreen(
         ) {
             Icon(
                 imageVector = Icons.Filled.Circle,
-                contentDescription = "YELLOW Code",
+                contentDescription = "Yellow Code",
                 tint = Color.Yellow,
                 modifier = Modifier.size(24.dp)
             )
@@ -84,156 +72,156 @@ fun NonRedCodeScreen(
                     .fillMaxWidth()
                     .verticalScroll(scrollState)
             ) {
-                YellowCodeCheckbox(
+                LabeledCheckbox(
                     label = "Airway swelling/mass",
                     checked = state.airwaySwellingMass,
                     onCheckedChange = {
-                        nonRedCodeViewModel.onEvent(
-                            NonRedCodeEvent.AirwaySwellingMassChanged(it)
+                        onEvent(
+                            TriageEvent.AirwaySwellingMassChanged(it)
                         )
                     }
                 )
-                YellowCodeCheckbox(
+                LabeledCheckbox(
                     label = "Ongoing bleeding (no red criteria)",
                     checked = state.ongoingBleeding,
                     onCheckedChange = {
-                        nonRedCodeViewModel.onEvent(
-                            NonRedCodeEvent.OngoingBleedingChanged(it)
+                        onEvent(
+                            TriageEvent.OngoingBleedingChanged(it)
                         )
                     }
                 )
-                YellowCodeCheckbox(
+                LabeledCheckbox(
                     label = "Severe pallor",
                     checked = state.severePallor,
                     onCheckedChange = {
-                        nonRedCodeViewModel.onEvent(
-                            NonRedCodeEvent.SeverePallorChanged(it)
+                        onEvent(
+                            TriageEvent.SeverePallorChanged(it)
                         )
                     }
                 )
-                YellowCodeCheckbox(
+                LabeledCheckbox(
                     label = "Ongoing severe vomiting/diarrhea",
                     checked = state.ongoingSevereVomitingDiarrhea,
                     onCheckedChange = {
-                        nonRedCodeViewModel.onEvent(
-                            NonRedCodeEvent.OngoingSevereVomitingDiarrheaChanged(it)
+                        onEvent(
+                            TriageEvent.OngoingSevereVomitingDiarrheaChanged(it)
                         )
                     }
                 )
-                YellowCodeCheckbox(
+                LabeledCheckbox(
                     label = "Unable to feed or drink",
                     checked = state.unableToFeedOrDrink,
                     onCheckedChange = {
-                        nonRedCodeViewModel.onEvent(
-                            NonRedCodeEvent.UnableToFeedOrDrinkChanged(it)
+                        onEvent(
+                            TriageEvent.UnableToFeedOrDrinkChanged(it)
                         )
                     }
                 )
-                YellowCodeCheckbox(
+                LabeledCheckbox(
                     label = "Recent fainting",
                     checked = state.recentFainting,
                     onCheckedChange = {
-                        nonRedCodeViewModel.onEvent(
-                            NonRedCodeEvent.RecentFaintingChanged(it)
+                        onEvent(
+                            TriageEvent.RecentFaintingChanged(it)
                         )
                     }
                 )
-                YellowCodeCheckbox(
+                LabeledCheckbox(
                     label = "Lethargy/confusion/agitation",
                     checked = state.lethargyConfusionAgitation,
                     onCheckedChange = {
-                        nonRedCodeViewModel.onEvent(
-                            NonRedCodeEvent.LethargyConfusionAgitationChanged(it)
+                        onEvent(
+                            TriageEvent.LethargyConfusionAgitationChanged(it)
                         )
                     }
                 )
-                YellowCodeCheckbox(
+                LabeledCheckbox(
                     label = "Focal neurologic/visual deficit",
                     checked = state.focalNeurologicVisualDeficit,
                     onCheckedChange = {
-                        nonRedCodeViewModel.onEvent(
-                            NonRedCodeEvent.FocalNeurologicalVisualDeficitChanged(it)
+                        onEvent(
+                            TriageEvent.FocalNeurologicVisualDeficitChanged(it)
                         )
                     }
                 )
-                YellowCodeCheckbox(
+                LabeledCheckbox(
                     label = "Headache with stiff neck",
                     checked = state.headacheWithStiffNeck,
                     onCheckedChange = {
-                        nonRedCodeViewModel.onEvent(
-                            NonRedCodeEvent.HeadacheWithStiffNeckChanged(it)
+                        onEvent(
+                            TriageEvent.HeadacheWithStiffNeckChanged(it)
                         )
                     }
                 )
-                YellowCodeCheckbox(
+                LabeledCheckbox(
                     label = "Severe pain",
                     checked = state.severePain,
                     onCheckedChange = {
-                        nonRedCodeViewModel.onEvent(
-                            NonRedCodeEvent.SeverePainChanged(it)
+                        onEvent(
+                            TriageEvent.SeverePainChanged(it)
                         )
                     }
                 )
-                YellowCodeCheckbox(
+                LabeledCheckbox(
                     label = "Acute testicular/scrotal pain/priapism",
                     checked = state.acuteTesticularScrotalPainPriapism,
                     onCheckedChange = {
-                        nonRedCodeViewModel.onEvent(
-                            NonRedCodeEvent.AcuteTesticularScrotalPainPriapismChanged(it)
+                        onEvent(
+                            TriageEvent.AcuteTesticularScrotalPainPriapismChanged(it)
                         )
                     }
                 )
-                YellowCodeCheckbox(
+                LabeledCheckbox(
                     label = "Unable to pass urine",
                     checked = state.unableToPassUrine,
                     onCheckedChange = {
-                        nonRedCodeViewModel.onEvent(
-                            NonRedCodeEvent.UnableToPassUrineChanged(it)
+                        onEvent(
+                            TriageEvent.UnableToPassUrineChanged(it)
                         )
                     }
                 )
-                YellowCodeCheckbox(
+                LabeledCheckbox(
                     label = "Acute limb deformity/open fracture",
                     checked = state.acuteLimbDeformityOpenFracture,
                     onCheckedChange = {
-                        nonRedCodeViewModel.onEvent(
-                            NonRedCodeEvent.AcuteLimbDeformityOpenFractureChanged(it)
+                        onEvent(
+                            TriageEvent.AcuteLimbDeformityOpenFractureChanged(it)
                         )
                     }
                 )
-                YellowCodeCheckbox(
+                LabeledCheckbox(
                     label = "Other trauma/burns (no red criteria)",
                     checked = state.otherTraumaBurns,
                     onCheckedChange = {
-                        nonRedCodeViewModel.onEvent(
-                            NonRedCodeEvent.OtherTraumaBurnsChanged(it)
+                        onEvent(
+                            TriageEvent.OtherTraumaBurnsChanged(it)
                         )
                     }
                 )
-                YellowCodeCheckbox(
+                LabeledCheckbox(
                     label = "Sexual assault",
                     checked = state.sexualAssault,
                     onCheckedChange = {
-                        nonRedCodeViewModel.onEvent(
-                            NonRedCodeEvent.SexualAssaultChanged(it)
+                        onEvent(
+                            TriageEvent.SexualAssaultChanged(it)
                         )
                     }
                 )
-                YellowCodeCheckbox(
+                LabeledCheckbox(
                     label = "Animal bite or needlestick puncture",
                     checked = state.animalBiteNeedlestickPuncture,
                     onCheckedChange = {
-                        nonRedCodeViewModel.onEvent(
-                            NonRedCodeEvent.AnimalBiteNeedlestickPunctureChanged(it)
+                        onEvent(
+                            TriageEvent.AnimalBiteNeedlestickPunctureChanged(it)
                         )
                     }
                 )
-                YellowCodeCheckbox(
+                LabeledCheckbox(
                     label = "Other pregnancy-related complaints",
                     checked = state.otherPregnancyRelatedComplaints,
                     onCheckedChange = {
-                        nonRedCodeViewModel.onEvent(
-                            NonRedCodeEvent.OtherPregnancyRelatedComplaintsChanged(it)
+                        onEvent(
+                            TriageEvent.OtherPregnancyRelatedComplaintsChanged(it)
                         )
                     }
                 )
@@ -242,52 +230,52 @@ fun NonRedCodeScreen(
 
                 TitleText("Vital Signs and Age")
 
-                YellowCodeCheckbox(
+                LabeledCheckbox(
                     label = "Age > 80 years",
                     checked = state.ageOver80Years,
                     onCheckedChange = { }
                 )
-                YellowCodeCheckbox(
+                LabeledCheckbox(
                     label = "SpO2 < 92%",
                     checked = state.alteredVitalSignsSpo2,
                     onCheckedChange = { }
                 )
-                YellowCodeCheckbox(
+                LabeledCheckbox(
                     label = "RR < 10",
                     checked = state.alteredVitalSignsRrLow,
                     onCheckedChange = { }
                 )
-                YellowCodeCheckbox(
+                LabeledCheckbox(
                     label = "RR > 30",
                     checked = state.alteredVitalSignsRrHigh,
                     onCheckedChange = { }
                 )
-                YellowCodeCheckbox(
+                LabeledCheckbox(
                     label = "HR < 50",
                     checked = state.alteredVitalSignsHrLow,
                     onCheckedChange = { }
                 )
-                YellowCodeCheckbox(
+                LabeledCheckbox(
                     label = "HR > 130",
                     checked = state.alteredVitalSignsHrHigh,
                     onCheckedChange = { }
                 )
-                YellowCodeCheckbox(
+                LabeledCheckbox(
                     label = "SBP < 90",
                     checked = state.alteredVitalSignsSbpLow,
                     onCheckedChange = { }
                 )
-                YellowCodeCheckbox(
+                LabeledCheckbox(
                     label = "SBP > 200",
                     checked = state.alteredVitalSignsSbpHigh,
                     onCheckedChange = { }
                 )
-                YellowCodeCheckbox(
+                LabeledCheckbox(
                     label = "Temp < 35°C",
                     checked = state.alteredVitalSignsTempLow,
                     onCheckedChange = { }
                 )
-                YellowCodeCheckbox(
+                LabeledCheckbox(
                     label = "Temp > 39°C",
                     checked = state.alteredVitalSignsTempHigh,
                     onCheckedChange = { }
@@ -298,26 +286,5 @@ fun NonRedCodeScreen(
 
             FadeOverlay(Modifier.align(Alignment.BottomCenter))
         }
-    }
-}
-
-@Composable
-fun YellowCodeCheckbox(
-    label: String,
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Checkbox(
-            checked = checked,
-            onCheckedChange = onCheckedChange
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(label)
     }
 }

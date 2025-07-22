@@ -28,6 +28,7 @@ import com.unimib.oases.data.local.TableNames
 data class PatientDiseaseEntity (
     @ColumnInfo(name = "patient_id") var patientId: String,
     @ColumnInfo(name = "disease_name") var diseaseName: String,
+    @ColumnInfo(name = "is_diagnosed") var isDiagnosed: Boolean,
     @ColumnInfo(name = "diagnosis_date") var diagnosisDate: String,
     @ColumnInfo(name = "additional_info") var additionalInfo: String,
 )

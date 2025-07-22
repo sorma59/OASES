@@ -44,8 +44,8 @@ import com.unimib.oases.ui.screen.login.AuthViewModel
 import com.unimib.oases.ui.screen.patient_registration.info.PatientInfoScreen
 import com.unimib.oases.ui.screen.patient_registration.past_medical_history.PastHistoryScreen
 import com.unimib.oases.ui.screen.patient_registration.transitionscreens.ContinueToTriageDecisionScreen
-import com.unimib.oases.ui.screen.patient_registration.triage.non_red_code.NonRedCodeScreen
-import com.unimib.oases.ui.screen.patient_registration.triage.red_code.RedCodeScreen
+import com.unimib.oases.ui.screen.patient_registration.triage.RedCodeScreen
+import com.unimib.oases.ui.screen.patient_registration.triage.YellowCodeScreen
 import com.unimib.oases.ui.screen.patient_registration.visit_history.VisitHistoryScreen
 import com.unimib.oases.ui.screen.patient_registration.vital_signs.VitalSignsScreen
 
@@ -177,6 +177,8 @@ fun RegistrationScreen(
                         }
                     )
                     Tabs.TRIAGE.title -> RedCodeScreen(
+                        state = state.triageState,
+                        onEvent = registrationScreenViewModel::onTriageEvent,
                         onRedCodeToggle = { isRedCodeSelected ->
                             isRedCode = isRedCodeSelected
                             if (isRedCode){
@@ -200,11 +202,11 @@ fun RegistrationScreen(
                                 currentIndex = currentIndex + 2
                             } else                  // Not a red code, check for yellow code
                                 currentIndex++
-                        },
-                        sbpValue = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Systolic Blood Pressure"}?.value ?: "",
-                        dbpValue = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Diastolic Blood Pressure"}?.value ?: ""
+                        }
                     )
-                    Tabs.NON_RED_CODE.title -> NonRedCodeScreen(
+                    Tabs.NON_RED_CODE.title -> YellowCodeScreen(
+                        state = state.triageState,
+                        onEvent = registrationScreenViewModel::onTriageEvent,
                         onYellowCodeToggle = { isYellowCodeSelected ->
                             isYellowCode = isYellowCodeSelected
                             if (isYellowCode){
@@ -220,16 +222,10 @@ fun RegistrationScreen(
                                     )
                                 )
                         },
-                        ageInMonths = state.patientInfoState.patient.ageInMonths,
-                        spo2Value = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Oxygen Saturation"}?.value ?: "",
-                        hrValue = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Heart Rate"}?.value ?: "",
-                        rrValue = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Respiratory Rate"}?.value ?: "",
-                        sbpValue = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Systolic Blood Pressure"}?.value ?: "",
-                        tempValue = state.vitalSignsState.vitalSigns.firstOrNull { it.name == "Temperature"}?.value ?: "",
                     )
                     Tabs.HISTORY.title -> VisitHistoryScreen(
-                        state.visitHistoryState,
-                        registrationScreenViewModel::onVisitHistoryEvent
+                        state = state.visitHistoryState,
+                        onEvent = registrationScreenViewModel::onVisitHistoryEvent
                     )
                     Tabs.PAST_MEDICAL_HISTORY.title ->
                         PastHistoryScreen(

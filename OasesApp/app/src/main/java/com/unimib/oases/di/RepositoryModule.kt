@@ -73,9 +73,4 @@ abstract class RepositoryModule {
     abstract fun bindVitalSignRepository(
         vitalSignRepositoryImpl: VitalSignRepositoryImpl // Hilt knows how to create this due to @Inject constructor
     ): VitalSignRepository // Return the interface
-
-
-
-
-
 }
