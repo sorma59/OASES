@@ -14,12 +14,14 @@ object PatientFullDataSerializer {
         val diseaseBytesList = patientFullData.patientDiseases.map { serialize(it) }
         val vitalSignBytesList = patientFullData.vitalSigns.map { serialize(it) }
         val visitByteArray = VisitSerializer.serialize(patientFullData.visit)
+        val triageByteArray = TriageEvaluationSerializer.serialize(patientFullData.triageEvaluation)
 
         val buffer = ByteBuffer.allocate(
             4 + patientByteArray.size +
             4 + diseaseBytesList.sumOf { 4 + it.size } +
             4 + visitByteArray.size +
-            4 + vitalSignBytesList.sumOf { 4 + it.size }
+            4 + vitalSignBytesList.sumOf { 4 + it.size } +
+            4 + triageByteArray.size
         ).order(ByteOrder.BIG_ENDIAN)
 
         buffer.putInt(patientByteArray.size)
@@ -39,6 +41,9 @@ object PatientFullDataSerializer {
             buffer.putInt(it.size)
             buffer.put(it)
         }
+
+        buffer.putInt(triageByteArray.size)
+        buffer.put(triageByteArray)
 
         return buffer.array()
     }
@@ -72,11 +77,17 @@ object PatientFullDataSerializer {
             VisitVitalSignSerializer.deserialize(itemBytes)
         }
 
+        // Triage Evaluation
+        val triageSize = buffer.int
+        val triageBytes = ByteArray(triageSize).also { buffer.get(it) }
+        val triageEvaluation = TriageEvaluationSerializer.deserialize(triageBytes)
+
         return PatientFullData(
             patientDetails = patient,
             patientDiseases = diseases,
             vitalSigns = vitals,
-            visit = visit
+            visit = visit,
+            triageEvaluation = triageEvaluation
         )
     }
 }

@@ -12,6 +12,7 @@ import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.domain.model.PatientDisease
 import com.unimib.oases.domain.model.VisitVitalSign
 import com.unimib.oases.domain.repository.PatientDiseaseRepository
+import com.unimib.oases.domain.repository.TriageEvaluationRepository
 import com.unimib.oases.domain.repository.VisitRepository
 import com.unimib.oases.domain.repository.VisitVitalSignRepository
 import com.unimib.oases.util.Resource
@@ -27,7 +28,8 @@ class SendPatientViaBluetoothUseCase @Inject constructor(
     private val bluetoothManager: BluetoothCustomManager,
     private val visitRepository: VisitRepository,
     private val patientDiseaseRepository: PatientDiseaseRepository,
-    private val visitVitalSignRepository: VisitVitalSignRepository
+    private val visitVitalSignRepository: VisitVitalSignRepository,
+    private val triageEvaluationRepository: TriageEvaluationRepository
 ) {
     suspend operator fun invoke(patient: Patient, device: BluetoothDevice): Resource<Unit> {
         return try {
@@ -41,7 +43,6 @@ class SendPatientViaBluetoothUseCase @Inject constructor(
                 )
                 if (enabled){
                     try {
-
                         val connectionSuccess = bluetoothManager.connectToServer(device)
 
                         if (connectionSuccess != null){
@@ -50,6 +51,9 @@ class SendPatientViaBluetoothUseCase @Inject constructor(
                             val currentVisit = visitRepository.getCurrentVisit(patient.id)
 
                             if (currentVisit != null){
+
+                                val triageEvaluation = triageEvaluationRepository.getTriageEvaluation(currentVisit.id).data!!
+
                                 // Get the patient's current visit's vital signs
                                 val vitalSignsDeferred = async(Dispatchers.IO) {
                                     try {
@@ -58,8 +62,7 @@ class SendPatientViaBluetoothUseCase @Inject constructor(
                                         resource.data ?: emptyList<VisitVitalSign>()
                                     } catch (e: NoSuchElementException) {
                                         // This catch block is important if the flow could complete
-                                        // without ever emitting Success or Error (highly unlikely with your repo setup,
-                                        // as Loading should be followed by Success/Error, or Error is emitted by catch).
+                                        // without ever emitting Success or Error (highly unlikely with current setup).
                                         Log.e("SendPatient", "Vital signs flow completed without Success/Error for visit ${currentVisit.id}", e)
                                         emptyList<VisitVitalSign>()
                                     } catch (e: Exception) {
@@ -90,7 +93,8 @@ class SendPatientViaBluetoothUseCase @Inject constructor(
                                     patientDetails = patient,
                                     visit = currentVisit,
                                     patientDiseases = diseases,
-                                    vitalSigns = vitalSigns
+                                    vitalSigns = vitalSigns,
+                                    triageEvaluation = triageEvaluation
                                 )
 
                                 // Serialize the patient data
@@ -121,14 +125,15 @@ class SendPatientViaBluetoothUseCase @Inject constructor(
 
                             // Make sure the patient data is sent and received
                             delay(1000)
-                            // Disconnect from the device
-                            bluetoothManager.closeConnectionSocket()
                             result = Resource.Success(Unit)
                         } else
                             result = Resource.Error("Could not connect to device")
 
                     } catch (e: Exception) {
                         result = Resource.Error(e.message ?: "An error occurred")
+                    } finally {
+                        // Disconnect from the device
+                        bluetoothManager.closeConnectionSocket()
                     }
                 }
             }
