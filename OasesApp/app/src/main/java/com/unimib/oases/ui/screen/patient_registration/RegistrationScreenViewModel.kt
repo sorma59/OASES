@@ -234,7 +234,24 @@ class RegistrationScreenViewModel @Inject constructor(
                     it.copy(aggressiveBehavior = event.value)
                 }
             }
-
+            is TriageEvent.PregnancyChanged -> {
+                updateTriageState {
+                    if (event.value == true)
+                        it.copy(pregnancy = true)
+                    else
+                        it.copy(
+                            pregnancy = false,
+                            pregnancyWithHeavyBleeding = false,
+                            pregnancyWithSevereAbdominalPain = false,
+                            pregnancyWithSeizures = false,
+                            pregnancyWithAlteredMentalStatus = false,
+                            pregnancyWithSevereHeadache = false,
+                            pregnancyWithVisualChanges = false,
+                            pregnancyWithTrauma = false,
+                            pregnancyWithActiveLabor = false,
+                        )
+                }
+            }
             is TriageEvent.PregnancyWithHeavyBleedingChanged -> {
                 updateTriageState {
                     it.copy(pregnancyWithHeavyBleeding = event.value)

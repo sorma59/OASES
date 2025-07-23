@@ -21,6 +21,18 @@ fun TriageEvaluation.mapToTriageState(): TriageState{
         pregnancyWithVisualChanges = pregnancyWithVisualChanges,
         pregnancyWithTrauma = pregnancyWithTrauma,
         pregnancyWithActiveLabor = pregnancyWithActiveLabor,
+        pregnancy = ( // The UI uses pregnancy field to show pregnancy related symptoms,
+                      // if any is true then pregnancy should be true as well
+            pregnancyWithHeavyBleeding ||
+            pregnancyWithSevereAbdominalPain ||
+            pregnancyWithSeizures ||
+            pregnancyWithAlteredMentalStatus ||
+            pregnancyWithSevereHeadache ||
+            pregnancyWithVisualChanges ||
+            pregnancyWithSbpHighDpbHigh ||
+            pregnancyWithTrauma ||
+            pregnancyWithActiveLabor
+        ),
 
         airwaySwellingMass = airwaySwellingMass,
         ongoingBleeding = ongoingBleeding,
@@ -61,7 +73,7 @@ fun TriageState.mapToTriageEvaluation(visitId: String): TriageEvaluation{
         pregnancyWithAlteredMentalStatus = pregnancyWithAlteredMentalStatus,
         pregnancyWithSevereHeadache = pregnancyWithSevereHeadache,
         pregnancyWithVisualChanges = pregnancyWithVisualChanges,
-        pregnancyWithSbpHighDpbHigh = pregnancyWithSbpHighDpbHigh,
+        pregnancyWithSbpHighDpbHigh = pregnancy && sbpHighDbpHighForPregnancy,
         pregnancyWithTrauma = pregnancyWithTrauma,
         pregnancyWithActiveLabor = pregnancyWithActiveLabor,
 

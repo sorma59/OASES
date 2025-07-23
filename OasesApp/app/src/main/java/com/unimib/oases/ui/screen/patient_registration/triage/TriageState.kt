@@ -21,6 +21,7 @@ data class TriageState(
     val poisoningIntoxication: Boolean = false,
     val snakeBite: Boolean = false,
     val aggressiveBehavior: Boolean = false,
+    val pregnancy: Boolean = false,
     val pregnancyWithHeavyBleeding: Boolean = false,
     val pregnancyWithSevereAbdominalPain: Boolean = false,
     val pregnancyWithSeizures: Boolean = false,
@@ -96,8 +97,9 @@ data class TriageState(
     val alteredVitalSignsTempHigh: Boolean
         get() = temp != null && temp > TEMP_HIGH
 
-    val pregnancyWithSbpHighDpbHigh: Boolean
-        get() = sbp != null && sbp >= PREGNANCY_HIGH_SBP || dbp != null && dbp >= PREGNANCY_HIGH_DBP
+    val sbpHighDbpHighForPregnancy: Boolean
+        get() = sbp != null && sbp >= PREGNANCY_HIGH_SBP ||
+                dbp != null && dbp >= PREGNANCY_HIGH_DBP
 
     val isRedCode: Boolean
         get() =
@@ -116,7 +118,7 @@ data class TriageState(
             pregnancyWithAlteredMentalStatus ||
             pregnancyWithSevereHeadache ||
             pregnancyWithVisualChanges ||
-            pregnancyWithSbpHighDpbHigh ||
+            (pregnancy && sbpHighDbpHighForPregnancy) || // Separated logic to break cycle
             pregnancyWithTrauma ||
             pregnancyWithActiveLabor
 

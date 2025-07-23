@@ -11,6 +11,7 @@ sealed class TriageEvent {
     data class PoisoningIntoxicationChanged(val value: Boolean) : TriageEvent()
     data class SnakeBiteChanged(val value: Boolean) : TriageEvent()
     data class AggressiveBehaviorChanged(val value: Boolean) : TriageEvent()
+    data class PregnancyChanged(val value: Boolean) : TriageEvent()
     data class PregnancyWithHeavyBleedingChanged(val value: Boolean) : TriageEvent()
     data class PregnancyWithSevereAbdominalPainChanged(val value: Boolean) : TriageEvent()
     data class PregnancyWithSeizuresChanged(val value: Boolean) : TriageEvent()
