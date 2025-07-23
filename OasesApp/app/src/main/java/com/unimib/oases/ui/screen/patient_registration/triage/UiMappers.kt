@@ -19,7 +19,6 @@ fun TriageEvaluation.mapToTriageState(): TriageState{
         pregnancyWithAlteredMentalStatus = pregnancyWithAlteredMentalStatus,
         pregnancyWithSevereHeadache = pregnancyWithSevereHeadache,
         pregnancyWithVisualChanges = pregnancyWithVisualChanges,
-        pregnancyWithSbpHighDpbHigh = pregnancyWithSbpHighDpbHigh,
         pregnancyWithTrauma = pregnancyWithTrauma,
         pregnancyWithActiveLabor = pregnancyWithActiveLabor,
 

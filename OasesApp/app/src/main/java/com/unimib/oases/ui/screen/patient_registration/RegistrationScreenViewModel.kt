@@ -107,12 +107,12 @@ class RegistrationScreenViewModel @Inject constructor(
                 }
                 updateTriageState {
                     it.copy(
-                        sbp = event.vitalSignsState.vitalSigns.firstOrNull { it.name == "Systolic Blood Pressure" }?.value?.toDouble()?.toInt(),
-                        dbp = event.vitalSignsState.vitalSigns.firstOrNull { it.name == "Diastolic Blood Pressure" }?.value?.toDouble()?.toInt(),
-                        hr = event.vitalSignsState.vitalSigns.firstOrNull { it.name == "Heart Rate" }?.value?.toDouble()?.toInt(),
-                        rr = event.vitalSignsState.vitalSigns.firstOrNull { it.name == "Respiratory Rate" }?.value?.toDouble()?.toInt(),
-                        spo2 = event.vitalSignsState.vitalSigns.firstOrNull { it.name == "Oxygen Saturation" }?.value?.toDouble()?.toInt(),
-                        temp = event.vitalSignsState.vitalSigns.firstOrNull { it.name == "Temperature" }?.value?.toDouble()
+                        sbp = event.vitalSignsState.vitalSigns.firstOrNull { it.name == "Systolic Blood Pressure" && it.value.isNotEmpty() }?.value?.toDouble()?.toInt(),
+                        dbp = event.vitalSignsState.vitalSigns.firstOrNull { it.name == "Diastolic Blood Pressure" && it.value.isNotEmpty() }?.value?.toDouble()?.toInt(),
+                        hr = event.vitalSignsState.vitalSigns.firstOrNull { it.name == "Heart Rate" && it.value.isNotEmpty() }?.value?.toDouble()?.toInt(),
+                        rr = event.vitalSignsState.vitalSigns.firstOrNull { it.name == "Respiratory Rate" && it.value.isNotEmpty() }?.value?.toDouble()?.toInt(),
+                        spo2 = event.vitalSignsState.vitalSigns.firstOrNull { it.name == "Oxygen Saturation" && it.value.isNotEmpty() }?.value?.toDouble()?.toInt(),
+                        temp = event.vitalSignsState.vitalSigns.firstOrNull { it.name == "Temperature" && it.value.isNotEmpty() }?.value?.toDouble()
                     )
                 }
             }
@@ -234,47 +234,43 @@ class RegistrationScreenViewModel @Inject constructor(
                     it.copy(aggressiveBehavior = event.value)
                 }
             }
-            is TriageEvent.PregnancyHeavyBleedingChanged -> {
+
+            is TriageEvent.PregnancyWithHeavyBleedingChanged -> {
                 updateTriageState {
                     it.copy(pregnancyWithHeavyBleeding = event.value)
                 }
             }
-            is TriageEvent.SevereAbdominalPainChanged -> {
+            is TriageEvent.PregnancyWithSevereAbdominalPainChanged -> {
                 updateTriageState {
                     it.copy(pregnancyWithSevereAbdominalPain = event.value)
                 }
             }
-            is TriageEvent.SeizuresChanged -> {
+            is TriageEvent.PregnancyWithSeizuresChanged -> {
                 updateTriageState {
                     it.copy(pregnancyWithSeizures = event.value)
                 }
             }
-            is TriageEvent.AlteredMentalStatusChanged -> {
+            is TriageEvent.PregnancyWithAlteredMentalStatusChanged -> {
                 updateTriageState {
                      it.copy(pregnancyWithAlteredMentalStatus = event.value)
                 }
             }
-            is TriageEvent.SevereHeadacheChanged -> {
+            is TriageEvent.PregnancyWithSevereHeadacheChanged -> {
                 updateTriageState {
                     it.copy(pregnancyWithSevereHeadache = event.value)
                 }
             }
-            is TriageEvent.VisualChangesChanged -> {
+            is TriageEvent.PregnancyWithVisualChangesChanged -> {
                 updateTriageState {
                     it.copy(pregnancyWithVisualChanges = event.value)
                 }
             }
-            is TriageEvent.SbpHighDpbHighChanged -> {
-                updateTriageState {
-                    it.copy(pregnancyWithSbpHighDpbHigh = event.value)
-                }
-            }
-            is TriageEvent.TraumaChanged -> {
+            is TriageEvent.PregnancyWithTraumaChanged -> {
                 updateTriageState {
                     it.copy(pregnancyWithTrauma = event.value)
                 }
             }
-            is TriageEvent.ActiveLaborChanged -> {
+            is TriageEvent.PregnancyWithActiveLaborChanged -> {
                 updateTriageState {
                     it.copy(pregnancyWithActiveLabor = event.value)
                 }

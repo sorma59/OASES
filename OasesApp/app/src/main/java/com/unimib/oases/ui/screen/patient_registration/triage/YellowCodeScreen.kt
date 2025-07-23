@@ -68,6 +68,7 @@ fun YellowCodeScreen(
         }
         Box{
             Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier
                     .fillMaxWidth()
                     .verticalScroll(scrollState)
@@ -228,7 +229,7 @@ fun YellowCodeScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                TitleText("Vital Signs and Age")
+                TitleText("Vital Signs and Age (computed)")
 
                 LabeledCheckbox(
                     label = "Age > 80 years",
@@ -236,47 +237,47 @@ fun YellowCodeScreen(
                     onCheckedChange = { }
                 )
                 LabeledCheckbox(
-                    label = "SpO2 < 92%",
+                    label = "SpO2 < ${TriageState.SPO2_LOW}%",
                     checked = state.alteredVitalSignsSpo2,
                     onCheckedChange = { }
                 )
                 LabeledCheckbox(
-                    label = "RR < 10",
+                    label = "RR < ${TriageState.RR_LOW}",
                     checked = state.alteredVitalSignsRrLow,
                     onCheckedChange = { }
                 )
                 LabeledCheckbox(
-                    label = "RR > 30",
+                    label = "RR > ${TriageState.RR_HIGH}",
                     checked = state.alteredVitalSignsRrHigh,
                     onCheckedChange = { }
                 )
                 LabeledCheckbox(
-                    label = "HR < 50",
+                    label = "HR < ${TriageState.HR_LOW}",
                     checked = state.alteredVitalSignsHrLow,
                     onCheckedChange = { }
                 )
                 LabeledCheckbox(
-                    label = "HR > 130",
+                    label = "HR > ${TriageState.HR_HIGH}",
                     checked = state.alteredVitalSignsHrHigh,
                     onCheckedChange = { }
                 )
                 LabeledCheckbox(
-                    label = "SBP < 90",
+                    label = "SBP < ${TriageState.SBP_LOW}",
                     checked = state.alteredVitalSignsSbpLow,
                     onCheckedChange = { }
                 )
                 LabeledCheckbox(
-                    label = "SBP > 200",
+                    label = "SBP > ${TriageState.SBP_HIGH}",
                     checked = state.alteredVitalSignsSbpHigh,
                     onCheckedChange = { }
                 )
                 LabeledCheckbox(
-                    label = "Temp < 35°C",
+                    label = "Temp < ${TriageState.TEMP_LOW}°C",
                     checked = state.alteredVitalSignsTempLow,
                     onCheckedChange = { }
                 )
                 LabeledCheckbox(
-                    label = "Temp > 39°C",
+                    label = "Temp > ${TriageState.TEMP_HIGH}°C",
                     checked = state.alteredVitalSignsTempHigh,
                     onCheckedChange = { }
                 )

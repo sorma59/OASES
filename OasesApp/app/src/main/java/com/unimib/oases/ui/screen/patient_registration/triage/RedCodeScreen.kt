@@ -20,6 +20,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import com.unimib.oases.ui.components.input.LabeledCheckbox
 import com.unimib.oases.ui.components.util.BottomButtons
 import com.unimib.oases.ui.components.util.FadeOverlay
+import com.unimib.oases.ui.components.util.ShowMoreArrow
 
 @Composable
 fun RedCodeScreen(
@@ -39,6 +44,8 @@ fun RedCodeScreen(
 ) {
 
     val scrollState = rememberScrollState()
+
+    var showPregnancyRelatedSymptoms by remember { mutableStateOf(false) }
 
     LaunchedEffect(state.isRedCode) {
         onRedCodeToggle(state.isRedCode)
@@ -75,10 +82,9 @@ fun RedCodeScreen(
                     fontWeight = FontWeight.Bold
                 )
             }
-            Box(
-
-            ){
+            Box{
                 Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier
                         .fillMaxWidth()
                         .verticalScroll(scrollState)
@@ -162,82 +168,93 @@ fun RedCodeScreen(
                             )
                         }
                     )
-                    LabeledCheckbox(
-                        label = "Pregnancy with heavy bleeding",
-                        checked = state.pregnancyWithHeavyBleeding,
-                        onCheckedChange = {
-                            onEvent(
-                                TriageEvent.PregnancyHeavyBleedingChanged(it)
-                            )
-                        }
+
+                    ShowMoreArrow(
+                        expanded = showPregnancyRelatedSymptoms,
+                        onClick = { showPregnancyRelatedSymptoms = !showPregnancyRelatedSymptoms },
+                        expandedLabel = "Pregnancy",
+                        collapsedLabel = "Pregnancy",
+                        modifier = Modifier.padding(start = 12.dp)
                     )
-                    LabeledCheckbox(
-                        label = "Pregnancy with severe abdominal pain",
-                        checked = state.pregnancyWithSevereAbdominalPain,
-                        onCheckedChange = {
-                            onEvent(
-                                TriageEvent.SevereAbdominalPainChanged(it)
-                            )
-                        }
-                    )
-                    LabeledCheckbox(
-                        label = "Pregnancy with seizures",
-                        checked = state.pregnancyWithSeizures,
-                        onCheckedChange = {
-                            onEvent(
-                                TriageEvent.SeizuresChanged(it)
-                            )
-                        }
-                    )
-                    LabeledCheckbox(
-                        label = "Pregnancy with altered mental status",
-                        checked = state.pregnancyWithAlteredMentalStatus,
-                        onCheckedChange = {
-                            onEvent(
-                                TriageEvent.AlteredMentalStatusChanged(it)
-                            )
-                        }
-                    )
-                    LabeledCheckbox(
-                        label = "Pregnancy with severe headache",
-                        checked = state.pregnancyWithSevereHeadache,
-                        onCheckedChange = {
-                            onEvent(
-                                TriageEvent.SevereHeadacheChanged(it)
-                            )
-                        }
-                    )
-                    LabeledCheckbox(
-                        label = "Pregnancy with visual changes",
-                        checked = state.pregnancyWithVisualChanges,
-                        onCheckedChange = {
-                            onEvent(
-                                TriageEvent.VisualChangesChanged(it)
-                            )
-                        }
-                    )
-                    LabeledCheckbox(
-                        label = "Pregnancy with SBP ≥160 or DBP ≥110",
-                        checked = state.pregnancyWithSbpHighDpbHigh,
-                        onCheckedChange = { }
-                    )
-                    LabeledCheckbox(
-                        label = "Pregnancy with trauma",
-                        checked = state.pregnancyWithTrauma,
-                        onCheckedChange = {
-                            onEvent(
-                                TriageEvent.TraumaChanged(it)
-                            )
-                        })
-                    LabeledCheckbox(
-                        label = "Pregnancy with active labor",
-                        checked = state.pregnancyWithActiveLabor,
-                        onCheckedChange = {
-                            onEvent(
-                                TriageEvent.ActiveLaborChanged(it)
-                            )
-                        }
-                    )
+
+                    if (showPregnancyRelatedSymptoms){
+                        LabeledCheckbox(
+                            label = "Pregnancy with heavy bleeding",
+                            checked = state.pregnancyWithHeavyBleeding,
+                            onCheckedChange = {
+                                onEvent(
+                                    TriageEvent.PregnancyWithHeavyBleedingChanged(it)
+                                )
+                            },
+                        )
+                        LabeledCheckbox(
+                            label = "Pregnancy with severe abdominal pain",
+                            checked = state.pregnancyWithSevereAbdominalPain,
+                            onCheckedChange = {
+                                onEvent(
+                                    TriageEvent.PregnancyWithSevereAbdominalPainChanged(it)
+                                )
+                            }
+                        )
+                        LabeledCheckbox(
+                            label = "Pregnancy with seizures",
+                            checked = state.pregnancyWithSeizures,
+                            onCheckedChange = {
+                                onEvent(
+                                    TriageEvent.PregnancyWithSeizuresChanged(it)
+                                )
+                            }
+                        )
+                        LabeledCheckbox(
+                            label = "Pregnancy with altered mental status",
+                            checked = state.pregnancyWithAlteredMentalStatus,
+                            onCheckedChange = {
+                                onEvent(
+                                    TriageEvent.PregnancyWithAlteredMentalStatusChanged(it)
+                                )
+                            }
+                        )
+                        LabeledCheckbox(
+                            label = "Pregnancy with severe headache",
+                            checked = state.pregnancyWithSevereHeadache,
+                            onCheckedChange = {
+                                onEvent(
+                                    TriageEvent.PregnancyWithSevereHeadacheChanged(it)
+                                )
+                            }
+                        )
+                        LabeledCheckbox(
+                            label = "Pregnancy with visual changes",
+                            checked = state.pregnancyWithVisualChanges,
+                            onCheckedChange = {
+                                onEvent(
+                                    TriageEvent.PregnancyWithVisualChangesChanged(it)
+                                )
+                            }
+                        )
+                        LabeledCheckbox(
+                            label = "Pregnancy with SBP ≥ ${TriageState.PREGNANCY_HIGH_SBP} or DBP ≥ ${TriageState.PREGNANCY_HIGH_DBP}",
+                            checked = state.pregnancyWithSbpHighDpbHigh,
+                            onCheckedChange = { }
+                        )
+                        LabeledCheckbox(
+                            label = "Pregnancy with trauma",
+                            checked = state.pregnancyWithTrauma,
+                            onCheckedChange = {
+                                onEvent(
+                                    TriageEvent.PregnancyWithTraumaChanged(it)
+                                )
+                            })
+                        LabeledCheckbox(
+                            label = "Pregnancy with active labor",
+                            checked = state.pregnancyWithActiveLabor,
+                            onCheckedChange = {
+                                onEvent(
+                                    TriageEvent.PregnancyWithActiveLaborChanged(it)
+                                )
+                            }
+                        )
+                    }
                     Spacer(Modifier.height(48.dp))
                 }
 

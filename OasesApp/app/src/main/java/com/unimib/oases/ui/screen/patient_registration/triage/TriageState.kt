@@ -27,7 +27,6 @@ data class TriageState(
     val pregnancyWithAlteredMentalStatus: Boolean = false,
     val pregnancyWithSevereHeadache: Boolean = false,
     val pregnancyWithVisualChanges: Boolean = false,
-    val pregnancyWithSbpHighDpbHigh: Boolean = false,
     val pregnancyWithTrauma: Boolean = false,
     val pregnancyWithActiveLabor: Boolean = false,
 
@@ -54,46 +53,51 @@ data class TriageState(
     val toastMessage: String? = null,
 ){
     companion object {
-        const val LOW_SPO2 = 92
-        const val LOW_RR = 10
-        const val HIGH_RR = 30
-        const val LOW_HR = 50
-        const val HIGH_HR = 130
-        const val LOW_SBP = 90
-        const val HIGH_SBP = 200
-        const val LOW_TEMP = 35.0
-        const val HIGH_TEMP = 39.0
+        const val SPO2_LOW = 92
+        const val RR_LOW = 10
+        const val RR_HIGH = 30
+        const val HR_LOW = 50
+        const val HR_HIGH = 130
+        const val SBP_LOW = 90
+        const val SBP_HIGH = 200
+        const val TEMP_LOW = 35.0
+        const val TEMP_HIGH = 39.0
+        const val PREGNANCY_HIGH_SBP = 160
+        const val PREGNANCY_HIGH_DBP = 110
     }
 
     val ageOver80Years: Boolean
         get() = age != null && age >= 80
 
     val alteredVitalSignsSpo2: Boolean
-        get() = spo2 != null && spo2 < LOW_SPO2
+        get() = spo2 != null && spo2 < SPO2_LOW
 
     val alteredVitalSignsRrLow: Boolean
-        get() = rr != null && rr < LOW_RR
+        get() = rr != null && rr < RR_LOW
 
     val alteredVitalSignsRrHigh: Boolean
-        get() = rr != null && rr > HIGH_RR
+        get() = rr != null && rr > RR_HIGH
 
     val alteredVitalSignsHrLow: Boolean
-        get() = hr != null && hr < LOW_HR
+        get() = hr != null && hr < HR_LOW
 
     val alteredVitalSignsHrHigh: Boolean
-        get() = hr != null && hr > HIGH_HR
+        get() = hr != null && hr > HR_HIGH
 
     val alteredVitalSignsSbpLow: Boolean
-        get() = sbp != null && sbp < LOW_SBP
+        get() = sbp != null && sbp < SBP_LOW
 
     val alteredVitalSignsSbpHigh: Boolean
-        get() = sbp != null && sbp > HIGH_SBP
+        get() = sbp != null && sbp > SBP_HIGH
 
     val alteredVitalSignsTempLow: Boolean
-        get() = temp != null && temp < LOW_TEMP
+        get() = temp != null && temp < TEMP_LOW
 
     val alteredVitalSignsTempHigh: Boolean
-        get() = temp != null && temp > HIGH_TEMP
+        get() = temp != null && temp > TEMP_HIGH
+
+    val pregnancyWithSbpHighDpbHigh: Boolean
+        get() = sbp != null && sbp >= PREGNANCY_HIGH_SBP || dbp != null && dbp >= PREGNANCY_HIGH_DBP
 
     val isRedCode: Boolean
         get() =
@@ -120,8 +124,8 @@ data class TriageState(
         get() =
             !isRedCode &&
             (airwaySwellingMass || ongoingBleeding || severePallor || ongoingSevereVomitingDiarrhea ||
-            unableToFeedOrDrink || recentFainting || lethargyConfusionAgitation || focalNeurologicVisualDeficit
-            || headacheWithStiffNeck || severePain || acuteTesticularScrotalPainPriapism || unableToPassUrine ||
+            unableToFeedOrDrink || recentFainting || lethargyConfusionAgitation || focalNeurologicVisualDeficit ||
+            headacheWithStiffNeck || severePain || acuteTesticularScrotalPainPriapism || unableToPassUrine ||
             acuteLimbDeformityOpenFracture || otherTraumaBurns || sexualAssault || animalBiteNeedlestickPuncture ||
             otherPregnancyRelatedComplaints || ageOver80Years || alteredVitalSignsSpo2 || alteredVitalSignsRrLow ||
             alteredVitalSignsRrHigh || alteredVitalSignsHrLow || alteredVitalSignsHrHigh || alteredVitalSignsSbpLow ||
