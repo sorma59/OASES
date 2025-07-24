@@ -27,14 +27,21 @@ class SendPatientViaBluetoothViewModel @Inject constructor(
         bluetoothCustomManager.fetchPairedDevices()
     }
 
-    fun sendPatient(patient: Patient, device: BluetoothDevice) {
+    fun onEvent(event: SendPatientViaBluetoothEvent) {
+        when (event) {
+            is SendPatientViaBluetoothEvent.SendPatient -> sendPatient(event.patient, event.device)
+            is SendPatientViaBluetoothEvent.SendResultShown -> resetSendPatientResult()
+        }
+    }
+
+    private fun sendPatient(patient: Patient, device: BluetoothDevice) {
         viewModelScope.launch {
             _sendPatientResult.value = Resource.Loading()
             _sendPatientResult.value = useCase(patient, device)
         }
     }
 
-    fun resetSendPatientResult(){
+    private fun resetSendPatientResult(){
         _sendPatientResult.value = Resource.None()
     }
 }

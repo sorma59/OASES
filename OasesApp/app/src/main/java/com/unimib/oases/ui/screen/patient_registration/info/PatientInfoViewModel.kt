@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -36,14 +37,14 @@ class PatientInfoViewModel @Inject constructor(
     private val validationEventsChannel = Channel<ValidationEvent>()
     val validationEvents = validationEventsChannel.receiveAsFlow()
 
-    private var currentPatientId: String? = null
-
     private var errorHandler = CoroutineExceptionHandler { _, e ->
         e.printStackTrace()
-        _state.value = _state.value.copy(
-            error = e.message,
-            isLoading = false
-        )
+        _state.update{
+            _state.value.copy(
+                error = e.message,
+                isLoading = false
+            )
+        }
         viewModelScope.launch {
             _eventFlow.emit(
                 UiEvent.ShowSnackbar(
@@ -61,34 +62,44 @@ class PatientInfoViewModel @Inject constructor(
                         result.collect { resource ->
                             when(resource){
                                 is Resource.Loading -> {
-                                    _state.value = _state.value.copy(
-                                        isLoading = true
-                                    )
+                                    _state.update{
+                                        _state.value.copy(
+                                            isLoading = true
+                                        )
+                                    }
                                 }
+
                                 is Resource.Success -> {
                                     val patient = resource.data!!
-                                    _state.value = _state.value.copy(
-                                        patient = patient,
-                                        isLoading = false
-                                    )
-                                    currentPatientId = id
+                                    _state.update{
+                                        _state.value.copy(
+                                            patient = patient,
+                                            isLoading = false
+                                        )
+                                    }
                                 }
+
                                 is Resource.Error -> {
-                                    _state.value = _state.value.copy(
-                                        error = resource.message,
-                                        isLoading = false
-                                    )
+                                    _state.update{
+                                        _state.value.copy(
+                                            error = resource.message,
+                                            isLoading = false
+                                        )
+                                    }
                                 }
+
                                 else -> {}
                             }
                         }
                     }
                 }
             } else {
-                _state.value = _state.value.copy(
-                    isLoading = false,
-                    patient = _state.value.patient
-                )
+                _state.update{
+                    _state.value.copy(
+                        isLoading = false,
+                        patient = _state.value.patient
+                    )
+                }
             }
         }
     }
@@ -102,50 +113,109 @@ class PatientInfoViewModel @Inject constructor(
     fun onEvent(event: PatientInfoEvent) {
         when(event) {
             is PatientInfoEvent.NameChanged -> {
-                _state.value = _state.value.copy(patient = _state.value.patient.copy(name = event.name), nameError = null, edited = true)
+                _state.update{
+                    _state.value.copy(patient = _state.value.patient.copy(name = event.name), nameError = null, edited = true)
+                }
             }
+
             is PatientInfoEvent.BirthDateChanged -> {
                 val ageInMonths = DateTimeFormatter().calculateAgeInMonths(event.birthDate)
-                if (ageInMonths != null){
-                    _state.value = _state.value.copy(patient = _state.value.patient.copy(ageInMonths = ageInMonths), birthDateError = null)
+                _state.update{
+                    if (ageInMonths != null)
+                        _state.value.copy(
+                            patient = _state.value.patient.copy(ageInMonths = ageInMonths),
+                            birthDateError = null
+                        )
+                    else
+                        _state.value.copy(
+                            patient = _state.value.patient.copy(birthDate = event.birthDate),
+                            birthDateError = null,
+                            edited = true
+                        )
                 }
-                _state.value = _state.value.copy(patient = _state.value.patient.copy(birthDate = event.birthDate), birthDateError = null, edited = true)
             }
+
             is PatientInfoEvent.AgeChanged -> {
-                _state.value = _state.value.copy(patient = _state.value.patient.copy(ageInMonths = event.ageInMonths), birthDateError = null, edited = true)
+                _state.update{
+                    _state.value.copy(
+                        patient = _state.value.patient.copy(ageInMonths = event.ageInMonths),
+                        birthDateError = null,
+                        edited = true
+                    )
+                }
                 val newBirthDate = DateTimeFormatter().calculateBirthDate(event.ageInMonths)
                 if (newBirthDate != null)
-                    _state.value = _state.value.copy(patient = _state.value.patient.copy(birthDate = newBirthDate))
+                    _state.update{
+                        _state.value.copy(patient = _state.value.patient.copy(birthDate = newBirthDate))
+                    }
             }
+
             is PatientInfoEvent.SexChanged -> {
-                _state.value = _state.value.copy(patient = _state.value.patient.copy(sex = event.sex),sexError = null, edited = true)
+                _state.update{
+                    _state.value.copy(
+                        patient = _state.value.patient.copy(sex = event.sex),
+                        sexError = null,
+                        edited = true
+                    )
+                }
             }
+
             is PatientInfoEvent.VillageChanged -> {
-                _state.value = _state.value.copy(patient = _state.value.patient.copy(village = event.village), edited = true)
+                _state.update{
+                    _state.value.copy(
+                        patient = _state.value.patient.copy(village = event.village),
+                        edited = true
+                    )
+                }
             }
+
             is PatientInfoEvent.ParishChanged -> {
-                _state.value = _state.value.copy(patient = _state.value.patient.copy(parish = event.parish), edited = true)
+                _state.update{
+                    _state.value.copy(
+                        patient = _state.value.patient.copy(parish = event.parish),
+                        edited = true
+                    )
+                }
             }
+
             is PatientInfoEvent.SubCountyChanged -> {
-                _state.value = _state.value.copy(patient = _state.value.patient.copy(subCounty = event.subCounty), edited = true)
+                _state.update{
+                    _state.value.copy(
+                        patient = _state.value.patient.copy(subCounty = event.subCounty),
+                        edited = true
+                    )
+                }
             }
+
             is PatientInfoEvent.DistrictChanged -> {
-                _state.value = _state.value.copy(patient = _state.value.patient.copy(district = event.district), edited = true)
+                _state.update{
+                    _state.value.copy(
+                        patient = _state.value.patient.copy(district = event.district),
+                        edited = true
+                    )
+                }
             }
+
             is PatientInfoEvent.NextOfKinChanged -> {
-                _state.value = _state.value.copy(patient = _state.value.patient.copy(nextOfKin = event.nextOfKin), edited = true)
+                _state.update{
+                    _state.value.copy(
+                        patient = _state.value.patient.copy(nextOfKin = event.nextOfKin),
+                        edited = true
+                    )
+                }
             }
+
             is PatientInfoEvent.ContactChanged -> {
-                _state.value = _state.value.copy(patient = _state.value.patient.copy(contact = event.contact), edited = true)
+                _state.update{
+                    _state.value.copy(
+                        patient = _state.value.patient.copy(contact = event.contact),
+                        edited = true
+                    )
+                }
             }
 
             is PatientInfoEvent.ValidateForm -> {
-                if (_state.value.edited)
-                    validateAndPrepareForSubmission()
-                else
-                    viewModelScope.launch {
-                        validationEventsChannel.send(ValidationEvent.ValidationSuccess)
-                    }
+                validateAndPrepareForSubmission()
             }
 
             is PatientInfoEvent.ConfirmSubmission -> {
@@ -156,7 +226,6 @@ class PatientInfoViewModel @Inject constructor(
                         validationEventsChannel.send(ValidationEvent.SubmissionSuccess)
                     }
             }
-
         }
     }
 

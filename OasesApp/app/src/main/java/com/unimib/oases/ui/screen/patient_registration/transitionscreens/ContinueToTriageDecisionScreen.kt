@@ -26,7 +26,7 @@ fun ContinueToTriageDecisionScreen(
     ){
 
         CenteredText(
-            "The patient was saved, you will be able to edit it later on.",
+            "The patient info was saved, you will be able to edit it later on.",
             fontSize = 20.sp
         )
 

@@ -24,6 +24,7 @@ import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.domain.usecase.HandleReceivedPatientUseCase
 import com.unimib.oases.domain.usecase.HandleReceivedPatientWithTriageDataUseCase
 import com.unimib.oases.service.BluetoothServerService
+import com.unimib.oases.ui.util.ToastUtils
 import com.unimib.oases.util.PermissionHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -174,6 +175,10 @@ class BluetoothCustomManager @Inject constructor(
         _toastMessage.value = message
     }
 
+    fun toastShown(){
+        updateToastMessage("")
+    }
+
     private fun updateSnackbarMessage(message: String){
         _snackbarMessage.value = message
     }
@@ -269,9 +274,9 @@ class BluetoothCustomManager @Inject constructor(
     // Function to ensure Bluetooth is enabled, using the ActivityResultLauncher
     fun ensureBluetoothEnabled(
         onEnabled: () -> Unit,
-        onDenied: () -> Unit = {updateToastMessage(appContext.getString(R.string.bluetooth_denied))},
-        onNotSupported: () -> Unit = {updateToastMessage(appContext.getString(R.string.bluetooth_not_supported))},
-        onMissingPermission: () -> Unit = {updateToastMessage(appContext.getString(R.string.bluetooth_missing_permissions))},
+        onDenied: () -> Unit = {updateSnackbarMessage(appContext.getString(R.string.bluetooth_denied))},
+        onNotSupported: () -> Unit = {updateSnackbarMessage(appContext.getString(R.string.bluetooth_not_supported))},
+        onMissingPermission: () -> Unit = {ToastUtils.showToast(appContext, appContext.getString(R.string.bluetooth_missing_permissions))},
     ) {
         if (!isBluetoothSupported()) {
             onNotSupported()

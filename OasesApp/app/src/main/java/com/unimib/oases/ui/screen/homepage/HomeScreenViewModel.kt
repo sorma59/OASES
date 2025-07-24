@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -32,10 +33,12 @@ class HomeScreenViewModel @Inject constructor(
     private var getPatientsJob: Job? = null
     private var errorHandler = CoroutineExceptionHandler { _, e ->
         e.printStackTrace()
-        _state.value = _state.value.copy(
-            errorMessage = e.message,
-            isLoading = false
-        )
+        _state.update{
+            _state.value.copy(
+                errorMessage = e.message,
+                isLoading = false
+            )
+        }
     }
 
 
@@ -47,19 +50,31 @@ class HomeScreenViewModel @Inject constructor(
                     val name = event.patient.name
                     val result = useCases.deletePatient(event.patient)
                     if (result is Resource.Success) {
-                        _state.value = _state.value.copy(
-                            toastMessage = "Deleted patient $name."
-                        )
+                        _state.update{
+                            _state.value.copy(
+                                toastMessage = "Deleted patient $name."
+                            )
+                        }
                     } else if (result is Resource.Error) {
-                        _state.value = _state.value.copy(
-                            toastMessage = "Couldn't delete $name"
-                        )
+                        _state.update{
+                            _state.value.copy(
+                                toastMessage = "Couldn't delete $name"
+                            )
+                        }
                     }
                 }
             }
 
             is HomeScreenEvent.Share -> {
                 // share with bluetooth
+            }
+
+            is HomeScreenEvent.ToastShown -> {
+                _state.update{
+                    _state.value.copy(
+                        toastMessage = null
+                    )
+                }
             }
         }
     }
@@ -74,7 +89,9 @@ class HomeScreenViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             receivedPatients.collect { patients ->
-                _state.value = _state.value.copy(receivedPatients = patients)
+                _state.update{
+                    _state.value.copy(receivedPatients = patients)
+                }
             }
         }
     }
@@ -88,23 +105,29 @@ class HomeScreenViewModel @Inject constructor(
             result.collect { resource ->
                 when (resource) {
                     is Resource.Loading -> {
-                        _state.value = _state.value.copy(
-                            isLoading = true
-                        )
+                        _state.update{
+                            _state.value.copy(
+                                isLoading = true
+                            )
+                        }
                     }
 
                     is Resource.Success -> {
-                        _state.value = _state.value.copy(
-                            patients = resource.data ?: emptyList(),
-                            isLoading = false
-                        )
+                        _state.update{
+                            _state.value.copy(
+                                patients = resource.data ?: emptyList(),
+                                isLoading = false
+                            )
+                        }
                     }
 
                     is Resource.Error -> {
-                        _state.value = _state.value.copy(
-                            errorMessage = resource.message,
-                            isLoading = false
+                        _state.update{
+                            _state.value.copy(
+                                errorMessage = resource.message,
+                                isLoading = false
                             )
+                        }
                     }
 
                     is Resource.None -> {}
@@ -115,6 +138,8 @@ class HomeScreenViewModel @Inject constructor(
 
     // ----------------Toasts----------------
     fun onToastMessageShown() {
-        _state.value = _state.value.copy(toastMessage = null)
+        _state.update{
+            _state.value.copy(toastMessage = null)
+        }
     }
 }

@@ -100,7 +100,7 @@ fun PairNewDeviceScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         TextButton(
-                            onClick = { pairNewDeviceScreenViewModel.makeDeviceDiscoverable(30) },
+                            onClick = { pairNewDeviceScreenViewModel.onEvent(PairNewDeviceEvent.MakeDeviceDiscoverable()) },
                             enabled = timeLeft == null,
                         ) {
                             Text(
@@ -122,9 +122,9 @@ fun PairNewDeviceScreen(
                         TextButton(
                             onClick = {
                                 if (!isDiscovering)
-                                    pairNewDeviceScreenViewModel.startScan()
+                                    pairNewDeviceScreenViewModel.onEvent(PairNewDeviceEvent.StartScan)
                                 else
-                                    pairNewDeviceScreenViewModel.stopScan()
+                                    pairNewDeviceScreenViewModel.onEvent(PairNewDeviceEvent.StopScan)
                             },
                         ) { Text(if (!isDiscovering) "Scan" else "Stop") }
                     }
@@ -148,7 +148,7 @@ fun PairNewDeviceScreen(
             DeviceList(
                 devices = discoveredDevices,
                 devicesType = "Discovered Devices",
-                onClick = { pairNewDeviceScreenViewModel.pairDevice(it) },
+                onClick = { pairNewDeviceScreenViewModel.onEvent(PairNewDeviceEvent.PairDevice(it)) },
                 modifier = Modifier.weight(1f)
             )
         }

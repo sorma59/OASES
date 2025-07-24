@@ -36,7 +36,6 @@ fun AppNavigation(
     NavHost(
         navController = navController,
         startDestination = Screen.LoginScreen.route,
-
     ) {
 
         composable(Screen.AdminScreen.route) {
@@ -54,8 +53,6 @@ fun AppNavigation(
         composable(Screen.DiseaseManagementScreen.route) {
             DiseaseManagementScreen (navController, padding)
         }
-
-
 
         composable(Screen.LoginScreen.route) {
             LoginScreen(navController, padding, authViewModel)
@@ -132,10 +129,10 @@ fun AppNavigation(
                 )
                 {
                     type = NavType.StringType
-                    defaultValue =
-                        ""
+                    defaultValue = ""
                 }
-            )) {
+            )
+        ) {
             RegistrationScreen(navController, padding, authViewModel)
         }
 

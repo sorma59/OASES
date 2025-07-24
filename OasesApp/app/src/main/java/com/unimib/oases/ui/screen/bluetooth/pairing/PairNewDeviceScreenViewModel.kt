@@ -1,10 +1,8 @@
 package com.unimib.oases.ui.screen.bluetooth.pairing
 
-import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import androidx.lifecycle.ViewModel
 import com.unimib.oases.data.bluetooth.BluetoothCustomManager
-import com.unimib.oases.util.PermissionHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -32,21 +30,33 @@ class PairNewDeviceScreenViewModel @Inject constructor(
         startScan()
     }
 
-    fun makeDeviceDiscoverable(duration: Int) {
+    fun onEvent(event: PairNewDeviceEvent) {
+        when (event) {
+            is PairNewDeviceEvent.StartScan -> startScan()
+
+            is PairNewDeviceEvent.StopScan -> stopScan()
+
+            is PairNewDeviceEvent.MakeDeviceDiscoverable -> makeDeviceDiscoverable(event.duration)
+
+            is PairNewDeviceEvent.PairDevice -> pairDevice(event.device)
+
+            is PairNewDeviceEvent.ToastShown -> bluetoothCustomManager.toastShown()
+        }
+    }
+
+    private fun makeDeviceDiscoverable(duration: Int) {
         bluetoothCustomManager.makeDeviceDiscoverable(duration)
     }
 
-    fun startScan() {
+    private fun startScan() {
         bluetoothCustomManager.startDiscovery()
     }
 
-    fun stopScan(){
+    private fun stopScan(){
         bluetoothCustomManager.stopDiscovery()
     }
 
-    @SuppressLint("MissingPermission")
-    fun pairDevice(device: BluetoothDevice) {
-        if (PermissionHelper.hasPermissions())
-            bluetoothCustomManager.pairWithDevice(device)
+    private fun pairDevice(device: BluetoothDevice) {
+        bluetoothCustomManager.pairWithDevice(device)
     }
 }

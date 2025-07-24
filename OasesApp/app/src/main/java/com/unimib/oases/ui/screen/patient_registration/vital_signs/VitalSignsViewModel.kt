@@ -30,10 +30,12 @@ class VitalSignsViewModel @Inject constructor(
 
     private var errorHandler = CoroutineExceptionHandler { _, e ->
         e.printStackTrace()
-        _state.value = _state.value.copy(
-            error = e.message,
-            isLoading = false
-        )
+        _state.update{
+            _state.value.copy(
+                error = e.message,
+                isLoading = false
+            )
+        }
     }
 
     private val _state = MutableStateFlow(VitalSignsState())
@@ -44,10 +46,12 @@ class VitalSignsViewModel @Inject constructor(
     }
 
     private fun refresh(){
-        _state.value = _state.value.copy(
-            error = null,
-            isLoading = true
-        )
+        _state.update{
+            _state.value.copy(
+                error = null,
+                isLoading = true
+            )
+        }
         val patientId = savedStateHandle.get<String>("patientId")
         viewModelScope.launch(ioDispatcher + errorHandler) {
             if (patientId != null) {

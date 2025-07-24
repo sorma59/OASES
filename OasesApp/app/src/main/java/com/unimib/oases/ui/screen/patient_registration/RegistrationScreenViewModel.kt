@@ -56,10 +56,11 @@ class RegistrationScreenViewModel @Inject constructor(
 
     private var errorHandler = CoroutineExceptionHandler { _, e ->
         e.printStackTrace()
-        _state.value = _state.value.copy(
-            error = e.message,
-//            isLoading = false
-        )
+        _state.update{
+            _state.value.copy(
+                error = e.message
+            )
+        }
     }
 
 

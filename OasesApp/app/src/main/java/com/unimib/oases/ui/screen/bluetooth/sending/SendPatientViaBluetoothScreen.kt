@@ -61,11 +61,11 @@ fun SendPatientViaBluetoothScreen(
         when (sendPatientResult.value) {
             is Resource.Success -> {
                 showResult("Patient sent successfully, tap another device to send ${patient.name} again")
-                sendPatientViaBluetoothViewModel.resetSendPatientResult()
+                sendPatientViaBluetoothViewModel.onEvent(SendPatientViaBluetoothEvent.SendResultShown)
             }
             is Resource.Error -> {
                 showResult("Failed to send patient:\n ${(sendPatientResult.value as Resource.Error).message}")
-                sendPatientViaBluetoothViewModel.resetSendPatientResult()
+                sendPatientViaBluetoothViewModel.onEvent(SendPatientViaBluetoothEvent.SendResultShown)
             }
             else -> {
                 // Do nothing for Loading, None, or other states
@@ -120,7 +120,9 @@ fun SendPatientViaBluetoothScreen(
                         devices = pairedDevices.value,
                         devicesType = "Paired Devices",
                         onClick = {
-                            sendPatientViaBluetoothViewModel.sendPatient(patient, it)
+                            sendPatientViaBluetoothViewModel.onEvent(
+                                SendPatientViaBluetoothEvent.SendPatient(patient, it)
+                            )
                         },
                     )
                 }
