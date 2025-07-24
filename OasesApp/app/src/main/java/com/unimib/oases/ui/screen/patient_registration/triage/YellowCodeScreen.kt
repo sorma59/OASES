@@ -22,11 +22,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.unimib.oases.ui.components.input.LabeledCheckbox
 import com.unimib.oases.ui.components.util.FadeOverlay
 import com.unimib.oases.ui.components.util.TitleText
+import com.unimib.oases.ui.util.ToastUtils
 
 @Composable
 fun YellowCodeScreen(
@@ -37,8 +39,17 @@ fun YellowCodeScreen(
 
     val scrollState = rememberScrollState()
 
+    val context = LocalContext.current
+
     LaunchedEffect(state.isYellowCode) {
         onYellowCodeToggle(state.isYellowCode)
+    }
+
+    LaunchedEffect(state.toastMessage) {
+        if (state.toastMessage != null) {
+            ToastUtils.showToast(context, state.toastMessage)
+            onEvent(TriageEvent.ToastShown)
+        }
     }
 
     Column(
@@ -234,52 +245,95 @@ fun YellowCodeScreen(
                 LabeledCheckbox(
                     label = "Age > 80 years",
                     checked = state.ageOver80Years,
-                    onCheckedChange = { }
+                    onCheckedChange = {
+                        onEvent(
+                            TriageEvent.ComputedFieldClicked
+                        )
+                    }
                 )
                 LabeledCheckbox(
                     label = "SpO2 < ${TriageState.SPO2_LOW}%",
                     checked = state.alteredVitalSignsSpo2,
-                    onCheckedChange = { }
+                    onCheckedChange = {
+                        onEvent(
+                            TriageEvent.ComputedFieldClicked
+                        )
+                    }
                 )
                 LabeledCheckbox(
                     label = "RR < ${TriageState.RR_LOW}",
                     checked = state.alteredVitalSignsRrLow,
-                    onCheckedChange = { }
+                    onCheckedChange = {
+                        onEvent(
+                            TriageEvent.ComputedFieldClicked
+                        )
+                    }
                 )
                 LabeledCheckbox(
                     label = "RR > ${TriageState.RR_HIGH}",
                     checked = state.alteredVitalSignsRrHigh,
-                    onCheckedChange = { }
+                    onCheckedChange = {
+                        onEvent(
+                            TriageEvent.ComputedFieldClicked
+                        )
+                        onEvent(
+                            TriageEvent.ComputedFieldClicked
+                        )
+                    }
                 )
                 LabeledCheckbox(
                     label = "HR < ${TriageState.HR_LOW}",
                     checked = state.alteredVitalSignsHrLow,
-                    onCheckedChange = { }
+                    onCheckedChange = {
+                        onEvent(
+                            TriageEvent.ComputedFieldClicked
+                        )
+                    }
                 )
                 LabeledCheckbox(
                     label = "HR > ${TriageState.HR_HIGH}",
                     checked = state.alteredVitalSignsHrHigh,
-                    onCheckedChange = { }
+                    onCheckedChange = {
+                        onEvent(
+                            TriageEvent.ComputedFieldClicked
+                        )
+                    }
                 )
                 LabeledCheckbox(
                     label = "SBP < ${TriageState.SBP_LOW}",
                     checked = state.alteredVitalSignsSbpLow,
-                    onCheckedChange = { }
+                    onCheckedChange = {
+                        onEvent(
+                            TriageEvent.ComputedFieldClicked
+                        )
+                    }
                 )
                 LabeledCheckbox(
                     label = "SBP > ${TriageState.SBP_HIGH}",
                     checked = state.alteredVitalSignsSbpHigh,
-                    onCheckedChange = { }
+                    onCheckedChange = {
+                        onEvent(
+                            TriageEvent.ComputedFieldClicked
+                        )
+                    }
                 )
                 LabeledCheckbox(
                     label = "Temp < ${TriageState.TEMP_LOW}°C",
                     checked = state.alteredVitalSignsTempLow,
-                    onCheckedChange = { }
+                    onCheckedChange = {
+                        onEvent(
+                            TriageEvent.ComputedFieldClicked
+                        )
+                    }
                 )
                 LabeledCheckbox(
                     label = "Temp > ${TriageState.TEMP_HIGH}°C",
                     checked = state.alteredVitalSignsTempHigh,
-                    onCheckedChange = { }
+                    onCheckedChange = {
+                        onEvent(
+                            TriageEvent.ComputedFieldClicked
+                        )
+                    }
                 )
 
                 Spacer(modifier = Modifier.height(48.dp))

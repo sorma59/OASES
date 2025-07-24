@@ -39,4 +39,7 @@ sealed class TriageEvent {
     data class SexualAssaultChanged(val value: Boolean): TriageEvent()
     data class AnimalBiteNeedlestickPunctureChanged(val value: Boolean): TriageEvent()
     data class OtherPregnancyRelatedComplaintsChanged(val value: Boolean): TriageEvent()
+
+    object ComputedFieldClicked: TriageEvent()
+    object ToastShown: TriageEvent()
 }

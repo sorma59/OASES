@@ -381,6 +381,17 @@ class RegistrationScreenViewModel @Inject constructor(
                     it.copy(unableToPassUrine = event.value)
                 }
             }
+
+            is TriageEvent.ComputedFieldClicked -> {
+                updateTriageState {
+                    it.copy(toastMessage = "This field is computed")
+                }
+            }
+            is TriageEvent.ToastShown -> {
+                updateTriageState {
+                    it.copy(toastMessage = null)
+                }
+            }
         }
     }
 

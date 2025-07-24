@@ -1,5 +1,8 @@
 package com.unimib.oases.ui.screen.patient_registration.triage
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,14 +23,25 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInParent
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.unimib.oases.ui.components.input.LabeledCheckbox
 import com.unimib.oases.ui.components.util.BottomButtons
 import com.unimib.oases.ui.components.util.FadeOverlay
+import com.unimib.oases.ui.components.util.ShowMoreArrow
+import com.unimib.oases.ui.util.ToastUtils
+import kotlinx.coroutines.launch
 
 @Composable
 fun RedCodeScreen(
@@ -40,8 +54,37 @@ fun RedCodeScreen(
 
     val scrollState = rememberScrollState()
 
+    val coroutineScope = rememberCoroutineScope()
+
+    val context = LocalContext.current
+
+    var pregnancyRowScrollTargetY by remember { mutableFloatStateOf(0f) }
+
+    val handlePregnancyChangeAndScroll = { newPregnancyState: Boolean ->
+        onEvent(TriageEvent.PregnancyChanged(newPregnancyState))
+        if (newPregnancyState) { // Only scroll if it's being expanded
+            coroutineScope.launch {
+                scrollState.animateScrollTo(
+                    value = pregnancyRowScrollTargetY.toInt(),
+                    animationSpec = tween(
+                        durationMillis = 500,
+                        delayMillis = 100,
+                        easing = LinearOutSlowInEasing
+                    )
+                )
+            }
+        }
+    }
+
     LaunchedEffect(state.isRedCode) {
         onRedCodeToggle(state.isRedCode)
+    }
+
+    LaunchedEffect(state.toastMessage) {
+        if (state.toastMessage != null) {
+            ToastUtils.showToast(context, state.toastMessage)
+            onEvent(TriageEvent.ToastShown)
+        }
     }
 
     Column(
@@ -75,7 +118,7 @@ fun RedCodeScreen(
                     fontWeight = FontWeight.Bold
                 )
             }
-            Box{
+            Box {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier
@@ -162,20 +205,35 @@ fun RedCodeScreen(
                         }
                     )
 
-                    LabeledCheckbox(
-                        label = "Pregnancy with any of:",
-                        checked = state.pregnancy,
-                        onCheckedChange = {
-                            onEvent(
-                                TriageEvent.PregnancyChanged(it)
-                            )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.onGloballyPositioned { coordinates ->
+                            // This gives the Y position of the top of this Row
+                            // relative to the content area of the scrollable Column
+                            pregnancyRowScrollTargetY = coordinates.positionInParent().y
                         }
-                    )
+                    ) {
+                        LabeledCheckbox(
+                            label = "Pregnancy with any of:",
+                            checked = state.pregnancy,
+                            onCheckedChange = {
+                                handlePregnancyChangeAndScroll(it)
+                            }
+                        )
 
-                    if (state.pregnancy){
+                        ShowMoreArrow(
+                            expanded = state.pregnancy,
+                            onClick = {
+                                handlePregnancyChangeAndScroll(it)
+                            }
+                        )
+                    }
+                    AnimatedVisibility(
+                        visible = state.pregnancy,
+                    ){
                         Column(
                             modifier = Modifier.padding(start = 16.dp)
-                        ){
+                        ) {
                             LabeledCheckbox(
                                 label = "Heavy bleeding",
                                 checked = state.pregnancyWithHeavyBleeding,
@@ -231,9 +289,13 @@ fun RedCodeScreen(
                                 }
                             )
                             LabeledCheckbox(
-                                label = "SBP ≥ ${TriageState.PREGNANCY_HIGH_SBP} or DBP ≥ ${TriageState.PREGNANCY_HIGH_DBP}",
+                                label = "SBP ≥ ${TriageState.PREGNANCY_HIGH_SBP} or DBP ≥ ${TriageState.PREGNANCY_HIGH_DBP} (computed)",
                                 checked = state.sbpHighDbpHighForPregnancy,
-                                onCheckedChange = { }
+                                onCheckedChange = {
+                                    onEvent(
+                                        TriageEvent.ComputedFieldClicked
+                                    )
+                                }
                             )
                             LabeledCheckbox(
                                 label = "Trauma",
@@ -256,7 +318,6 @@ fun RedCodeScreen(
                     }
                     Spacer(Modifier.height(48.dp))
                 }
-
                 FadeOverlay(Modifier.align(Alignment.BottomCenter))
             }
         }
