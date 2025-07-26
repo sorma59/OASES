@@ -11,7 +11,7 @@ data class DiseaseManagementState(
     ),
     val diseases: List<Disease> = emptyList(),
     val isLoading: Boolean = false,
-    var error: String? = null,
+    val error: String? = null,
     val message: String? = null
 )
 

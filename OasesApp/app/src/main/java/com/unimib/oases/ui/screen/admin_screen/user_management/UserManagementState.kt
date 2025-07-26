@@ -13,7 +13,9 @@ data class UserManagementState(
     ),
     val users: List<User> = emptyList(),
     val isLoading: Boolean = false,
-    var error: String? = null,
-    val message: String? = null
+    val error: String? = null,
+    val toastMessage: String? = null,
+    val usernameError: String? = null,
+    val passwordError: String? = null
 )
 

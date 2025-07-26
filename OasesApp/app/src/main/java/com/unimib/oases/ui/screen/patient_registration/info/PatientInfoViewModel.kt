@@ -146,7 +146,11 @@ class PatientInfoViewModel @Inject constructor(
                 val newBirthDate = DateTimeFormatter().calculateBirthDate(event.ageInMonths)
                 if (newBirthDate != null)
                     _state.update{
-                        _state.value.copy(patient = _state.value.patient.copy(birthDate = newBirthDate))
+                        _state.value.copy(
+                            patient = _state.value.patient.copy(
+                                birthDate = newBirthDate
+                            )
+                        )
                     }
             }
 

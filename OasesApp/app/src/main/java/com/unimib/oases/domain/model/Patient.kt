@@ -11,16 +11,16 @@ import java.util.UUID
 data class Patient(
     val id: String = UUID.randomUUID().toString(),
     val publicId: String = PasswordUtils.generateShortId(),
-    var name: String,
-    var birthDate: String,
-    var ageInMonths: Int,
-    var sex: String,
-    var village: String,
-    var parish: String,
-    var subCounty: String,
-    var district: String,
-    var nextOfKin: String,
-    var contact: String,
-    var status: String,
-    var image: ByteArray? = null
+    val name: String,
+    val birthDate: String,
+    val ageInMonths: Int,
+    val sex: String,
+    val village: String,
+    val parish: String,
+    val subCounty: String,
+    val district: String,
+    val nextOfKin: String,
+    val contact: String,
+    val status: String,
+    val image: ByteArray? = null
 ) : Parcelable

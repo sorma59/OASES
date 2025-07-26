@@ -9,7 +9,7 @@ import com.unimib.oases.domain.model.SexSpecificity
 
 @Entity(tableName = TableNames.DISEASE)
 data class DiseaseEntity (
-    @PrimaryKey @ColumnInfo(name = "name") var name: String,
-    @ColumnInfo(name = "sex_specificity") var sexSpecificity: SexSpecificity,
-    @ColumnInfo(name = "age_specificity") var ageSpecificity: AgeSpecificity,
+    @PrimaryKey @ColumnInfo(name = "name") val name: String,
+    @ColumnInfo(name = "sex_specificity") val sexSpecificity: SexSpecificity,
+    @ColumnInfo(name = "age_specificity") val ageSpecificity: AgeSpecificity,
 )

@@ -95,7 +95,8 @@ fun PatientList(
                                     },
                                     backgroundColor = MaterialTheme.colorScheme.error,
                                     icon = Icons.Default.Delete,
-                                    modifier = Modifier.fillMaxHeight()
+                                    modifier = Modifier.fillMaxHeight(),
+                                    tint = MaterialTheme.colorScheme.onError
                                 )
                                 ActionIcon(
                                     onClick = {

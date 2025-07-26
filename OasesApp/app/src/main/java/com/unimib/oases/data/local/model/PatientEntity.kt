@@ -9,18 +9,18 @@ import com.unimib.oases.ui.screen.patient_registration.info.Sex
 @Entity(tableName = TableNames.PATIENT)
 data class PatientEntity (
     @PrimaryKey val id: String,
-    @ColumnInfo(name = "public_id") var publicId: String,
-    @ColumnInfo(name = "name") var name: String,
-    @ColumnInfo(name = "birth_date") var birthDate: String,
-    @ColumnInfo(name = "sex") var sex: Sex,
-    @ColumnInfo(name = "village") var village: String,
-    @ColumnInfo(name = "parish") var parish: String,
-    @ColumnInfo(name = "sub_county") var subCounty: String,
-    @ColumnInfo(name = "district") var district: String,
-    @ColumnInfo(name = "next_of_kin") var nextOfKin: String,
-    @ColumnInfo(name = "contact") var contact: String,
-    @ColumnInfo(name = "status") var status: String,
-    @ColumnInfo(name = "image") var image: ByteArray? = null
+    @ColumnInfo(name = "public_id") val publicId: String,
+    @ColumnInfo(name = "name") val name: String,
+    @ColumnInfo(name = "birth_date") val birthDate: String,
+    @ColumnInfo(name = "sex") val sex: Sex,
+    @ColumnInfo(name = "village") val village: String,
+    @ColumnInfo(name = "parish") val parish: String,
+    @ColumnInfo(name = "sub_county") val subCounty: String,
+    @ColumnInfo(name = "district") val district: String,
+    @ColumnInfo(name = "next_of_kin") val nextOfKin: String,
+    @ColumnInfo(name = "contact") val contact: String,
+    @ColumnInfo(name = "status") val status: String,
+    @ColumnInfo(name = "image") val image: ByteArray? = null
 )
 
 /**
@@ -29,6 +29,6 @@ data class PatientEntity (
 enum class PatientStatus(val displayValue: String) {
     WAITING_FOR_TRIAGE("Waiting for triage"),
     WAITING_FOR_VISIT("Waiting for visit"),
-    WAITING_FOR_TESTS_RESULTS("Waiting for test results"),
+    WAITING_FOR_TEST_RESULTS("Waiting for test results"),
     DISMISSED("Dismissed")
 }

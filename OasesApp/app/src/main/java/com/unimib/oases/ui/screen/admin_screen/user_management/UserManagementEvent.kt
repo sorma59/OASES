@@ -8,7 +8,9 @@ sealed class UserManagementEvent {
     data class EnteredPassword(val value: String) : UserManagementEvent()
     data class SelectedRole(val value: Role) : UserManagementEvent()
     data class Delete(val value: User) : UserManagementEvent()
-    data class Click(val value: User) : UserManagementEvent()
+    data class UserClicked(val value: User) : UserManagementEvent()
     data object SaveUser : UserManagementEvent()
     data object UndoDelete: UserManagementEvent()
+
+    data object OnToastShown : UserManagementEvent()
 }

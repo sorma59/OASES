@@ -18,7 +18,9 @@ import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -43,6 +45,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -53,8 +56,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.unimib.oases.data.local.model.Role
 import com.unimib.oases.data.local.model.User
+import com.unimib.oases.ui.components.util.DeleteButton
+import com.unimib.oases.ui.components.util.DismissButton
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 import com.unimib.oases.ui.navigation.Screen
+import com.unimib.oases.ui.util.ToastUtils
 import kotlinx.coroutines.launch
 
 
@@ -68,19 +74,33 @@ fun UserManagementScreen(
 
     val state by userManagementViewModel.state.collectAsState()
 
+    val context = LocalContext.current
 
     val snackbarHostState =
-        remember { SnackbarHostState() } // for hosting snackbars, if I delete a intem I get a snackbar to undo the item
+        remember { SnackbarHostState() } // for hosting snackbars, if I delete an item I get a snackbar to undo the item
 
     val scope = rememberCoroutineScope()
     var passwordVisible by remember { mutableStateOf(false) }
+
+    var showDeletionDialog by remember { mutableStateOf(false) }
+
+    var userToDelete by remember { mutableStateOf<User?>(null) }
+
+    val dismissDeletionDialog = {
+        showDeletionDialog = false
+        userToDelete = null
+    }
 
     LaunchedEffect(key1 = true) {
         userManagementViewModel.getUsers()
     }
 
-
-
+    LaunchedEffect(key1 = state.toastMessage) {
+        state.toastMessage?.let {
+            ToastUtils.showToast(context, it)
+            userManagementViewModel.onEvent(UserManagementEvent.OnToastShown)
+        }
+    }
 
     Column(modifier = Modifier.fillMaxSize()) {
 
@@ -91,7 +111,6 @@ fun UserManagementScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-
 
                     Text(
                         "Admin Panel",
@@ -151,8 +170,16 @@ fun UserManagementScreen(
                 onValueChange = { userManagementViewModel.onEvent(UserManagementEvent.EnteredUsername(it)) },
                 label = { Text("Username") },
                 singleLine = true,
+                isError = state.usernameError != null,
                 modifier = Modifier.fillMaxWidth()
             )
+
+            if (state.usernameError != null){
+                Text(
+                    text = state.usernameError!!,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -169,9 +196,16 @@ fun UserManagementScreen(
                         Icon(imageVector = image, contentDescription = "PASSWORD")
                     }
                 },
+                isError = state.passwordError != null,
                 modifier = Modifier.fillMaxWidth()
             )
 
+            if (state.passwordError != null){
+                Text(
+                    text = state.passwordError!!,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -179,8 +213,7 @@ fun UserManagementScreen(
             // Role selection radio buttons
             Text(
                 text = "Select Role:",
-                modifier = Modifier
-                    .fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
             )
 
 
@@ -190,11 +223,13 @@ fun UserManagementScreen(
                         .fillMaxWidth()
                         .selectable(
                             selected = (roleOption == state.user.role),
-                            onClick = { userManagementViewModel.onEvent(
-                                UserManagementEvent.SelectedRole(
-                                    roleOption
+                            onClick = {
+                                userManagementViewModel.onEvent(
+                                    UserManagementEvent.SelectedRole(
+                                        roleOption
+                                    )
                                 )
-                            ) }
+                            }
                         ),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -214,14 +249,9 @@ fun UserManagementScreen(
 
             Button(
                 onClick = {
-
-                    if (state.user.username.isBlank() || state.user.pwHash.isBlank()) {
-                        state.error = "Username and password cannot be empty!"
-                        return@Button
-                    }
-
-                    userManagementViewModel.onEvent(UserManagementEvent.SaveUser)
-
+                    userManagementViewModel.onEvent(
+                        UserManagementEvent.SaveUser
+                    )
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -237,19 +267,9 @@ fun UserManagementScreen(
                 )
             }
 
-            state.message?.let {
-                Text(
-                    text = it,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-
-
-
             Column(
                 modifier = Modifier.fillMaxWidth()
             ) {
-
 
                 Text(
                     text = "Registered Users (${state.users.size})",
@@ -258,7 +278,6 @@ fun UserManagementScreen(
                         .fillMaxWidth()
                         .padding(vertical = 8.dp)
                 )
-
 
                 if (state.isLoading) {
                     CustomCircularProgressIndicator()
@@ -273,27 +292,52 @@ fun UserManagementScreen(
                             UserListItem(
                                 user = user,
                                 onDelete = {
-                                    userManagementViewModel.onEvent(UserManagementEvent.Delete(user))
-                                    scope.launch {
-                                        val undo = snackbarHostState.showSnackbar(
-                                            message = "Deleted user ${user.username}",
-                                            actionLabel = "UNDO"
-                                        )
-                                        if (undo == SnackbarResult.ActionPerformed) {
-                                            userManagementViewModel.onEvent(UserManagementEvent.UndoDelete)
-                                        }
-                                    }
+                                    userToDelete = user
+                                    showDeletionDialog = true
                                 },
                                 onClick = {
-                                    userManagementViewModel.onEvent(UserManagementEvent.Click(user))
+                                    userManagementViewModel.onEvent(UserManagementEvent.UserClicked(user))
                                 }
                             )
                         }
                     }
                 }
-
             }
         }
+    }
+
+    if (showDeletionDialog){
+        AlertDialog(
+            onDismissRequest = dismissDeletionDialog,
+            title = { "Delete User" },
+            text = { Text("Are you sure you want to delete this user?") },
+            confirmButton = {
+                DeleteButton(
+                    onDelete = {
+                        userManagementViewModel.onEvent(UserManagementEvent.Delete(userToDelete!!))
+                        scope.launch {
+                            val undo = snackbarHostState.showSnackbar(
+                                message = "Deleted user ${userToDelete?.username ?: ""}",
+                                actionLabel = "UNDO"
+                            )
+                            if (undo == SnackbarResult.ActionPerformed) {
+                                userManagementViewModel.onEvent(UserManagementEvent.UndoDelete)
+                            }
+                        }
+                        dismissDeletionDialog()
+                    }
+                )
+            },
+            dismissButton = {
+                DismissButton(
+                    onDismiss = dismissDeletionDialog,
+                    buttonText = "Cancel",
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.onBackground
+                    )
+                )
+            }
+        )
     }
 }
 
@@ -323,13 +367,6 @@ fun UserListItem(
                     text = user.username,
                     style = MaterialTheme.typography.bodyLarge
                 )
-//                if (user.username.isNotEmpty()) {
-//                    Text(
-//                        text = user.username,
-//                        style = MaterialTheme.typography.bodySmall,
-//                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-//                    )
-//                }
             }
 
             IconButton(

@@ -38,7 +38,6 @@ import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberTopAppBarState
@@ -72,6 +71,8 @@ import com.unimib.oases.ui.components.patients.PatientList
 import com.unimib.oases.ui.components.patients.RecentlyReceivedPatientList
 import com.unimib.oases.ui.components.search.SearchBar
 import com.unimib.oases.ui.components.util.BluetoothPermissionHandler
+import com.unimib.oases.ui.components.util.DeleteButton
+import com.unimib.oases.ui.components.util.DismissButton
 import com.unimib.oases.ui.components.util.NoPermissionMessage
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 import com.unimib.oases.ui.navigation.Screen
@@ -102,6 +103,11 @@ fun HomeScreen(
     var showAlertDialog by remember { mutableStateOf(false) }
 
     var patientToDelete by remember { mutableStateOf<Patient?>(null) }
+
+    val dismissDeletionDialog = {
+        showAlertDialog = false
+        patientToDelete = null
+    }
 
     var searchText by remember { mutableStateOf("") }
     var active by remember { mutableStateOf(false) }
@@ -433,9 +439,7 @@ fun HomeScreen(
 
     if (showAlertDialog) {
         AlertDialog(
-            onDismissRequest = {
-                showAlertDialog = false
-            },
+            onDismissRequest = dismissDeletionDialog,
             title = {
                 Text(text = "Confirm deletion of ${patientToDelete?.name}")
             },
@@ -443,24 +447,21 @@ fun HomeScreen(
                 Text(text = "Are you sure you want to delete this patient? All the records related to this patient will be deleted.")
             },
             confirmButton = {
-                TextButton(
-                    onClick = {
+                DeleteButton(
+                    onDelete = {
                         homeScreenViewModel.onEvent(HomeScreenEvent.Delete(patientToDelete!!))
-                        showAlertDialog = false
-                        patientToDelete = null
+                        dismissDeletionDialog()
                     }
-                ) {
-                    Text("Confirm")
-                }
+                )
             },
             dismissButton = {
-                TextButton(
-                    onClick = {
-                        showAlertDialog = false
-                    }
-                ) {
-                    Text("Cancel")
-                }
+                DismissButton(
+                    onDismiss = dismissDeletionDialog,
+                    buttonText = "Cancel",
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.onBackground,
+                    )
+                )
             }
         )
     }

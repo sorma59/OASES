@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -32,10 +33,12 @@ class DiseaseManagementViewModel @Inject constructor(
     private var undoDisease: Disease? = null
     private var errorHandler = CoroutineExceptionHandler { _, e ->
         e.printStackTrace()
-        _state.value = _state.value.copy(
-            error = e.message,
-            isLoading = false
-        )
+        _state.update{
+            _state.value.copy(
+                error = e.message,
+                isLoading = false
+            )
+        }
     }
 
 
@@ -53,9 +56,11 @@ class DiseaseManagementViewModel @Inject constructor(
     fun onEvent(event: DiseaseManagementEvent) {
         when (event) {
             is DiseaseManagementEvent.Click -> {
-                _state.value = _state.value.copy(
-                    disease = event.value
-                )
+                _state.update{
+                    _state.value.copy(
+                        disease = event.value
+                    )
+                }
             }
 
             is DiseaseManagementEvent.Delete -> {
@@ -67,27 +72,33 @@ class DiseaseManagementViewModel @Inject constructor(
             }
 
             is DiseaseManagementEvent.EnteredDiseaseName -> {
-                _state.value = _state.value.copy(
-                    disease = _state.value.disease.copy(
-                        name = event.value
+                _state.update{
+                    _state.value.copy(
+                        disease = _state.value.disease.copy(
+                            name = event.value
+                        )
                     )
-                )
+                }
             }
 
             is DiseaseManagementEvent.EnteredSexSpecificity -> {
-                _state.value = _state.value.copy(
-                    disease = _state.value.disease.copy(
-                        sexSpecificity = event.value
+                _state.update{
+                    _state.value.copy(
+                        disease = _state.value.disease.copy(
+                            sexSpecificity = event.value
+                        )
                     )
-                )
+                }
             }
 
             is DiseaseManagementEvent.EnteredAgeSpecificity -> {
-                _state.value = _state.value.copy(
-                    disease = _state.value.disease.copy(
-                        ageSpecificity = event.value
+                _state.update{
+                    _state.value.copy(
+                        disease = _state.value.disease.copy(
+                            ageSpecificity = event.value
+                        )
                     )
-                )
+                }
             }
 
             DiseaseManagementEvent.UndoDelete -> {
@@ -103,23 +114,30 @@ class DiseaseManagementViewModel @Inject constructor(
             DiseaseManagementEvent.SaveDisease -> {
                 viewModelScope.launch(dispatcher + errorHandler) {
                     try {
-                        _state.value = _state.value.copy(isLoading = true)
+                        _state.update{
+                            _state.value.copy(isLoading = true)
+                        }
 
                         useCases.addDisease(_state.value.disease)
 
-                        _state.value = _state.value.copy(isLoading = false,
-                            disease = state.value.disease.copy(
-                                name = "",
-                                sexSpecificity = "",
-                                ageSpecificity = ""
-                            ))
+                        _state.update{
+                            _state.value.copy(isLoading = false,
+                                disease = state.value.disease.copy(
+                                    name = "",
+                                    sexSpecificity = "",
+                                    ageSpecificity = ""
+                                )
+                            )
+                        }
                         // _eventFlow.emit(UiEvent.SaveUser) // I emit it into the screen then
                         // in the screen we handle it and we go back to the list
 
                     } catch (e: Exception) {
-                        _state.value = _state.value.copy(
-                            isLoading = false
-                        )
+                        _state.update{
+                            _state.value.copy(
+                                isLoading = false
+                            )
+                        }
                         _eventFlow.emit(
                             UiEvent.showSnackbar(
                                 message = "Error adding disease " + e.message
@@ -128,17 +146,12 @@ class DiseaseManagementViewModel @Inject constructor(
                     }
                 }
             }
-
-
         }
-
     }
 
 
     fun getDiseases() {
         getDiseasesJob?.cancel()
-
-
 
         getDiseasesJob = viewModelScope.launch(dispatcher + errorHandler) {
             val result = useCases.getDiseases()

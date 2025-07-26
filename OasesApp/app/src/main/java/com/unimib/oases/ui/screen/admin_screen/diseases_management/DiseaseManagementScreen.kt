@@ -201,7 +201,6 @@ fun DiseaseManagementScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
 
-
                 Text(
                     text = "Diseases (${state.diseases.size})",
                     style = MaterialTheme.typography.titleLarge,
@@ -242,7 +241,6 @@ fun DiseaseManagementScreen(
                         }
                     }
                 }
-
             }
         }
     }

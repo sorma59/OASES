@@ -26,9 +26,9 @@ import com.unimib.oases.data.local.TableNames
     ]
 )
 data class PatientDiseaseEntity (
-    @ColumnInfo(name = "patient_id") var patientId: String,
-    @ColumnInfo(name = "disease_name") var diseaseName: String,
-    @ColumnInfo(name = "is_diagnosed") var isDiagnosed: Boolean,
-    @ColumnInfo(name = "diagnosis_date") var diagnosisDate: String,
-    @ColumnInfo(name = "additional_info") var additionalInfo: String,
+    @ColumnInfo(name = "patient_id") val patientId: String,
+    @ColumnInfo(name = "disease_name") val diseaseName: String,
+    @ColumnInfo(name = "is_diagnosed") val isDiagnosed: Boolean,
+    @ColumnInfo(name = "diagnosis_date") val diagnosisDate: String,
+    @ColumnInfo(name = "additional_info") val additionalInfo: String,
 )

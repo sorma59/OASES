@@ -24,8 +24,8 @@ import com.unimib.oases.data.local.TableNames
     ]
 )
 data class VisitVitalSignEntity (
-    @ColumnInfo(name = "visit_id") var visitId: String,
-    @ColumnInfo(name = "vital_sign_name") var vitalSignName: String,
-    @ColumnInfo(name = "timestamp") var timestamp: String,
-    @ColumnInfo(name = "value") var value: Double,
+    @ColumnInfo(name = "visit_id") val visitId: String,
+    @ColumnInfo(name = "vital_sign_name") val vitalSignName: String,
+    @ColumnInfo(name = "timestamp") val timestamp: String,
+    @ColumnInfo(name = "value") val value: Double,
 )
