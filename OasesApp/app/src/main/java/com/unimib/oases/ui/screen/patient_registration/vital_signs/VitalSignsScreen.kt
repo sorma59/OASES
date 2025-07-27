@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.unimib.oases.domain.model.NumericPrecision
 import com.unimib.oases.ui.components.util.AnimatedLabelOutlinedTextField
 import com.unimib.oases.ui.components.util.BottomButtons
 import com.unimib.oases.ui.components.util.FadeOverlay
@@ -81,8 +82,8 @@ fun VitalSignsScreen(
                             },
                             labelText = vitalSign.name + " (" + vitalSign.acronym + ", " + vitalSign.unit + ")",
                             isError = vitalSign.error != null,
-                            isInteger = vitalSign.name != "Temperature" && vitalSign.name != "Rapid Blood Sugar", // Hardcoded, to fix later
-                            isDouble = vitalSign.name == "Temperature" || vitalSign.name == "Rapid Blood Sugar", // Hardcoded, to fix later
+                            isInteger = vitalSignsViewModel.getPrecisionFor(vitalSign.name) == NumericPrecision.INTEGER,
+                            isDouble = vitalSignsViewModel.getPrecisionFor(vitalSign.name) == NumericPrecision.FLOAT
                         )
 
                         Spacer(modifier = Modifier.height(16.dp))

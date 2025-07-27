@@ -48,7 +48,7 @@ object VisitVitalSignSerializer {
             visitId = visitId,
             vitalSignName = vitalSignName,
             timestamp = timestamp,
-            value = value.toDouble()
+            value = value
         )
     }
 
@@ -58,7 +58,7 @@ object VisitVitalSignSerializer {
             visitId = "id",
             vitalSignName = "vital sign",
             timestamp = "timestamp",
-            value = 5.0
+            value = "5.0"
         )
         Log.d("VisitVitalSignSerializer", "Original: $original")
         val bytes = serialize(original)

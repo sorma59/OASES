@@ -108,11 +108,11 @@ class RegistrationScreenViewModel @Inject constructor(
                 }
                 updateTriageState {
                     it.copy(
-                        sbp = event.vitalSignsState.vitalSigns.firstOrNull { it.name == "Systolic Blood Pressure" && it.value.isNotEmpty() }?.value?.toDouble()?.toInt(),
-                        dbp = event.vitalSignsState.vitalSigns.firstOrNull { it.name == "Diastolic Blood Pressure" && it.value.isNotEmpty() }?.value?.toDouble()?.toInt(),
-                        hr = event.vitalSignsState.vitalSigns.firstOrNull { it.name == "Heart Rate" && it.value.isNotEmpty() }?.value?.toDouble()?.toInt(),
-                        rr = event.vitalSignsState.vitalSigns.firstOrNull { it.name == "Respiratory Rate" && it.value.isNotEmpty() }?.value?.toDouble()?.toInt(),
-                        spo2 = event.vitalSignsState.vitalSigns.firstOrNull { it.name == "Oxygen Saturation" && it.value.isNotEmpty() }?.value?.toDouble()?.toInt(),
+                        sbp = event.vitalSignsState.vitalSigns.firstOrNull { it.name == "Systolic Blood Pressure" && it.value.isNotEmpty() }?.value?.toInt(),
+                        dbp = event.vitalSignsState.vitalSigns.firstOrNull { it.name == "Diastolic Blood Pressure" && it.value.isNotEmpty() }?.value?.toInt(),
+                        hr = event.vitalSignsState.vitalSigns.firstOrNull { it.name == "Heart Rate" && it.value.isNotEmpty() }?.value?.toInt(),
+                        rr = event.vitalSignsState.vitalSigns.firstOrNull { it.name == "Respiratory Rate" && it.value.isNotEmpty() }?.value?.toInt(),
+                        spo2 = event.vitalSignsState.vitalSigns.firstOrNull { it.name == "Oxygen Saturation" && it.value.isNotEmpty() }?.value?.toInt(),
                         temp = event.vitalSignsState.vitalSigns.firstOrNull { it.name == "Temperature" && it.value.isNotEmpty() }?.value?.toDouble()
                     )
                 }
@@ -165,7 +165,7 @@ class RegistrationScreenViewModel @Inject constructor(
                             visitId = visit.id,
                             vitalSignName = it.name,
                             timestamp = System.currentTimeMillis().toString(),
-                            value = it.value.toDouble()
+                            value = it.value
                         )
                         visitVitalSignsUseCase.addVisitVitalSign(visitVitalSign)
 

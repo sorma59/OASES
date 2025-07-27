@@ -42,6 +42,11 @@ fun AnimatedLabelOutlinedTextField(
             onValueChange = {
                 if (isInteger) {
                     onValueChange(it.filter { char -> char.isDigit() })
+                } else if (isDouble){
+                    val regex = Regex("^\\d*\\.?\\d{0,2}$")
+                    if (it.isEmpty() || regex.matches(it)) {
+                        onValueChange(it)
+                    }
                 } else {
                     onValueChange(it)
                 }

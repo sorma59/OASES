@@ -114,7 +114,11 @@ class PatientInfoViewModel @Inject constructor(
         when(event) {
             is PatientInfoEvent.NameChanged -> {
                 _state.update{
-                    _state.value.copy(patient = _state.value.patient.copy(name = event.name), nameError = null, edited = true)
+                    _state.value.copy(
+                        patient = _state.value.patient.copy(name = event.name),
+                        nameError = null,
+                        edited = true
+                    )
                 }
             }
 
@@ -123,7 +127,7 @@ class PatientInfoViewModel @Inject constructor(
                 _state.update{
                     if (ageInMonths != null)
                         _state.value.copy(
-                            patient = _state.value.patient.copy(ageInMonths = ageInMonths),
+                            patient = _state.value.patient.copy(birthDate = event.birthDate, ageInMonths = ageInMonths),
                             birthDateError = null
                         )
                     else

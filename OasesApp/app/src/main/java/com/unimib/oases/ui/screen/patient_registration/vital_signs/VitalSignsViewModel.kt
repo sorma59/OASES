@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unimib.oases.di.IoDispatcher
+import com.unimib.oases.domain.usecase.GetVitalSignPrecisionUseCase
 import com.unimib.oases.domain.usecase.VisitUseCase
 import com.unimib.oases.domain.usecase.VisitVitalSignsUseCase
 import com.unimib.oases.domain.usecase.VitalSignUseCase
@@ -24,6 +25,7 @@ class VitalSignsViewModel @Inject constructor(
     private val vitalSignsUseCases: VitalSignUseCase,
     private val visitUseCases: VisitUseCase,
     private val visitVitalSignsUseCases: VisitVitalSignsUseCase,
+    private val getVitalSignPrecisionUseCase: GetVitalSignPrecisionUseCase,
     private val savedStateHandle: SavedStateHandle,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ): ViewModel() {
@@ -181,4 +183,6 @@ class VitalSignsViewModel @Inject constructor(
 
 
     }
+
+    fun getPrecisionFor(name: String) = getVitalSignPrecisionUseCase.execute(name)
 }

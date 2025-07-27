@@ -4,6 +4,7 @@ import android.util.Log
 import com.unimib.oases.data.local.RoomDataSource
 import com.unimib.oases.data.mapper.toDomain
 import com.unimib.oases.data.mapper.toEntity
+import com.unimib.oases.domain.model.NumericPrecision
 import com.unimib.oases.domain.model.VitalSign
 import com.unimib.oases.domain.repository.VitalSignRepository
 import com.unimib.oases.util.Resource
@@ -19,6 +20,8 @@ import javax.inject.Inject
 class VitalSignRepositoryImpl @Inject constructor(
     private val roomDataSource: RoomDataSource
 ): VitalSignRepository {
+
+    private val precisionMap = mutableMapOf<String, NumericPrecision>()
 
     override suspend fun addVitalSign(vitalSign: VitalSign): Resource<Unit> {
         return try {
@@ -47,7 +50,15 @@ class VitalSignRepositoryImpl @Inject constructor(
     override fun getAllVitalSigns(): Flow<Resource<List<VitalSign>>> = flow {
         emit(Resource.Loading())
         roomDataSource.getAllVitalSigns().collect {
+            precisionMap.clear()
+            precisionMap.putAll(
+                it.associate { it.name to it.precision}
+            )
             emit(Resource.Success(it.map { entity -> entity.toDomain() }))
         }
+    }
+
+    override fun getPrecisionFor(name: String): NumericPrecision? {
+        return precisionMap[name]
     }
 }
