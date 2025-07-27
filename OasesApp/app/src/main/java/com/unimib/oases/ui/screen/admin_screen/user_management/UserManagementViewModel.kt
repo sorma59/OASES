@@ -41,17 +41,6 @@ class UserManagementViewModel @Inject constructor(
         }
     }
 
-    sealed class UiEvent {
-        // all events that gonna happen when we need to screen to display something and pass data back to the screen
-        data class showSnackbar(val message: String) : UiEvent()
-        object SaveUser : UiEvent()
-        object Back : UiEvent()
-    }
-
-
-//    private val _eventFlow = MutableSharedFlow<UiEvent>()
-//    val eventFlow = _eventFlow.asSharedFlow()
-
     fun onEvent(event: UserManagementEvent) {
         when (event) {
             is UserManagementEvent.UserClicked -> {
@@ -137,10 +126,18 @@ class UserManagementViewModel @Inject constructor(
                                 }
                             }
                             is SaveUserUseCase.SaveUserUseCaseResult.RepositoryFailure -> {
-                                _state.update { it.copy(toastMessage = result.errorMessage) }
+                                _state.update {
+                                    it.copy(
+                                        toastMessage = "Failed: Repository error"
+                                    )
+                                }
                             }
                             is SaveUserUseCase.SaveUserUseCaseResult.UnknownError -> {
-                                _state.update { it.copy(toastMessage = "Unknown error") }
+                                _state.update {
+                                    it.copy(
+                                        toastMessage = "Failed: Unknown error"
+                                    )
+                                }
                             }
                             is SaveUserUseCase.SaveUserUseCaseResult.ValidationFailure -> {
                                 _state.update {
@@ -157,15 +154,9 @@ class UserManagementViewModel @Inject constructor(
                     } catch (e: Exception) {
                         _state.update{
                             _state.value.copy(
-                                isLoading = false,
                                 error = e.message
                             )
                         }
-//                        _eventFlow.emit(
-//                            UiEvent.showSnackbar(
-//                                message = e.message ?: "ERROR"
-//                            )
-//                        )
                     }
                     finally {
                         _state.update{
@@ -226,6 +217,3 @@ class UserManagementViewModel @Inject constructor(
         }
     }
 }
-
-
-

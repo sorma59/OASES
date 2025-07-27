@@ -4,22 +4,23 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.model.VitalSign
+import com.unimib.oases.domain.usecase.SaveVitalSignUseCase
 import com.unimib.oases.domain.usecase.VitalSignUseCase
 import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class VitalSignManagementViewModel @Inject constructor(
     private val useCases: VitalSignUseCase,
+    private val saveVitalSignUseCase: SaveVitalSignUseCase,
     @IoDispatcher private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
@@ -32,28 +33,22 @@ class VitalSignManagementViewModel @Inject constructor(
     private var undoVitalSign: VitalSign? = null
     private var errorHandler = CoroutineExceptionHandler { _, e ->
         e.printStackTrace()
-        _state.value = _state.value.copy(
-            error = e.message,
-            isLoading = false
-        )
+        _state.update{
+            _state.value.copy(
+                error = e.message,
+                isLoading = false
+            )
+        }
     }
-
-
-    sealed class UiEvent {
-        // all events that gonna happen when we need to screen to display something and pass data back to the screen
-        data class showSnackbar(val message: String) : UiEvent()
-    }
-
-
-    private val _eventFlow = MutableSharedFlow<UiEvent>()
-    val eventFlow = _eventFlow.asSharedFlow()
 
     fun onEvent(event: VitalSignManagementEvent) {
         when (event) {
             is VitalSignManagementEvent.Click -> {
-                _state.value = _state.value.copy(
-                    vitalSign = event.value
-                )
+                _state.update{
+                    _state.value.copy(
+                        vitalSign = event.value
+                    )
+                }
             }
 
             is VitalSignManagementEvent.Delete -> {
@@ -65,31 +60,49 @@ class VitalSignManagementViewModel @Inject constructor(
             }
 
             is VitalSignManagementEvent.EnteredVitalSignName -> {
-                _state.value = _state.value.copy(
-                    vitalSign = _state.value.vitalSign.copy(
-                        name = event.value
+                _state.update{
+                    _state.value.copy(
+                        vitalSign = _state.value.vitalSign.copy(
+                            name = event.value
+                        ),
+                        nameError = null
                     )
-                )
+                }
             }
 
             is VitalSignManagementEvent.EnteredVitalSignAcronym -> {
-                _state.value = _state.value.copy(
-                    vitalSign = _state.value.vitalSign.copy(
-                        acronym = event.value
+                _state.update{
+                    _state.value.copy(
+                        vitalSign = _state.value.vitalSign.copy(
+                            acronym = event.value
+                        ),
+                        acronymError = null
                     )
-                )
+                }
             }
 
             is VitalSignManagementEvent.EnteredVitalSignUnit -> {
-                _state.value = _state.value.copy(
-                    vitalSign = _state.value.vitalSign.copy(
-                        unit = event.value
+                _state.update{
+                    _state.value.copy(
+                        vitalSign = _state.value.vitalSign.copy(
+                            unit = event.value,
+                        ),
+                        unitError = null
                     )
-                )
+                }
             }
 
+            is VitalSignManagementEvent.SelectedPrecision -> {
+                _state.update {
+                    _state.value.copy(
+                        vitalSign = _state.value.vitalSign.copy(
+                            precision = event.value
+                        )
+                    )
+                }
+            }
 
-            VitalSignManagementEvent.UndoDelete -> {
+            is VitalSignManagementEvent.UndoDelete -> {
                 viewModelScope.launch(dispatcher + errorHandler) {
                     useCases.addVitalSign(undoVitalSign ?: return@launch)
                     undoVitalSign = null
@@ -97,45 +110,92 @@ class VitalSignManagementViewModel @Inject constructor(
                 }
             }
 
-
-
-            VitalSignManagementEvent.SaveVitalSign -> {
+            is VitalSignManagementEvent.SaveVitalSign -> {
                 viewModelScope.launch(dispatcher + errorHandler) {
                     try {
-                        _state.value = _state.value.copy(isLoading = true)
+                        _state.update{
+                            _state.value.copy(isLoading = true)
+                        }
 
-                        useCases.addVitalSign(_state.value.vitalSign)
+                        val result = saveVitalSignUseCase(
+                            state.value.vitalSign.name,
+                            state.value.vitalSign.acronym,
+                            state.value.vitalSign.unit
+                        )
 
-                        _state.value = _state.value.copy(isLoading = false,
-                            vitalSign = state.value.vitalSign.copy(
-                                name = ""
-                            ))
+                        when (result) {
+                            is SaveVitalSignUseCase.SaveVitalSignUseCaseResult.Success -> {
+                                _state.update{
+                                    _state.value.copy(
+                                        toastMessage = "Saved successfully",
+                                        vitalSign = it.vitalSign.copy(
+                                            name = "",
+                                            acronym = "",
+                                            unit = ""
+                                        )
+                                    )
+                                }
+                            }
+
+                            is SaveVitalSignUseCase.SaveVitalSignUseCaseResult.ValidationFailure -> {
+                                _state.update{
+                                    _state.value.copy(
+                                        nameError = result.nameError,
+                                        acronymError = result.acronymError,
+                                        unitError = result.unitError
+                                    )
+                                }
+                            }
+
+                            is SaveVitalSignUseCase.SaveVitalSignUseCaseResult.RepositoryFailure -> {
+                                _state.update{
+                                    _state.value.copy(
+                                        toastMessage = "Failed: Repository error"
+                                    )
+                                }
+                            }
+
+                            is SaveVitalSignUseCase.SaveVitalSignUseCaseResult.UnknownError -> {
+                                _state.update{
+                                    _state.value.copy(
+                                        toastMessage = "Failed: Unknown error"
+                                    )
+                                }
+                            }
+                        }
                         // _eventFlow.emit(UiEvent.SaveUser) // I emit it into the screen then
                         // in the screen we handle it and we go back to the list
 
                     } catch (e: Exception) {
-                        _state.value = _state.value.copy(
-                            isLoading = false
-                        )
-                        _eventFlow.emit(
-                            UiEvent.showSnackbar(
-                                message = e.message ?: "ERROR"
+                        _state.update{
+                            _state.value.copy(
+                                error = e.message
                             )
-                        )
+                        }
+                    }
+                    finally {
+                        _state.update{
+                            _state.value.copy(
+                                isLoading = false
+                            )
+                        }
                     }
                 }
             }
 
-
+            is VitalSignManagementEvent.ToastShown -> {
+                _state.update {
+                    _state.value.copy(
+                        toastMessage = null
+                    )
+                }
+            }
         }
-
     }
 
 
     fun getVitalSigns() {
         getVitalSignsJob?.cancel()
-
-
 
         getVitalSignsJob = viewModelScope.launch(dispatcher + errorHandler) {
             val result = useCases.getVitalSigns()
@@ -143,22 +203,28 @@ class VitalSignManagementViewModel @Inject constructor(
             result.collect { resource ->
                 when (resource) {
                     is Resource.Loading -> {
-                        _state.value = _state.value.copy(
-                            isLoading = true
-                        )
+                        _state.update{
+                            _state.value.copy(
+                                isLoading = true
+                            )
+                        }
                     }
 
                     is Resource.Success -> {
-                        _state.value = _state.value.copy(
-                            vitalSigns = resource.data ?: emptyList(),
-                            isLoading = false
-                        )
+                        _state.update{
+                            _state.value.copy(
+                                vitalSigns = resource.data ?: emptyList(),
+                                isLoading = false
+                            )
+                        }
                     }
 
                     is Resource.Error -> {
-                        _state.value = _state.value.copy(
-                            error = resource.message,
-                        )
+                        _state.update{
+                            _state.value.copy(
+                                error = resource.message,
+                            )
+                        }
                     }
 
                     is Resource.None -> {}
@@ -166,9 +232,4 @@ class VitalSignManagementViewModel @Inject constructor(
             }
         }
     }
-
 }
-
-
-
-

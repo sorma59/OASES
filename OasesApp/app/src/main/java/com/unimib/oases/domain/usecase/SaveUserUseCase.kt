@@ -21,9 +21,9 @@ class SaveUserUseCase @Inject constructor(
             )
         }
 
-        return when (val result = repo.createUser(username, pwHash, role)){
+        return when (repo.createUser(username, pwHash, role)){
             is Resource.Error -> {
-                SaveUserUseCaseResult.RepositoryFailure(result.message ?: "Unknown error")
+                SaveUserUseCaseResult.RepositoryFailure
             }
             is Resource.Success -> {
                 SaveUserUseCaseResult.Success
@@ -51,7 +51,7 @@ class SaveUserUseCase @Inject constructor(
     sealed class SaveUserUseCaseResult {
         data object Success : SaveUserUseCaseResult()
         data class ValidationFailure(val usernameError: String?, val passwordError: String?) : SaveUserUseCaseResult()
-        data class RepositoryFailure(val errorMessage: String) : SaveUserUseCaseResult()
+        data object RepositoryFailure : SaveUserUseCaseResult()
         data object UnknownError : SaveUserUseCaseResult()
     }
 }

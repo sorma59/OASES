@@ -9,7 +9,10 @@ data class VitalSignManagementState(
     ),
     val vitalSigns: List<VitalSign> = emptyList(),
     val isLoading: Boolean = false,
-    var error: String? = null,
-    val message: String? = null
+    val error: String? = null,
+    val toastMessage: String? = null,
+    val nameError: String? = null,
+    val acronymError: String? = null,
+    val unitError: String? = null
 )
 

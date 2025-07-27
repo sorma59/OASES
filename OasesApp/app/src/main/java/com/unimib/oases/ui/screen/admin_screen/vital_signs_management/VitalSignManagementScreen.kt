@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Delete
@@ -24,6 +25,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
@@ -33,21 +35,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.unimib.oases.domain.model.NumericPrecision
 import com.unimib.oases.domain.model.VitalSign
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 import com.unimib.oases.ui.navigation.Screen
+import com.unimib.oases.ui.util.ToastUtils
 import kotlinx.coroutines.launch
 
 
@@ -61,23 +64,27 @@ fun VitalSignManagementScreen(
 
     val state by vitalSignsManagementViewModel.state.collectAsState()
 
-
-
     val snackbarHostState =
         remember { SnackbarHostState() } // for hosting snackbars, if I delete a intem I get a snackbar to undo the item
 
     val scope = rememberCoroutineScope()
-    var passwordVisible by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
 
     LaunchedEffect(key1 = true) {
         vitalSignsManagementViewModel.getVitalSigns()
     }
 
-
-
+    LaunchedEffect(key1 = state.toastMessage) {
+        if (state.toastMessage != null) {
+            ToastUtils.showToast(context, state.toastMessage!!)
+            vitalSignsManagementViewModel.onEvent(
+                VitalSignManagementEvent.ToastShown
+            )
+        }
+    }
 
     Column(modifier = Modifier.fillMaxSize()) {
-
 
         CenterAlignedTopAppBar(
             title = {
@@ -85,7 +92,6 @@ fun VitalSignManagementScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-
 
                     Text(
                         "Admin Panel",
@@ -145,8 +151,16 @@ fun VitalSignManagementScreen(
                 label = { Text("Name") },
                 placeholder = { Text("e.g. Systolic Blood Pressure, ...") },
                 singleLine = true,
+                isError = state.nameError != null,
                 modifier = Modifier.fillMaxWidth()
             )
+
+            if (state.nameError != null){
+                Text(
+                    text = state.nameError!!,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
 
             OutlinedTextField(
                 value = state.vitalSign.acronym,
@@ -154,37 +168,80 @@ fun VitalSignManagementScreen(
                 label = { Text("Acronym") },
                 placeholder = { Text("e.g. SBP, SpO2, ...") },
                 singleLine = true,
+                isError = state.acronymError != null,
                 modifier = Modifier.fillMaxWidth()
             )
+
+            if (state.acronymError != null){
+                Text(
+                    text = state.acronymError!!,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
 
             OutlinedTextField(
                 value = state.vitalSign.unit,
-                onValueChange = { vitalSignsManagementViewModel.onEvent(VitalSignManagementEvent.EnteredVitalSignUnit(it)) },
+                onValueChange = {
+                    vitalSignsManagementViewModel.onEvent(
+                        VitalSignManagementEvent.EnteredVitalSignUnit(it)
+                    )
+                },
                 label = { Text("Unit") },
                 placeholder = { Text("e.g. mmHg, bpm, %, ...") },
                 singleLine = true,
+                isError = state.unitError != null,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            if (state.unitError != null){
+                Text(
+                    text = state.unitError!!,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
 
+            NumericPrecision.entries.forEach { precisionOption ->
+
+                val examples = when (precisionOption) {
+                    NumericPrecision.INTEGER -> " (e.g. 10, 15)"
+                    NumericPrecision.FLOAT -> " (e.g. 25.4)"
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .selectable(
+                            selected = (precisionOption.displayName == state.vitalSign.precision),
+                            onClick = {
+                                vitalSignsManagementViewModel.onEvent(
+                                    VitalSignManagementEvent.SelectedPrecision(precisionOption.displayName)
+                                )
+                            }
+                        ),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    RadioButton(
+                        selected = (precisionOption.displayName == state.vitalSign.precision),
+                        onClick = { vitalSignsManagementViewModel.onEvent(VitalSignManagementEvent.SelectedPrecision(precisionOption.displayName)) }
+                    )
+                    Text(
+                        text = precisionOption.displayName + examples,
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                }
+            }
+
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             Button(
                 onClick = {
-
-//                        if (state.disease.username.isBlank() || state.dise.pwHash.isBlank()) {
-//                            state.error = "Username and password cannot be empty!"
-//                            return@Button
-//                        }
-
                     vitalSignsManagementViewModel.onEvent(VitalSignManagementEvent.SaveVitalSign)
-
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Save Vital Sign")
             }
-
 
             state.error?.let {
                 Text(
@@ -193,17 +250,9 @@ fun VitalSignManagementScreen(
                 )
             }
 
-            state.message?.let {
-                Text(
-                    text = it,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-
             Column(
                 modifier = Modifier.fillMaxWidth()
             ) {
-
 
                 Text(
                     text = "Vital Signs (${state.vitalSigns.size})",
@@ -245,7 +294,6 @@ fun VitalSignManagementScreen(
                         }
                     }
                 }
-
             }
         }
     }
@@ -277,13 +325,6 @@ fun VitalSignListItem(
                     text = vitalSign.name,
                     style = MaterialTheme.typography.bodyLarge
                 )
-//                if (user.username.isNotEmpty()) {
-//                    Text(
-//                        text = user.username,
-//                        style = MaterialTheme.typography.bodySmall,
-//                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-//                    )
-//                }
             }
 
             IconButton(
