@@ -20,11 +20,11 @@ import com.unimib.oases.ui.screen.patient_registration.past_medical_history.Past
 import com.unimib.oases.ui.screen.patient_registration.past_medical_history.PastHistoryState
 import com.unimib.oases.ui.screen.patient_registration.past_medical_history.PatientDiseaseState
 import com.unimib.oases.ui.screen.patient_registration.triage.TriageEvent
-import com.unimib.oases.ui.screen.patient_registration.triage.TriageState
 import com.unimib.oases.ui.screen.patient_registration.triage.mapToTriageEvaluation
 import com.unimib.oases.ui.screen.patient_registration.triage.mapToTriageState
 import com.unimib.oases.ui.screen.patient_registration.visit_history.VisitHistoryEvent
 import com.unimib.oases.ui.screen.patient_registration.visit_history.VisitHistoryState
+import com.unimib.oases.util.AppConstants
 import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -80,7 +80,7 @@ class RegistrationScreenViewModel @Inject constructor(
                     updatePastHistoryState {
                         it.copy(
                             age =
-                                if (age >= 12)
+                                if (age >= AppConstants.MATURITY_AGE)
                                     AgeSpecificity.ADULTS
                                 else
                                     AgeSpecificity.CHILDREN,
@@ -99,8 +99,11 @@ class RegistrationScreenViewModel @Inject constructor(
             }
 
 
-
             is RegistrationEvent.VitalSignsSubmitted -> {
+
+                fun getVitalSignValue(name: String) =
+                    event.vitalSignsState.vitalSigns.firstOrNull { it.name == name && it.value.isNotEmpty()}?.value
+
                 _state.update {
                     _state.value.copy(
                         vitalSignsState = event.vitalSignsState,
@@ -108,12 +111,12 @@ class RegistrationScreenViewModel @Inject constructor(
                 }
                 updateTriageState {
                     it.copy(
-                        sbp = event.vitalSignsState.vitalSigns.firstOrNull { it.name == "Systolic Blood Pressure" && it.value.isNotEmpty() }?.value?.toInt(),
-                        dbp = event.vitalSignsState.vitalSigns.firstOrNull { it.name == "Diastolic Blood Pressure" && it.value.isNotEmpty() }?.value?.toInt(),
-                        hr = event.vitalSignsState.vitalSigns.firstOrNull { it.name == "Heart Rate" && it.value.isNotEmpty() }?.value?.toInt(),
-                        rr = event.vitalSignsState.vitalSigns.firstOrNull { it.name == "Respiratory Rate" && it.value.isNotEmpty() }?.value?.toInt(),
-                        spo2 = event.vitalSignsState.vitalSigns.firstOrNull { it.name == "Oxygen Saturation" && it.value.isNotEmpty() }?.value?.toInt(),
-                        temp = event.vitalSignsState.vitalSigns.firstOrNull { it.name == "Temperature" && it.value.isNotEmpty() }?.value?.toDouble()
+                        sbp = getVitalSignValue("Systolic Blood Pressure")?.toInt(),
+                        dbp = getVitalSignValue("Diastolic Blood Pressure")?.toInt(),
+                        hr = getVitalSignValue("Heart Rate")?.toInt(),
+                        rr = getVitalSignValue("Respiratory Rate")?.toInt(),
+                        spo2 = getVitalSignValue("Oxygen Saturation")?.toInt(),
+                        temp = getVitalSignValue("Temperature")?.toDouble()
                     )
                 }
             }
@@ -171,10 +174,7 @@ class RegistrationScreenViewModel @Inject constructor(
 
                     }
 
-//                    patientUseCase.updateTriageState(patient, triageCode)
-
                     patientUseCase.updateStatus(patient, PatientStatus.WAITING_FOR_VISIT.displayValue)
-
 
                     triageEvaluationRepository.insertTriageEvaluation(_state.value.triageState.mapToTriageEvaluation(visit.id))
                 }
@@ -566,10 +566,6 @@ class RegistrationScreenViewModel @Inject constructor(
     private fun updateTriageState(update: (TriageState) -> TriageState) {
         _state.update { it.copy(triageState = update(it.triageState)) }
     }
-
-//    private fun updateTriageState(triageState: TriageState) {
-//        _state.update { it.copy(triageState = triageState) }
-//    }
 
     private fun updatePastHistoryState(update: (PastHistoryState) -> PastHistoryState) {
         _state.update { it.copy(pastHistoryState = update(it.pastHistoryState)) }

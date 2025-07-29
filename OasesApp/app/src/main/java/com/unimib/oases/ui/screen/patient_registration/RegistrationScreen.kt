@@ -65,13 +65,13 @@ fun RegistrationScreen(
     val userRole = authViewModel.currentUser()?.role
 
     val tabs = arrayOf(
-        Tabs.DEMOGRAPHICS.title,
-        Tabs.CONTINUE_TO_TRIAGE.title,
-        Tabs.VITAL_SIGNS.title,
-        Tabs.TRIAGE.title,
-        Tabs.NON_RED_CODE.title,
-        Tabs.HISTORY.title,
-        Tabs.PAST_MEDICAL_HISTORY.title,
+        Tabs.DEMOGRAPHICS,
+        Tabs.CONTINUE_TO_TRIAGE,
+        Tabs.VITAL_SIGNS,
+        Tabs.RED_CODE,
+        Tabs.YELLOW_CODE,
+        Tabs.HISTORY,
+        Tabs.PAST_MEDICAL_HISTORY,
     )
 
     var currentIndex by rememberSaveable { mutableIntStateOf(0) }
@@ -81,6 +81,40 @@ fun RegistrationScreen(
     var mustSkipPastMedicalHistory = remember {
         derivedStateOf {
             userRole == Role.NURSE && !state.pastHistoryState.hasBeenFilledIn
+        }
+    }
+
+    val onYellowCodeToggle: (Boolean) -> Unit = { isYellowCodeSelected ->
+        isYellowCode = isYellowCodeSelected
+        if (isYellowCode){
+            registrationScreenViewModel.onEvent(
+                RegistrationEvent.TriageCodeSelected(
+                    TriageCode.YELLOW.name
+                )
+            )
+        } else{
+            registrationScreenViewModel.onEvent(
+                RegistrationEvent.TriageCodeSelected(
+                    TriageCode.GREEN.name
+                )
+            )
+        }
+    }
+
+    val onRedCodeToggle: (Boolean) -> Unit = { isRedCodeSelected ->
+        isRedCode = isRedCodeSelected
+        if (isRedCode){
+            registrationScreenViewModel.onEvent(
+                RegistrationEvent.TriageCodeSelected(
+                    TriageCode.RED.name
+                )
+            )
+        } else{
+            registrationScreenViewModel.onEvent(
+                RegistrationEvent.TriageCodeSelected(
+                    TriageCode.GREEN.name
+                )
+            )
         }
     }
 
@@ -141,7 +175,7 @@ fun RegistrationScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = tabs[currentIndex],
+                    text = tabs[currentIndex].title,
                     style = MaterialTheme.typography.titleLarge
                 )
             }
@@ -153,13 +187,13 @@ fun RegistrationScreen(
                 contentAlignment = Alignment.Center
             ) {
                 when (tabs[currentIndex]) {
-                    Tabs.DEMOGRAPHICS.title -> PatientInfoScreen(
+                    Tabs.DEMOGRAPHICS -> PatientInfoScreen(
                         onSubmitted = { patientInfoState ->
                             registrationScreenViewModel.onEvent(RegistrationEvent.PatientSubmitted(patientInfoState))
                             currentIndex++
                         }
                     )
-                    Tabs.CONTINUE_TO_TRIAGE.title -> ContinueToTriageDecisionScreen(
+                    Tabs.CONTINUE_TO_TRIAGE -> ContinueToTriageDecisionScreen(
                         onContinueToTriage = {
                             currentIndex++
                         },
@@ -167,7 +201,7 @@ fun RegistrationScreen(
                             navController.popBackStack()
                         }
                     )
-                    Tabs.VITAL_SIGNS.title -> VitalSignsScreen(
+                    Tabs.VITAL_SIGNS -> VitalSignsScreen(
                         onSubmitted = { vitalSigns ->
                             registrationScreenViewModel.onEvent(RegistrationEvent.VitalSignsSubmitted(vitalSigns))
                             currentIndex++
@@ -176,58 +210,30 @@ fun RegistrationScreen(
                             currentIndex--
                         }
                     )
-                    Tabs.TRIAGE.title -> RedCodeScreen(
+                    Tabs.RED_CODE -> RedCodeScreen(
                         state = state.triageState,
                         onEvent = registrationScreenViewModel::onTriageEvent,
-                        onRedCodeToggle = { isRedCodeSelected ->
-                            isRedCode = isRedCodeSelected
-                            if (isRedCode){
-                                registrationScreenViewModel.onEvent(
-                                    RegistrationEvent.TriageCodeSelected(
-                                        TriageCode.RED.name
-                                    )
-                                )
-                            } else
-                                registrationScreenViewModel.onEvent(
-                                    RegistrationEvent.TriageCodeSelected(
-                                        TriageCode.GREEN.name
-                                    )
-                                )
-                        },
+                        onRedCodeToggle = onRedCodeToggle,
                         onBack = {
                             currentIndex--
                         },
                         onSubmitted = {
                             if (isRedCode){ // Red code: skip yellow code
                                 currentIndex = currentIndex + 2
-                            } else                  // Not a red code, check for yellow code
+                            } else          // Not a red code, check for yellow code
                                 currentIndex++
                         }
                     )
-                    Tabs.NON_RED_CODE.title -> YellowCodeScreen(
+                    Tabs.YELLOW_CODE -> YellowCodeScreen(
                         state = state.triageState,
                         onEvent = registrationScreenViewModel::onTriageEvent,
-                        onYellowCodeToggle = { isYellowCodeSelected ->
-                            isYellowCode = isYellowCodeSelected
-                            if (isYellowCode){
-                                registrationScreenViewModel.onEvent(
-                                    RegistrationEvent.TriageCodeSelected(
-                                        TriageCode.YELLOW.name
-                                    )
-                                )
-                            } else
-                                registrationScreenViewModel.onEvent(
-                                    RegistrationEvent.TriageCodeSelected(
-                                        TriageCode.GREEN.name
-                                    )
-                                )
-                        },
+                        onYellowCodeToggle = onYellowCodeToggle,
                     )
-                    Tabs.HISTORY.title -> VisitHistoryScreen(
+                    Tabs.HISTORY -> VisitHistoryScreen(
                         state = state.visitHistoryState,
                         onEvent = registrationScreenViewModel::onVisitHistoryEvent
                     )
-                    Tabs.PAST_MEDICAL_HISTORY.title ->
+                    Tabs.PAST_MEDICAL_HISTORY ->
                         PastHistoryScreen(
                             state = pastHistoryState,
                             onEvent = registrationScreenViewModel::onPastHistoryEvent,
@@ -242,10 +248,10 @@ fun RegistrationScreen(
                 }
             }
 
-            if (tabs[currentIndex] == Tabs.HISTORY.title || tabs[currentIndex] == Tabs.NON_RED_CODE.title) {
+            if (tabs[currentIndex] == Tabs.HISTORY || tabs[currentIndex] == Tabs.YELLOW_CODE) {
                 BottomButtons(
                     onCancel = {
-                        if (tabs[currentIndex] == Tabs.HISTORY.title && isRedCode)
+                        if (tabs[currentIndex] == Tabs.HISTORY && isRedCode)
                             currentIndex = currentIndex - 2
                         else
                             currentIndex--
@@ -255,7 +261,7 @@ fun RegistrationScreen(
                             registrationScreenViewModel.onEvent(RegistrationEvent.Submit)
                             navController.popBackStack()
                         }
-                        else if (tabs[currentIndex] == Tabs.HISTORY.title && mustSkipPastMedicalHistory.value){
+                        else if (tabs[currentIndex] == Tabs.HISTORY && mustSkipPastMedicalHistory.value){
                             registrationScreenViewModel.onEvent(RegistrationEvent.Submit)
                             navController.popBackStack()
                         }
@@ -275,8 +281,8 @@ enum class Tabs(val title: String){
     DEMOGRAPHICS("Demographics"),
     CONTINUE_TO_TRIAGE("Continue to Triage?"),
     VITAL_SIGNS("Vital Signs"),
-    TRIAGE("Triage"),
-    NON_RED_CODE("Non Red Code"),
+    RED_CODE("Triage"),
+    YELLOW_CODE("Triage"),
     PAST_MEDICAL_HISTORY("Past Medical History"),
     HISTORY("History"),
 }
