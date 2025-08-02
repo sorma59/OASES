@@ -15,11 +15,10 @@ class DateTimeFormatter {
      *                  Defaults to ISO_LOCAL_DATE (yyyy-MM-dd).
      * @return The age in years, or null if the birthDateString is invalid or cannot be parsed.
      */
-    fun calculateAgeInMonths(birthDateString: String, formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")): Int? {
+    fun calculateAgeInMonths(birthDateString: String, date: LocalDate = LocalDate.now(), formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")): Int? {
         return try {
             val birthDate = LocalDate.parse(birthDateString, formatter)
-            val currentDate = LocalDate.now()
-            val period = Period.between(birthDate, currentDate)
+            val period = Period.between(birthDate, date)
             (period.years * 12) + period.months
         } catch (e: DateTimeParseException) {
             // Handle cases where the date string is not in the expected format
