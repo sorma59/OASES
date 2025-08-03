@@ -24,7 +24,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -37,7 +36,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.unimib.oases.data.local.model.Role
-import com.unimib.oases.domain.model.TriageCode
 import com.unimib.oases.ui.components.util.BottomButtons
 import com.unimib.oases.ui.navigation.Screen
 import com.unimib.oases.ui.screen.login.AuthViewModel
@@ -58,7 +56,6 @@ fun RegistrationScreen(
 ) {
 
     val registrationScreenViewModel: RegistrationScreenViewModel = hiltViewModel()
-    val pastHistoryState = registrationScreenViewModel.state.collectAsState().value.pastHistoryState
 
     val state by registrationScreenViewModel.state.collectAsState()
 
@@ -76,45 +73,9 @@ fun RegistrationScreen(
 
     var currentIndex by rememberSaveable { mutableIntStateOf(0) }
 
-    var isYellowCode by remember { mutableStateOf(false) }
-    var isRedCode by remember { mutableStateOf(false) }
     var mustSkipPastMedicalHistory = remember {
         derivedStateOf {
             userRole == Role.NURSE && !state.pastHistoryState.hasBeenFilledIn
-        }
-    }
-
-    val onYellowCodeToggle: (Boolean) -> Unit = { isYellowCodeSelected ->
-        isYellowCode = isYellowCodeSelected
-        if (isYellowCode){
-            registrationScreenViewModel.onEvent(
-                RegistrationEvent.TriageCodeSelected(
-                    TriageCode.YELLOW.name
-                )
-            )
-        } else{
-            registrationScreenViewModel.onEvent(
-                RegistrationEvent.TriageCodeSelected(
-                    TriageCode.GREEN.name
-                )
-            )
-        }
-    }
-
-    val onRedCodeToggle: (Boolean) -> Unit = { isRedCodeSelected ->
-        isRedCode = isRedCodeSelected
-        if (isRedCode){
-            registrationScreenViewModel.onEvent(
-                RegistrationEvent.TriageCodeSelected(
-                    TriageCode.RED.name
-                )
-            )
-        } else{
-            registrationScreenViewModel.onEvent(
-                RegistrationEvent.TriageCodeSelected(
-                    TriageCode.GREEN.name
-                )
-            )
         }
     }
 
@@ -213,12 +174,11 @@ fun RegistrationScreen(
                     Tabs.RED_CODE -> RedCodeScreen(
                         state = state.triageState,
                         onEvent = registrationScreenViewModel::onTriageEvent,
-                        onRedCodeToggle = onRedCodeToggle,
                         onBack = {
                             currentIndex--
                         },
                         onSubmitted = {
-                            if (isRedCode){ // Red code: skip yellow code
+                            if (state.triageState.isRedCode){ // Red code: skip yellow code
                                 currentIndex = currentIndex + 2
                             } else          // Not a red code, check for yellow code
                                 currentIndex++
@@ -226,8 +186,7 @@ fun RegistrationScreen(
                     )
                     Tabs.YELLOW_CODE -> YellowCodeScreen(
                         state = state.triageState,
-                        onEvent = registrationScreenViewModel::onTriageEvent,
-                        onYellowCodeToggle = onYellowCodeToggle,
+                        onEvent = registrationScreenViewModel::onTriageEvent
                     )
                     Tabs.HISTORY -> VisitHistoryScreen(
                         state = state.visitHistoryState,
@@ -235,7 +194,7 @@ fun RegistrationScreen(
                     )
                     Tabs.PAST_MEDICAL_HISTORY ->
                         PastHistoryScreen(
-                            state = pastHistoryState,
+                            state = state.pastHistoryState,
                             onEvent = registrationScreenViewModel::onPastHistoryEvent,
                             onSubmitted = {
                                 registrationScreenViewModel.onEvent(RegistrationEvent.Submit)
@@ -251,7 +210,7 @@ fun RegistrationScreen(
             if (tabs[currentIndex] == Tabs.HISTORY || tabs[currentIndex] == Tabs.YELLOW_CODE) {
                 BottomButtons(
                     onCancel = {
-                        if (tabs[currentIndex] == Tabs.HISTORY && isRedCode)
+                        if (tabs[currentIndex] == Tabs.HISTORY && state.triageState.isRedCode)
                             currentIndex = currentIndex - 2
                         else
                             currentIndex--

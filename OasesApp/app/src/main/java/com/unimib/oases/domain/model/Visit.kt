@@ -7,20 +7,30 @@ import java.util.UUID
 data class Visit(
     val id: String = UUID.randomUUID().toString(),
     val patientId: String,
-    val triageCode: String = TriageCode.GREEN.name,
+    val triageCode: TriageCode = TriageCode.GREEN,
     val date: String = "",
     val description: String = "",
-    val status: String = VisitStatus.OPEN.name
+    val status: VisitStatus = VisitStatus.OPEN
 )
 
 enum class TriageCode()
 {
     RED(),
     YELLOW(),
-    GREEN()
+    GREEN();
+
+    companion object {
+        fun fromTriageCodeName(name: String): TriageCode =
+            entries.first { it.name == name }
+    }
 }
 
 enum class VisitStatus(){
     OPEN(),
-    CLOSED()
+    CLOSED();
+
+    companion object {
+        fun fromVisitStatusName(name: String): VisitStatus =
+            entries.first { it.name == name }
+    }
 }

@@ -1,6 +1,5 @@
 package com.unimib.oases.ui.screen.patient_registration
 
-import com.unimib.oases.domain.model.TriageCode
 import com.unimib.oases.domain.model.Visit
 import com.unimib.oases.ui.screen.patient_registration.info.PatientInfoState
 import com.unimib.oases.ui.screen.patient_registration.past_medical_history.PastHistoryState
@@ -15,7 +14,6 @@ data class RegistrationState (
     val visitHistoryState: VisitHistoryState = VisitHistoryState(),
     val triageState: TriageState = TriageState(),
     val currentVisit: Visit? = null,
-    val triageCode: String = TriageCode.GREEN.name,
     val error : String? = null,
     // Other state properties
 )

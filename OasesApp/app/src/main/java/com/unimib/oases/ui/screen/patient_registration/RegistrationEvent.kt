@@ -7,8 +7,6 @@ sealed class RegistrationEvent {
 
     data class PatientSubmitted(val patientInfoState: PatientInfoState) : RegistrationEvent()
     data class VitalSignsSubmitted(val vitalSignsState: VitalSignsState) : RegistrationEvent()
-    data class TriageCodeSelected(val triageCode: String) : RegistrationEvent()
-    // Other next events
 
     object Submit : RegistrationEvent()
 }

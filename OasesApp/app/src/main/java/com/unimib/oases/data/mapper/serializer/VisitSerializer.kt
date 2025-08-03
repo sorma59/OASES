@@ -1,6 +1,8 @@
 package com.unimib.oases.data.mapper.serializer
 
 import android.util.Log
+import com.unimib.oases.domain.model.TriageCode
+import com.unimib.oases.domain.model.TriageCode.Companion.fromTriageCodeName
 import com.unimib.oases.domain.model.Visit
 import java.nio.ByteBuffer
 
@@ -9,7 +11,7 @@ object VisitSerializer {
     fun serialize(visit: Visit): ByteArray {
         val idBytes = visit.id.toByteArray(Charsets.UTF_8)
         val patientIdBytes = visit.patientId.toByteArray(Charsets.UTF_8)
-        val triageCodeBytes = visit.triageCode.toByteArray(Charsets.UTF_8)
+        val triageCodeBytes = visit.triageCode.name.toByteArray(Charsets.UTF_8)
         val dateBytes = visit.date.toByteArray(Charsets.UTF_8)
         val descriptionBytes = visit.description.toByteArray(Charsets.UTF_8)
 
@@ -51,7 +53,7 @@ object VisitSerializer {
         return Visit(
             id = id,
             patientId = patientId,
-            triageCode = triageCode,
+            triageCode = fromTriageCodeName(triageCode),
             date = date,
             description = description
         )
@@ -62,7 +64,7 @@ object VisitSerializer {
         val original = Visit(
             id = "id",
             patientId = "patientId",
-            triageCode = "code",
+            triageCode = TriageCode.GREEN,
             date = "date",
             description = "description"
         )

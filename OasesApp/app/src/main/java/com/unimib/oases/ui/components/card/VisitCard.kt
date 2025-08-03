@@ -28,10 +28,9 @@ import com.unimib.oases.domain.model.Visit
 @Composable
 fun VisitCard(visit: Visit) {
     val statusColor = when (visit.triageCode) {
-        TriageCode.GREEN.name -> Color.Green
-        TriageCode.YELLOW.name -> Color.Yellow
-        TriageCode.RED.name -> Color.Red
-        else -> Color.Gray
+        TriageCode.GREEN -> Color.Green
+        TriageCode.YELLOW -> Color.Yellow
+        TriageCode.RED -> Color.Red
     }
     val textColor = MaterialTheme.colorScheme.onPrimaryContainer
     val cardBackgroundColor = MaterialTheme.colorScheme.primaryContainer

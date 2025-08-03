@@ -47,7 +47,6 @@ import kotlinx.coroutines.launch
 fun RedCodeScreen(
     state: TriageState,
     onEvent: (TriageEvent) -> Unit,
-    onRedCodeToggle: (Boolean) -> Unit,
     onBack: () -> Unit,
     onSubmitted: () -> Unit,
 ) {
@@ -74,10 +73,6 @@ fun RedCodeScreen(
                 )
             }
         }
-    }
-
-    LaunchedEffect(state.isRedCode) {
-        onRedCodeToggle(state.isRedCode)
     }
 
     LaunchedEffect(state.toastMessage) {

@@ -15,6 +15,7 @@ import com.unimib.oases.domain.repository.TriageEvaluationRepository
 import com.unimib.oases.domain.usecase.ComputeSymptomsUseCase
 import com.unimib.oases.domain.usecase.ConfigTriageUseCase
 import com.unimib.oases.domain.usecase.DiseaseUseCase
+import com.unimib.oases.domain.usecase.EvaluateTriageCodeUseCase
 import com.unimib.oases.domain.usecase.PatientDiseaseUseCase
 import com.unimib.oases.domain.usecase.PatientUseCase
 import com.unimib.oases.domain.usecase.VisitUseCase
@@ -72,6 +73,7 @@ class RegistrationScreenViewModel @Inject constructor(
     private val triageEvaluationRepository: TriageEvaluationRepository,
     private val computeSymptomsUseCase: ComputeSymptomsUseCase,
     private val configTriageUseCase: ConfigTriageUseCase,
+    private val evaluateTriageCodeUseCase: EvaluateTriageCodeUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
     @IoDispatcher private val dispatcher: CoroutineDispatcher
 ): ViewModel() {
@@ -162,22 +164,9 @@ class RegistrationScreenViewModel @Inject constructor(
                                 vitalSigns = vitalSigns
                             )
                         )
-//                        sbp = getVitalSignValue("Systolic Blood Pressure")?.toInt(),
-//                        dbp = getVitalSignValue("Diastolic Blood Pressure")?.toInt(),
-//                        hr = getVitalSignValue("Heart Rate")?.toInt(),
-//                        rr = getVitalSignValue("Respiratory Rate")?.toInt(),
-//                        spo2 = getVitalSignValue("Oxygen Saturation")?.toInt(),
-//                        temp = getVitalSignValue("Temperature")?.toDouble()
                     )
                 }
-            }
-
-            is RegistrationEvent.TriageCodeSelected -> {
-                _state.update {
-                    _state.value.copy(
-                        triageCode = event.triageCode
-                    )
-                }
+                updateTriageCode()
             }
 
             is RegistrationEvent.Submit -> {
@@ -185,7 +174,7 @@ class RegistrationScreenViewModel @Inject constructor(
                     val patient = _state.value.patientInfoState.patient
                     val vitalSigns =
                         _state.value.vitalSignsState.vitalSigns.filter { it.value.isNotEmpty() }
-                    val triageCode = _state.value.triageCode
+                    val triageCode = _state.value.triageState.triageCode
 
                     val currentVisit = _state.value.currentVisit
 
@@ -196,7 +185,7 @@ class RegistrationScreenViewModel @Inject constructor(
                                 triageCode = triageCode,
                                 date = LocalDate.now().toString(),
                                 description = "",
-                                status = VisitStatus.OPEN.name
+                                status = VisitStatus.OPEN
                             )
                     visitUseCase.addVisit(visit)
 
@@ -243,218 +232,27 @@ class RegistrationScreenViewModel @Inject constructor(
 
             is TriageEvent.FieldToggled -> {
 
-                val symptom = symptoms[event.field]
+                val symptom = symptoms[event.fieldId]
 
                 if (symptom == null)
                     Log.e("TriageScreenViewModel", "Field not found: bug")
                 else if (symptom.isComputed)
                     updateTriageState { it.copy(toastMessage = "This field is computed") }
-                else{
+                else {
                     updateTriageState {
-                        if (it.triageConfig?.redOptions?.any { it.id == event.field } == true){
+                        if (it.triageConfig?.redOptions?.any { it.id == event.fieldId } == true){
                             it.copy(
-                                selectedReds = it.selectedReds.toggle(event.field)
+                                selectedReds = it.selectedReds.toggle(event.fieldId)
                             )
                         } else{
                             it.copy(
-                                selectedYellows = it.selectedYellows.toggle(event.field)
+                                selectedYellows = it.selectedYellows.toggle(event.fieldId)
                             )
                         }
                     }
+                    updateTriageCode()
                 }
             }
-            // Red Code
-//            is TriageEvent.UnconsciousnessChanged -> {
-//                updateAdultTriageState {
-//                    it.copy(unconsciousness = event.value)
-//                }
-//            }
-//            is TriageEvent.ActiveConvulsionsChanged -> {
-//                updateAdultTriageState {
-//                    it.copy(activeConvulsions = event.value)
-//                }
-//            }
-//            is TriageEvent.RespiratoryDistressChanged -> {
-//                updateAdultTriageState {
-//                    it.copy(respiratoryDistress = event.value)
-//                }
-//            }
-//            is TriageEvent.HeavyBleedingChanged -> {
-//                updateAdultTriageState {
-//                    it.copy(heavyBleeding = event.value)
-//                }
-//            }
-//            is TriageEvent.HighRiskTraumaBurnsChanged -> {
-//                updateAdultTriageState {
-//                    it.copy(highRiskTraumaOrHighRiskBurns = event.value)
-//                }
-//            }
-//            is TriageEvent.ThreatenedLimbChanged -> {
-//                updateAdultTriageState {
-//                    it.copy(threatenedLimb = event.value)
-//                }
-//            }
-//            is TriageEvent.PoisoningIntoxicationChanged -> {
-//                updateAdultTriageState {
-//                    it.copy(poisoningOrIntoxication = event.value)
-//                }
-//            }
-//            is TriageEvent.SnakeBiteChanged -> {
-//                updateAdultTriageState {
-//                    it.copy(snakeBite = event.value)
-//                }
-//            }
-//            is TriageEvent.AggressiveBehaviorChanged -> {
-//                updateAdultTriageState {
-//                    it.copy(aggressiveBehavior = event.value)
-//                }
-//            }
-//            is TriageEvent.PregnancyChanged -> {
-//                updateAdultTriageState {
-//                    if (event.value == true)
-//                        it.copy(pregnancy = true)
-//                    else
-//                        it.copy(
-//                            pregnancy = false,
-//                            pregnancyWithHeavyBleeding = false,
-//                            pregnancyWithSevereAbdominalPain = false,
-//                            pregnancyWithSeizures = false,
-//                            pregnancyWithAlteredMentalStatus = false,
-//                            pregnancyWithSevereHeadache = false,
-//                            pregnancyWithVisualChanges = false,
-//                            pregnancyWithTrauma = false,
-//                            pregnancyWithActiveLabor = false,
-//                        )
-//                }
-//            }
-//            is TriageEvent.PregnancyWithHeavyBleedingChanged -> {
-//                updateAdultTriageState {
-//                    it.copy(pregnancyWithHeavyBleeding = event.value)
-//                }
-//            }
-//            is TriageEvent.PregnancyWithSevereAbdominalPainChanged -> {
-//                updateAdultTriageState {
-//                    it.copy(pregnancyWithSevereAbdominalPain = event.value)
-//                }
-//            }
-//            is TriageEvent.PregnancyWithSeizuresChanged -> {
-//                updateAdultTriageState {
-//                    it.copy(pregnancyWithSeizures = event.value)
-//                }
-//            }
-//            is TriageEvent.PregnancyWithAlteredMentalStatusChanged -> {
-//                updateAdultTriageState {
-//                     it.copy(pregnancyWithAlteredMentalStatus = event.value)
-//                }
-//            }
-//            is TriageEvent.PregnancyWithSevereHeadacheChanged -> {
-//                updateAdultTriageState {
-//                    it.copy(pregnancyWithSevereHeadache = event.value)
-//                }
-//            }
-//            is TriageEvent.PregnancyWithVisualChangesChanged -> {
-//                updateAdultTriageState {
-//                    it.copy(pregnancyWithVisualChanges = event.value)
-//                }
-//            }
-//            is TriageEvent.PregnancyWithTraumaChanged -> {
-//                updateAdultTriageState {
-//                    it.copy(pregnancyWithTrauma = event.value)
-//                }
-//            }
-//            is TriageEvent.PregnancyWithActiveLaborChanged -> {
-//                updateAdultTriageState {
-//                    it.copy(pregnancyWithActiveLabor = event.value)
-//                }
-//            }
-//
-//            // Yellow Code
-//
-//            is TriageEvent.AcuteLimbDeformityOpenFractureChanged -> {
-//                updateAdultTriageState {
-//                    it.copy(acuteLimbDeformityOrOpenFracture = event.value)
-//                }
-//            }
-//            is TriageEvent.AcuteTesticularScrotalPainPriapismChanged -> {
-//                updateAdultTriageState {
-//                    it.copy(acuteTesticularOrScrotalPainOrPriapism = event.value)
-//                }
-//            }
-//            is TriageEvent.AirwaySwellingMassChanged -> {
-//                updateAdultTriageState {
-//                    it.copy(airwaySwellingOrAirwayMass = event.value)
-//                }
-//            }
-//            is TriageEvent.AnimalBiteNeedlestickPunctureChanged -> {
-//                updateAdultTriageState {
-//                    it.copy(animalBiteOrNeedlestickPuncture = event.value)
-//                }
-//            }
-//            is TriageEvent.FocalNeurologicVisualDeficitChanged -> {
-//                updateAdultTriageState {
-//                    it.copy(focalNeurologicDeficitOrFocalVisualDeficit = event.value)
-//                }
-//            }
-//            is TriageEvent.HeadacheWithStiffNeckChanged -> {
-//                updateAdultTriageState {
-//                    it.copy(headacheWithStiffNeck = event.value)
-//                }
-//            }
-//            is TriageEvent.LethargyConfusionAgitationChanged -> {
-//                updateAdultTriageState {
-//                    it.copy(lethargyOrConfusionOrAgitation = event.value)
-//                }
-//            }
-//            is TriageEvent.OngoingBleedingChanged -> {
-//                updateAdultTriageState {
-//                    it.copy(ongoingBleeding = event.value)
-//                }
-//            }
-//            is TriageEvent.OngoingSevereVomitingDiarrheaChanged -> {
-//                updateAdultTriageState {
-//                    it.copy(ongoingSevereVomitingOrOngoingSevereDiarrhea = event.value)
-//                }
-//            }
-//            is TriageEvent.OtherPregnancyRelatedComplaintsChanged -> {
-//                updateAdultTriageState {
-//                    it.copy(otherPregnancyRelatedComplaints = event.value)
-//                }
-//            }
-//            is TriageEvent.OtherTraumaBurnsChanged -> {
-//                updateAdultTriageState {
-//                    it.copy(otherTraumaOrOtherBurns = event.value)
-//                }
-//            }
-//            is TriageEvent.RecentFaintingChanged -> {
-//                updateAdultTriageState {
-//                    it.copy(recentFainting = event.value)
-//                }
-//            }
-//            is TriageEvent.SeverePainChanged -> {
-//                updateAdultTriageState {
-//                    it.copy(severePain = event.value)
-//                }
-//            }
-//            is TriageEvent.SeverePallorChanged -> {
-//                updateAdultTriageState {
-//                    it.copy(severePallor = event.value)
-//                }
-//            }
-//            is TriageEvent.SexualAssaultChanged -> {
-//                updateAdultTriageState {
-//                    it.copy(sexualAssault = event.value)
-//                }
-//            }
-//            is TriageEvent.UnableToFeedOrDrinkChanged -> {
-//                updateAdultTriageState {
-//                    it.copy(unableToFeedOrDrink = event.value)
-//                }
-//            }
-//            is TriageEvent.UnableToPassUrineChanged -> {
-//                updateAdultTriageState {
-//                    it.copy(unableToPassUrine = event.value)
-//                }
-//            }
 
             is TriageEvent.ToastShown -> {
                 updateTriageState {
@@ -637,6 +435,15 @@ class RegistrationScreenViewModel @Inject constructor(
 
     private fun updateTriageState(update: (TriageState) -> TriageState) {
         _state.update { it.copy(triageState = update(it.triageState)) }
+    }
+
+    private fun updateTriageCode(){
+        _state.update { it.copy(
+            triageState =
+                it.triageState.copy(
+                    triageCode = evaluateTriageCodeUseCase(it.triageState.selectedReds, it.triageState.selectedYellows)
+                )
+        ) }
     }
 
     private fun updatePastHistoryState(update: (PastHistoryState) -> PastHistoryState) {

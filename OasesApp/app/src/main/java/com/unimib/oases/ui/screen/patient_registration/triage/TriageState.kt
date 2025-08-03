@@ -1,6 +1,6 @@
 package com.unimib.oases.ui.screen.patient_registration.triage
 
-import com.unimib.oases.util.AppConstants
+import com.unimib.oases.domain.model.TriageCode
 
 data class TriageState(
 
@@ -18,7 +18,7 @@ data class TriageState(
     val selectedReds: Set<String> = emptySet(),
     val selectedYellows: Set<String> = emptySet(),
 
-//    val computedSymptoms: Set<Symptom> = emptySet(),
+    val triageCode: TriageCode = TriageCode.GREEN,
 
     val isLoading: Boolean = false,
     val error: String? = null,
@@ -58,16 +58,5 @@ data class TriageState(
     }
 
     val isRedCode: Boolean
-        get() = selectedReds.minus("pregnancy").isNotEmpty()
-    val isYellowCode: Boolean
-        get() = !isRedCode && selectedYellows.isNotEmpty()
-
-    val patientCategory: PatientCategory?
-        get() = if (ageInMonths == null) null
-            else{
-                if (ageInMonths / 12 >= AppConstants.MATURITY_AGE)
-                    PatientCategory.ADULT
-                else
-                    PatientCategory.PEDIATRIC
-            }
+        get() = triageCode == TriageCode.RED
 }
