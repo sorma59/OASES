@@ -1,13 +1,15 @@
 package com.unimib.oases.ui.screen.admin_screen.diseases_management
 
+import com.unimib.oases.domain.model.AgeSpecificity
 import com.unimib.oases.domain.model.Disease
+import com.unimib.oases.domain.model.SexSpecificity
 
 
 data class DiseaseManagementState(
     val disease: Disease = Disease(
         name = "",
-        sexSpecificity = "",
-        ageSpecificity = ""
+        sexSpecificity = SexSpecificity.ALL,
+        ageSpecificity = AgeSpecificity.ALL
     ),
     val diseases: List<Disease> = emptyList(),
     val isLoading: Boolean = false,

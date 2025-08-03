@@ -2,8 +2,8 @@ package com.unimib.oases.domain.model
 
 data class Disease(
     val name: String,
-    val sexSpecificity: String,
-    val ageSpecificity: String
+    val sexSpecificity: SexSpecificity,
+    val ageSpecificity: AgeSpecificity
 )
 
 enum class SexSpecificity(val displayName: String) {

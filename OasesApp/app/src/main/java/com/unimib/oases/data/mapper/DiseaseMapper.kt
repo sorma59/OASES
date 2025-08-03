@@ -5,18 +5,21 @@ import com.unimib.oases.domain.model.AgeSpecificity.Companion.fromAgeSpecificity
 import com.unimib.oases.domain.model.Disease
 import com.unimib.oases.domain.model.SexSpecificity.Companion.fromSexSpecificityDisplayName
 
+
+
+
 fun Disease.toEntity(): DiseaseEntity {
     return DiseaseEntity(
         name = name,
-        sexSpecificity = fromSexSpecificityDisplayName(sexSpecificity),
-        ageSpecificity = fromAgeSpecificityDisplayName(ageSpecificity)
+        sexSpecificity = sexSpecificity.displayName,
+        ageSpecificity = ageSpecificity.displayName
     )
 }
 
 fun DiseaseEntity.toDomain(): Disease {
     return Disease(
         name = name,
-        sexSpecificity = sexSpecificity.displayName,
-        ageSpecificity = ageSpecificity.displayName
+        sexSpecificity = fromSexSpecificityDisplayName(sexSpecificity),
+        ageSpecificity = fromAgeSpecificityDisplayName(ageSpecificity)
     )
 }

@@ -148,7 +148,7 @@ fun DiseaseManagementScreen(
             )
 
             OutlinedDropdown(
-                selected = state.disease.sexSpecificity,
+                selected = state.disease.sexSpecificity.displayName,
                 onSelected = { diseaseManagementViewModel.onEvent(DiseaseManagementEvent.EnteredSexSpecificity(it)) },
                 options = SexSpecificity.entries.map {it.displayName},
                 labelText = "Sex specificity",
@@ -156,7 +156,7 @@ fun DiseaseManagementScreen(
             )
 
             OutlinedDropdown(
-                selected = state.disease.ageSpecificity,
+                selected = state.disease.ageSpecificity.displayName,
                 onSelected = { diseaseManagementViewModel.onEvent(DiseaseManagementEvent.EnteredAgeSpecificity(it)) },
                 options = AgeSpecificity.entries.map {it.displayName},
                 labelText = "Age specificity",
