@@ -16,7 +16,9 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -35,8 +37,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -48,6 +52,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.unimib.oases.domain.model.NumericPrecision
 import com.unimib.oases.domain.model.VitalSign
+import com.unimib.oases.ui.components.util.DeleteButton
+import com.unimib.oases.ui.components.util.DismissButton
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 import com.unimib.oases.ui.navigation.Screen
 import com.unimib.oases.ui.util.ToastUtils
@@ -70,6 +76,15 @@ fun VitalSignManagementScreen(
     val scope = rememberCoroutineScope()
 
     val context = LocalContext.current
+
+    var showDeletionDialog by remember { mutableStateOf(false) }
+
+    var vitalSignToDelete by remember { mutableStateOf<VitalSign?>(null) }
+
+    val dismissDeletionDialog = {
+        showDeletionDialog = false
+        vitalSignToDelete = null
+    }
 
     LaunchedEffect(key1 = true) {
         vitalSignsManagementViewModel.getVitalSigns()
@@ -276,16 +291,8 @@ fun VitalSignManagementScreen(
                             VitalSignListItem (
                                 vitalSign = vitalSign,
                                 onDelete = {
-                                    vitalSignsManagementViewModel.onEvent(VitalSignManagementEvent.Delete(vitalSign))
-                                    scope.launch {
-                                        val undo = snackbarHostState.showSnackbar(
-                                            message = "Deleted Vital Sign ${vitalSign.name}",
-                                            actionLabel = "UNDO"
-                                        )
-                                        if (undo == SnackbarResult.ActionPerformed) {
-                                            vitalSignsManagementViewModel.onEvent(VitalSignManagementEvent.UndoDelete)
-                                        }
-                                    }
+                                    vitalSignToDelete = vitalSign
+                                    showDeletionDialog = true
                                 },
                                 onClick = {
                                     vitalSignsManagementViewModel.onEvent(VitalSignManagementEvent.Click(vitalSign))
@@ -296,6 +303,40 @@ fun VitalSignManagementScreen(
                 }
             }
         }
+    }
+
+    if (showDeletionDialog){
+        AlertDialog(
+            onDismissRequest = dismissDeletionDialog,
+            title = { "Delete Vital Sign" },
+            text = { Text("Are you sure you want to delete this vital sign?") },
+            confirmButton = {
+                DeleteButton(
+                    onDelete = {
+                        vitalSignsManagementViewModel.onEvent(VitalSignManagementEvent.Delete(vitalSignToDelete!!))
+                        scope.launch {
+                            val undo = snackbarHostState.showSnackbar(
+                                message = "Deleted vital sign ${vitalSignToDelete?.name ?: ""}",
+                                actionLabel = "UNDO"
+                            )
+                            if (undo == SnackbarResult.ActionPerformed) {
+                                vitalSignsManagementViewModel.onEvent(VitalSignManagementEvent.UndoDelete)
+                            }
+                        }
+                        dismissDeletionDialog()
+                    }
+                )
+            },
+            dismissButton = {
+                DismissButton(
+                    onDismiss = dismissDeletionDialog,
+                    buttonText = "Cancel",
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.onBackground
+                    )
+                )
+            }
+        )
     }
 }
 
