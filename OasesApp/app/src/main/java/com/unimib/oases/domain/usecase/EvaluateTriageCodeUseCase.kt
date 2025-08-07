@@ -1,7 +1,7 @@
 package com.unimib.oases.domain.usecase
 
 import com.unimib.oases.domain.model.TriageCode
-import com.unimib.oases.ui.screen.patient_registration.triage.symptoms
+import com.unimib.oases.ui.screen.nurse_assessment.triage.symptoms
 import javax.inject.Inject
 
 class EvaluateTriageCodeUseCase @Inject constructor() {

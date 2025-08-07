@@ -25,7 +25,6 @@ class HandleReceivedPatientWithTriageDataUseCase @Inject constructor(
             if (patientRepository.addPatient(patientWithTriageData.patientDetails) is Resource.Error)
                 throw Exception("Failed to insert patient ${patientWithTriageData.patientDetails}")
 
-
             // Add the visit to the db
             if (visitRepository.addVisit(patientWithTriageData.visit) is Resource.Error)
                 throw Exception("Failed to insert visit ${patientWithTriageData.visit}")

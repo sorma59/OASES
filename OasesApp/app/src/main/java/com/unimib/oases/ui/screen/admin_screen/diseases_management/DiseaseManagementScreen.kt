@@ -68,8 +68,6 @@ fun DiseaseManagementScreen(
 
     val state by diseaseManagementViewModel.state.collectAsState()
 
-
-
     val snackbarHostState =
         remember { SnackbarHostState() } // for hosting snackbars, if I delete a intem I get a snackbar to undo the item
 
@@ -88,11 +86,7 @@ fun DiseaseManagementScreen(
         diseaseManagementViewModel.getDiseases()
     }
 
-
-
-
     Column(modifier = Modifier.fillMaxSize()) {
-
 
         CenterAlignedTopAppBar(
             title = {
@@ -100,7 +94,6 @@ fun DiseaseManagementScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-
 
                     Text(
                         "Admin Panel",
@@ -313,13 +306,6 @@ fun DiseaseListItem(
                     text = disease.name,
                     style = MaterialTheme.typography.bodyLarge
                 )
-//                if (user.username.isNotEmpty()) {
-//                    Text(
-//                        text = user.username,
-//                        style = MaterialTheme.typography.bodySmall,
-//                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-//                    )
-//                }
             }
 
             IconButton(

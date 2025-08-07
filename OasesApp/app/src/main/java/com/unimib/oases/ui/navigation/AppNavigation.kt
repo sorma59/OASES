@@ -22,7 +22,7 @@ import com.unimib.oases.ui.screen.homepage.HomeScreen
 import com.unimib.oases.ui.screen.login.AuthViewModel
 import com.unimib.oases.ui.screen.login.LoginScreen
 import com.unimib.oases.ui.screen.medical_visit.MedicalVisitScreen
-import com.unimib.oases.ui.screen.patient_registration.RegistrationScreen
+import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreen
 
 @Composable
 fun AppNavigation(

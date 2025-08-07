@@ -1,8 +1,8 @@
 package com.unimib.oases.domain.usecase
 
-import com.unimib.oases.ui.screen.patient_registration.triage.Symptom
-import com.unimib.oases.ui.screen.patient_registration.triage.SymptomTriageCode
-import com.unimib.oases.ui.screen.patient_registration.triage.TriageConfig
+import com.unimib.oases.ui.screen.nurse_assessment.triage.Symptom
+import com.unimib.oases.ui.screen.nurse_assessment.triage.SymptomTriageCode
+import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageConfig
 import javax.inject.Inject
 
 class ConfigTriageUseCase @Inject constructor(

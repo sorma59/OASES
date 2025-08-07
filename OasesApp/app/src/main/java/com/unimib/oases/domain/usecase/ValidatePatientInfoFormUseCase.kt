@@ -1,6 +1,6 @@
 package com.unimib.oases.domain.usecase
 
-import com.unimib.oases.ui.screen.patient_registration.info.Sex
+import com.unimib.oases.ui.screen.nurse_assessment.patient_registration.Sex
 import javax.inject.Inject
 
 class ValidatePatientInfoFormUseCase @Inject constructor() {

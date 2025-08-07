@@ -4,7 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.unimib.oases.data.local.TableNames
-import com.unimib.oases.ui.screen.patient_registration.info.Sex
+import com.unimib.oases.ui.screen.nurse_assessment.patient_registration.Sex
 
 @Entity(tableName = TableNames.PATIENT)
 data class PatientEntity (

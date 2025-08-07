@@ -2,7 +2,7 @@ package com.unimib.oases.data.mapper
 
 import com.unimib.oases.data.local.model.PatientEntity
 import com.unimib.oases.domain.model.Patient
-import com.unimib.oases.ui.screen.patient_registration.info.Sex.Companion.fromDisplayName
+import com.unimib.oases.ui.screen.nurse_assessment.patient_registration.Sex.Companion.fromDisplayName
 import com.unimib.oases.util.DateTimeFormatter
 
 fun PatientEntity.toDomain(): Patient {
