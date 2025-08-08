@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import com.unimib.oases.domain.model.MuacCategory
 import com.unimib.oases.ui.components.util.AnimatedLabelOutlinedTextField
 import com.unimib.oases.ui.components.util.BottomButtons
+import java.util.Locale
 
 @Composable
 fun MalnutritionScreeningScreen(
@@ -52,7 +53,7 @@ fun MalnutritionScreeningScreen(
             )
 
             Text(
-               "BMI: ${state.bmi}"
+                "BMI: " + (state.bmi?.let { String.format(Locale.getDefault(), "%.1f", it) } ?: "")
             )
 
             AnimatedLabelOutlinedTextField(

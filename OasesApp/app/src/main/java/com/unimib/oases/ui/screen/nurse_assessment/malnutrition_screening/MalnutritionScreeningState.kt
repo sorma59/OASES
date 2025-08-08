@@ -7,7 +7,7 @@ import com.unimib.oases.domain.model.MuacCategory
 data class MalnutritionScreeningState(
     val weight: String = "", // Kg
     val height: String = "", // cm
-    val bmi: String = "",
+    val bmi: Double? = null,
     val muacState: MuacState = MuacState()
 )
 

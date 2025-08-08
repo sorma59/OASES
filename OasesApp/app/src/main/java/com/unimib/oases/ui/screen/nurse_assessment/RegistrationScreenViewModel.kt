@@ -455,7 +455,7 @@ class RegistrationScreenViewModel @Inject constructor(
                     _state.update { current ->
                         current.copy(
                             malnutritionScreeningState = current.malnutritionScreeningState.copy(
-                                bmi = bmi?.toString() ?: "",
+                                bmi = bmi,
                                 muacState = current.malnutritionScreeningState.muacState.copy(
                                     category = muacCategory
                                 )
