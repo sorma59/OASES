@@ -30,7 +30,6 @@ import com.unimib.oases.ui.screen.nurse_assessment.malnutrition_screening.toMuac
 import com.unimib.oases.ui.screen.nurse_assessment.past_medical_history.PastHistoryEvent
 import com.unimib.oases.ui.screen.nurse_assessment.past_medical_history.PastHistoryState
 import com.unimib.oases.ui.screen.nurse_assessment.past_medical_history.PatientDiseaseState
-import com.unimib.oases.ui.screen.nurse_assessment.triage.Symptom
 import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageEvent
 import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageState
 import com.unimib.oases.ui.screen.nurse_assessment.triage.mapToTriageEvaluation
@@ -60,15 +59,6 @@ private fun <T> Set<T>.toggle(element: T): Set<T> {
     } else {
         this.plus(element)
     }
-}
-
-private fun Set<String>.resetComputedElements(): Set<String> {
-    return this.minus(
-        Symptom.entries
-            .filter { it.isComputed }
-            .map { it.id }
-            .toSet()
-    )
 }
 
 @HiltViewModel
@@ -162,18 +152,19 @@ class RegistrationScreenViewModel @Inject constructor(
 
                 updateTriageState {
                     it.copy(
-                        selectedReds = it.selectedReds.resetComputedElements().plus(
+                        selectedReds =
                             computeSymptomsUseCase.computeRedSymptoms(
+                                selectedReds = it.selectedReds,
                                 ageInMonths = _state.value.patientInfoState.patient.ageInMonths,
                                 vitalSigns = vitalSigns
                             )
-                        ),
-                        selectedYellows = it.selectedYellows.resetComputedElements().plus(
+                        ,
+                        selectedYellows =
                             computeSymptomsUseCase.computeYellowSymptoms(
+                                selectedYellows = it.selectedYellows,
                                 ageInMonths = _state.value.patientInfoState.patient.ageInMonths,
                                 vitalSigns = vitalSigns
                             )
-                        )
                     )
                 }
                 updateTriageCode()
@@ -476,7 +467,6 @@ class RegistrationScreenViewModel @Inject constructor(
             }
             is MalnutritionScreeningEvent.MuacChanged -> {
                 updateMalnutritionScreeningState {
-//                    val category = evaluateMuacCategoryUseCase(event.muac.toDoubleOrNull())
                     it.copy(
                         muacState = it.muacState.copy(
                             value = event.muac

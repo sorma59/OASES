@@ -30,28 +30,32 @@ import javax.inject.Inject
 class ComputeSymptomsUseCase @Inject constructor(
     private val getPatientCategory: GetPatientCategoryUseCase
 ){
-    fun computeYellowSymptoms(ageInMonths: Int, vitalSigns: VitalSigns): Set<String>{
+    fun computeYellowSymptoms(
+        selectedYellows: Set<String>,
+        ageInMonths: Int,
+        vitalSigns: VitalSigns
+    ): Set<String>{
 
-        val symptoms = mutableSetOf<String>()
+        val newYellows = selectedYellows.resetComputedElements()
 
         val patientCategory = getPatientCategory(ageInMonths)
 
         when (patientCategory){
             PatientCategory.ADULT -> {
                 if ((ageInMonths / 12) >= 80)
-                    symptoms.add(Symptom.AGE_OVER_EIGHTY_YEARS.id)
+                    newYellows.add(Symptom.AGE_OVER_EIGHTY_YEARS.id)
                 if (vitalSigns.rr != null && vitalSigns.rr < RR_LOW)
-                    symptoms.add(Symptom.LOW_RR.id)
+                    newYellows.add(Symptom.LOW_RR.id)
                 if (vitalSigns.rr != null && vitalSigns.rr > RR_HIGH)
-                    symptoms.add(Symptom.HIGH_RR.id)
+                    newYellows.add(Symptom.HIGH_RR.id)
                 if (vitalSigns.hr != null && vitalSigns.hr < HR_LOW)
-                    symptoms.add(Symptom.LOW_HR.id)
+                    newYellows.add(Symptom.LOW_HR.id)
                 if (vitalSigns.hr != null && vitalSigns.hr > HR_HIGH)
-                    symptoms.add(Symptom.HIGH_HR.id)
+                    newYellows.add(Symptom.HIGH_HR.id)
                 if (vitalSigns.sbp != null && vitalSigns.sbp < SBP_LOW)
-                    symptoms.add(Symptom.LOW_SBP.id)
+                    newYellows.add(Symptom.LOW_SBP.id)
                 if (vitalSigns.sbp != null && vitalSigns.sbp > SBP_HIGH)
-                    symptoms.add(Symptom.HIGH_SBP.id)
+                    newYellows.add(Symptom.HIGH_SBP.id)
             }
             PatientCategory.PEDIATRIC -> {
                 var rrUpperBound: Int
@@ -61,7 +65,7 @@ class ComputeSymptomsUseCase @Inject constructor(
                 when (ageInMonths / 12) {
                     0 -> {
                         if (ageInMonths < 6)
-                            symptoms.add(Symptom.YOUNGER_THAN_SIX_MONTHS.id)
+                            newYellows.add(Symptom.YOUNGER_THAN_SIX_MONTHS.id)
                         rrUpperBound = RR_HIGH_FOR_ONE_YEAR_OLDS
                         rrLowerBound = RR_LOW_FOR_ONE_YEAR_OLDS
                         hrUpperBound = HR_HIGH_FOR_ONE_YEAR_OLDS
@@ -82,50 +86,63 @@ class ComputeSymptomsUseCase @Inject constructor(
                         hrLowerBound = HR_LOW_FOR_FIVE_TO_TWELVE_YEARS_OLDS
                     }
 
-                    else -> return symptoms
+                    else -> return newYellows
                 }
                 if (vitalSigns.rr != null && vitalSigns.rr < rrLowerBound)
-                    symptoms.add(Symptom.LOW_RR.id)
+                    newYellows.add(Symptom.LOW_RR.id)
                 if (vitalSigns.rr != null && vitalSigns.rr > rrUpperBound)
-                    symptoms.add(Symptom.HIGH_RR.id)
+                    newYellows.add(Symptom.HIGH_RR.id)
                 if (vitalSigns.hr != null && vitalSigns.hr < hrLowerBound)
-                    symptoms.add(Symptom.LOW_HR.id)
+                    newYellows.add(Symptom.LOW_HR.id)
                 if (vitalSigns.hr != null && vitalSigns.hr > hrUpperBound)
-                    symptoms.add(Symptom.HIGH_HR.id)
+                    newYellows.add(Symptom.HIGH_HR.id)
             }
         }
         // Common
         if (vitalSigns.spo2 != null && vitalSigns.spo2 < SPO2_LOW)
-            symptoms.add(Symptom.LOW_SPO2.id)
+            newYellows.add(Symptom.LOW_SPO2.id)
         if (vitalSigns.temp != null && vitalSigns.temp < TEMP_LOW)
-            symptoms.add(Symptom.LOW_TEMP.id)
+            newYellows.add(Symptom.LOW_TEMP.id)
         if (vitalSigns.temp != null && vitalSigns.temp > TEMP_HIGH)
-            symptoms.add(Symptom.HIGH_TEMP.id)
+            newYellows.add(Symptom.HIGH_TEMP.id)
 
-        return symptoms
+        return newYellows.toSet() // Make it immutable
 
     }
 
-    fun computeRedSymptoms(ageInMonths: Int, vitalSigns: VitalSigns): Set<String>{
-        val symptoms = mutableSetOf<String>()
+    fun computeRedSymptoms(
+        selectedReds: Set<String>,
+        ageInMonths: Int,
+        vitalSigns: VitalSigns
+    ): Set<String>{
+        val newReds = selectedReds.resetComputedElements()
         val patientCategory = getPatientCategory(ageInMonths)
         when (patientCategory){
             PatientCategory.ADULT -> {
                 if (vitalSigns.sbp != null && vitalSigns.sbp >= PREGNANCY_HIGH_SBP ||
                     vitalSigns.dbp != null && vitalSigns.dbp >= PREGNANCY_HIGH_DBP
                 )
-                    symptoms.add(Symptom.PREGNANCY_HIGH_BP.id)
+                    newReds.add(Symptom.PREGNANCY_HIGH_BP.id)
             }
             PatientCategory.PEDIATRIC -> {
                 if (ageInMonths < 2 &&
                     vitalSigns.temp != null &&
                     (vitalSigns.temp < TEMP_LOW || vitalSigns.temp > TEMP_HIGH)
                 )
-                    symptoms.add(Symptom.YOUNGER_THAN_TWO_MONTHS_AND_LOW_OR_HIGH_TEMPERATURE.id)
+                    newReds.add(Symptom.YOUNGER_THAN_TWO_MONTHS_AND_LOW_OR_HIGH_TEMPERATURE.id)
             }
         }
-        return symptoms
+        return newReds.toSet() // Make it immutable
     }
+}
+
+private fun Set<String>.resetComputedElements(): MutableSet<String> {
+    return this.minus(
+        Symptom.entries
+            .filter { it.isComputed }
+            .map { it.id }
+            .toSet()
+    ).toMutableSet()
 }
 
 data class VitalSigns(

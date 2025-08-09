@@ -17,5 +17,4 @@ data class RegistrationState (
     val malnutritionScreeningState: MalnutritionScreeningState = MalnutritionScreeningState(),
     val currentVisit: Visit? = null,
     val error : String? = null,
-    // Other state properties
 )
