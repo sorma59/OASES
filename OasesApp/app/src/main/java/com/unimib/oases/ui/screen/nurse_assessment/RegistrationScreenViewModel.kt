@@ -89,141 +89,17 @@ class RegistrationScreenViewModel @Inject constructor(
         }
     }
 
-
     fun onEvent(event: RegistrationEvent) {
         when (event) {
 
-            is RegistrationEvent.PatientSubmitted -> {
-                applicationScope.launch(dispatcher + errorHandler) {
-                    val age = event.patientInfoState.patient.ageInMonths / 12
-                    val sex = fromSexSpecificityDisplayName(event.patientInfoState.patient.sex)
-                    _state.update {
-                        _state.value.copy(
-                            patientInfoState = event.patientInfoState,
-                            currentVisit = getCurrentVisit(event.patientInfoState.patient.id)
-                        )
-                    }
-                    updatePastHistoryState {
-                        it.copy(
-                            age =
-                                if (age >= AppConstants.MATURITY_AGE)
-                                    AgeSpecificity.ADULTS
-                                else
-                                    AgeSpecificity.CHILDREN,
-                            sex = sex
-                        )
-                    }
-                    val triageConfig = configTriageUseCase(event.patientInfoState.patient.ageInMonths)
-                    updateTriageState {
-                        it.copy(
-                            ageInMonths = event.patientInfoState.patient.ageInMonths,
-                            triageConfig = triageConfig,
-                            patientCategory = getPatientCategoryUseCase(event.patientInfoState.patient.ageInMonths)
-                        )
-                    }
-                    refreshVisitHistory(event.patientInfoState.patient.id)
-                    refreshPastHistory(event.patientInfoState.patient.id)
-                    val currentVisit = _state.value.currentVisit
-                    if (currentVisit != null)
-                        refreshTriage(currentVisit.id)
-                }
-            }
+            is RegistrationEvent.PatientSubmitted -> handlePatientSubmission(event)
 
+            is RegistrationEvent.VitalSignsSubmitted -> handleVitalSignsSubmission(event)
 
-            is RegistrationEvent.VitalSignsSubmitted -> {
-
-                fun getVitalSignValue(name: String) =
-                    event.vitalSignsState.vitalSigns.firstOrNull { it.name == name && it.value.isNotEmpty()}?.value
-
-                _state.update {
-                    _state.value.copy(
-                        vitalSignsState = event.vitalSignsState,
-                    )
-                }
-
-                val vitalSigns = VitalSigns(
-                    sbp = getVitalSignValue("Systolic Blood Pressure")?.toInt(),
-                    dbp = getVitalSignValue("Diastolic Blood Pressure")?.toInt(),
-                    hr = getVitalSignValue("Heart Rate")?.toInt(),
-                    rr = getVitalSignValue("Respiratory Rate")?.toInt(),
-                    spo2 = getVitalSignValue("Oxygen Saturation")?.toInt(),
-                    temp = getVitalSignValue("Temperature")?.toDouble()
-                )
-
-                updateTriageState {
-                    it.copy(
-                        selectedReds =
-                            computeSymptomsUseCase.computeRedSymptoms(
-                                selectedReds = it.selectedReds,
-                                ageInMonths = _state.value.patientInfoState.patient.ageInMonths,
-                                vitalSigns = vitalSigns
-                            )
-                        ,
-                        selectedYellows =
-                            computeSymptomsUseCase.computeYellowSymptoms(
-                                selectedYellows = it.selectedYellows,
-                                ageInMonths = _state.value.patientInfoState.patient.ageInMonths,
-                                vitalSigns = vitalSigns
-                            )
-                    )
-                }
-                updateTriageCode()
-            }
-
-            is RegistrationEvent.Submit -> {
-                applicationScope.launch(dispatcher + errorHandler) {
-                    val patient = _state.value.patientInfoState.patient
-                    val vitalSigns =
-                        _state.value.vitalSignsState.vitalSigns.filter { it.value.isNotEmpty() }
-                    val triageCode = _state.value.triageState.triageCode
-
-                    val currentVisit = _state.value.currentVisit
-
-                    val visit =
-                        currentVisit?.copy(triageCode = triageCode)
-                            ?: Visit(
-                                patientId = patient.id,
-                                triageCode = triageCode,
-                                date = LocalDate.now().toString(),
-                                description = "",
-                                status = VisitStatus.OPEN
-                            )
-                    visitUseCase.addVisit(visit)
-
-                    _state.value.pastHistoryState.diseases.forEach {
-                        if (it.isDiagnosed != null) {
-                            val patientDisease = PatientDisease(
-                                patientId = patient.id,
-                                diseaseName = it.disease,
-                                isDiagnosed = it.isDiagnosed == true,
-                                additionalInfo = it.additionalInfo,
-                                diagnosisDate = it.date
-                            )
-                            patientDiseaseUseCase.addPatientDisease(patientDisease)
-                        }
-                    }
-
-                    vitalSigns.forEach {
-
-                        val visitVitalSign = VisitVitalSign(
-                            visitId = visit.id,
-                            vitalSignName = it.name,
-                            timestamp = System.currentTimeMillis().toString(),
-                            value = it.value
-                        )
-                        visitVitalSignsUseCase.addVisitVitalSign(visitVitalSign)
-
-                    }
-
-                    patientUseCase.updateStatus(patient, PatientStatus.WAITING_FOR_VISIT.displayValue)
-
-                    triageEvaluationRepository.insertTriageEvaluation(_state.value.triageState.mapToTriageEvaluation(visit.id))
-                }
-            }
+            is RegistrationEvent.Submit -> handleFinalSubmission()
         }
     }
 
-    // Call in a coroutine
     fun getCurrentVisit(patientId: String) = visitUseCase.getCurrentVisit(patientId)
 
     // -----------------Triage----------------------
@@ -231,29 +107,7 @@ class RegistrationScreenViewModel @Inject constructor(
     fun onTriageEvent(event: TriageEvent) {
         when(event){
 
-            is TriageEvent.FieldToggled -> {
-
-                val symptom = symptoms[event.fieldId]
-
-                if (symptom == null)
-                    Log.e("TriageScreenViewModel", "Field not found: bug")
-                else if (symptom.isComputed)
-                    updateTriageState { it.copy(toastMessage = "This field is computed") }
-                else {
-                    updateTriageState {
-                        if (it.triageConfig?.redOptions?.any { it.id == event.fieldId } == true){
-                            it.copy(
-                                selectedReds = it.selectedReds.toggle(event.fieldId)
-                            )
-                        } else{
-                            it.copy(
-                                selectedYellows = it.selectedYellows.toggle(event.fieldId)
-                            )
-                        }
-                    }
-                    updateTriageCode()
-                }
-            }
+            is TriageEvent.FieldToggled -> handleTriageFieldToggle(event.fieldId)
 
             is TriageEvent.ToastShown -> {
                 updateTriageState {
@@ -474,6 +328,153 @@ class RegistrationScreenViewModel @Inject constructor(
                     )
                 }
             }
+        }
+    }
+
+    private fun handlePatientSubmission(event: RegistrationEvent.PatientSubmitted){
+        applicationScope.launch(dispatcher + errorHandler) {
+            val age = event.patientInfoState.patient.ageInMonths / 12
+            val sex = fromSexSpecificityDisplayName(event.patientInfoState.patient.sex)
+            _state.update {
+                _state.value.copy(
+                    patientInfoState = event.patientInfoState,
+                    currentVisit = getCurrentVisit(event.patientInfoState.patient.id)
+                )
+            }
+            updatePastHistoryState {
+                it.copy(
+                    age =
+                        if (age >= AppConstants.MATURITY_AGE)
+                            AgeSpecificity.ADULTS
+                        else
+                            AgeSpecificity.CHILDREN,
+                    sex = sex
+                )
+            }
+            updateTriageState {
+                it.copy(
+                    ageInMonths = event.patientInfoState.patient.ageInMonths,
+                    triageConfig = configTriageUseCase(event.patientInfoState.patient.ageInMonths),
+                    patientCategory = getPatientCategoryUseCase(event.patientInfoState.patient.ageInMonths)
+                )
+            }
+            refreshVisitHistory(event.patientInfoState.patient.id)
+            refreshPastHistory(event.patientInfoState.patient.id)
+            val currentVisit = _state.value.currentVisit
+            if (currentVisit != null)
+                refreshTriage(currentVisit.id)
+        }
+    }
+
+    private fun handleVitalSignsSubmission(event: RegistrationEvent.VitalSignsSubmitted){
+        fun getVitalSignValue(name: String) =
+            event.vitalSignsState.vitalSigns.firstOrNull { it.name == name && it.value.isNotEmpty()}?.value
+
+        _state.update {
+            _state.value.copy(
+                vitalSignsState = event.vitalSignsState,
+            )
+        }
+
+        val vitalSigns = VitalSigns(
+            sbp = getVitalSignValue("Systolic Blood Pressure")?.toInt(),
+            dbp = getVitalSignValue("Diastolic Blood Pressure")?.toInt(),
+            hr = getVitalSignValue("Heart Rate")?.toInt(),
+            rr = getVitalSignValue("Respiratory Rate")?.toInt(),
+            spo2 = getVitalSignValue("Oxygen Saturation")?.toInt(),
+            temp = getVitalSignValue("Temperature")?.toDouble()
+        )
+
+        updateTriageState {
+            val ageInMonths = _state.value.patientInfoState.patient.ageInMonths
+            it.copy(
+                selectedReds = computeSymptomsUseCase.computeRedSymptoms(
+                    selectedReds = it.selectedReds,
+                    ageInMonths = ageInMonths,
+                    vitalSigns = vitalSigns
+                ),
+                selectedYellows =
+                    computeSymptomsUseCase.computeYellowSymptoms(
+                        selectedYellows = it.selectedYellows,
+                        ageInMonths = ageInMonths,
+                        vitalSigns = vitalSigns
+                    )
+            )
+        }
+        updateTriageCode()
+    }
+
+    private fun handleFinalSubmission(){
+        applicationScope.launch(dispatcher + errorHandler) {
+            val patient = _state.value.patientInfoState.patient
+            val vitalSigns =
+                _state.value.vitalSignsState.vitalSigns.filter { it.value.isNotEmpty() }
+            val triageCode = _state.value.triageState.triageCode
+
+            val currentVisit = _state.value.currentVisit
+
+            val visit =
+                currentVisit?.copy(triageCode = triageCode)
+                    ?: Visit(
+                        patientId = patient.id,
+                        triageCode = triageCode,
+                        date = LocalDate.now().toString(),
+                        description = "",
+                        status = VisitStatus.OPEN
+                    )
+            visitUseCase.addVisit(visit)
+
+            _state.value.pastHistoryState.diseases.forEach {
+                if (it.isDiagnosed != null) {
+                    val patientDisease = PatientDisease(
+                        patientId = patient.id,
+                        diseaseName = it.disease,
+                        isDiagnosed = it.isDiagnosed == true,
+                        additionalInfo = it.additionalInfo,
+                        diagnosisDate = it.date
+                    )
+                    patientDiseaseUseCase.addPatientDisease(patientDisease)
+                }
+            }
+
+            vitalSigns.forEach {
+
+                val visitVitalSign = VisitVitalSign(
+                    visitId = visit.id,
+                    vitalSignName = it.name,
+                    timestamp = System.currentTimeMillis().toString(),
+                    value = it.value
+                )
+                visitVitalSignsUseCase.addVisitVitalSign(visitVitalSign)
+
+            }
+
+            patientUseCase.updateStatus(patient, PatientStatus.WAITING_FOR_VISIT.displayValue)
+
+            triageEvaluationRepository.insertTriageEvaluation(_state.value.triageState.mapToTriageEvaluation(visit.id))
+        }
+    }
+
+    private fun handleTriageFieldToggle(fieldId: String) {
+        val symptom = symptoms[fieldId]
+
+        if (symptom == null)
+            Log.e("TriageScreenViewModel", "Field not found: bug")
+        else if (symptom.isComputed)
+            updateTriageState { it.copy(toastMessage = "This field is computed") }
+        else {
+            updateTriageState {
+                if (it.triageConfig?.redOptions?.any { it.id == fieldId } == true){
+                    it.copy(
+                        selectedReds = it.selectedReds.toggle(fieldId)
+                    )
+                } else{
+                    it.copy(
+                        selectedYellows = it.selectedYellows.toggle(fieldId)
+                    )
+                }
+            }
+            updateTriageCode()
         }
     }
 
