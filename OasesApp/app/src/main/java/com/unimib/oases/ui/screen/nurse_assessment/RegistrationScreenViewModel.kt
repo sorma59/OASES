@@ -7,10 +7,10 @@ import com.unimib.oases.data.local.model.PatientStatus
 import com.unimib.oases.di.ApplicationScope
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.model.AgeSpecificity
-import com.unimib.oases.domain.model.PatientDisease
 import com.unimib.oases.domain.model.SexSpecificity.Companion.fromSexSpecificityDisplayName
 import com.unimib.oases.domain.model.Visit
 import com.unimib.oases.domain.model.VisitStatus
+import com.unimib.oases.domain.repository.MalnutritionScreeningRepository
 import com.unimib.oases.domain.repository.TriageEvaluationRepository
 import com.unimib.oases.domain.usecase.ComputeSymptomsUseCase
 import com.unimib.oases.domain.usecase.ConfigTriageUseCase
@@ -25,6 +25,7 @@ import com.unimib.oases.domain.usecase.VitalSigns
 import com.unimib.oases.ui.screen.nurse_assessment.malnutrition_screening.MalnutritionScreeningEvent
 import com.unimib.oases.ui.screen.nurse_assessment.malnutrition_screening.MalnutritionScreeningState
 import com.unimib.oases.ui.screen.nurse_assessment.malnutrition_screening.toBmiOrNull
+import com.unimib.oases.ui.screen.nurse_assessment.malnutrition_screening.toMalnutritionScreeningOrNull
 import com.unimib.oases.ui.screen.nurse_assessment.malnutrition_screening.toMuacCategoryOrNull
 import com.unimib.oases.ui.screen.nurse_assessment.past_medical_history.PastHistoryEvent
 import com.unimib.oases.ui.screen.nurse_assessment.past_medical_history.PastHistoryState
@@ -70,6 +71,7 @@ class RegistrationScreenViewModel @Inject constructor(
     private val patientDiseaseUseCase: PatientDiseaseUseCase,
     private val visitVitalSignsUseCase: VisitVitalSignsUseCase,
     private val triageEvaluationRepository: TriageEvaluationRepository,
+    private val malnutritionScreeningRepository: MalnutritionScreeningRepository,
     private val computeSymptomsUseCase: ComputeSymptomsUseCase,
     private val configTriageUseCase: ConfigTriageUseCase,
     private val evaluateTriageCodeUseCase: EvaluateTriageCodeUseCase,
@@ -332,6 +334,31 @@ class RegistrationScreenViewModel @Inject constructor(
         }
     }
 
+    fun refreshMalnutritionScreening(visitId: String) {
+        updateMalnutritionScreeningState { it.copy(error = null, isLoading = true) }
+        applicationScope.launch(dispatcher + errorHandler) {
+            loadMalnutritionScreening(visitId)
+        }
+
+    }
+
+    private fun loadMalnutritionScreening(visitId: String) {
+        val malnutritionScreeningResource = malnutritionScreeningRepository.getMalnutritionScreening(visitId)
+        if (malnutritionScreeningResource is Resource.Success){
+            updateMalnutritionScreeningState {
+                it.copy(
+                    weight = malnutritionScreeningResource.data!!.weight.toString(),
+                    height = malnutritionScreeningResource.data!!.height.toString(),
+                    muacState = it.muacState.copy(
+                        value = malnutritionScreeningResource.data!!.muac.value.toString()
+                    )
+                )
+            }
+        } else{
+            updateMalnutritionScreeningState { it.copy(error = malnutritionScreeningResource.message) }
+        }
+    }
+
     private fun handlePatientSubmission(event: RegistrationEvent.PatientSubmitted){
         applicationScope.launch(dispatcher + errorHandler) {
             val age = event.patientInfoState.patient.ageInMonths / 12
@@ -362,8 +389,10 @@ class RegistrationScreenViewModel @Inject constructor(
             refreshVisitHistory(event.patientInfoState.patient.id)
             refreshPastHistory(event.patientInfoState.patient.id)
             val currentVisit = _state.value.currentVisit
-            if (currentVisit != null)
+            if (currentVisit != null) {
                 refreshTriage(currentVisit.id)
+                refreshMalnutritionScreening(currentVisit.id)
+            }
         }
     }
 
@@ -424,19 +453,6 @@ class RegistrationScreenViewModel @Inject constructor(
                     )
             visitUseCase.addVisit(visit)
 
-            _state.value.pastHistoryState.diseases.forEach {
-                if (it.isDiagnosed != null) {
-                    val patientDisease = PatientDisease(
-                        patientId = patient.id,
-                        diseaseName = it.disease,
-                        isDiagnosed = it.isDiagnosed == true,
-                        additionalInfo = it.additionalInfo,
-                        diagnosisDate = it.date
-                    )
-                    patientDiseaseUseCase.addPatientDisease(patientDisease)
-                }
-            }
-
             val vitalSigns = _state.value.vitalSignsState.toVisitVitalSigns(visit.id)
 
             vitalSigns.forEach {
@@ -450,6 +466,13 @@ class RegistrationScreenViewModel @Inject constructor(
             patientUseCase.updateStatus(patient, PatientStatus.WAITING_FOR_VISIT.displayValue)
 
             triageEvaluationRepository.insertTriageEvaluation(_state.value.triageState.mapToTriageEvaluation(visit.id))
+
+            val screening = _state.value.malnutritionScreeningState.toMalnutritionScreeningOrNull(visit.id)
+            if (screening != null) {
+                val result = malnutritionScreeningRepository.insertMalnutritionScreening(screening)
+                if (result is Resource.Error)
+                    Log.e("RegistrationScreenViewModel", result.message.toString())
+            }
         }
     }
 

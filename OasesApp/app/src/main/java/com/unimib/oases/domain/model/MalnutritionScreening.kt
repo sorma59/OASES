@@ -1,6 +1,11 @@
 package com.unimib.oases.domain.model
 
+import java.util.UUID
+
 data class MalnutritionScreening(
+
+    val visitId: String = UUID.randomUUID().toString(),
+
     val weight: Double, // Kg
     val height: Double, // cm
     val muac: Muac,

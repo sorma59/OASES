@@ -8,7 +8,10 @@ data class MalnutritionScreeningState(
     val weight: String = "", // Kg
     val height: String = "", // cm
     val bmi: Double? = null,
-    val muacState: MuacState = MuacState()
+    val muacState: MuacState = MuacState(),
+
+    val error: String? = null,
+    val isLoading: Boolean = false
 )
 
 data class MuacState(
@@ -27,13 +30,14 @@ fun MalnutritionScreeningState.toMuacCategoryOrNull(): MuacCategory? {
     return Muac(muac).color
 }
 
-fun MalnutritionScreeningState.toMalnutritionScreeningOrNull(): MalnutritionScreening? {
+fun MalnutritionScreeningState.toMalnutritionScreeningOrNull(visitId: String): MalnutritionScreening? {
     val weight = this.weight.toDoubleOrNull()
     val height = this.height.toDoubleOrNull()
     val muacValue = this.muacState.value.toDoubleOrNull()
     if (weight == null || height == null || muacValue == null)
         return null
     return MalnutritionScreening(
+        visitId = visitId,
         weight = weight,
         height = height,
         muac = Muac(muacValue)

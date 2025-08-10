@@ -1,6 +1,7 @@
 package com.unimib.oases.data.local
 
 import com.unimib.oases.data.local.dao.DiseaseDao
+import com.unimib.oases.data.local.dao.MalnutritionScreeningDao
 import com.unimib.oases.data.local.dao.PatientDao
 import com.unimib.oases.data.local.dao.PatientDiseaseDao
 import com.unimib.oases.data.local.dao.TriageEvaluationDao
@@ -11,6 +12,7 @@ import com.unimib.oases.data.local.dao.VitalSignsDao
 import com.unimib.oases.data.local.db.AuthDatabase
 import com.unimib.oases.data.local.db.OasesDatabase
 import com.unimib.oases.data.local.model.DiseaseEntity
+import com.unimib.oases.data.local.model.MalnutritionScreeningEntity
 import com.unimib.oases.data.local.model.PatientDiseaseEntity
 import com.unimib.oases.data.local.model.PatientEntity
 import com.unimib.oases.data.local.model.Role
@@ -31,6 +33,7 @@ class RoomDataSource @Inject constructor(
     private val userDao: UserDao get() = authDatabase.userDao()
     private val patientDiseaseDao: PatientDiseaseDao get() = appDatabase.patientDiseaseDao()
     private val diseaseDao: DiseaseDao get() = appDatabase.diseaseDao()
+    private val malnutritionScreeningDao: MalnutritionScreeningDao get() = appDatabase.malnutritionScreeningDao()
     private val triageEvaluationDao: TriageEvaluationDao get() = appDatabase.triageEvaluationDao()
     private val visitDao: VisitDao get() = appDatabase.visitDao()
     private val visitVitalSignDao: VisitVitalSignDao get() = appDatabase.visitVitalSignDao()
@@ -115,6 +118,15 @@ class RoomDataSource @Inject constructor(
 
     suspend fun deleteDisease(disease: DiseaseEntity) {
         diseaseDao.delete(disease)
+    }
+
+    // -------------------Malnutrition Screening-------------------
+    suspend fun insertMalnutritionScreening(malnutritionScreening: MalnutritionScreeningEntity) {
+        malnutritionScreeningDao.insert(malnutritionScreening)
+    }
+
+    fun getMalnutritionScreening(visitId: String): MalnutritionScreeningEntity? {
+        return malnutritionScreeningDao.getMalnutritionScreening(visitId)
     }
 
     // -------------------Triage Evaluation-------------------

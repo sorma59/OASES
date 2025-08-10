@@ -1,6 +1,7 @@
 package com.unimib.oases.di
 
 import com.unimib.oases.data.repository.DiseaseRepositoryImpl
+import com.unimib.oases.data.repository.MalnutritionScreeningRepositoryImpl
 import com.unimib.oases.data.repository.PatientDiseaseRepositoryImpl
 import com.unimib.oases.data.repository.PatientRepositoryImpl
 import com.unimib.oases.data.repository.TriageEvaluationRepositoryImpl
@@ -9,6 +10,7 @@ import com.unimib.oases.data.repository.VisitRepositoryImpl
 import com.unimib.oases.data.repository.VisitVitalSignRepositoryImpl
 import com.unimib.oases.data.repository.VitalSignRepositoryImpl
 import com.unimib.oases.domain.repository.DiseaseRepository
+import com.unimib.oases.domain.repository.MalnutritionScreeningRepository
 import com.unimib.oases.domain.repository.PatientDiseaseRepository
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.domain.repository.TriageEvaluationRepository
@@ -55,6 +57,12 @@ abstract class RepositoryModule {
     abstract fun bindTriageEvaluationRepository(
         triageEvaluationRepositoryImpl: TriageEvaluationRepositoryImpl // Hilt knows how to create this due to @Inject constructor
     ): TriageEvaluationRepository // Return the interface
+
+    @Binds
+    @Singleton// The scope here must match or be wider than the scope on the repository
+    abstract fun bindMalnutritionScreeningRepository(
+        malnutritionScreeningRepositoryImpl: MalnutritionScreeningRepositoryImpl
+    ): MalnutritionScreeningRepository // Return the interface
 
     @Binds
     @Singleton // The scope here must match or be wider than the scope on the repository
