@@ -7,7 +7,7 @@ import javax.inject.Inject
 class GetVitalSignPrecisionUseCase @Inject constructor(
     private val vitalSignRepository: VitalSignRepository
 ) {
-    fun execute(name: String): NumericPrecision? {
+    operator fun invoke(name: String): NumericPrecision? {
         return vitalSignRepository.getPrecisionFor(name)
     }
 }

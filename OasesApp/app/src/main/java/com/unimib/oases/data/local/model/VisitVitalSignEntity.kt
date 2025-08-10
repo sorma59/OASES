@@ -27,5 +27,5 @@ data class VisitVitalSignEntity (
     @ColumnInfo(name = "visit_id") val visitId: String,
     @ColumnInfo(name = "vital_sign_name") val vitalSignName: String,
     @ColumnInfo(name = "timestamp") val timestamp: String,
-    @ColumnInfo(name = "value") val value: String,
+    @ColumnInfo(name = "value") val value: Double,
 )

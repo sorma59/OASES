@@ -6,6 +6,6 @@ import kotlinx.serialization.Serializable
 data class VisitVitalSign (
     val visitId: String,
     val vitalSignName: String,
-    val timestamp: String = "",
-    val value: String = ""
+    val timestamp: String,
+    val value: Double
 )

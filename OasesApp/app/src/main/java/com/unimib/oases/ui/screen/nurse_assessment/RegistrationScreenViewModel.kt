@@ -11,7 +11,6 @@ import com.unimib.oases.domain.model.PatientDisease
 import com.unimib.oases.domain.model.SexSpecificity.Companion.fromSexSpecificityDisplayName
 import com.unimib.oases.domain.model.Visit
 import com.unimib.oases.domain.model.VisitStatus
-import com.unimib.oases.domain.model.VisitVitalSign
 import com.unimib.oases.domain.repository.TriageEvaluationRepository
 import com.unimib.oases.domain.usecase.ComputeSymptomsUseCase
 import com.unimib.oases.domain.usecase.ConfigTriageUseCase
@@ -30,12 +29,14 @@ import com.unimib.oases.ui.screen.nurse_assessment.malnutrition_screening.toMuac
 import com.unimib.oases.ui.screen.nurse_assessment.past_medical_history.PastHistoryEvent
 import com.unimib.oases.ui.screen.nurse_assessment.past_medical_history.PastHistoryState
 import com.unimib.oases.ui.screen.nurse_assessment.past_medical_history.PatientDiseaseState
+import com.unimib.oases.ui.screen.nurse_assessment.past_medical_history.toPatientDiseases
 import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageEvent
 import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageState
 import com.unimib.oases.ui.screen.nurse_assessment.triage.mapToTriageEvaluation
 import com.unimib.oases.ui.screen.nurse_assessment.triage.symptoms
 import com.unimib.oases.ui.screen.nurse_assessment.visit_history.VisitHistoryEvent
 import com.unimib.oases.ui.screen.nurse_assessment.visit_history.VisitHistoryState
+import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.toVisitVitalSigns
 import com.unimib.oases.util.AppConstants
 import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -368,7 +369,7 @@ class RegistrationScreenViewModel @Inject constructor(
 
     private fun handleVitalSignsSubmission(event: RegistrationEvent.VitalSignsSubmitted){
         fun getVitalSignValue(name: String) =
-            event.vitalSignsState.vitalSigns.firstOrNull { it.name == name && it.value.isNotEmpty()}?.value
+            event.vitalSignsState.vitalSigns.firstOrNull { it.name == name && it.value.isNotEmpty()}?.value?.toDouble()
 
         _state.update {
             _state.value.copy(
@@ -382,7 +383,7 @@ class RegistrationScreenViewModel @Inject constructor(
             hr = getVitalSignValue("Heart Rate")?.toInt(),
             rr = getVitalSignValue("Respiratory Rate")?.toInt(),
             spo2 = getVitalSignValue("Oxygen Saturation")?.toInt(),
-            temp = getVitalSignValue("Temperature")?.toDouble()
+            temp = getVitalSignValue("Temperature")
         )
 
         updateTriageState {
@@ -407,8 +408,7 @@ class RegistrationScreenViewModel @Inject constructor(
     private fun handleFinalSubmission(){
         applicationScope.launch(dispatcher + errorHandler) {
             val patient = _state.value.patientInfoState.patient
-            val vitalSigns =
-                _state.value.vitalSignsState.vitalSigns.filter { it.value.isNotEmpty() }
+            val currentVisit = _state.value.currentVisit
             val triageCode = _state.value.triageState.triageCode
 
             val currentVisit = _state.value.currentVisit
@@ -437,16 +437,10 @@ class RegistrationScreenViewModel @Inject constructor(
                 }
             }
 
+            val vitalSigns = _state.value.vitalSignsState.toVisitVitalSigns(visit.id)
+
             vitalSigns.forEach {
-
-                val visitVitalSign = VisitVitalSign(
-                    visitId = visit.id,
-                    vitalSignName = it.name,
-                    timestamp = System.currentTimeMillis().toString(),
-                    value = it.value
-                )
-                visitVitalSignsUseCase.addVisitVitalSign(visitVitalSign)
-
+                visitVitalSignsUseCase.addVisitVitalSign(it)
             }
 
             patientUseCase.updateStatus(patient, PatientStatus.WAITING_FOR_VISIT.displayValue)

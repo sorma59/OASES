@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unimib.oases.di.IoDispatcher
+import com.unimib.oases.domain.model.NumericPrecision
 import com.unimib.oases.domain.usecase.GetVitalSignPrecisionUseCase
 import com.unimib.oases.domain.usecase.VisitUseCase
 import com.unimib.oases.domain.usecase.VisitVitalSignsUseCase
@@ -132,8 +133,16 @@ class VitalSignsViewModel @Inject constructor(
                             val visitSpecificVitalSignData =visitVitalSignsDbMap[uiState.name]
 
                             if (visitSpecificVitalSignData != null) {
+                                val precision = getPrecisionFor(uiState.name)
+
+                                val value = when (precision) {
+                                    NumericPrecision.INTEGER -> visitSpecificVitalSignData.value.toInt().toString()
+                                    NumericPrecision.FLOAT -> visitSpecificVitalSignData.value.toString()
+                                    null -> throw IllegalStateException("Precision for ${uiState.name} not found")
+                                }
+
                                 uiState.copy(
-                                    value = visitSpecificVitalSignData.value.toString()
+                                    value = value
                                 )
                             } else {
                                 uiState
@@ -184,5 +193,5 @@ class VitalSignsViewModel @Inject constructor(
 
     }
 
-    fun getPrecisionFor(name: String) = getVitalSignPrecisionUseCase.execute(name)
+    fun getPrecisionFor(name: String) = getVitalSignPrecisionUseCase(name)
 }

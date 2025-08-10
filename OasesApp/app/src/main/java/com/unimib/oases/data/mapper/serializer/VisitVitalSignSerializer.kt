@@ -42,7 +42,7 @@ object VisitVitalSignSerializer {
         val visitId = buffer.readString()
         val vitalSignName = buffer.readString()
         val timestamp = buffer.readString()
-        val value = buffer.readString()
+        val value = buffer.readString().toDouble()
 
         return VisitVitalSign(
             visitId = visitId,
@@ -58,7 +58,7 @@ object VisitVitalSignSerializer {
             visitId = "id",
             vitalSignName = "vital sign",
             timestamp = "timestamp",
-            value = "5.0"
+            value = 5.0
         )
         Log.d("VisitVitalSignSerializer", "Original: $original")
         val bytes = serialize(original)
