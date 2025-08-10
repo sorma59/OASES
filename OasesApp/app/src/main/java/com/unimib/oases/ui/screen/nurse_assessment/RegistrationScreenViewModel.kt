@@ -411,7 +411,7 @@ class RegistrationScreenViewModel @Inject constructor(
             val currentVisit = _state.value.currentVisit
             val triageCode = _state.value.triageState.triageCode
 
-            val currentVisit = _state.value.currentVisit
+            val patientDiseases = _state.value.pastHistoryState.toPatientDiseases(patient.id)
 
             val visit =
                 currentVisit?.copy(triageCode = triageCode)
@@ -441,6 +441,10 @@ class RegistrationScreenViewModel @Inject constructor(
 
             vitalSigns.forEach {
                 visitVitalSignsUseCase.addVisitVitalSign(it)
+            }
+
+            patientDiseases.forEach {
+                patientDiseaseUseCase.addPatientDisease(it)
             }
 
             patientUseCase.updateStatus(patient, PatientStatus.WAITING_FOR_VISIT.displayValue)

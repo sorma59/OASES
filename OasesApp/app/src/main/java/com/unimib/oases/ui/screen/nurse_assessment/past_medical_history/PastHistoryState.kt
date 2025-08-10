@@ -1,6 +1,7 @@
 package com.unimib.oases.ui.screen.nurse_assessment.past_medical_history
 
 import com.unimib.oases.domain.model.AgeSpecificity
+import com.unimib.oases.domain.model.PatientDisease
 import com.unimib.oases.domain.model.SexSpecificity
 
 data class PastHistoryState (
@@ -21,3 +22,21 @@ data class PatientDiseaseState(
     val additionalInfo: String = "",
     val date: String = ""
 )
+
+fun PastHistoryState.toPatientDiseases(patientId: String): List<PatientDisease> {
+    val list = mutableListOf<PatientDisease>()
+    diseases.forEach {
+        if (it.isDiagnosed != null) {
+            list.add(
+                PatientDisease(
+                    patientId = patientId,
+                    diseaseName = it.disease,
+                    isDiagnosed = it.isDiagnosed,
+                    additionalInfo = it.additionalInfo,
+                    diagnosisDate = it.date
+                )
+            )
+        }
+    }
+    return list.toList()
+}
