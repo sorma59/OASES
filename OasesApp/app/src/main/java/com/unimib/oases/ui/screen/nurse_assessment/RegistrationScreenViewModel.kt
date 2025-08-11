@@ -9,7 +9,6 @@ import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.model.AgeSpecificity
 import com.unimib.oases.domain.model.SexSpecificity.Companion.fromSexSpecificityDisplayName
 import com.unimib.oases.domain.model.Visit
-import com.unimib.oases.domain.model.VisitStatus
 import com.unimib.oases.domain.repository.MalnutritionScreeningRepository
 import com.unimib.oases.domain.repository.TriageEvaluationRepository
 import com.unimib.oases.domain.usecase.ComputeSymptomsUseCase
@@ -363,10 +362,12 @@ class RegistrationScreenViewModel @Inject constructor(
         applicationScope.launch(dispatcher + errorHandler) {
             val age = event.patientInfoState.patient.ageInMonths / 12
             val sex = fromSexSpecificityDisplayName(event.patientInfoState.patient.sex)
+            val currentVisit = getCurrentVisit(event.patientInfoState.patient.id)
+            if (currentVisit == null) Log.d("Prova", "null")
             _state.update {
                 _state.value.copy(
                     patientInfoState = event.patientInfoState,
-                    currentVisit = getCurrentVisit(event.patientInfoState.patient.id)
+                    currentVisit = currentVisit
                 )
             }
             updatePastHistoryState {
@@ -388,7 +389,6 @@ class RegistrationScreenViewModel @Inject constructor(
             }
             refreshVisitHistory(event.patientInfoState.patient.id)
             refreshPastHistory(event.patientInfoState.patient.id)
-            val currentVisit = _state.value.currentVisit
             if (currentVisit != null) {
                 refreshTriage(currentVisit.id)
                 refreshMalnutritionScreening(currentVisit.id)
@@ -447,9 +447,8 @@ class RegistrationScreenViewModel @Inject constructor(
                     ?: Visit(
                         patientId = patient.id,
                         triageCode = triageCode,
-                        date = LocalDate.now().toString(),
-                        description = "",
-                        status = VisitStatus.OPEN
+                        date = LocalDate.now(),
+                        description = ""
                     )
             visitUseCase.addVisit(visit)
 

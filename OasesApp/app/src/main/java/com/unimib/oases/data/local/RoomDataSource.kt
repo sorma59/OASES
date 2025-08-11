@@ -21,7 +21,6 @@ import com.unimib.oases.data.local.model.User
 import com.unimib.oases.data.local.model.VisitEntity
 import com.unimib.oases.data.local.model.VisitVitalSignEntity
 import com.unimib.oases.data.local.model.VitalSignEntity
-import com.unimib.oases.domain.model.VisitStatus
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -153,7 +152,7 @@ class RoomDataSource @Inject constructor(
     }
 
     fun getCurrentVisit(patientId: String): VisitEntity? {
-        return visitDao.getCurrentVisit(patientId, VisitStatus.CLOSED.name)
+        return visitDao.getCurrentVisit(patientId)
     }
 
     // ----------------Visits Vital Signs----------------

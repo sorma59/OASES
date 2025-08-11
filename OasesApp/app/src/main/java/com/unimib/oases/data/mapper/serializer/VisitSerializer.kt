@@ -5,6 +5,7 @@ import com.unimib.oases.domain.model.TriageCode
 import com.unimib.oases.domain.model.TriageCode.Companion.fromTriageCodeName
 import com.unimib.oases.domain.model.Visit
 import java.nio.ByteBuffer
+import java.time.LocalDate
 
 object VisitSerializer {
 
@@ -12,7 +13,7 @@ object VisitSerializer {
         val idBytes = visit.id.toByteArray(Charsets.UTF_8)
         val patientIdBytes = visit.patientId.toByteArray(Charsets.UTF_8)
         val triageCodeBytes = visit.triageCode.name.toByteArray(Charsets.UTF_8)
-        val dateBytes = visit.date.toByteArray(Charsets.UTF_8)
+        val dateBytes = visit.date.toString().toByteArray(Charsets.UTF_8)
         val descriptionBytes = visit.description.toByteArray(Charsets.UTF_8)
 
         val buffer = ByteBuffer.allocate(
@@ -54,7 +55,7 @@ object VisitSerializer {
             id = id,
             patientId = patientId,
             triageCode = fromTriageCodeName(triageCode),
-            date = date,
+            date = LocalDate.parse(date),
             description = description
         )
     }
@@ -65,7 +66,7 @@ object VisitSerializer {
             id = "id",
             patientId = "patientId",
             triageCode = TriageCode.GREEN,
-            date = "date",
+            date = LocalDate.now(),
             description = "description"
         )
         Log.d("VisitSerializer", "Original: $original")
