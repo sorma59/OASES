@@ -15,14 +15,19 @@ object PatientFullDataSerializer {
         val vitalSignBytesList = patientFullData.vitalSigns.map { serialize(it) }
         val visitByteArray = VisitSerializer.serialize(patientFullData.visit)
         val triageByteArray = TriageEvaluationSerializer.serialize(patientFullData.triageEvaluation)
+        val malnutritionScreeningBytes = patientFullData.malnutritionScreening?.let {
+            MalnutritionScreeningSerializer.serialize(it)
+        }
 
-        val buffer = ByteBuffer.allocate(
+        val totalSize =
             4 + patientByteArray.size +
             4 + diseaseBytesList.sumOf { 4 + it.size } +
             4 + visitByteArray.size +
             4 + vitalSignBytesList.sumOf { 4 + it.size } +
-            4 + triageByteArray.size
-        ).order(ByteOrder.BIG_ENDIAN)
+            4 + triageByteArray.size +
+            1 + (malnutritionScreeningBytes?.let { 4 + it.size } ?: 0)
+
+        val buffer = ByteBuffer.allocate(totalSize).order(ByteOrder.BIG_ENDIAN)
 
         buffer.putInt(patientByteArray.size)
         buffer.put(patientByteArray)
@@ -44,6 +49,15 @@ object PatientFullDataSerializer {
 
         buffer.putInt(triageByteArray.size)
         buffer.put(triageByteArray)
+
+        // MalnutritionScreening (nullable)
+        if (malnutritionScreeningBytes != null) {
+            buffer.put(1) // presence flag
+            buffer.putInt(malnutritionScreeningBytes.size)
+            buffer.put(malnutritionScreeningBytes)
+        } else {
+            buffer.put(0) // absence flag
+        }
 
         return buffer.array()
     }
@@ -82,12 +96,21 @@ object PatientFullDataSerializer {
         val triageBytes = ByteArray(triageSize).also { buffer.get(it) }
         val triageEvaluation = TriageEvaluationSerializer.deserialize(triageBytes)
 
+        // Malnutrition Screening (nullable)
+        val malnutritionScreening = if (buffer.get().toInt() == 1){
+            val malnutritionScreeningSize = buffer.int
+            val malnutritionScreeningBytes = ByteArray(malnutritionScreeningSize).also { buffer.get(it) }
+            MalnutritionScreeningSerializer.deserialize(malnutritionScreeningBytes)
+        } else
+            null
+
         return PatientFullData(
             patientDetails = patient,
             patientDiseases = diseases,
             vitalSigns = vitals,
             visit = visit,
-            triageEvaluation = triageEvaluation
+            triageEvaluation = triageEvaluation,
+            malnutritionScreening = malnutritionScreening
         )
     }
 }

@@ -11,6 +11,7 @@ import com.unimib.oases.data.mapper.serializer.PatientSerializer.serialize
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.domain.model.PatientDisease
 import com.unimib.oases.domain.model.VisitVitalSign
+import com.unimib.oases.domain.repository.MalnutritionScreeningRepository
 import com.unimib.oases.domain.repository.PatientDiseaseRepository
 import com.unimib.oases.domain.repository.TriageEvaluationRepository
 import com.unimib.oases.domain.repository.VisitRepository
@@ -29,7 +30,8 @@ class SendPatientViaBluetoothUseCase @Inject constructor(
     private val visitRepository: VisitRepository,
     private val patientDiseaseRepository: PatientDiseaseRepository,
     private val visitVitalSignRepository: VisitVitalSignRepository,
-    private val triageEvaluationRepository: TriageEvaluationRepository
+    private val triageEvaluationRepository: TriageEvaluationRepository,
+    private val malnutritionScreeningRepository: MalnutritionScreeningRepository
 ) {
     suspend operator fun invoke(patient: Patient, device: BluetoothDevice): Resource<Unit> {
         return try {
@@ -53,6 +55,9 @@ class SendPatientViaBluetoothUseCase @Inject constructor(
                             if (currentVisit != null){
 
                                 val triageEvaluation = triageEvaluationRepository.getTriageEvaluation(currentVisit.id).data!!
+
+                                val result = malnutritionScreeningRepository.getMalnutritionScreening(currentVisit.id)
+                                val malnutritionScreening = if (result is Resource.Success) result.data else null
 
                                 // Get the patient's current visit's vital signs
                                 val vitalSignsDeferred = async(Dispatchers.IO) {
@@ -94,7 +99,8 @@ class SendPatientViaBluetoothUseCase @Inject constructor(
                                     visit = currentVisit,
                                     patientDiseases = diseases,
                                     vitalSigns = vitalSigns,
-                                    triageEvaluation = triageEvaluation
+                                    triageEvaluation = triageEvaluation,
+                                    malnutritionScreening = malnutritionScreening
                                 )
 
                                 // Serialize the patient data

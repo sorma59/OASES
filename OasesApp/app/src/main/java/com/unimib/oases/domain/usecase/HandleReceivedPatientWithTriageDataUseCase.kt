@@ -2,6 +2,7 @@ package com.unimib.oases.domain.usecase
 
 import android.util.Log
 import com.unimib.oases.data.bluetooth.transfer.PatientFullData
+import com.unimib.oases.domain.repository.MalnutritionScreeningRepository
 import com.unimib.oases.domain.repository.PatientDiseaseRepository
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.domain.repository.TriageEvaluationRepository
@@ -17,9 +18,10 @@ class HandleReceivedPatientWithTriageDataUseCase @Inject constructor(
     private val visitRepository: VisitRepository,
     private val patientDiseaseRepository: PatientDiseaseRepository,
     private val visitVitalSignRepository: VisitVitalSignRepository,
-    private val triageEvaluationRepository: TriageEvaluationRepository
+    private val triageEvaluationRepository: TriageEvaluationRepository,
+    private val malnutritionScreeningRepository: MalnutritionScreeningRepository
 ) {
-    suspend fun invoke(patientWithTriageData: PatientFullData) = withContext(Dispatchers.IO) {
+    suspend operator fun invoke(patientWithTriageData: PatientFullData) = withContext(Dispatchers.IO) {
         try {
             // Add the patient to the db
             if (patientRepository.addPatient(patientWithTriageData.patientDetails) is Resource.Error)
@@ -44,6 +46,10 @@ class HandleReceivedPatientWithTriageDataUseCase @Inject constructor(
             // Add the triage evaluation to the db
             if (triageEvaluationRepository.insertTriageEvaluation(patientWithTriageData.triageEvaluation) is Resource.Error)
                 throw Exception("Failed to insert triage evaluation ${patientWithTriageData.triageEvaluation}")
+
+            if (patientWithTriageData.malnutritionScreening != null)
+                if (malnutritionScreeningRepository.insertMalnutritionScreening(patientWithTriageData.malnutritionScreening) is Resource.Error)
+                    throw Exception("Failed to insert malnutrition screening ${patientWithTriageData.malnutritionScreening}")
 
         } catch (e: Exception) {
             Log.e("PatientWithTriageDataInsertUseCase", "Failed to insert patient full data", e)

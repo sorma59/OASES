@@ -12,7 +12,7 @@ class HandleReceivedPatientUseCase @Inject constructor(
     private val patientRepository: PatientRepository
 ) {
 
-    suspend fun invoke(patient: Patient) = withContext(Dispatchers.IO) {
+    suspend operator fun invoke(patient: Patient) = withContext(Dispatchers.IO) {
         try {
             // Add the patient to the db
             var patientResult = patientRepository.addPatient(patient)

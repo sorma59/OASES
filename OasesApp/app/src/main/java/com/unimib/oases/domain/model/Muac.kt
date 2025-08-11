@@ -1,5 +1,8 @@
 package com.unimib.oases.domain.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Muac(
     val value: Double
 ) {

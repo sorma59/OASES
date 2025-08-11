@@ -1,5 +1,6 @@
 package com.unimib.oases.data.bluetooth.transfer
 
+import com.unimib.oases.domain.model.MalnutritionScreening
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.domain.model.PatientDisease
 import com.unimib.oases.domain.model.TriageEvaluation
@@ -14,4 +15,5 @@ data class PatientFullData(
     val patientDiseases: List<PatientDisease>,
     val vitalSigns: List<VisitVitalSign>,
     val triageEvaluation: TriageEvaluation,
+    val malnutritionScreening: MalnutritionScreening?
 )

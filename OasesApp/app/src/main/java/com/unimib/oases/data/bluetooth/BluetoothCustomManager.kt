@@ -540,10 +540,10 @@ class BluetoothCustomManager @Inject constructor(
 
     override suspend fun onPatientReceived(patient: Patient) {
         _receivedPatients.tryEmit(patient)
-        handleReceivedPatientUseCase.invoke(patient)
+        handleReceivedPatientUseCase(patient)
     }
 
     override suspend fun onPatientWithTriageDataReceived(patientWithTriageData: PatientFullData) {
-        handleReceivedPatientWithTriageDataUseCase.invoke(patientWithTriageData)
+        handleReceivedPatientWithTriageDataUseCase(patientWithTriageData)
     }
 }
