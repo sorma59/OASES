@@ -39,6 +39,7 @@ import com.unimib.oases.ui.screen.nurse_assessment.visit_history.VisitHistorySta
 import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.toVisitVitalSigns
 import com.unimib.oases.util.AppConstants
 import com.unimib.oases.util.Resource
+import com.unimib.oases.util.debounce
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -47,7 +48,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -363,7 +363,6 @@ class RegistrationScreenViewModel @Inject constructor(
             val age = event.patientInfoState.patient.ageInMonths / 12
             val sex = fromSexSpecificityDisplayName(event.patientInfoState.patient.sex)
             val currentVisit = getCurrentVisit(event.patientInfoState.patient.id)
-            if (currentVisit == null) Log.d("Prova", "null")
             _state.update {
                 _state.value.copy(
                     patientInfoState = event.patientInfoState,
@@ -423,12 +422,11 @@ class RegistrationScreenViewModel @Inject constructor(
                     ageInMonths = ageInMonths,
                     vitalSigns = vitalSigns
                 ),
-                selectedYellows =
-                    computeSymptomsUseCase.computeYellowSymptoms(
-                        selectedYellows = it.selectedYellows,
-                        ageInMonths = ageInMonths,
-                        vitalSigns = vitalSigns
-                    )
+                selectedYellows = computeSymptomsUseCase.computeYellowSymptoms(
+                    selectedYellows = it.selectedYellows,
+                    ageInMonths = ageInMonths,
+                    vitalSigns = vitalSigns
+                )
             )
         }
         updateTriageCode()
@@ -442,14 +440,13 @@ class RegistrationScreenViewModel @Inject constructor(
 
             val patientDiseases = _state.value.pastHistoryState.toPatientDiseases(patient.id)
 
-            val visit =
-                currentVisit?.copy(triageCode = triageCode)
-                    ?: Visit(
-                        patientId = patient.id,
-                        triageCode = triageCode,
-                        date = LocalDate.now(),
-                        description = ""
-                    )
+            val visit = currentVisit?.copy(triageCode = triageCode)
+                ?: Visit(
+                    patientId = patient.id,
+                    triageCode = triageCode,
+                    date = LocalDate.now(),
+                    description = ""
+                )
             visitUseCase.addVisit(visit)
 
             val vitalSigns = _state.value.vitalSignsState.toVisitVitalSigns(visit.id)
