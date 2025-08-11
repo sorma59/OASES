@@ -31,10 +31,5 @@ enum class TriageCode{
 
 enum class VisitStatus{
     OPEN,
-    CLOSED;
-
-    companion object {
-        fun fromVisitStatusName(name: String): VisitStatus =
-            entries.first { it.name == name }
-    }
+    CLOSED
 }

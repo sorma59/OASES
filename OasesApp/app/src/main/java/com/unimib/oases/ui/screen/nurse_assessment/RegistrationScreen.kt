@@ -200,11 +200,7 @@ fun RegistrationScreen(
                     )
                     Tab.MALNUTRITION_SCREENING -> MalnutritionScreeningScreen(
                         state = state.malnutritionScreeningState,
-                        onEvent = registrationScreenViewModel::onMalnutritionScreeningEvent,
-                        onSubmitted = {
-                            currentIndex++
-                        },
-                        onBack = { currentIndex-- }
+                        onEvent = registrationScreenViewModel::onMalnutritionScreeningEvent
                     )
                     Tab.SUBMIT_ALL -> SubmissionScreen(
                         onSubmit = {
@@ -219,7 +215,9 @@ fun RegistrationScreen(
             if (tabs[currentIndex] == Tab.HISTORY ||
                 tabs[currentIndex] == Tab.YELLOW_CODE ||
                 tabs[currentIndex] == Tab.PAST_MEDICAL_HISTORY ||
-                tabs[currentIndex] == Tab.RED_CODE
+                tabs[currentIndex] == Tab.RED_CODE ||
+                tabs[currentIndex] == Tab.MALNUTRITION_SCREENING
+
             ) { // Tabs without custom bottom buttons
                 BottomButtons(
                     onCancel = {

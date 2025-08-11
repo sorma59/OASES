@@ -17,15 +17,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.unimib.oases.domain.model.MuacCategory
 import com.unimib.oases.ui.components.util.AnimatedLabelOutlinedTextField
-import com.unimib.oases.ui.components.util.BottomButtons
 import java.util.Locale
 
 @Composable
 fun MalnutritionScreeningScreen(
     state: MalnutritionScreeningState,
-    onEvent: (MalnutritionScreeningEvent) -> Unit,
-    onSubmitted: () -> Unit,
-    onBack: () -> Unit
+    onEvent: (MalnutritionScreeningEvent) -> Unit
 ){
 
     Column{
@@ -66,13 +63,6 @@ fun MalnutritionScreeningScreen(
                 }
             )
         }
-
-        BottomButtons(
-            onCancel = onBack,
-            onConfirm = onSubmitted,
-            cancelButtonText = "Back",
-            confirmButtonText = "Next"
-        )
     }
 
 }
