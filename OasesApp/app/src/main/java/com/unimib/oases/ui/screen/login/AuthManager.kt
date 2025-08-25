@@ -1,31 +1,47 @@
 package com.unimib.oases.ui.screen.login
 
-import android.content.Context
+import com.unimib.oases.data.local.model.Role
 import com.unimib.oases.data.local.model.User
 import com.unimib.oases.util.UserPreferences
-import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class AuthManager @Inject constructor(
-    @ApplicationContext private val context: Context,
     private val userPreferences: UserPreferences
 ) {
-    var currentUser: User? = null
-        private set
+    private val _currentUser = MutableStateFlow<User?>(null)
+    val currentUser: StateFlow<User?> = _currentUser
+
+    val userRole: StateFlow<Role?> = _currentUser
+        .map { it?.role }
+        .stateIn(
+            scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
+            started = SharingStarted.Eagerly,
+            initialValue = null
+        )
 
     init {
-        currentUser = userPreferences.getUser()
+        // Load persisted user into flow
+        _currentUser.value = userPreferences.getUser()
     }
 
     fun login(user: User) {
-        currentUser = user
+        _currentUser.value = user
         userPreferences.saveUser(user)
     }
 
     fun logout() {
-        currentUser = null
+        _currentUser.value = null
         userPreferences.clear()
     }
 }
+

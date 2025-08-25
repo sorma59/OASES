@@ -15,13 +15,13 @@ data class PatientInfoState(
         district = "",
         nextOfKin = "",
         contact = "",
-        status = PatientStatus.WAITING_FOR_TRIAGE.displayValue,
-        image = null
+        status = PatientStatus.WAITING_FOR_TRIAGE.displayValue
     ),
-    val isLoading: Boolean = true,
+    val isLoading: Boolean = false,
     val nameError: String?= null,
     val birthDateError: String?= null,
     val sexError: String?= null,
-    val edited: Boolean = false,
+    val isEdited: Boolean = false,
+    val isNew: Boolean = true,
     val error: String?= null,
 )

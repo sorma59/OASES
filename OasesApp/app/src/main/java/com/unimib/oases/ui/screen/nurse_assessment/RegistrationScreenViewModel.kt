@@ -1,9 +1,11 @@
 package com.unimib.oases.ui.screen.nurse_assessment
 
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unimib.oases.data.local.model.PatientStatus
+import com.unimib.oases.data.local.model.Role
 import com.unimib.oases.di.ApplicationScope
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.model.AgeSpecificity
@@ -16,20 +18,27 @@ import com.unimib.oases.domain.usecase.ConfigTriageUseCase
 import com.unimib.oases.domain.usecase.DiseaseUseCase
 import com.unimib.oases.domain.usecase.EvaluateTriageCodeUseCase
 import com.unimib.oases.domain.usecase.GetPatientCategoryUseCase
+import com.unimib.oases.domain.usecase.InsertPatientLocallyUseCase
 import com.unimib.oases.domain.usecase.PatientDiseaseUseCase
 import com.unimib.oases.domain.usecase.PatientUseCase
 import com.unimib.oases.domain.usecase.VisitUseCase
 import com.unimib.oases.domain.usecase.VisitVitalSignsUseCase
 import com.unimib.oases.domain.usecase.VitalSigns
+import com.unimib.oases.ui.screen.login.AuthManager
+import com.unimib.oases.ui.screen.nurse_assessment.handler.PastHistoryHandler
+import com.unimib.oases.ui.screen.nurse_assessment.handler.PatientInfoHandler
 import com.unimib.oases.ui.screen.nurse_assessment.malnutrition_screening.MalnutritionScreeningEvent
 import com.unimib.oases.ui.screen.nurse_assessment.malnutrition_screening.MalnutritionScreeningState
 import com.unimib.oases.ui.screen.nurse_assessment.malnutrition_screening.toBmiOrNull
 import com.unimib.oases.ui.screen.nurse_assessment.malnutrition_screening.toMalnutritionScreeningOrNull
 import com.unimib.oases.ui.screen.nurse_assessment.malnutrition_screening.toMuacCategoryOrNull
+import com.unimib.oases.ui.screen.nurse_assessment.past_medical_history.PastHistoryEffect
 import com.unimib.oases.ui.screen.nurse_assessment.past_medical_history.PastHistoryEvent
 import com.unimib.oases.ui.screen.nurse_assessment.past_medical_history.PastHistoryState
 import com.unimib.oases.ui.screen.nurse_assessment.past_medical_history.PatientDiseaseState
 import com.unimib.oases.ui.screen.nurse_assessment.past_medical_history.toPatientDiseases
+import com.unimib.oases.ui.screen.nurse_assessment.patient_registration.PatientInfoEffect
+import com.unimib.oases.ui.screen.nurse_assessment.patient_registration.PatientInfoEvent
 import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageEvent
 import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageState
 import com.unimib.oases.ui.screen.nurse_assessment.triage.mapToTriageEvaluation
@@ -38,6 +47,7 @@ import com.unimib.oases.ui.screen.nurse_assessment.visit_history.VisitHistoryEve
 import com.unimib.oases.ui.screen.nurse_assessment.visit_history.VisitHistoryState
 import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.toVisitVitalSigns
 import com.unimib.oases.util.AppConstants
+import com.unimib.oases.util.DateTimeFormatter
 import com.unimib.oases.util.Resource
 import com.unimib.oases.util.debounce
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -45,10 +55,12 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -61,6 +73,11 @@ private fun <T> Set<T>.toggle(element: T): Set<T> {
         this.plus(element)
     }
 }
+
+fun Array<Tab>.next(currentIndex: Int) = if (currentIndex != this.lastIndex) this[(currentIndex + 1)] else null
+
+fun Array<Tab>.previous(currentIndex: Int) = if (currentIndex != 0) this[(currentIndex - 1)] else null
+
 
 @HiltViewModel
 class RegistrationScreenViewModel @Inject constructor(
@@ -75,12 +92,27 @@ class RegistrationScreenViewModel @Inject constructor(
     private val configTriageUseCase: ConfigTriageUseCase,
     private val evaluateTriageCodeUseCase: EvaluateTriageCodeUseCase,
     private val getPatientCategoryUseCase: GetPatientCategoryUseCase,
+    private val insertPatientLocallyUseCase: InsertPatientLocallyUseCase,
+    private val pastHistoryHandler: PastHistoryHandler,
+    private val patientInfoHandler: PatientInfoHandler,
+    authManager: AuthManager,
+    savedStateHandle: SavedStateHandle,
     @ApplicationScope private val applicationScope: CoroutineScope,
     @IoDispatcher private val dispatcher: CoroutineDispatcher
 ): ViewModel() {
 
     private val _state = MutableStateFlow(RegistrationState())
     val state: StateFlow<RegistrationState> = _state.asStateFlow()
+
+    private val userRole = authManager.userRole.value
+
+    val tabs = state.value.tabs
+
+    private val navigationEventsChannel = Channel<NavigationEvent>()
+    val navigationEvents = navigationEventsChannel.receiveAsFlow()
+
+    private val validationEventsChannel = Channel<ValidationEvent>()
+    val validationEvents = validationEventsChannel.receiveAsFlow()
 
     private var errorHandler = CoroutineExceptionHandler { _, e ->
         e.printStackTrace()
@@ -94,7 +126,7 @@ class RegistrationScreenViewModel @Inject constructor(
     fun onEvent(event: RegistrationEvent) {
         when (event) {
 
-            is RegistrationEvent.PatientSubmitted -> handlePatientSubmission(event)
+            is RegistrationEvent.PatientSubmitted -> handlePatientSubmission()
 
             is RegistrationEvent.VitalSignsSubmitted -> handleVitalSignsSubmission(event)
 
@@ -103,6 +135,128 @@ class RegistrationScreenViewModel @Inject constructor(
     }
 
     fun getCurrentVisit(patientId: String) = visitUseCase.getCurrentVisit(patientId)
+
+    // --------------Demographics-----------------------
+
+    init {
+        savedStateHandle.get<String>("patientId")?.let { id ->
+            if(id.isNotBlank()) {
+                viewModelScope.launch(dispatcher + errorHandler) {
+                    patientUseCase.getPatient(id).also { result ->
+                        result.collect { resource ->
+                            when(resource){
+                                is Resource.Loading -> {
+                                    _state.update{
+                                        _state.value.copy(
+                                            patientInfoState = _state.value.patientInfoState.copy(
+                                                isLoading = true
+                                            )
+                                        )
+                                    }
+                                }
+
+                                is Resource.Success -> {
+                                    val patient = resource.data!!
+                                    _state.update{
+                                        _state.value.copy(
+                                            patientInfoState = _state.value.patientInfoState.copy(
+                                                patient = patient,
+                                                isNew = false,
+                                                isLoading = false
+                                            )
+                                        )
+                                    }
+                                }
+
+                                is Resource.Error -> {
+                                    _state.update{
+                                        _state.value.copy(
+                                            patientInfoState = _state.value.patientInfoState.copy(
+                                                error = resource.message,
+                                                isLoading = false
+                                            )
+                                        )
+                                    }
+                                }
+
+                                is Resource.None -> {}
+                            }
+                        }
+                    }
+                }
+            } else {
+                _state.update{
+                    _state.value.copy(
+                        patientInfoState = _state.value.patientInfoState.copy(
+                            isLoading = false,
+                            isNew = true
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    fun onPatientInfoEvent(event: PatientInfoEvent) {
+        val (newState, effect) = patientInfoHandler.handle(state.value.patientInfoState, event)
+        _state.update { it.copy(patientInfoState = newState) }
+        effect?.let{ handlePatientInfoEffect(it) }
+    }
+
+    fun handlePatientInfoEffect(effect: PatientInfoEffect) {
+        when (effect) {
+            PatientInfoEffect.SavePatientData -> {
+                applicationScope.launch(dispatcher + errorHandler) {
+                    savePatientData()
+                }
+            }
+            PatientInfoEffect.SendValidationResult -> {
+                viewModelScope.launch(dispatcher + errorHandler) {
+                    validationEventsChannel.send(ValidationEvent.ValidationSuccess)
+                }
+            }
+            PatientInfoEffect.ComputeAge -> {
+                val newAge = DateTimeFormatter().calculateAgeInMonths(state.value.patientInfoState.patient.birthDate)
+                newAge?.let{
+                    onPatientInfoEvent(PatientInfoEvent.AgeComputed(it))
+                }
+            }
+            PatientInfoEffect.ComputeBirthDate -> {
+                val newBirthDate = DateTimeFormatter().calculateBirthDate(state.value.patientInfoState.patient.ageInMonths)
+                newBirthDate?.let{
+                    onPatientInfoEvent(PatientInfoEvent.BirthDateComputed(it))
+                }
+            }
+        }
+    }
+
+    private suspend fun savePatientData() {
+
+        _state.update {
+            it.copy(
+                patientInfoState = _state.value.patientInfoState.copy(isLoading = true)
+            )
+        }
+        try {
+            val result = insertPatientLocallyUseCase(_state.value.patientInfoState.patient)
+            if (result is Resource.Error)
+                throw Exception(result.message)
+        }
+        catch (e: Exception){
+            _state.update {
+                it.copy(
+                    patientInfoState = _state.value.patientInfoState.copy(error = e.message)
+                )
+            }
+        }
+        finally {
+            _state.update {
+                it.copy(
+                    patientInfoState = _state.value.patientInfoState.copy(isLoading = false)
+                )
+            }
+        }
+    }
 
     // -----------------Triage----------------------
 
@@ -169,55 +323,27 @@ class RegistrationScreenViewModel @Inject constructor(
     // --------------PastHistory--------------------
 
     fun onPastHistoryEvent(event: PastHistoryEvent) {
-        when (event) {
 
-            is PastHistoryEvent.RadioButtonClicked -> {
-                updatePastHistoryState {
-                    it.copy(diseases = it.diseases.map { d ->
-                        if (d.disease == event.disease) d.copy(isDiagnosed = event.isDiagnosed) else d
-                    })
-                }
-            }
+        val (newState, effect) = pastHistoryHandler.handle(state.value.pastHistoryState, event)
+        _state.update { it.copy(pastHistoryState = newState) }
+        effect?.let { handlePastHistoryEffect(it) }
 
-            is PastHistoryEvent.AdditionalInfoChanged -> {
-                updatePastHistoryState {
-                    it.copy(diseases = it.diseases.map { d ->
-                        if (d.disease == event.disease) d.copy(additionalInfo = event.additionalInfo) else d
-                    })
-                }
-            }
+    }
 
-            is PastHistoryEvent.DateChanged -> {
-                updatePastHistoryState {
-                    it.copy(diseases = it.diseases.map { d ->
-                        if (d.disease == event.disease) d.copy(date = event.date) else d
-                    })
-                }
-            }
-
-            is PastHistoryEvent.Retry -> {
-                refreshPastHistory(state.value.patientInfoState.patient.id)
-            }
-
-            is PastHistoryEvent.NurseClicked -> {
-                updatePastHistoryState {
-                    it.copy(toastMessage = "Only doctors can edit PMH")
-                }
-            }
-
-            is PastHistoryEvent.ToastShown -> {
-                updatePastHistoryState { it.copy(toastMessage = null) }
+    fun handlePastHistoryEffect(effect: PastHistoryEffect) {
+        when (effect) {
+            is PastHistoryEffect.Refresh -> {
+                refreshPastHistory()
             }
         }
     }
 
-
-    fun refreshPastHistory(patientId: String) {
+    fun refreshPastHistory() {
         updatePastHistoryState { it.copy(error = null, isLoading = true) }
 
-        applicationScope.launch(dispatcher + errorHandler) { // applicationScope?
+        viewModelScope.launch(dispatcher + errorHandler) {
             loadDiseases()
-            loadPatientDiseases(patientId)
+            loadPatientDiseases()
         }
     }
 
@@ -255,8 +381,10 @@ class RegistrationScreenViewModel @Inject constructor(
         }
     }
 
-    private suspend fun loadPatientDiseases(patientId: String) {
+    private suspend fun loadPatientDiseases() {
         updatePastHistoryState { it.copy(isLoading = true) }
+
+        val patientId = state.value.patientInfoState.patient.id
 
         try {
             val result = patientDiseaseUseCase.getPatientDiseases(patientId).first {
@@ -335,7 +463,7 @@ class RegistrationScreenViewModel @Inject constructor(
 
     fun refreshMalnutritionScreening(visitId: String) {
         updateMalnutritionScreeningState { it.copy(error = null, isLoading = true) }
-        applicationScope.launch(dispatcher + errorHandler) {
+        viewModelScope.launch(dispatcher + errorHandler) {
             loadMalnutritionScreening(visitId)
         }
 
@@ -358,14 +486,17 @@ class RegistrationScreenViewModel @Inject constructor(
         }
     }
 
-    private fun handlePatientSubmission(event: RegistrationEvent.PatientSubmitted){
+    private fun handlePatientSubmission(){
+
+        val ageInMonths = _state.value.patientInfoState.patient.ageInMonths
+        val age = ageInMonths / 12
+        val sex = fromSexSpecificityDisplayName(_state.value.patientInfoState.patient.sex)
+        val id = _state.value.patientInfoState.patient.id
+        val currentVisit = getCurrentVisit(id)
+
         applicationScope.launch(dispatcher + errorHandler) {
-            val age = event.patientInfoState.patient.ageInMonths / 12
-            val sex = fromSexSpecificityDisplayName(event.patientInfoState.patient.sex)
-            val currentVisit = getCurrentVisit(event.patientInfoState.patient.id)
             _state.update {
                 _state.value.copy(
-                    patientInfoState = event.patientInfoState,
                     currentVisit = currentVisit
                 )
             }
@@ -381,13 +512,13 @@ class RegistrationScreenViewModel @Inject constructor(
             }
             updateTriageState {
                 it.copy(
-                    ageInMonths = event.patientInfoState.patient.ageInMonths,
-                    triageConfig = configTriageUseCase(event.patientInfoState.patient.ageInMonths),
-                    patientCategory = getPatientCategoryUseCase(event.patientInfoState.patient.ageInMonths)
+                    ageInMonths = ageInMonths,
+                    triageConfig = configTriageUseCase(ageInMonths),
+                    patientCategory = getPatientCategoryUseCase(ageInMonths)
                 )
             }
-            refreshVisitHistory(event.patientInfoState.patient.id)
-            refreshPastHistory(event.patientInfoState.patient.id)
+            refreshVisitHistory(id)
+            refreshPastHistory()
             if (currentVisit != null) {
                 refreshTriage(currentVisit.id)
                 refreshMalnutritionScreening(currentVisit.id)
@@ -504,12 +635,13 @@ class RegistrationScreenViewModel @Inject constructor(
     }
 
     private fun updateTriageCode(){
-        _state.update { it.copy(
-            triageState =
-                it.triageState.copy(
+        _state.update {
+            it.copy(
+                triageState = it.triageState.copy(
                     triageCode = evaluateTriageCodeUseCase(it.triageState.selectedReds, it.triageState.selectedYellows)
                 )
-        ) }
+            )
+        }
     }
 
     private fun updatePastHistoryState(update: (PastHistoryState) -> PastHistoryState) {
@@ -518,5 +650,81 @@ class RegistrationScreenViewModel @Inject constructor(
 
     private fun updateVisitHistoryState(update: (VisitHistoryState) -> VisitHistoryState) {
         _state.update { it.copy(visitHistoryState = update(it.visitHistoryState)) }
+    }
+
+    // --------------Flow-----------------
+
+    fun onNext() {
+        val currentIndex = _state.value.currentStep
+        executeSideEffect()
+        if (currentIndex != _state.value.tabs.lastIndex) {
+            val nextIndex = calculateNextStep(currentIndex)
+            _state.update { it.copy(currentStep = nextIndex) }
+        }
+    }
+
+    fun onBack() {
+        val currentIndex = _state.value.currentStep
+        if (state.value.currentTab == Tab.CONTINUE_TO_TRIAGE && !mustSkipContinueToTriagePage()) {
+            viewModelScope.launch(dispatcher + errorHandler){
+                navigationEventsChannel.send(NavigationEvent.NavigateBack)
+            }
+            return
+        }
+        val previousIndex = calculatePreviousStep(currentIndex)
+        _state.update { it.copy(currentStep = previousIndex) }
+    }
+
+    private fun calculateNextStep(currentIndex: Int): Int {
+        val nextTab = tabs.next(currentIndex)
+        if (nextTab == Tab.PAST_MEDICAL_HISTORY && mustSkipPastMedicalHistory() ||
+            nextTab == Tab.YELLOW_CODE && _state.value.triageState.isRedCode ||
+            nextTab == Tab.CONTINUE_TO_TRIAGE && mustSkipContinueToTriagePage()){
+            return currentIndex + 2
+        }
+        return (currentIndex + 1).coerceAtMost(tabs.lastIndex)
+    }
+
+    private fun calculatePreviousStep(currentIndex: Int): Int {
+        val previousTab = tabs.previous(currentIndex)
+        if (previousTab == Tab.YELLOW_CODE && _state.value.triageState.isRedCode ||
+            previousTab == Tab.PAST_MEDICAL_HISTORY && mustSkipPastMedicalHistory() ||
+            previousTab == Tab.CONTINUE_TO_TRIAGE && mustSkipContinueToTriagePage()){
+            return currentIndex - 2
+        }
+        return (currentIndex - 1).coerceAtLeast(0)
+    }
+
+    private fun executeSideEffect() {
+        when (state.value.currentTab){
+            Tab.DEMOGRAPHICS -> {
+                onPatientInfoEvent(PatientInfoEvent.ConfirmSubmission)
+                onEvent(RegistrationEvent.PatientSubmitted)
+            }
+            Tab.SUBMIT_ALL -> {
+                onEvent(RegistrationEvent.Submit)
+                viewModelScope.launch(dispatcher + errorHandler) {
+                    navigationEventsChannel.send(NavigationEvent.NavigateBack)
+                }
+            }
+            else -> {}
+        }
+    }
+
+    fun mustSkipPastMedicalHistory(): Boolean {
+        return userRole == Role.NURSE && !_state.value.pastHistoryState.hasBeenFilledIn
+    }
+
+    fun mustSkipContinueToTriagePage(): Boolean {
+        return !_state.value.patientInfoState.isEdited && !_state.value.patientInfoState.isNew
+    }
+
+    sealed class NavigationEvent {
+        data object NavigateBack : NavigationEvent()
+    }
+
+    sealed class ValidationEvent {
+        data object ValidationSuccess : ValidationEvent() // Successful validation
+//        data object SubmissionSuccess : ValidationEvent() // Successful submission to the db
     }
 }

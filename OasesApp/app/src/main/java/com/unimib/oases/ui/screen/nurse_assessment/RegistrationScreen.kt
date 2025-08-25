@@ -1,5 +1,6 @@
 package com.unimib.oases.ui.screen.nurse_assessment
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,24 +12,27 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -39,8 +43,11 @@ import com.unimib.oases.data.local.model.Role
 import com.unimib.oases.ui.components.util.BottomButtons
 import com.unimib.oases.ui.navigation.Screen
 import com.unimib.oases.ui.screen.login.AuthViewModel
+import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreenViewModel.NavigationEvent
+import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreenViewModel.ValidationEvent
 import com.unimib.oases.ui.screen.nurse_assessment.malnutrition_screening.MalnutritionScreeningScreen
 import com.unimib.oases.ui.screen.nurse_assessment.past_medical_history.PastHistoryScreen
+import com.unimib.oases.ui.screen.nurse_assessment.patient_registration.PatientInfoEvent
 import com.unimib.oases.ui.screen.nurse_assessment.patient_registration.PatientInfoScreen
 import com.unimib.oases.ui.screen.nurse_assessment.transitionscreens.ContinueToTriageDecisionScreen
 import com.unimib.oases.ui.screen.nurse_assessment.transitionscreens.SubmissionScreen
@@ -49,10 +56,6 @@ import com.unimib.oases.ui.screen.nurse_assessment.triage.RedCodeScreen
 import com.unimib.oases.ui.screen.nurse_assessment.triage.YellowCodeScreen
 import com.unimib.oases.ui.screen.nurse_assessment.visit_history.VisitHistoryScreen
 import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.VitalSignsScreen
-
-fun Array<Tab>.next(currentIndex: Int) = if (currentIndex != this.lastIndex) this[(currentIndex + 1)] else null
-
-fun Array<Tab>.previous(currentIndex: Int) = if (currentIndex != 0) this[(currentIndex - 1)] else null
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,35 +69,87 @@ fun RegistrationScreen(
 
     val state by registrationScreenViewModel.state.collectAsState()
 
+    val navigationEvents by registrationScreenViewModel.navigationEvents.collectAsState(null)
+
+    val validationEvents = registrationScreenViewModel.validationEvents
+
     val userRole = authViewModel.currentUser()?.role
 
-    val tabs = arrayOf(
-        Tab.DEMOGRAPHICS,
-        Tab.CONTINUE_TO_TRIAGE,
-        Tab.VITAL_SIGNS,
-        Tab.RED_CODE,
-        Tab.YELLOW_CODE,
-        Tab.HISTORY,
-        Tab.PAST_MEDICAL_HISTORY,
-        Tab.MALNUTRITION_SCREENING,
-        Tab.SUBMIT_ALL
-    )
+    var showAlertDialog by remember { mutableStateOf(false) }
 
-    var currentIndex by rememberSaveable { mutableIntStateOf(0) }
+    val currentTab = state.currentTab
 
-    var mustSkipPastMedicalHistory = remember {
-        derivedStateOf {
-            userRole == Role.NURSE && !state.pastHistoryState.hasBeenFilledIn
+    val prefixText = remember(currentTab) {
+        when (currentTab){
+            Tab.RED_CODE, Tab.YELLOW_CODE -> {
+                when (state.triageState.patientCategory){
+                    PatientCategory.ADULT -> "Adult "
+                    PatientCategory.PEDIATRIC -> "Pediatric "
+                }
+            }
+            else -> ""
         }
     }
 
-    val prefixText = remember(currentIndex) {
-        if (tabs[currentIndex] == Tab.RED_CODE || tabs[currentIndex] == Tab.YELLOW_CODE){
-            when (state.triageState.patientCategory){
-                PatientCategory.ADULT -> "Adult "
-                PatientCategory.PEDIATRIC -> "Pediatric "
+    val nextButtonText by remember(currentTab) { // Outer remember for tab changes
+        derivedStateOf { // Inner derived state for isEdited/isNew changes within the DEMOGRAPHICS tab
+            when (currentTab) {
+                Tab.DEMOGRAPHICS -> {
+                    if (state.patientInfoState.isEdited || state.patientInfoState.isNew)
+                        "Submit"
+                    else
+                        "Next"
+                }
+                Tab.CONTINUE_TO_TRIAGE -> "Triage"
+                Tab.VITAL_SIGNS, Tab.RED_CODE, Tab.YELLOW_CODE, Tab.PAST_MEDICAL_HISTORY, Tab.HISTORY, Tab.MALNUTRITION_SCREENING -> "Next"
+                Tab.SUBMIT_ALL -> "Submit"
             }
-        } else ""
+        }
+    }
+
+
+    val cancelButtonText = remember(currentTab){
+        when (currentTab) {
+            Tab.DEMOGRAPHICS -> "Cancel"
+            Tab.CONTINUE_TO_TRIAGE -> "Home"
+            else -> "Back"
+        }
+    }
+
+    val onConfirm =
+        if (currentTab == Tab.DEMOGRAPHICS &&
+            (state.patientInfoState.isEdited ||
+            state.patientInfoState.isNew))
+        {
+            { registrationScreenViewModel.onPatientInfoEvent(PatientInfoEvent.NextButtonPressed) }
+        }
+        else
+            registrationScreenViewModel::onNext
+
+    LaunchedEffect(key1 = navigationEvents) {
+        when (navigationEvents) {
+            is NavigationEvent.NavigateBack -> {
+                navController.popBackStack()
+            }
+
+            null -> {}
+        }
+    }
+
+    val context = LocalContext.current
+
+    LaunchedEffect(key1 = context) {
+        validationEvents.collect { event ->
+            when (event) {
+                is ValidationEvent.ValidationSuccess -> {
+                    Log.d("Prova", "isEdited: ${state.patientInfoState.isEdited}")
+                    if (state.patientInfoState.isEdited)
+                        showAlertDialog = true
+                    else
+                        registrationScreenViewModel.onNext()
+                }
+            }
+        }
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -146,7 +201,7 @@ fun RegistrationScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = prefixText + tabs[currentIndex].title,
+                    text = prefixText + currentTab.title,
                     style = MaterialTheme.typography.titleLarge
                 )
             }
@@ -157,30 +212,14 @@ fun RegistrationScreen(
                     .weight(1f),
                 contentAlignment = Alignment.Center
             ) {
-                when (tabs[currentIndex]) {
+                when (currentTab) {
                     Tab.DEMOGRAPHICS -> PatientInfoScreen(
-                        onSubmitted = { patientInfoState ->
-                            registrationScreenViewModel.onEvent(RegistrationEvent.PatientSubmitted(patientInfoState))
-                            currentIndex++
-                        }
+                        state = state.patientInfoState,
+                        onEvent = registrationScreenViewModel::onPatientInfoEvent,
+                        validationEvents = registrationScreenViewModel.validationEvents
                     )
-                    Tab.CONTINUE_TO_TRIAGE -> ContinueToTriageDecisionScreen(
-                        onContinueToTriage = {
-                            currentIndex++
-                        },
-                        onSkipTriage = {
-                            navController.popBackStack()
-                        }
-                    )
-                    Tab.VITAL_SIGNS -> VitalSignsScreen(
-                        onSubmitted = { vitalSigns ->
-                            registrationScreenViewModel.onEvent(RegistrationEvent.VitalSignsSubmitted(vitalSigns))
-                            currentIndex++
-                        },
-                        onBack = {
-                            currentIndex--
-                        }
-                    )
+                    Tab.CONTINUE_TO_TRIAGE -> ContinueToTriageDecisionScreen()
+                    Tab.VITAL_SIGNS -> VitalSignsScreen()
                     Tab.RED_CODE -> RedCodeScreen(
                         state = state.triageState,
                         onEvent = registrationScreenViewModel::onTriageEvent,
@@ -202,47 +241,50 @@ fun RegistrationScreen(
                         state = state.malnutritionScreeningState,
                         onEvent = registrationScreenViewModel::onMalnutritionScreeningEvent
                     )
-                    Tab.SUBMIT_ALL -> SubmissionScreen(
-                        onSubmit = {
-                            registrationScreenViewModel.onEvent(RegistrationEvent.Submit)
-                            navController.popBackStack()
-                        },
-                        onBack = { currentIndex-- }
-                    )
+                    Tab.SUBMIT_ALL -> SubmissionScreen()
                 }
             }
 
-            if (tabs[currentIndex] == Tab.HISTORY ||
-                tabs[currentIndex] == Tab.YELLOW_CODE ||
-                tabs[currentIndex] == Tab.PAST_MEDICAL_HISTORY ||
-                tabs[currentIndex] == Tab.RED_CODE ||
-                tabs[currentIndex] == Tab.MALNUTRITION_SCREENING
-
-            ) { // Tabs without custom bottom buttons
-                BottomButtons(
-                    onCancel = {
-                        if (tabs.previous(currentIndex) == Tab.YELLOW_CODE && state.triageState.isRedCode ||
-                            tabs.previous(currentIndex) == Tab.PAST_MEDICAL_HISTORY && mustSkipPastMedicalHistory.value
-                        )
-                            currentIndex = currentIndex - 2
-                        else
-                            currentIndex--
-                    },
-                    onConfirm = {
-                        if (tabs.next(currentIndex) == Tab.PAST_MEDICAL_HISTORY && mustSkipPastMedicalHistory.value ||
-                            tabs.next(currentIndex) == Tab.YELLOW_CODE && state.triageState.isRedCode
-                        ){
-                            currentIndex = currentIndex + 2
-                        }
-                        else {
-                            currentIndex++
-                        }
-                    },
-                    cancelButtonText = "Back",
-                    confirmButtonText = "Next"
-                )
-            }
+            BottomButtons(
+                onCancel = registrationScreenViewModel::onBack,
+                onConfirm = onConfirm,
+                cancelButtonText = cancelButtonText,
+                confirmButtonText = nextButtonText
+            )
         }
+    }
+
+    if (showAlertDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showAlertDialog = false
+            },
+            title = {
+                Text(text = "Confirm patient saving")
+            },
+            text = {
+                Text(text = "Do you want to save the patient to the database?")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showAlertDialog = false
+                        registrationScreenViewModel.onNext()
+                    }
+                ) {
+                    Text("Confirm")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showAlertDialog = false
+                    }
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 }
 
@@ -252,8 +294,8 @@ enum class Tab(val title: String){
     VITAL_SIGNS("Vital Signs"),
     RED_CODE("Triage"),
     YELLOW_CODE("Triage"),
-    PAST_MEDICAL_HISTORY("Past Medical History"),
     HISTORY("History"),
+    PAST_MEDICAL_HISTORY("Past Medical History"),
     MALNUTRITION_SCREENING("Malnutrition Screening"),
     SUBMIT_ALL("Submit everything")
 }

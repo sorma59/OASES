@@ -20,15 +20,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.unimib.oases.domain.model.NumericPrecision
 import com.unimib.oases.ui.components.util.AnimatedLabelOutlinedTextField
-import com.unimib.oases.ui.components.util.BottomButtons
 import com.unimib.oases.ui.components.util.FadeOverlay
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 
 @Composable
-fun VitalSignsScreen(
-    onSubmitted: (VitalSignsState) -> Unit,
-    onBack: () -> Unit
-) {
+fun VitalSignsScreen() {
 
     val vitalSignsViewModel: VitalSignsViewModel = hiltViewModel()
 
@@ -36,68 +32,55 @@ fun VitalSignsScreen(
 
     val scrollState = rememberScrollState()
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Bottom
-    ){
-        Box(modifier = Modifier.weight(1f)){
-            if (state.error != null) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    Text(text = state.error!!)
+    Box{
+        if (state.error != null) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Text(text = state.error!!)
 
-                    Button(
-                        onClick = {
-                            vitalSignsViewModel.onEvent(VitalSignsEvent.Retry)
-                        }
-                    ) {
-                        Text("Retry")
+                Button(
+                    onClick = {
+                        vitalSignsViewModel.onEvent(VitalSignsEvent.Retry)
                     }
-                }
-            } else if (state.isLoading) {
-                CustomCircularProgressIndicator()
-            } else {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp)
-                        .verticalScroll(scrollState)
                 ) {
-
-                    for (vitalSign in state.vitalSigns) {
-                        AnimatedLabelOutlinedTextField(
-                            value = vitalSign.value.toString(),
-                            onValueChange = {
-                                vitalSignsViewModel.onEvent(
-                                    VitalSignsEvent.ValueChanged(
-                                        vitalSign.name,
-                                        it
-                                    )
-                                )
-                            },
-                            labelText = vitalSign.name + " (" + vitalSign.acronym + ", " + vitalSign.unit + ")",
-                            isError = vitalSign.error != null,
-                            isInteger = vitalSignsViewModel.getPrecisionFor(vitalSign.name) == NumericPrecision.INTEGER,
-                            isDouble = vitalSignsViewModel.getPrecisionFor(vitalSign.name) == NumericPrecision.FLOAT
-                        )
-
-                        Spacer(modifier = Modifier.height(16.dp))
-                    }
+                    Text("Retry")
                 }
             }
+        } else if (state.isLoading) {
+            CustomCircularProgressIndicator()
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+                    .verticalScroll(scrollState)
+            ) {
 
-            FadeOverlay(Modifier.align(Alignment.BottomCenter))
+                for (vitalSign in state.vitalSigns) {
+                    AnimatedLabelOutlinedTextField(
+                        value = vitalSign.value.toString(),
+                        onValueChange = {
+                            vitalSignsViewModel.onEvent(
+                                VitalSignsEvent.ValueChanged(
+                                    vitalSign.name,
+                                    it
+                                )
+                            )
+                        },
+                        labelText = vitalSign.name + " (" + vitalSign.acronym + ", " + vitalSign.unit + ")",
+                        isError = vitalSign.error != null,
+                        isInteger = vitalSignsViewModel.getPrecisionFor(vitalSign.name) == NumericPrecision.INTEGER,
+                        isDouble = vitalSignsViewModel.getPrecisionFor(vitalSign.name) == NumericPrecision.FLOAT
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+            }
         }
 
-        BottomButtons(
-            onCancel = { onBack() },
-            onConfirm = { onSubmitted(state) },
-            cancelButtonText = "Back",
-            confirmButtonText = "Next",
-        )
+        FadeOverlay(Modifier.align(Alignment.BottomCenter))
     }
 }

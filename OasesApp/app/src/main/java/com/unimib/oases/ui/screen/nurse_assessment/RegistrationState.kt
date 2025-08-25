@@ -16,5 +16,11 @@ data class RegistrationState (
     val triageState: TriageState = TriageState(),
     val malnutritionScreeningState: MalnutritionScreeningState = MalnutritionScreeningState(),
     val currentVisit: Visit? = null,
+    val currentStep: Int = 0,
     val error : String? = null,
-)
+){
+    val tabs = Tab.entries.toTypedArray()
+
+    val currentTab: Tab
+        get() = tabs[currentStep]
+}

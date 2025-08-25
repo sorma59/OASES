@@ -1,11 +1,12 @@
 package com.unimib.oases.domain.usecase
 
+import com.unimib.oases.domain.common.FormErrorMessages
 import com.unimib.oases.ui.screen.nurse_assessment.patient_registration.Sex
 import javax.inject.Inject
 
 class ValidatePatientInfoFormUseCase @Inject constructor() {
 
-    fun invoke(name: String, birthDate: String, sex: String): ValidationResult {
+    operator fun invoke(name: String, birthDate: String, sex: String): ValidationResult {
 
         val nameError = validateName(name)
         val birthDateError = validateBirthDate(birthDate)
@@ -33,21 +34,21 @@ class ValidatePatientInfoFormUseCase @Inject constructor() {
 
     private fun validateName(name: String): String? {
         if (name.isBlank()) {
-            return "The name can't be blank"
+            return FormErrorMessages.NAME_BLANK
         }
         return null
     }
 
     private fun validateBirthDate(birthDate: String): String? {
         if (birthDate.isBlank()) {
-            return "The birth date can't be blank"
+            return FormErrorMessages.BIRTHDATE_BLANK
         }
         return null
     }
 
     private fun validateSex(sex: String): String? {
         if (sex == Sex.UNSPECIFIED.displayName) {
-            return "The sex must be specified"
+            return FormErrorMessages.SEX_NOT_SELECTED
         }
         return null
     }

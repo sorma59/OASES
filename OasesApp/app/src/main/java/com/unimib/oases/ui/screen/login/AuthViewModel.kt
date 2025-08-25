@@ -38,10 +38,10 @@ class AuthViewModel @Inject constructor(
 
     private fun checkAuthStatus() {
 
-        if (auth.currentUser == null) {
+        if (auth.currentUser.value == null) {
             _authState.value = AuthState.Unauthenticated
         } else {
-            _authState.value = AuthState.Authenticated(User(auth.currentUser!!.username, auth.currentUser!!.pwHash, auth.currentUser!!.role, auth.currentUser!!.salt))
+            _authState.value = AuthState.Authenticated(User(auth.currentUser.value!!.username, auth.currentUser.value!!.pwHash, auth.currentUser.value!!.role, auth.currentUser.value!!.salt))
         }
     }
 
@@ -72,16 +72,4 @@ class AuthViewModel @Inject constructor(
             }
         }
     }
-
-//    fun isNurse():Boolean {
-//        return authState.value is AuthState.Authenticated && (authState.value as AuthState.Authenticated).user.role == Role.Nurse
-//    }
-//
-//    fun isDoctor(): Boolean {
-//        return authState.value is AuthState.Authenticated && (authState.value as AuthState.Authenticated).user.role == Role.Doctor
-//    }
-//
-//    fun isAdmin(): Boolean {
-//        return authState.value is AuthState.Authenticated && (authState.value as AuthState.Authenticated).user.role == Role.Admin
-//    }
 }
