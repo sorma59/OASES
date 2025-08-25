@@ -4,5 +4,4 @@ sealed class VitalSignsEvent {
     data class ValueChanged(val vitalSign: String, val value: String): VitalSignsEvent()
 
     object Retry: VitalSignsEvent()
-    object Submit: VitalSignsEvent()
 }

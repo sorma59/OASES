@@ -19,8 +19,7 @@ class VitalSignUseCase @Inject constructor (
     }
 
     fun getVitalSigns(): Flow<Resource<List<VitalSign>>> {
-        val result = repo.getAllVitalSigns()
-        return result
+        return repo.getAllVitalSigns()
     }
 }
 

@@ -12,25 +12,30 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.unimib.oases.domain.model.NumericPrecision
 import com.unimib.oases.ui.components.util.AnimatedLabelOutlinedTextField
 import com.unimib.oases.ui.components.util.FadeOverlay
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 
 @Composable
-fun VitalSignsScreen() {
-
-    val vitalSignsViewModel: VitalSignsViewModel = hiltViewModel()
-
-    val state by vitalSignsViewModel.state.collectAsState()
+fun VitalSignsScreen(
+    state: VitalSignsState,
+    onEvent: (VitalSignsEvent) -> Unit,
+    getPrecisionFor: (String) -> NumericPrecision?
+) {
 
     val scrollState = rememberScrollState()
+
+    val context = LocalContext.current
+
+    LaunchedEffect(key1 = context) {
+        onEvent(VitalSignsEvent.Retry)
+    }
 
     Box{
         if (state.error != null) {
@@ -39,11 +44,11 @@ fun VitalSignsScreen() {
                 verticalArrangement = Arrangement.Center,
                 modifier = Modifier.fillMaxSize()
             ) {
-                Text(text = state.error!!)
+                Text(text = state.error)
 
                 Button(
                     onClick = {
-                        vitalSignsViewModel.onEvent(VitalSignsEvent.Retry)
+                        onEvent(VitalSignsEvent.Retry)
                     }
                 ) {
                     Text("Retry")
@@ -63,7 +68,7 @@ fun VitalSignsScreen() {
                     AnimatedLabelOutlinedTextField(
                         value = vitalSign.value.toString(),
                         onValueChange = {
-                            vitalSignsViewModel.onEvent(
+                            onEvent(
                                 VitalSignsEvent.ValueChanged(
                                     vitalSign.name,
                                     it
@@ -72,8 +77,8 @@ fun VitalSignsScreen() {
                         },
                         labelText = vitalSign.name + " (" + vitalSign.acronym + ", " + vitalSign.unit + ")",
                         isError = vitalSign.error != null,
-                        isInteger = vitalSignsViewModel.getPrecisionFor(vitalSign.name) == NumericPrecision.INTEGER,
-                        isDouble = vitalSignsViewModel.getPrecisionFor(vitalSign.name) == NumericPrecision.FLOAT
+                        isInteger = getPrecisionFor(vitalSign.name) == NumericPrecision.INTEGER,
+                        isDouble = getPrecisionFor(vitalSign.name) == NumericPrecision.FLOAT
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))

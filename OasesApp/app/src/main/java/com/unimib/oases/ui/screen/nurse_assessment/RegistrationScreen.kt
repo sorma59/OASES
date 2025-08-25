@@ -1,6 +1,5 @@
 package com.unimib.oases.ui.screen.nurse_assessment
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -142,7 +141,6 @@ fun RegistrationScreen(
         validationEvents.collect { event ->
             when (event) {
                 is ValidationEvent.ValidationSuccess -> {
-                    Log.d("Prova", "isEdited: ${state.patientInfoState.isEdited}")
                     if (state.patientInfoState.isEdited)
                         showAlertDialog = true
                     else
@@ -219,7 +217,11 @@ fun RegistrationScreen(
                         validationEvents = registrationScreenViewModel.validationEvents
                     )
                     Tab.CONTINUE_TO_TRIAGE -> ContinueToTriageDecisionScreen()
-                    Tab.VITAL_SIGNS -> VitalSignsScreen()
+                    Tab.VITAL_SIGNS -> VitalSignsScreen(
+                        state = state.vitalSignsState,
+                        onEvent = registrationScreenViewModel::onVitalSignsEvent,
+                        getPrecisionFor = registrationScreenViewModel::getPrecisionFor
+                    )
                     Tab.RED_CODE -> RedCodeScreen(
                         state = state.triageState,
                         onEvent = registrationScreenViewModel::onTriageEvent,
