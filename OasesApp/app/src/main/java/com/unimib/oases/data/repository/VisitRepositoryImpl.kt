@@ -36,7 +36,6 @@ class VisitRepositoryImpl @Inject constructor(
     }
 
     override fun getVisits(patientId: String): Flow<Resource<List<Visit>>> = flow {
-
         try {
             emit(Resource.Loading())
             roomDataSource.getVisits(patientId).collect {

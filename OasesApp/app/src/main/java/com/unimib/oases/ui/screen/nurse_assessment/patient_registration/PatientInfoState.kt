@@ -23,5 +23,5 @@ data class PatientInfoState(
     val sexError: String?= null,
     val isEdited: Boolean = false,
     val isNew: Boolean = true,
-    val error: String?= null,
+    val error: String?= null
 )

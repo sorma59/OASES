@@ -25,6 +25,7 @@ data class TriageState(
     val isLoading: Boolean = false,
     val error: String? = null,
     val toastMessage: String? = null,
+    val loaded: Boolean = true
 ) {
     companion object {
         // Common

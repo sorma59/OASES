@@ -37,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.unimib.oases.ui.components.input.LabeledCheckbox
 import com.unimib.oases.ui.components.util.FadeOverlay
+import com.unimib.oases.ui.components.util.RetryButton
 import com.unimib.oases.ui.components.util.ShowMoreArrow
 import com.unimib.oases.ui.util.ToastUtils
 import kotlinx.coroutines.launch
@@ -104,54 +105,64 @@ fun RedCodeScreen(
                 fontWeight = FontWeight.Bold
             )
         }
-        Box {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .verticalScroll(scrollState)
-            ) {
-                state.triageConfig!!.redOptions.forEach {
-                    val id = it.id
-                    ConditionalAnimatedVisibility(
-                        applyWrapper = it.parent != null,
-                        visible = state.selectedReds.contains(it.parent?.id),
-                        content = {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = if (it.isParent) Modifier.onGloballyPositioned { coordinates ->
-                                    // This gives the Y position of the top of this Row
-                                    // relative to the content area of the scrollable Column
-                                    pregnancyRowScrollTargetY = coordinates.positionInParent().y
-                                } else Modifier
-                            ) {
-                                LabeledCheckbox(
-                                    label = it.label,
-                                    checked = state.selectedReds.contains(it.id),
-                                    onCheckedChange = { boolean: Boolean ->
-                                        if (it.isParent)
-                                            handlePregnancyChangeAndScroll(boolean)
-                                        else
-                                            onEvent(TriageEvent.FieldToggled(id))
-                                    },
-                                    modifier = if (it.parent != null) Modifier.padding(start = 16.dp) else Modifier
-                                )
 
-                                if (it.isParent) {
-                                    ShowMoreArrow(
-                                        expanded = state.selectedReds.contains(it.id),
-                                        onClick = {
-                                            handlePregnancyChangeAndScroll(it)
-                                        }
+        if (state.error != null){
+            RetryButton(
+                error = state.error,
+                onClick = { onEvent(TriageEvent.Retry) }
+            )
+        }
+
+        else {
+            Box {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(scrollState)
+                ) {
+                    state.triageConfig!!.redOptions.forEach {
+                        val id = it.id
+                        ConditionalAnimatedVisibility(
+                            applyWrapper = it.parent != null,
+                            visible = state.selectedReds.contains(it.parent?.id),
+                            content = {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = if (it.isParent) Modifier.onGloballyPositioned { coordinates ->
+                                        // This gives the Y position of the top of this Row
+                                        // relative to the content area of the scrollable Column
+                                        pregnancyRowScrollTargetY = coordinates.positionInParent().y
+                                    } else Modifier
+                                ) {
+                                    LabeledCheckbox(
+                                        label = it.label,
+                                        checked = state.selectedReds.contains(it.id),
+                                        onCheckedChange = { boolean: Boolean ->
+                                            if (it.isParent)
+                                                handlePregnancyChangeAndScroll(boolean)
+                                            else
+                                                onEvent(TriageEvent.FieldToggled(id))
+                                        },
+                                        modifier = if (it.parent != null) Modifier.padding(start = 16.dp) else Modifier
                                     )
+
+                                    if (it.isParent) {
+                                        ShowMoreArrow(
+                                            expanded = state.selectedReds.contains(it.id),
+                                            onClick = {
+                                                handlePregnancyChangeAndScroll(it)
+                                            }
+                                        )
+                                    }
                                 }
                             }
-                        }
-                    )
+                        )
+                    }
+                    Spacer(Modifier.height(48.dp))
                 }
-                Spacer(Modifier.height(48.dp))
+                FadeOverlay(Modifier.align(Alignment.BottomCenter))
             }
-            FadeOverlay(Modifier.align(Alignment.BottomCenter))
         }
     }
 }

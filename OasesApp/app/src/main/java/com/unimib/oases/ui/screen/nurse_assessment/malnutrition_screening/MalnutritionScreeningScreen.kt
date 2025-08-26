@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.unimib.oases.domain.model.MuacCategory
 import com.unimib.oases.ui.components.util.AnimatedLabelOutlinedTextField
+import com.unimib.oases.ui.components.util.RetryButton
 import java.util.Locale
 
 @Composable
@@ -24,47 +25,55 @@ fun MalnutritionScreeningScreen(
     state: MalnutritionScreeningState,
     onEvent: (MalnutritionScreeningEvent) -> Unit
 ){
-
-    Column{
-        Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxSize()
-                .weight(1f)
-                .padding(16.dp)
-        ) {
-            AnimatedLabelOutlinedTextField(
-                value = state.weight,
-                onValueChange = { onEvent(MalnutritionScreeningEvent.WeightChanged(it)) },
-                labelText = "Weight (kg)",
-                isDouble = true
-
-            )
-
-            AnimatedLabelOutlinedTextField(
-                value = state.height,
-                onValueChange = { onEvent(MalnutritionScreeningEvent.HeightChanged(it)) },
-                labelText = "Height (cm)",
-                isDouble = true
-            )
-
-            Text(
-                "BMI: " + (state.bmi?.let { String.format(Locale.getDefault(), "%.1f", it) } ?: "")
-            )
-
-            AnimatedLabelOutlinedTextField(
-                value = state.muacState.value,
-                onValueChange = { onEvent(MalnutritionScreeningEvent.MuacChanged(it)) },
-                labelText = "MUAC (cm)",
-                isDouble = true,
-                trailingIcon = {
-                    MuacColorIndicator(muacCategory = state.muacState.category)
-                }
-            )
-        }
+    if (state.error != null){
+        RetryButton(
+            error = state.error,
+            onClick = { onEvent(MalnutritionScreeningEvent.Retry) }
+        )
     }
 
+    else {
+        Column {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .weight(1f)
+                    .padding(16.dp)
+            ) {
+                AnimatedLabelOutlinedTextField(
+                    value = state.weight,
+                    onValueChange = { onEvent(MalnutritionScreeningEvent.WeightChanged(it)) },
+                    labelText = "Weight (kg)",
+                    isDouble = true
+
+                )
+
+                AnimatedLabelOutlinedTextField(
+                    value = state.height,
+                    onValueChange = { onEvent(MalnutritionScreeningEvent.HeightChanged(it)) },
+                    labelText = "Height (cm)",
+                    isDouble = true
+                )
+
+                Text(
+                    "BMI: " + (state.bmi?.let { String.format(Locale.getDefault(), "%.1f", it) }
+                        ?: "")
+                )
+
+                AnimatedLabelOutlinedTextField(
+                    value = state.muacState.value,
+                    onValueChange = { onEvent(MalnutritionScreeningEvent.MuacChanged(it)) },
+                    labelText = "MUAC (cm)",
+                    isDouble = true,
+                    trailingIcon = {
+                        MuacColorIndicator(muacCategory = state.muacState.category)
+                    }
+                )
+            }
+        }
+    }
 }
 
 @Composable

@@ -124,6 +124,10 @@ class PatientInfoHandler @Inject constructor(
             PatientInfoEvent.ConfirmSubmission -> {
                 state to PatientInfoEffect.SavePatientData
             }
+
+            PatientInfoEvent.Retry -> {
+                state.copy(isLoading = true) to PatientInfoEffect.Retry
+            }
         }
     }
 

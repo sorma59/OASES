@@ -21,13 +21,13 @@ class MalnutritionScreeningRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getMalnutritionScreening(visitId: String): Resource<MalnutritionScreening> {
+    override fun getMalnutritionScreening(visitId: String): Resource<MalnutritionScreening?> {
         return try {
             val entity = roomDataSource.getMalnutritionScreening(visitId)
             if (entity != null) {
                 Resource.Success(entity.toDomain())
             } else {
-                Resource.Error("Malnutrition screening not found")
+                Resource.Success(null)
             }
         } catch (e: Exception) {
             Resource.Error(e.message ?: "An error occurred")

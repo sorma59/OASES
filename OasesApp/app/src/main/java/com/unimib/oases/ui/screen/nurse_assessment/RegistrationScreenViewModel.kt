@@ -124,6 +124,8 @@ class RegistrationScreenViewModel @Inject constructor(
     private val validationEventsChannel = Channel<ValidationEvent>()
     val validationEvents = validationEventsChannel.receiveAsFlow()
 
+    private val retrievedPatientId = savedStateHandle.get<String>("patientId")
+
     private var errorHandler = CoroutineExceptionHandler { _, e ->
         e.printStackTrace()
         _state.update{
@@ -149,16 +151,21 @@ class RegistrationScreenViewModel @Inject constructor(
     // --------------Demographics-----------------------
 
     init {
-        savedStateHandle.get<String>("patientId")?.let { id ->
-            if(id.isNotBlank()) {
+        refreshPatientInfo()
+    }
+
+    private fun refreshPatientInfo() {
+        retrievedPatientId?.let { id ->
+            if (id.isNotBlank()) {
                 viewModelScope.launch(ioDispatcher + errorHandler) {
                     patientUseCase.getPatient(id).also { result ->
                         result.collect { resource ->
-                            when(resource){
+                            when (resource) {
                                 is Resource.Loading -> {
                                     updatePatientInfoState {
                                         it.copy(
-                                            isLoading = true
+                                            isLoading = true,
+                                            error = null
                                         )
                                     }
                                 }
@@ -169,7 +176,8 @@ class RegistrationScreenViewModel @Inject constructor(
                                         it.copy(
                                             patient = patient,
                                             isNew = false,
-                                            isLoading = false
+                                            isLoading = false,
+                                            error = null
                                         )
                                     }
                                 }
@@ -177,8 +185,8 @@ class RegistrationScreenViewModel @Inject constructor(
                                 is Resource.Error -> {
                                     updatePatientInfoState {
                                         it.copy(
-                                                error = resource.message,
-                                                isLoading = false
+                                            error = resource.message,
+                                            isLoading = false
                                         )
                                     }
                                 }
@@ -191,8 +199,8 @@ class RegistrationScreenViewModel @Inject constructor(
             } else {
                 updatePatientInfoState {
                     it.copy(
-                            isLoading = false,
-                            isNew = true
+                        isLoading = false,
+                        isNew = true
                     )
                 }
             }
@@ -228,6 +236,9 @@ class RegistrationScreenViewModel @Inject constructor(
                 newBirthDate?.let{
                     onPatientInfoEvent(PatientInfoEvent.BirthDateComputed(it))
                 }
+            }
+            PatientInfoEffect.Retry -> {
+                refreshPatientInfo()
             }
         }
     }
@@ -395,6 +406,10 @@ class RegistrationScreenViewModel @Inject constructor(
                     it.copy(toastMessage = null)
                 }
             }
+
+            is TriageEvent.Retry -> {
+                refreshTriage(state.value.currentVisit!!.id)
+            }
         }
     }
 
@@ -412,11 +427,16 @@ class RegistrationScreenViewModel @Inject constructor(
             updateTriageState {
                 it.copy(
                     selectedReds = triageEvaluationResource.data!!.redSymptomIds.toSet(),
-                    selectedYellows = triageEvaluationResource.data!!.yellowSymptomIds.toSet()
+                    selectedYellows = triageEvaluationResource.data!!.yellowSymptomIds.toSet(),
                 )
             }
         else
-            updateTriageState { it.copy(error = triageEvaluationResource.message) }
+            updateTriageState {
+                it.copy(
+                    error = triageEvaluationResource.message,
+                    loaded = false
+                )
+            }
     }
 
     // --------------Visit History------------------
@@ -440,7 +460,10 @@ class RegistrationScreenViewModel @Inject constructor(
     private suspend fun loadVisits(patientId: String) {
 
         patientUseCase.getPatientVisits(patientId).collect { visits ->
-            updateVisitHistoryState { it.copy(visits = visits.data ?: emptyList(), isLoading = false) }
+            if (visits is Resource.Success)
+                updateVisitHistoryState { it.copy(visits = visits.data ?: emptyList(), isLoading = false) }
+            else if (visits is Resource.Error)
+                updateVisitHistoryState { it.copy(error = visits.message, isLoading = false) }
         }
 
     }
@@ -551,14 +574,13 @@ class RegistrationScreenViewModel @Inject constructor(
                 .debounce(400L)
                 .collect { state ->
                     val bmi = state.malnutritionScreeningState.toBmiOrNull()
-                    val muacCategory = state.malnutritionScreeningState.toMuacCategoryOrNull()
-                    _state.update { current ->
-                        current.copy(
-                            malnutritionScreeningState = current.malnutritionScreeningState.copy(
-                                bmi = bmi,
-                                muacState = current.malnutritionScreeningState.muacState.copy(
-                                    category = muacCategory
-                                )
+                    val muacCategory =
+                        state.malnutritionScreeningState.toMuacCategoryOrNull()
+                    updateMalnutritionScreeningState {
+                        it.copy(
+                            bmi = bmi,
+                            muacState = it.muacState.copy(
+                                category = muacCategory
                             )
                         )
                     }
@@ -583,6 +605,9 @@ class RegistrationScreenViewModel @Inject constructor(
                     )
                 }
             }
+            MalnutritionScreeningEvent.Retry -> {
+                refreshMalnutritionScreening(state.value.currentVisit!!.id)
+            }
         }
     }
 
@@ -591,23 +616,28 @@ class RegistrationScreenViewModel @Inject constructor(
         viewModelScope.launch(ioDispatcher + errorHandler) {
             loadMalnutritionScreening(visitId)
         }
-
     }
 
     private fun loadMalnutritionScreening(visitId: String) {
         val malnutritionScreeningResource = malnutritionScreeningRepository.getMalnutritionScreening(visitId)
         if (malnutritionScreeningResource is Resource.Success){
-            updateMalnutritionScreeningState {
-                it.copy(
-                    weight = malnutritionScreeningResource.data!!.weight.toString(),
-                    height = malnutritionScreeningResource.data!!.height.toString(),
-                    muacState = it.muacState.copy(
-                        value = malnutritionScreeningResource.data!!.muac.value.toString()
+            malnutritionScreeningResource.data?.let{
+                updateMalnutritionScreeningState {
+                    it.copy(
+                        weight = malnutritionScreeningResource.data!!.weight.toString(),
+                        height = malnutritionScreeningResource.data!!.height.toString(),
+                        muacState = it.muacState.copy(
+                            value = malnutritionScreeningResource.data!!.muac.value.toString()
+                        )
                     )
-                )
+                }
             }
         } else{
-            updateMalnutritionScreeningState { it.copy(error = malnutritionScreeningResource.message) }
+            updateMalnutritionScreeningState {
+                it.copy(
+                    error = malnutritionScreeningResource.message,
+                )
+            }
         }
     }
 
@@ -686,17 +716,22 @@ class RegistrationScreenViewModel @Inject constructor(
         applicationScope.launch(ioDispatcher + errorHandler) {
             val patient = _state.value.patientInfoState.patient
             val currentVisit = _state.value.currentVisit
-            val triageCode = _state.value.triageState.triageCode
+            val triageCode =
+                if (_state.value.triageState.loaded)
+                    _state.value.triageState.triageCode
+                else
+                    null
 
             val patientDiseases = _state.value.pastHistoryState.toPatientDiseases(patient.id)
 
-            val visit = currentVisit?.copy(triageCode = triageCode)
-                ?: Visit(
-                    patientId = patient.id,
-                    triageCode = triageCode,
-                    date = LocalDate.now(),
-                    description = ""
-                )
+            val visit =
+                currentVisit?.copy(triageCode = triageCode ?: currentVisit.triageCode)
+                    ?: Visit(
+                        patientId = patient.id,
+                        triageCode = triageCode!!,
+                        date = LocalDate.now(),
+                        description = ""
+                    )
             visitUseCase.addVisit(visit)
 
             val vitalSigns = _state.value.vitalSignsState.toVisitVitalSigns(visit.id)
@@ -711,7 +746,8 @@ class RegistrationScreenViewModel @Inject constructor(
 
             patientUseCase.updateStatus(patient, PatientStatus.WAITING_FOR_VISIT.displayValue)
 
-            triageEvaluationRepository.insertTriageEvaluation(_state.value.triageState.mapToTriageEvaluation(visit.id))
+            if (state.value.triageState.loaded)
+                triageEvaluationRepository.insertTriageEvaluation(_state.value.triageState.mapToTriageEvaluation(visit.id))
 
             val screening = _state.value.malnutritionScreeningState.toMalnutritionScreeningOrNull(visit.id)
             if (screening != null) {

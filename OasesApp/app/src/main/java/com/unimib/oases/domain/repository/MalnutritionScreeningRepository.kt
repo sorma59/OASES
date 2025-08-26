@@ -7,6 +7,6 @@ interface MalnutritionScreeningRepository {
 
     suspend fun insertMalnutritionScreening(malnutritionScreening: MalnutritionScreening): Resource<Unit>
 
-    fun getMalnutritionScreening(visitId: String): Resource<MalnutritionScreening>
+    fun getMalnutritionScreening(visitId: String): Resource<MalnutritionScreening?>
 
 }

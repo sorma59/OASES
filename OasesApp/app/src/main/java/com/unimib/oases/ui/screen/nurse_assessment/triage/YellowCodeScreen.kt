@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.unimib.oases.ui.components.input.LabeledCheckbox
 import com.unimib.oases.ui.components.util.FadeOverlay
+import com.unimib.oases.ui.components.util.RetryButton
 import com.unimib.oases.ui.util.ToastUtils
 
 @Composable
@@ -71,27 +72,37 @@ fun YellowCodeScreen(
                 fontWeight = FontWeight.Bold
             )
         }
-        Box{
-            Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .verticalScroll(scrollState)
-            ) {
 
-                state.triageConfig!!.yellowOptions.forEach {
-                    val id = it.id
-                    LabeledCheckbox(
-                        label = it.label,
-                        checked = state.selectedYellows.contains(it.id),
-                        onCheckedChange = { onEvent(TriageEvent.FieldToggled(id)) }
-                    )
+        if (state.error != null){
+            RetryButton(
+                error = state.error,
+                onClick = { onEvent(TriageEvent.Retry) }
+            )
+        }
+
+        else {
+            Box{
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(scrollState)
+                ) {
+
+                    state.triageConfig!!.yellowOptions.forEach {
+                        val id = it.id
+                        LabeledCheckbox(
+                            label = it.label,
+                            checked = state.selectedYellows.contains(it.id),
+                            onCheckedChange = { onEvent(TriageEvent.FieldToggled(id)) }
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(48.dp))
                 }
 
-                Spacer(modifier = Modifier.height(48.dp))
+                FadeOverlay(Modifier.align(Alignment.BottomCenter))
             }
-
-            FadeOverlay(Modifier.align(Alignment.BottomCenter))
         }
     }
 }

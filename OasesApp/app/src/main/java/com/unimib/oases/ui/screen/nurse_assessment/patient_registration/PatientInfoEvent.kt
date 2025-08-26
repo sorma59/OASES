@@ -15,6 +15,7 @@ sealed class PatientInfoEvent {
     data class NextOfKinChanged(val nextOfKin: String): PatientInfoEvent()
     data class ContactChanged(val contact: String): PatientInfoEvent()
 
+    data object Retry : PatientInfoEvent()
     data object NextButtonPressed : PatientInfoEvent()
     data object ConfirmSubmission : PatientInfoEvent()
 }
