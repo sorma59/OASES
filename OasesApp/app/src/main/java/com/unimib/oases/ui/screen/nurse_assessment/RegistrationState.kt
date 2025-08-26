@@ -19,7 +19,17 @@ data class RegistrationState (
     val currentStep: Int = 0,
     val error : String? = null,
 ){
-    val tabs = Tab.entries.toTypedArray()
+    val tabs = arrayOf(
+        Tab.DEMOGRAPHICS,
+        Tab.CONTINUE_TO_TRIAGE,
+        Tab.VITAL_SIGNS,
+        Tab.RED_CODE,
+        Tab.YELLOW_CODE,
+        Tab.HISTORY,
+        Tab.PAST_MEDICAL_HISTORY,
+        Tab.MALNUTRITION_SCREENING,
+        Tab.SUBMIT_ALL
+    )
 
     val currentTab: Tab
         get() = tabs[currentStep]
