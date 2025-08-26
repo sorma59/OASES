@@ -4,6 +4,6 @@ sealed class TriageEvent {
 
     data class FieldToggled(val fieldId: String) : TriageEvent()
 
-    object Retry: TriageEvent()
-    object ToastShown: TriageEvent()
+    data object Retry: TriageEvent()
+    data object ToastShown: TriageEvent()
 }

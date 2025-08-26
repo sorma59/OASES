@@ -6,7 +6,7 @@ sealed class PastHistoryEvent {
     data class AdditionalInfoChanged(val disease: String, val additionalInfo: String): PastHistoryEvent()
     data class DateChanged(val disease: String, val date: String): PastHistoryEvent()
 
-    object NurseClicked: PastHistoryEvent()
-    object ToastShown: PastHistoryEvent()
-    object Retry: PastHistoryEvent()
+    data object NurseClicked: PastHistoryEvent()
+    data object ToastShown: PastHistoryEvent()
+    data object Retry: PastHistoryEvent()
 }
