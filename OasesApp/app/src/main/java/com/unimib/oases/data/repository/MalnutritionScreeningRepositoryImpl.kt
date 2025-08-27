@@ -24,11 +24,9 @@ class MalnutritionScreeningRepositoryImpl @Inject constructor(
     override fun getMalnutritionScreening(visitId: String): Resource<MalnutritionScreening?> {
         return try {
             val entity = roomDataSource.getMalnutritionScreening(visitId)
-            if (entity != null) {
-                Resource.Success(entity.toDomain())
-            } else {
-                Resource.Success(null)
-            }
+            Resource.Success(entity?.toDomain())
+            // if entity is null then null is returned in Resource Success
+            // the reason is a visit can have no screening
         } catch (e: Exception) {
             Resource.Error(e.message ?: "An error occurred")
         }
