@@ -26,7 +26,7 @@ import com.unimib.oases.ui.components.form.DateSelector
 import com.unimib.oases.ui.components.util.AnimatedLabelOutlinedTextField
 import com.unimib.oases.ui.components.util.FadeOverlay
 import com.unimib.oases.ui.components.util.OutlinedDropdown
-import com.unimib.oases.ui.components.util.RetryButton
+import com.unimib.oases.ui.components.util.button.RetryButton
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreenViewModel.ValidationEvent
 import kotlinx.coroutines.flow.Flow

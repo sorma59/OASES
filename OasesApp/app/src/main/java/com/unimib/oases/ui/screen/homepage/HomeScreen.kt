@@ -71,9 +71,9 @@ import com.unimib.oases.ui.components.patients.PatientList
 import com.unimib.oases.ui.components.patients.RecentlyReceivedPatientList
 import com.unimib.oases.ui.components.search.SearchBar
 import com.unimib.oases.ui.components.util.BluetoothPermissionHandler
-import com.unimib.oases.ui.components.util.DeleteButton
-import com.unimib.oases.ui.components.util.DismissButton
 import com.unimib.oases.ui.components.util.NoPermissionMessage
+import com.unimib.oases.ui.components.util.button.DeleteButton
+import com.unimib.oases.ui.components.util.button.DismissButton
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 import com.unimib.oases.ui.navigation.Screen
 import com.unimib.oases.ui.screen.login.AuthState

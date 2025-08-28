@@ -50,9 +50,9 @@ import androidx.navigation.NavController
 import com.unimib.oases.domain.model.AgeSpecificity
 import com.unimib.oases.domain.model.Disease
 import com.unimib.oases.domain.model.SexSpecificity
-import com.unimib.oases.ui.components.util.DeleteButton
-import com.unimib.oases.ui.components.util.DismissButton
 import com.unimib.oases.ui.components.util.OutlinedDropdown
+import com.unimib.oases.ui.components.util.button.DeleteButton
+import com.unimib.oases.ui.components.util.button.DismissButton
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 import com.unimib.oases.ui.navigation.Screen
 import kotlinx.coroutines.launch

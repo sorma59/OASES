@@ -17,7 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.unimib.oases.domain.model.MuacCategory
 import com.unimib.oases.ui.components.util.AnimatedLabelOutlinedTextField
-import com.unimib.oases.ui.components.util.RetryButton
+import com.unimib.oases.ui.components.util.button.RetryButton
 import java.util.Locale
 
 @Composable

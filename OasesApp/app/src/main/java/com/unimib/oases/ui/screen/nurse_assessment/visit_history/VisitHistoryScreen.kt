@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import com.unimib.oases.domain.model.Visit
 import com.unimib.oases.ui.components.card.VisitCard
 import com.unimib.oases.ui.components.util.CenteredTextInBox
-import com.unimib.oases.ui.components.util.RetryButton
+import com.unimib.oases.ui.components.util.button.RetryButton
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 
 @Composable

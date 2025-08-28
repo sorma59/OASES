@@ -39,7 +39,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.unimib.oases.data.local.model.Role
-import com.unimib.oases.ui.components.util.BottomButtons
+import com.unimib.oases.ui.components.util.button.BottomButtons
 import com.unimib.oases.ui.navigation.Screen
 import com.unimib.oases.ui.screen.login.AuthViewModel
 import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreenViewModel.NavigationEvent

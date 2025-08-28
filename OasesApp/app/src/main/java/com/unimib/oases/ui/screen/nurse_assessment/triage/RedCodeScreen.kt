@@ -37,8 +37,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.unimib.oases.ui.components.input.LabeledCheckbox
 import com.unimib.oases.ui.components.util.FadeOverlay
-import com.unimib.oases.ui.components.util.RetryButton
 import com.unimib.oases.ui.components.util.ShowMoreArrow
+import com.unimib.oases.ui.components.util.button.RetryButton
 import com.unimib.oases.ui.util.ToastUtils
 import kotlinx.coroutines.launch
 

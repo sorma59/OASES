@@ -28,8 +28,8 @@ import androidx.navigation.NavController
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.ui.components.bluetooth.devices.DeviceList
 import com.unimib.oases.ui.components.patients.PatientItem
-import com.unimib.oases.ui.components.util.BottomButtons
 import com.unimib.oases.ui.components.util.TitleText
+import com.unimib.oases.ui.components.util.button.BottomButtons
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 import com.unimib.oases.ui.navigation.Screen
 import com.unimib.oases.util.Resource

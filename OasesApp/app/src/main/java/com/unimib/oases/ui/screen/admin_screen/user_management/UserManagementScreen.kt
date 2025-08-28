@@ -56,8 +56,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.unimib.oases.data.local.model.Role
 import com.unimib.oases.data.local.model.User
-import com.unimib.oases.ui.components.util.DeleteButton
-import com.unimib.oases.ui.components.util.DismissButton
+import com.unimib.oases.ui.components.util.button.DeleteButton
+import com.unimib.oases.ui.components.util.button.DismissButton
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 import com.unimib.oases.ui.navigation.Screen
 import com.unimib.oases.ui.util.ToastUtils

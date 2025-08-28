@@ -12,10 +12,7 @@ import androidx.compose.ui.unit.sp
 import com.unimib.oases.ui.components.util.CenteredText
 
 @Composable
-fun SubmissionScreen(
-//    onSubmit: () -> Unit,
-//    onBack: () -> Unit
-){
+fun SubmissionScreen(){
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
@@ -32,25 +29,6 @@ fun SubmissionScreen(
             "Do you want to submit everything?",
             fontSize = 20.sp
         )
-
-//        Spacer(modifier = Modifier.height(64.dp))
-//
-//        Row(
-//            horizontalArrangement = Arrangement.SpaceEvenly,
-//            verticalAlignment = Alignment.CenterVertically,
-//            modifier = Modifier.fillMaxWidth()
-//        ){
-//            OutlinedButton(
-//                onClick = onBack
-//            ){
-//                Text("Back")
-//            }
-//            Button(
-//                onClick = onSubmit
-//            ){
-//                Text("Submit")
-//            }
-//        }
 
     }
 }

@@ -18,6 +18,7 @@ import com.unimib.oases.ui.screen.admin_screen.user_management.UserManagementScr
 import com.unimib.oases.ui.screen.admin_screen.vital_signs_management.VitalSignManagementScreen
 import com.unimib.oases.ui.screen.bluetooth.pairing.PairNewDeviceScreen
 import com.unimib.oases.ui.screen.bluetooth.sending.SendPatientViaBluetoothScreen
+import com.unimib.oases.ui.screen.dashboard.PatientDashboardScreen
 import com.unimib.oases.ui.screen.homepage.HomeScreen
 import com.unimib.oases.ui.screen.login.AuthViewModel
 import com.unimib.oases.ui.screen.login.LoginScreen
@@ -32,6 +33,9 @@ fun AppNavigation(
 ){
 
     val authViewModel: AuthViewModel = hiltViewModel()
+
+    val getPatient =
+        { navController.previousBackStackEntry?.savedStateHandle?.get<Patient>("patient") }
 
     NavHost(
         navController = navController,
@@ -138,12 +142,9 @@ fun AppNavigation(
 
         composable(Screen.SendPatient.route){
             // Get the patient from SavedStateHandle
-            val patient = navController
-                .previousBackStackEntry
-                ?.savedStateHandle
-                ?.get<Patient>("patient")
+            val patient = getPatient()
 
-            if (patient != null) {
+            patient?.let {
                 SendPatientViaBluetoothScreen(
                     patient = patient,
                     navController = navController,
@@ -157,7 +158,21 @@ fun AppNavigation(
         }
 
         composable(Screen.MedicalVisitScreen.route) {
-            MedicalVisitScreen(navController, authViewModel, padding)
+            // Get the patient from SavedStateHandle
+            val patient = getPatient()
+
+            patient?.let{
+                MedicalVisitScreen(navController, authViewModel, padding, patient)
+            }
+        }
+
+        composable(Screen.PatientDashboardScreen.route) {
+            // Get the patient from SavedStateHandle
+            val patient = getPatient()
+
+            patient?.let{
+                PatientDashboardScreen(navController, authViewModel, padding, patient)
+            }
         }
     }
 }

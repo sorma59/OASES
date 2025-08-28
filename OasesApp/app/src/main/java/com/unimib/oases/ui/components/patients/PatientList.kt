@@ -25,9 +25,9 @@ import androidx.navigation.NavController
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.ui.components.card.PatientCard
 import com.unimib.oases.ui.components.card.PatientUi
-import com.unimib.oases.ui.components.util.ActionIcon
 import com.unimib.oases.ui.components.util.CenteredText
 import com.unimib.oases.ui.components.util.SmallGrayText
+import com.unimib.oases.ui.components.util.button.ActionIcon
 import com.unimib.oases.ui.navigation.Screen
 
 @Composable
@@ -108,8 +108,10 @@ fun PatientList(
                                     modifier = Modifier.fillMaxHeight()
                                 )
                             },
-                            onCardClick = {
-                                navController.navigate(Screen.RegistrationScreen.route + "?patientId=${patient.item.id}")
+                            onCardClick = { patient ->
+                                navController.currentBackStackEntry?.savedStateHandle?.set("patient", patient)
+                                navController.navigate(Screen.PatientDashboardScreen.route)
+//                                navController.navigate(Screen.RegistrationScreen.route + "?patientId=${patient.id}")
                             },
                         )
                     }

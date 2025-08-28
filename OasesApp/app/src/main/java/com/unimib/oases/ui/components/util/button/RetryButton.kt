@@ -1,4 +1,4 @@
-package com.unimib.oases.ui.components.util
+package com.unimib.oases.ui.components.util.button
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
