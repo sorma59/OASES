@@ -49,7 +49,7 @@ fun PatientItem(
         else if (patient == null)
             CenteredTextInBox(
                 text = errorText,
-                color = MaterialTheme.colorScheme.error
+                color = MaterialTheme.colorScheme.errorContainer
             )
 
         else{

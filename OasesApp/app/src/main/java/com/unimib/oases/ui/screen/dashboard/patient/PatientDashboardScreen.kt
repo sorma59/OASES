@@ -88,7 +88,7 @@ fun PatientDashboardScreen(
 
                     IconButton(
                         onClick = {
-                            navController.navigate(button.route + "?patientId=${state.receivedId}")
+                            navController.navigate(button.route + state.receivedId)
                         },
                         colors = IconButtonDefaults.iconButtonColors(
                             containerColor = button.buttonColor(),
@@ -114,9 +114,9 @@ enum class PatientDashboardButton(
     val contentDescription: String,
     val route: String
 ){
-    VIEW("View", Icons.Default.PersonSearch, "View patient data", Screen.RegistrationScreen.route),
-    EDIT("Edit", Icons.Default.Edit, "Edit patient data", Screen.RegistrationScreen.route),
-    SEND("Send", Icons.AutoMirrored.Filled.Send, "Send patient data", Screen.SendPatient.route),
+    VIEW("View", Icons.Default.PersonSearch, "View patient data", Screen.RegistrationScreen.route + "?patientId="),
+    EDIT("Edit", Icons.Default.Edit, "Edit patient data", Screen.RegistrationScreen.route + "?patientId="),
+    SEND("Send", Icons.AutoMirrored.Filled.Send, "Send patient data", Screen.SendPatient.route + "/patientId="),
     START_VISIT("Start visit", Icons.Default.MedicalServices , "Start a new visit", Screen.MedicalVisitScreen.route),
     DELETE("Delete", Icons.Default.Delete, "Delete patient data", Screen.HomeScreen.route);
 

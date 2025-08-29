@@ -100,7 +100,7 @@ fun PatientList(
                                 )
                                 ActionIcon(
                                     onClick = {
-                                        navController.navigate(Screen.SendPatient.route + "?patientId=${patient.item.id}")
+                                        navController.navigate(Screen.SendPatient.route + "/patientId=${patient.item.id}")
                                     },
                                     backgroundColor = Color.Gray,
                                     icon = Icons.Default.Bluetooth,
@@ -108,7 +108,7 @@ fun PatientList(
                                 )
                             },
                             onCardClick = { patientId ->
-                                navController.navigate(Screen.PatientDashboardScreen.route + "?patientId=$patientId")
+                                navController.navigate(Screen.PatientDashboardScreen.route + "/patientId=$patientId")
 //                                navController.navigate(Screen.RegistrationScreen.route + "?patientId=${patient.id}")
                             },
                         )

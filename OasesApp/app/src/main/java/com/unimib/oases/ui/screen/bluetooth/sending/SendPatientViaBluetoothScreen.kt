@@ -22,22 +22,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.ui.components.bluetooth.devices.DeviceList
 import com.unimib.oases.ui.components.patients.PatientItem
 import com.unimib.oases.ui.components.util.TitleText
 import com.unimib.oases.ui.components.util.button.BottomButtons
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 import com.unimib.oases.ui.navigation.Screen
-import com.unimib.oases.util.Resource
+import com.unimib.oases.ui.util.ToastUtils
 
 
 @Composable
 fun SendPatientViaBluetoothScreen(
-    patient: Patient,
     navController: NavController,
     padding: PaddingValues
 ) {
@@ -47,30 +46,17 @@ fun SendPatientViaBluetoothScreen(
 
     val sendPatientViaBluetoothViewModel: SendPatientViaBluetoothViewModel = hiltViewModel()
 
-    val pairedDevices = sendPatientViaBluetoothViewModel.pairedDevices.collectAsState()
+    val state by sendPatientViaBluetoothViewModel.state.collectAsState()
 
-    val sendPatientResult = sendPatientViaBluetoothViewModel.sendPatientResult.collectAsState()
+    val context = LocalContext.current
 
-    // Define the function to show the result dialog
-    fun showResult(message: String) {
-        resultMessageToShow = message
-        showResultDialog = true
-    }
+    LaunchedEffect(state.toastMessage) {
 
-    LaunchedEffect(sendPatientResult.value) {
-        when (sendPatientResult.value) {
-            is Resource.Success -> {
-                showResult("Patient sent successfully, tap another device to send ${patient.name} again")
-                sendPatientViaBluetoothViewModel.onEvent(SendPatientViaBluetoothEvent.SendResultShown)
-            }
-            is Resource.Error -> {
-                showResult("Failed to send patient:\n ${(sendPatientResult.value as Resource.Error).message}")
-                sendPatientViaBluetoothViewModel.onEvent(SendPatientViaBluetoothEvent.SendResultShown)
-            }
-            else -> {
-                // Do nothing for Loading, None, or other states
-            }
+        state.toastMessage?.let{
+            ToastUtils.showToast(context, it)
+            sendPatientViaBluetoothViewModel.onEvent(SendPatientViaBluetoothEvent.OnToastShown)
         }
+
     }
 
     Column(
@@ -92,18 +78,15 @@ fun SendPatientViaBluetoothScreen(
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.height(100.dp)
-                ) {
-                    Text("Patient:")
-
-                    PatientItem(
-                        patient = patient,
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        onClick = { navController.popBackStack() }
-                    )
-                }
+                PatientItem(
+                    patient = state.patient,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    onClick = {
+                        sendPatientViaBluetoothViewModel.onEvent(SendPatientViaBluetoothEvent.PatientItemClicked)
+                    },
+                    errorText = "Couldn't load patient data, tap to retry \n${state.patientRetrievalState.error}",
+                    isLoading = state.patientRetrievalState.isLoading
+                )
 
                 Spacer(modifier = Modifier.height(32.dp))
 
@@ -115,11 +98,11 @@ fun SendPatientViaBluetoothScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     DeviceList(
-                        devices = pairedDevices.value,
+                        devices = state.pairedDevices,
                         devicesType = "Paired Devices",
-                        onClick = {
+                        onClick = { device ->
                             sendPatientViaBluetoothViewModel.onEvent(
-                                SendPatientViaBluetoothEvent.SendPatient(patient, it)
+                                SendPatientViaBluetoothEvent.SendPatient(device)
                             )
                         },
                     )
@@ -142,10 +125,12 @@ fun SendPatientViaBluetoothScreen(
             Box (
                 modifier = Modifier.weight(1f)
             ){
-                sendPatientViaBluetoothViewModel.sendPatientResult.collectAsState().value.let {
-                    when (it) {
-                        is Resource.Loading<*> -> CustomCircularProgressIndicator()
-                        else -> {}
+                if (state.patientSendingState.isLoading){
+                    CustomCircularProgressIndicator()
+                }
+                else {
+                    state.patientSendingState.result?.let{
+                        Text(it)
                     }
                 }
             }

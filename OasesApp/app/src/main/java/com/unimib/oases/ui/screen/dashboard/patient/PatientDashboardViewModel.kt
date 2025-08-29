@@ -10,6 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -18,28 +19,26 @@ import javax.inject.Inject
 @HiltViewModel
 class PatientDashboardViewModel @Inject constructor(
     private val patientRepository: PatientRepository,
-    private val savedStateHandle: SavedStateHandle,
+    savedStateHandle: SavedStateHandle,
     @IoDispatcher private val dispatcher: CoroutineDispatcher
 ): ViewModel(){
 
-    private val _state = MutableStateFlow(PatientDashboardState())
-    val state: StateFlow<PatientDashboardState> = _state
+    private val _state = MutableStateFlow(
+        PatientDashboardState(receivedId = savedStateHandle.get<String>("patientId")!!)
+    )
+    val state: StateFlow<PatientDashboardState> = _state.asStateFlow()
 
     init {
-        getPatientFromSSH()
+        getPatientData()
     }
 
-    private fun getPatientFromSSH() {
-        val patientId = savedStateHandle.get<String>("patientId")
-        _state.update { it.copy(receivedId = patientId) }
-        if (patientId == null)
-            return
+    private fun getPatientData() {
 
         viewModelScope.launch(dispatcher) {
             try {
                 _state.update { it.copy(isLoading = true, error = null) }
 
-                val resource = patientRepository.getPatientById(patientId).first {
+                val resource = patientRepository.getPatientById(_state.value.receivedId).first {
                     it is Resource.Success || it is Resource.Error
                 }
 
@@ -67,7 +66,7 @@ class PatientDashboardViewModel @Inject constructor(
             is PatientDashboardEvent.ActionButtonClicked -> {}
             PatientDashboardEvent.PatientItemClicked -> {
                 if (_state.value.patient == null)
-                    getPatientFromSSH()
+                    getPatientData()
             }
         }
 

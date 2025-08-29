@@ -3,7 +3,7 @@ package com.unimib.oases.ui.screen.dashboard.patient
 import com.unimib.oases.domain.model.Patient
 
 data class PatientDashboardState(
-    val receivedId: String? = null,
+    val receivedId: String,
     val patient: Patient? = null,
     val buttons: List<PatientDashboardButton> = PatientDashboardButton.entries.toList(),
     val isLoading: Boolean = false,

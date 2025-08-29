@@ -1,10 +1,11 @@
 package com.unimib.oases.ui.screen.bluetooth.sending
 
 import android.bluetooth.BluetoothDevice
-import com.unimib.oases.domain.model.Patient
 
 sealed class SendPatientViaBluetoothEvent {
-    data class SendPatient(val patient: Patient, val device: BluetoothDevice) : SendPatientViaBluetoothEvent()
+    data class SendPatient(val device: BluetoothDevice) : SendPatientViaBluetoothEvent()
 
-    object SendResultShown : SendPatientViaBluetoothEvent()
+    data object PatientItemClicked : SendPatientViaBluetoothEvent()
+    data object SendResultShown : SendPatientViaBluetoothEvent()
+    data object OnToastShown : SendPatientViaBluetoothEvent()
 }

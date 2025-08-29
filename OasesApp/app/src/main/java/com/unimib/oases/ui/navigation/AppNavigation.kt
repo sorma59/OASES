@@ -86,7 +86,18 @@ fun AppNavigation(
             HomeScreen(navController, padding, authViewModel, bluetoothCustomManager)
         }
 
-        composable(route = Screen.RegistrationScreen.route + "?patientId={patientId}",
+        composable(
+            route = Screen.RegistrationScreen.route + "?patientId={patientId}",
+            arguments =  listOf(
+                navArgument(
+                    name = "patientId"
+                )
+                {
+                    type = NavType.StringType
+                    defaultValue = null
+                    nullable = true
+                }
+            ),
             enterTransition = {
                 when (initialState.destination.route) {
                     Screen.HomeScreen.route ->
@@ -126,34 +137,24 @@ fun AppNavigation(
                         )
                     else -> null
                 }
-            },
-            arguments =  listOf(
-                navArgument(
-                    name = "patientId"
-                )
-                {
-                    type = NavType.StringType
-                    defaultValue = null
-                    nullable = true
-                }
-            )
+            }
         ) {
             RegistrationScreen(navController, padding, authViewModel)
         }
 
-        composable(Screen.SendPatient.route){
-            // Get the patient from SavedStateHandle
-            val patient = getPatient()
-
-            // TODO(Refactor this by using only patientId)
-
-            patient?.let {
-                SendPatientViaBluetoothScreen(
-                    patient = patient,
-                    navController = navController,
-                    padding = padding
-                )
-            }
+        composable(
+            route = Screen.SendPatient.route + "/patientId={patientId}",
+            arguments = listOf(
+                navArgument("patientId")
+                {
+                    type = NavType.StringType
+                }
+            )
+        ){
+            SendPatientViaBluetoothScreen(
+                navController = navController,
+                padding = padding
+            )
         }
 
         composable(Screen.PairDevice.route){
@@ -164,7 +165,15 @@ fun AppNavigation(
             MedicalVisitScreen(navController, authViewModel, padding)
         }
 
-        composable(Screen.PatientDashboardScreen.route + "?patientId={patientId}") {
+        composable(
+            route = Screen.PatientDashboardScreen.route + "/patientId={patientId}",
+            arguments =  listOf(
+                navArgument("patientId")
+                {
+                    type = NavType.StringType
+                }
+            )
+        ) {
             PatientDashboardScreen(navController, authViewModel, padding)
         }
     }
