@@ -8,7 +8,6 @@ import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -39,8 +38,6 @@ class PatientDashboardViewModel @Inject constructor(
         viewModelScope.launch(dispatcher) {
             try {
                 _state.update { it.copy(isLoading = true, error = null) }
-
-                delay(1500)
 
                 val resource = patientRepository.getPatientById(patientId).first {
                     it is Resource.Success || it is Resource.Error

@@ -156,52 +156,51 @@ class RegistrationScreenViewModel @Inject constructor(
 
     private fun refreshPatientInfo() {
         retrievedPatientId?.let { id ->
-            if (id.isNotBlank()) {
-                viewModelScope.launch(ioDispatcher + errorHandler) {
-                    patientUseCase.getPatient(id).also { result ->
-                        result.collect { resource ->
-                            when (resource) {
-                                is Resource.Loading -> {
-                                    updatePatientInfoState {
-                                        it.copy(
-                                            isLoading = true,
-                                            error = null
-                                        )
-                                    }
-                                }
+            viewModelScope.launch(ioDispatcher + errorHandler) {
 
-                                is Resource.Success -> {
-                                    val patient = resource.data!!
-                                    updatePatientInfoState {
-                                        it.copy(
-                                            patient = patient,
-                                            isNew = false,
-                                            isLoading = false,
-                                            error = null
-                                        )
-                                    }
-                                }
+                try {
+                    updatePatientInfoState {
+                        it.copy(
+                            isLoading = true,
+                            error = null
+                        )
+                    }
 
-                                is Resource.Error -> {
-                                    updatePatientInfoState {
-                                        it.copy(
-                                            error = resource.message,
-                                            isLoading = false
-                                        )
-                                    }
-                                }
+                    val resource = patientUseCase.getPatient(id).first {
+                        it is Resource.Success || it is Resource.Error
+                    }
 
-                                is Resource.None -> {}
+                    when (resource) {
+
+                        is Resource.Success -> {
+                            updatePatientInfoState {
+                                it.copy(
+                                    patient = resource.data!!,
+                                    isNew = false,
+                                    isLoading = false,
+                                    error = null
+                                )
                             }
                         }
+
+                        is Resource.Error -> {
+                            updatePatientInfoState {
+                                it.copy(
+                                    error = resource.message,
+                                    isLoading = false
+                                )
+                            }
+                        }
+
+                        else -> {} // Unreachable
                     }
-                }
-            } else {
-                updatePatientInfoState {
-                    it.copy(
-                        isLoading = false,
-                        isNew = true
-                    )
+                } catch (e: Exception) {
+                    updatePatientInfoState {
+                        it.copy(
+                            error = e.message,
+                            isLoading = false
+                        )
+                    }
                 }
             }
         }

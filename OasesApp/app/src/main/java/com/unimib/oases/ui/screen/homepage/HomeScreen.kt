@@ -419,7 +419,7 @@ fun HomeScreen(
                         }
 
                     }
-                    if (authViewModel.currentUser()?.role == Role.NURSE) {
+                    if (authViewModel.currentUser()?.role == Role.NURSE) { //TODO(Refactor this?)
                         FloatingActionButton(
                             onClick = { navController.navigate(Screen.RegistrationScreen.route) },
                             modifier = Modifier.padding(30.dp),

@@ -133,7 +133,8 @@ fun AppNavigation(
                 )
                 {
                     type = NavType.StringType
-                    defaultValue = ""
+                    defaultValue = null
+                    nullable = true
                 }
             )
         ) {

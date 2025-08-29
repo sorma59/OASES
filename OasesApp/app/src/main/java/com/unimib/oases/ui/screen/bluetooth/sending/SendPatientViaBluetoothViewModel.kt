@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SendPatientViaBluetoothViewModel @Inject constructor(
-    private val useCase: SendPatientViaBluetoothUseCase,
+    private val sendPatientViaBluetoothUseCase: SendPatientViaBluetoothUseCase,
     bluetoothCustomManager: BluetoothCustomManager
 ) : ViewModel(){
 
@@ -37,7 +37,7 @@ class SendPatientViaBluetoothViewModel @Inject constructor(
     private fun sendPatient(patient: Patient, device: BluetoothDevice) {
         viewModelScope.launch {
             _sendPatientResult.value = Resource.Loading()
-            _sendPatientResult.value = useCase(patient, device)
+            _sendPatientResult.value = sendPatientViaBluetoothUseCase(patient, device)
         }
     }
 
