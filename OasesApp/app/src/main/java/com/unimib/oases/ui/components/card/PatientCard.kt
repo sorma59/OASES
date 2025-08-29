@@ -53,7 +53,7 @@ fun PatientCard(
     onExpanded: () -> Unit = {},
     onCollapsed: () -> Unit = {},
     patient: Patient,
-    onCardClick: (Patient) -> Unit,
+    onCardClick: (String) -> Unit,
 ) {
     var contextMenuWidth by remember {
         mutableFloatStateOf(0f)
@@ -97,7 +97,7 @@ fun PatientCard(
             actions()
         }
         Card(
-            onClick = { onCardClick(patient) },
+            onClick = { onCardClick(patient.id) },
             shape = RoundedCornerShape(0.dp),
             modifier = Modifier
                 .fillMaxSize()

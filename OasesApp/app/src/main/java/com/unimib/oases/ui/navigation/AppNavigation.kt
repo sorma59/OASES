@@ -12,12 +12,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.unimib.oases.data.bluetooth.BluetoothCustomManager
 import com.unimib.oases.domain.model.Patient
+import com.unimib.oases.ui.screen.bluetooth.pairing.PairNewDeviceScreen
+import com.unimib.oases.ui.screen.bluetooth.sending.SendPatientViaBluetoothScreen
 import com.unimib.oases.ui.screen.dashboard.admin.AdminScreen
 import com.unimib.oases.ui.screen.dashboard.admin.disease.DiseaseManagementScreen
 import com.unimib.oases.ui.screen.dashboard.admin.user.UserManagementScreen
 import com.unimib.oases.ui.screen.dashboard.admin.vitalsigns.VitalSignManagementScreen
-import com.unimib.oases.ui.screen.bluetooth.pairing.PairNewDeviceScreen
-import com.unimib.oases.ui.screen.bluetooth.sending.SendPatientViaBluetoothScreen
 import com.unimib.oases.ui.screen.dashboard.patient.PatientDashboardScreen
 import com.unimib.oases.ui.screen.homepage.HomeScreen
 import com.unimib.oases.ui.screen.login.AuthViewModel
@@ -144,6 +144,8 @@ fun AppNavigation(
             // Get the patient from SavedStateHandle
             val patient = getPatient()
 
+            // TODO(Refactor this by using only patientId)
+
             patient?.let {
                 SendPatientViaBluetoothScreen(
                     patient = patient,
@@ -158,21 +160,11 @@ fun AppNavigation(
         }
 
         composable(Screen.MedicalVisitScreen.route) {
-            // Get the patient from SavedStateHandle
-            val patient = getPatient()
-
-            patient?.let{
-                MedicalVisitScreen(navController, authViewModel, padding, patient)
-            }
+            MedicalVisitScreen(navController, authViewModel, padding)
         }
 
-        composable(Screen.PatientDashboardScreen.route) {
-            // Get the patient from SavedStateHandle
-            val patient = getPatient()
-
-            patient?.let{
-                PatientDashboardScreen(navController, authViewModel, padding, patient)
-            }
+        composable(Screen.PatientDashboardScreen.route + "?patientId={patientId}") {
+            PatientDashboardScreen(navController, authViewModel, padding)
         }
     }
 }

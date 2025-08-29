@@ -22,6 +22,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -89,17 +91,15 @@ class PatientRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getPatientById(patientId: String): Flow<Resource<Patient?>> = flow {
-        emit(Resource.Loading())
-        try {
-            roomDataSource.getPatientById(patientId).collect {
-                emit(Resource.Success(it?.toDomain()))
+    override suspend fun getPatientById(patientId: String): Flow<Resource<Patient>> =
+        roomDataSource.getPatientById(patientId)
+            .map { patient ->
+                if (patient == null) Resource.Error("Patient not found")
+                else Resource.Success(patient.toDomain())
             }
-        } catch
-            (e: Exception) {
-            emit(Resource.Error(e.message ?: "Unknown error"))
-        }
-    }
+            .onStart { emit(Resource.Loading()) }
+            .catch { e -> emit(Resource.Error(e.message ?: "Unknown error")) }
+
 
     override fun doOnlineTasks(){
         println("Doing Online tasks")

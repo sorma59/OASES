@@ -100,17 +100,15 @@ fun PatientList(
                                 )
                                 ActionIcon(
                                     onClick = {
-                                        navController.currentBackStackEntry?.savedStateHandle?.set("patient", patient.item)
-                                        navController.navigate(Screen.SendPatient.route)
+                                        navController.navigate(Screen.SendPatient.route + "?patientId=${patient.item.id}")
                                     },
                                     backgroundColor = Color.Gray,
                                     icon = Icons.Default.Bluetooth,
                                     modifier = Modifier.fillMaxHeight()
                                 )
                             },
-                            onCardClick = { patient ->
-                                navController.currentBackStackEntry?.savedStateHandle?.set("patient", patient)
-                                navController.navigate(Screen.PatientDashboardScreen.route)
+                            onCardClick = { patientId ->
+                                navController.navigate(Screen.PatientDashboardScreen.route + "?patientId=$patientId")
 //                                navController.navigate(Screen.RegistrationScreen.route + "?patientId=${patient.id}")
                             },
                         )

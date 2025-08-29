@@ -100,9 +100,7 @@ fun SendPatientViaBluetoothScreen(
 
                     PatientItem(
                         patient = patient,
-                        navController = navController,
                         modifier = Modifier.padding(horizontal = 16.dp),
-                        hideBluetoothButton = true,
                         onClick = { navController.popBackStack() }
                     )
                 }

@@ -24,14 +24,16 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.ui.components.patients.PatientItem
 import com.unimib.oases.ui.components.util.TitleText
 import com.unimib.oases.ui.navigation.Screen
@@ -41,9 +43,12 @@ import com.unimib.oases.ui.screen.login.AuthViewModel
 fun PatientDashboardScreen(
     navController: NavController,
     authViewModel: AuthViewModel,
-    padding: PaddingValues,
-    patient: Patient
+    padding: PaddingValues
 ) {
+
+    val patientDashboardViewModel: PatientDashboardViewModel = hiltViewModel()
+
+    val state by patientDashboardViewModel.state.collectAsState()
 
     Column(
         modifier = Modifier
@@ -60,17 +65,17 @@ fun PatientDashboardScreen(
         }
 
         PatientItem(
-            patient = patient,
-            navController = navController,
-            hideBluetoothButton = true,
-            onClick = {},
+            patient = state.patient,
+            onClick = { patientDashboardViewModel.onEvent(PatientDashboardEvent.PatientItemClicked) },
+            errorText = "Could not load patient info, tap to retry \n${state.error}",
+            isLoading = state.isLoading
         )
 
         Column(
             verticalArrangement = Arrangement.spacedBy(30.dp),
             horizontalAlignment = Alignment.End
         ){
-            for (button in PatientDashboardButton.entries) {
+            for (button in state.buttons) {
 
                 Row(verticalAlignment = Alignment.CenterVertically){
 
@@ -83,7 +88,7 @@ fun PatientDashboardScreen(
 
                     IconButton(
                         onClick = {
-                            navController.navigate(button.route)
+                            navController.navigate(button.route + "?patientId=${state.receivedId}")
                         },
                         colors = IconButtonDefaults.iconButtonColors(
                             containerColor = button.buttonColor(),
