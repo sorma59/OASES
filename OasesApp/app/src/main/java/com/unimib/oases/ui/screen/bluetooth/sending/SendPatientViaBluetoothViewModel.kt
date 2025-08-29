@@ -55,7 +55,7 @@ class SendPatientViaBluetoothViewModel @Inject constructor(
 
                 updatePatientRetrievalState { it.copy(isLoading = true, error = null) }
 
-                val resource = patientRepository.getPatientById(_state.value.receivedId + "AA").first {
+                val resource = patientRepository.getPatientById(_state.value.receivedId).first {
                     it is Resource.Success || it is Resource.Error
                 }
 
