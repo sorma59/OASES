@@ -11,7 +11,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.unimib.oases.data.bluetooth.BluetoothCustomManager
-import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.ui.screen.bluetooth.pairing.PairNewDeviceScreen
 import com.unimib.oases.ui.screen.bluetooth.sending.SendPatientViaBluetoothScreen
 import com.unimib.oases.ui.screen.dashboard.admin.AdminScreen
@@ -33,9 +32,6 @@ fun AppNavigation(
 ){
 
     val authViewModel: AuthViewModel = hiltViewModel()
-
-    val getPatient =
-        { navController.previousBackStackEntry?.savedStateHandle?.get<Patient>("patient") }
 
     NavHost(
         navController = navController,
