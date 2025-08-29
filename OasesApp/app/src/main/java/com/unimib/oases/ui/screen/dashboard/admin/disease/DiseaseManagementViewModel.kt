@@ -1,4 +1,4 @@
-package com.unimib.oases.ui.screen.admin_screen.diseases_management
+package com.unimib.oases.ui.screen.dashboard.admin.disease
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

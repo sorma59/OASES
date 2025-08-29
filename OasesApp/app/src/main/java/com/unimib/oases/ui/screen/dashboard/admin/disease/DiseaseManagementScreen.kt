@@ -1,4 +1,4 @@
-package com.unimib.oases.ui.screen.admin_screen.vital_signs_management
+package com.unimib.oases.ui.screen.dashboard.admin.disease
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Delete
@@ -27,7 +26,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
@@ -43,60 +41,49 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.unimib.oases.domain.model.NumericPrecision
-import com.unimib.oases.domain.model.VitalSign
+import com.unimib.oases.domain.model.AgeSpecificity
+import com.unimib.oases.domain.model.Disease
+import com.unimib.oases.domain.model.SexSpecificity
+import com.unimib.oases.ui.components.util.OutlinedDropdown
 import com.unimib.oases.ui.components.util.button.DeleteButton
 import com.unimib.oases.ui.components.util.button.DismissButton
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 import com.unimib.oases.ui.navigation.Screen
-import com.unimib.oases.ui.util.ToastUtils
 import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun VitalSignManagementScreen(
+fun DiseaseManagementScreen(
     navController: NavController,
     padding : PaddingValues,
-    vitalSignsManagementViewModel: VitalSignManagementViewModel = hiltViewModel(),
+    diseaseManagementViewModel: DiseaseManagementViewModel = hiltViewModel(),
 ) {
 
-    val state by vitalSignsManagementViewModel.state.collectAsState()
+    val state by diseaseManagementViewModel.state.collectAsState()
 
     val snackbarHostState =
         remember { SnackbarHostState() } // for hosting snackbars, if I delete a intem I get a snackbar to undo the item
 
     val scope = rememberCoroutineScope()
 
-    val context = LocalContext.current
-
     var showDeletionDialog by remember { mutableStateOf(false) }
 
-    var vitalSignToDelete by remember { mutableStateOf<VitalSign?>(null) }
+    var diseaseToDelete by remember { mutableStateOf<Disease?>(null) }
 
     val dismissDeletionDialog = {
         showDeletionDialog = false
-        vitalSignToDelete = null
+        diseaseToDelete = null
     }
 
     LaunchedEffect(key1 = true) {
-        vitalSignsManagementViewModel.getVitalSigns()
-    }
-
-    LaunchedEffect(key1 = state.toastMessage) {
-        if (state.toastMessage != null) {
-            ToastUtils.showToast(context, state.toastMessage!!)
-            vitalSignsManagementViewModel.onEvent(
-                VitalSignManagementEvent.ToastShown
-            )
-        }
+        diseaseManagementViewModel.getDiseases()
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -155,108 +142,54 @@ fun VitalSignManagementScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Add a new vital sign:",
+                    text = "Add a new disease:",
                     style = MaterialTheme.typography.titleLarge
                 )
             }
 
             OutlinedTextField(
-                value = state.vitalSign.name,
-                onValueChange = { vitalSignsManagementViewModel.onEvent(VitalSignManagementEvent.EnteredVitalSignName(it)) },
-                label = { Text("Name") },
-                placeholder = { Text("e.g. Systolic Blood Pressure, ...") },
+                value = state.disease.name,
+                onValueChange = { diseaseManagementViewModel.onEvent(DiseaseManagementEvent.EnteredDiseaseName(it)) },
+                label = { Text("Disease") },
                 singleLine = true,
-                isError = state.nameError != null,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            if (state.nameError != null){
-                Text(
-                    text = state.nameError!!,
-                    color = MaterialTheme.colorScheme.error
-                )
-            }
-
-            OutlinedTextField(
-                value = state.vitalSign.acronym,
-                onValueChange = { vitalSignsManagementViewModel.onEvent(VitalSignManagementEvent.EnteredVitalSignAcronym(it)) },
-                label = { Text("Acronym") },
-                placeholder = { Text("e.g. SBP, SpO2, ...") },
-                singleLine = true,
-                isError = state.acronymError != null,
+            OutlinedDropdown(
+                selected = state.disease.sexSpecificity.displayName,
+                onSelected = { diseaseManagementViewModel.onEvent(DiseaseManagementEvent.EnteredSexSpecificity(it)) },
+                options = SexSpecificity.entries.map {it.displayName},
+                labelText = "Sex specificity",
                 modifier = Modifier.fillMaxWidth()
             )
 
-            if (state.acronymError != null){
-                Text(
-                    text = state.acronymError!!,
-                    color = MaterialTheme.colorScheme.error
-                )
-            }
-
-            OutlinedTextField(
-                value = state.vitalSign.unit,
-                onValueChange = {
-                    vitalSignsManagementViewModel.onEvent(
-                        VitalSignManagementEvent.EnteredVitalSignUnit(it)
-                    )
-                },
-                label = { Text("Unit") },
-                placeholder = { Text("e.g. mmHg, bpm, %, ...") },
-                singleLine = true,
-                isError = state.unitError != null,
+            OutlinedDropdown(
+                selected = state.disease.ageSpecificity.displayName,
+                onSelected = { diseaseManagementViewModel.onEvent(DiseaseManagementEvent.EnteredAgeSpecificity(it)) },
+                options = AgeSpecificity.entries.map {it.displayName},
+                labelText = "Age specificity",
                 modifier = Modifier.fillMaxWidth()
             )
-
-            if (state.unitError != null){
-                Text(
-                    text = state.unitError!!,
-                    color = MaterialTheme.colorScheme.error
-                )
-            }
-
-            NumericPrecision.entries.forEach { precisionOption ->
-
-                val examples = when (precisionOption) {
-                    NumericPrecision.INTEGER -> " (e.g. 10, 15)"
-                    NumericPrecision.FLOAT -> " (e.g. 25.4)"
-                }
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .selectable(
-                            selected = (precisionOption.displayName == state.vitalSign.precision),
-                            onClick = {
-                                vitalSignsManagementViewModel.onEvent(
-                                    VitalSignManagementEvent.SelectedPrecision(precisionOption.displayName)
-                                )
-                            }
-                        ),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    RadioButton(
-                        selected = (precisionOption.displayName == state.vitalSign.precision),
-                        onClick = { vitalSignsManagementViewModel.onEvent(VitalSignManagementEvent.SelectedPrecision(precisionOption.displayName)) }
-                    )
-                    Text(
-                        text = precisionOption.displayName + examples,
-                        style = MaterialTheme.typography.bodyLarge,
-                    )
-                }
-            }
-
 
             Spacer(modifier = Modifier.height(16.dp))
 
+
             Button(
                 onClick = {
-                    vitalSignsManagementViewModel.onEvent(VitalSignManagementEvent.SaveVitalSign)
+
+//                        if (state.disease.username.isBlank() || state.dise.pwHash.isBlank()) {
+//                            state.error = "Username and password cannot be empty!"
+//                            return@Button
+//                        }
+
+                    diseaseManagementViewModel.onEvent(DiseaseManagementEvent.SaveDisease)
+
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Save Vital Sign")
+                Text("Save Disease")
             }
+
 
             state.error?.let {
                 Text(
@@ -265,12 +198,19 @@ fun VitalSignManagementScreen(
                 )
             }
 
+            state.message?.let {
+                Text(
+                    text = it,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+
             Column(
                 modifier = Modifier.fillMaxWidth()
             ) {
 
                 Text(
-                    text = "Vital Signs (${state.vitalSigns.size})",
+                    text = "Diseases (${state.diseases.size})",
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -286,16 +226,16 @@ fun VitalSignManagementScreen(
                             .fillMaxWidth()
                             .weight(1f)
                     ) {
-                        items(state.vitalSigns.size) { i ->
-                            val vitalSign = state.vitalSigns[i]
-                            VitalSignListItem (
-                                vitalSign = vitalSign,
+                        items(state.diseases.size) { i ->
+                            val disease = state.diseases[i]
+                            DiseaseListItem (
+                                disease = disease,
                                 onDelete = {
-                                    vitalSignToDelete = vitalSign
+                                    diseaseToDelete = disease
                                     showDeletionDialog = true
                                 },
                                 onClick = {
-                                    vitalSignsManagementViewModel.onEvent(VitalSignManagementEvent.Click(vitalSign))
+                                    diseaseManagementViewModel.onEvent(DiseaseManagementEvent.Click(disease))
                                 }
                             )
                         }
@@ -308,19 +248,19 @@ fun VitalSignManagementScreen(
     if (showDeletionDialog){
         AlertDialog(
             onDismissRequest = dismissDeletionDialog,
-            title = { "Delete Vital Sign" },
-            text = { Text("Are you sure you want to delete this vital sign?") },
+            title = { "Delete Disease" },
+            text = { Text("Are you sure you want to delete this disease?") },
             confirmButton = {
                 DeleteButton(
                     onDelete = {
-                        vitalSignsManagementViewModel.onEvent(VitalSignManagementEvent.Delete(vitalSignToDelete!!))
+                        diseaseManagementViewModel.onEvent(DiseaseManagementEvent.Delete(diseaseToDelete!!))
                         scope.launch {
                             val undo = snackbarHostState.showSnackbar(
-                                message = "Deleted vital sign ${vitalSignToDelete?.name ?: ""}",
+                                message = "Deleted disease ${diseaseToDelete?.name ?: ""}",
                                 actionLabel = "UNDO"
                             )
                             if (undo == SnackbarResult.ActionPerformed) {
-                                vitalSignsManagementViewModel.onEvent(VitalSignManagementEvent.UndoDelete)
+                                diseaseManagementViewModel.onEvent(DiseaseManagementEvent.UndoDelete)
                             }
                         }
                         dismissDeletionDialog()
@@ -342,8 +282,8 @@ fun VitalSignManagementScreen(
 
 
 @Composable
-fun VitalSignListItem(
-    vitalSign: VitalSign,
+fun DiseaseListItem(
+    disease: Disease,
     onDelete: () -> Unit,
     onClick: () -> Unit
 ) {
@@ -363,7 +303,7 @@ fun VitalSignListItem(
         ) {
             Column {
                 Text(
-                    text = vitalSign.name,
+                    text = disease.name,
                     style = MaterialTheme.typography.bodyLarge
                 )
             }

@@ -1,4 +1,4 @@
-package com.unimib.oases.ui.screen.dashboard
+package com.unimib.oases.ui.screen.dashboard.patient
 
 import javax.inject.Inject
 

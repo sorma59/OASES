@@ -1,4 +1,4 @@
-package com.unimib.oases.ui.screen.admin_screen.vital_signs_management
+package com.unimib.oases.ui.screen.dashboard.admin.vitalsigns
 
 import com.unimib.oases.domain.model.VitalSign
 

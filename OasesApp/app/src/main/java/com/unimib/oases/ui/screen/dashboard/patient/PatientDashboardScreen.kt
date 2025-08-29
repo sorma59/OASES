@@ -1,4 +1,4 @@
-package com.unimib.oases.ui.screen.dashboard
+package com.unimib.oases.ui.screen.dashboard.patient
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

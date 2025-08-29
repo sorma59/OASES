@@ -1,4 +1,4 @@
-package com.unimib.oases.ui.screen.admin_screen.user_management
+package com.unimib.oases.ui.screen.dashboard.admin.user
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
