@@ -1,7 +1,6 @@
 package com.unimib.oases.ui.screen.homepage
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,25 +20,20 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Bluetooth
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -55,18 +49,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.unimib.oases.R
 import com.unimib.oases.data.bluetooth.BluetoothCustomManager
 import com.unimib.oases.data.local.model.Role
 import com.unimib.oases.ui.components.patients.PatientList
 import com.unimib.oases.ui.components.patients.RecentlyReceivedPatientList
+import com.unimib.oases.ui.components.scaffold.OasesTopAppBar
+import com.unimib.oases.ui.components.scaffold.OasesTopAppBarType
 import com.unimib.oases.ui.components.search.SearchBar
 import com.unimib.oases.ui.components.util.BluetoothPermissionHandler
 import com.unimib.oases.ui.components.util.NoPermissionMessage
@@ -306,51 +299,17 @@ fun HomeScreen(
                     .padding(bottom = padding.calculateBottomPadding())
             ) {
 
-                CenterAlignedTopAppBar(
-
-                    title = {
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-
-                            Image(
-                                painter = painterResource(R.drawable.ic_launcher_round),
-                                contentDescription = "Icon",
-                                modifier = Modifier
-                                    .size(50.dp)
-                                    .padding(5.dp)
-                            )
-
-                            Text(
-                                "OASES", fontWeight = FontWeight.Bold,
-                                fontSize = 20.sp,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
+                OasesTopAppBar(
+                    title = "OASES",
+                    type = OasesTopAppBarType.MENU,
+                    showLogo = true,
+                    onNavigationIconClick = {
+                        scope.launch{
+                            drawerState.open()
                         }
-
-                    },
-                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.onPrimary,
-                        scrolledContainerColor = MaterialTheme.colorScheme.onPrimary,
-                        navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
-                        titleContentColor = MaterialTheme.colorScheme.onBackground,
-                        actionIconContentColor = MaterialTheme.colorScheme.onBackground,
-                    ),
-                    navigationIcon = {
-                        IconButton(onClick = {
-                            scope.launch { drawerState.open() } // open sorting menu
-                        }) {
-                            Icon(
-                                imageVector = Icons.Filled.Menu,
-                                contentDescription = "MENU"
-                            )
-                        }
-                    },
-                    actions = {},
-                    scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+                    }
                 )
+
                 Column(
                     modifier = Modifier
                         .fillMaxSize(),

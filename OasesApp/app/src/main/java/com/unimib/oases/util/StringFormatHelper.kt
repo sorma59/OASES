@@ -13,7 +13,7 @@ object StringFormatHelper {
         }
     }
 
-    fun formatDate(date: LocalDate, formatter: java.time.format.DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")): String {
+    fun formatDate(date: LocalDate, formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")): String {
         return date.format(formatter)
     }
 }
