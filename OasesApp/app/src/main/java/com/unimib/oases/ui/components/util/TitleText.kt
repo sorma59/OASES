@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.sp
 fun TitleText(
     text: String,
     modifier: Modifier = Modifier,
-    fontSize: Int = 20,
+    fontSize: Int = 22,
     fontWeight: FontWeight = FontWeight.Bold,
     color: Color = Color.Unspecified,
 ){
