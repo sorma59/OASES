@@ -1,25 +1,18 @@
 package com.unimib.oases.ui.components.patients
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Bluetooth
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.unimib.oases.domain.model.Patient
@@ -27,7 +20,6 @@ import com.unimib.oases.ui.components.card.PatientCard
 import com.unimib.oases.ui.components.card.PatientUi
 import com.unimib.oases.ui.components.util.CenteredText
 import com.unimib.oases.ui.components.util.SmallGrayText
-import com.unimib.oases.ui.components.util.button.ActionIcon
 import com.unimib.oases.ui.navigation.Screen
 
 @Composable
@@ -36,8 +28,6 @@ fun PatientList(
     patients: List<Patient> = emptyList(),
     navController: NavController,
     title: String = "Patient List",
-    onDeleteButtonPressed: (Patient) -> Unit = {},
-  //  onItemClick: (Patient) -> Unit = {},
     noPatientsMessage: String = "No patients found."
 ) {
 
@@ -82,34 +72,9 @@ fun PatientList(
                                     p.copy(isOptionsRevealed = p.item.id == patient.item.id)
                                 }
                             },
-                            onCollapsed = {
-                                //wrappedPatientList[index] = patient.copy(isOptionsRevealed = false)
-                            },
-                            actions = {
-                                ActionIcon(
-                                    onClick = {
-                                        onDeleteButtonPressed(patient.item)
-                                        Log.d("PatientList", "onDeleteButtonPressed: $patient")
-                                       // homeScreenViewModel.onEvent(HomeScreenEvent.Delete(patient.item))
-//                                        wrappedPatientList.remove(patient)
-                                    },
-                                    backgroundColor = MaterialTheme.colorScheme.error,
-                                    icon = Icons.Default.Delete,
-                                    modifier = Modifier.fillMaxHeight(),
-                                    tint = MaterialTheme.colorScheme.onError
-                                )
-                                ActionIcon(
-                                    onClick = {
-                                        navController.navigate(Screen.SendPatient.route + "/patientId=${patient.item.id}")
-                                    },
-                                    backgroundColor = Color.Gray,
-                                    icon = Icons.Default.Bluetooth,
-                                    modifier = Modifier.fillMaxHeight()
-                                )
-                            },
+                            actions = {},
                             onCardClick = { patientId ->
                                 navController.navigate(Screen.PatientDashboardScreen.route + "/patientId=$patientId")
-//                                navController.navigate(Screen.RegistrationScreen.route + "?patientId=${patient.id}")
                             },
                         )
                     }

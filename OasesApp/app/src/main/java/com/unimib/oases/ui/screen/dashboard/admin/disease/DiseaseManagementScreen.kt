@@ -270,7 +270,6 @@ fun DiseaseManagementScreen(
             dismissButton = {
                 DismissButton(
                     onDismiss = dismissDeletionDialog,
-                    buttonText = "Cancel",
                     colors = ButtonDefaults.outlinedButtonColors(
                         contentColor = MaterialTheme.colorScheme.onBackground
                     )

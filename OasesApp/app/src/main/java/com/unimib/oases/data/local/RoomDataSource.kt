@@ -47,6 +47,10 @@ class RoomDataSource @Inject constructor(
         patientDao.delete(patient)
     }
 
+    fun deleteById(id: String) {
+        patientDao.deleteById(id)
+    }
+
     fun getPatients(): Flow<List<PatientEntity>> {
         return patientDao.getPatients()
     }

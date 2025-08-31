@@ -91,6 +91,15 @@ class PatientRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun deletePatientById(patientId: String): Resource<Unit> {
+        return try {
+            roomDataSource.deleteById(patientId)
+            Resource.Success(Unit)
+        } catch (e: Exception) {
+            Resource.Error(e.message ?: "An error occurred")
+        }
+    }
+
     override suspend fun getPatientById(patientId: String): Flow<Resource<Patient>> =
         roomDataSource.getPatientById(patientId)
             .map { patient ->

@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MedicalServices
 import androidx.compose.material.icons.filled.PersonSearch
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -24,11 +25,16 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -36,8 +42,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.unimib.oases.ui.components.patients.PatientItem
 import com.unimib.oases.ui.components.util.TitleText
+import com.unimib.oases.ui.components.util.button.DeleteButton
+import com.unimib.oases.ui.components.util.button.DismissButton
 import com.unimib.oases.ui.navigation.Screen
 import com.unimib.oases.ui.screen.login.AuthViewModel
+import com.unimib.oases.ui.util.ToastUtils
 
 @Composable
 fun PatientDashboardScreen(
@@ -49,6 +58,45 @@ fun PatientDashboardScreen(
     val patientDashboardViewModel: PatientDashboardViewModel = hiltViewModel()
 
     val state by patientDashboardViewModel.state.collectAsState()
+
+    var showAlertDialog by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+
+        patientDashboardViewModel.navigationEvents.collect {
+            when (it) {
+                is PatientDashboardViewModel.NavigationEvent.Navigate -> {
+                    navController.navigate(it.route)
+                }
+
+                is PatientDashboardViewModel.NavigationEvent.NavigateBack -> {
+                    navController.popBackStack()
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        patientDashboardViewModel.uiEvents.collect {
+            showAlertDialog = when(it){
+                is PatientDashboardViewModel.UiEvent.ShowDialog -> {
+                    true
+                }
+
+                is PatientDashboardViewModel.UiEvent.HideDialog -> {
+                    false
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(state.toastMessage) {
+        state.toastMessage?.let {
+            ToastUtils.showToast(context, it)
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -88,7 +136,7 @@ fun PatientDashboardScreen(
 
                     IconButton(
                         onClick = {
-                            navController.navigate(button.route + state.receivedId)
+                            patientDashboardViewModel.onEvent(PatientDashboardEvent.ActionButtonClicked(button))
                         },
                         colors = IconButtonDefaults.iconButtonColors(
                             containerColor = button.buttonColor(),
@@ -106,19 +154,48 @@ fun PatientDashboardScreen(
             }
         }
     }
+
+    if (showAlertDialog) {
+        AlertDialog(
+            onDismissRequest = { showAlertDialog = false },
+            title = {
+                Text(text = "Confirm deletion of ${state.patient?.name}")
+            },
+            text = {
+                Text(text = "Are you sure you want to delete this patient? All the records related to this patient will be deleted.")
+            },
+            confirmButton = {
+                DeleteButton(
+                    onDelete = {
+                        patientDashboardViewModel.onEvent(
+                            PatientDashboardEvent.PatientDeletionConfirmed
+                        )
+                    }
+                )
+            },
+            dismissButton = {
+                DismissButton(
+                    onDismiss = { showAlertDialog = false },
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.onBackground,
+                    )
+                )
+            }
+        )
+    }
 }
 
 enum class PatientDashboardButton(
     val text: String,
     val icon: ImageVector,
     val contentDescription: String,
-    val route: String
+    val route: String? = null
 ){
     VIEW("View", Icons.Default.PersonSearch, "View patient data", Screen.RegistrationScreen.route + "?patientId="),
     EDIT("Edit", Icons.Default.Edit, "Edit patient data", Screen.RegistrationScreen.route + "?patientId="),
     SEND("Send", Icons.AutoMirrored.Filled.Send, "Send patient data", Screen.SendPatient.route + "/patientId="),
     START_VISIT("Start visit", Icons.Default.MedicalServices , "Start a new visit", Screen.MedicalVisitScreen.route),
-    DELETE("Delete", Icons.Default.Delete, "Delete patient data", Screen.HomeScreen.route);
+    DELETE("Delete", Icons.Default.Delete, "Delete patient data");
 
     /**
      * Returns the appropriate color for this button.

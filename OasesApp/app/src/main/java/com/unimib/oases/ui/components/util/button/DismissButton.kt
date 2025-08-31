@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 fun DismissButton(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
-    buttonText: String = "Dismiss",
+    buttonText: String = "Cancel",
     colors: ButtonColors = ButtonDefaults.outlinedButtonColors()
 ){
     OutlinedButton(

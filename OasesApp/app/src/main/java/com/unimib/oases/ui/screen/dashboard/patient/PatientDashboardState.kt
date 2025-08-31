@@ -6,6 +6,8 @@ data class PatientDashboardState(
     val receivedId: String,
     val patient: Patient? = null,
     val buttons: List<PatientDashboardButton> = PatientDashboardButton.entries.toList(),
+
+    val toastMessage: String? = null,
     val isLoading: Boolean = false,
     val error: String? = null
 )

@@ -16,6 +16,9 @@ interface PatientDao {
     @Delete
     suspend fun delete(patient: PatientEntity)
 
+    @Query("DELETE FROM " + TableNames.PATIENT + " WHERE id = :id")
+    fun deleteById(id: String)
+
     @Query("SELECT * FROM " + TableNames.PATIENT)
     fun getPatients(): Flow<List<PatientEntity>>
 
