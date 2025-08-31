@@ -18,6 +18,7 @@ import com.unimib.oases.ui.screen.dashboard.admin.disease.DiseaseManagementScree
 import com.unimib.oases.ui.screen.dashboard.admin.user.UserManagementScreen
 import com.unimib.oases.ui.screen.dashboard.admin.vitalsigns.VitalSignManagementScreen
 import com.unimib.oases.ui.screen.dashboard.patient.PatientDashboardScreen
+import com.unimib.oases.ui.screen.dashboard.patient.view.PatientDetailsScreen
 import com.unimib.oases.ui.screen.homepage.HomeScreen
 import com.unimib.oases.ui.screen.login.AuthViewModel
 import com.unimib.oases.ui.screen.login.LoginScreen
@@ -167,6 +168,17 @@ fun AppNavigation(
             )
         ) {
             PatientDashboardScreen(navController, authViewModel, padding)
+        }
+
+        composable(
+            route = Screen.ViewPatientDetailsScreen.route + "/patientId={patientId}",
+            arguments =  listOf(
+                navArgument("patientId"){
+                    type = NavType.StringType
+                }
+            )
+        ){
+            PatientDetailsScreen(navController, authViewModel, padding)
         }
     }
 }

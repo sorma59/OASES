@@ -1,13 +1,11 @@
 package com.unimib.oases.ui.screen.dashboard.patient
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -41,7 +39,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.unimib.oases.ui.components.patients.PatientItem
-import com.unimib.oases.ui.components.util.TitleText
+import com.unimib.oases.ui.components.scaffold.OasesTopAppBar
+import com.unimib.oases.ui.components.scaffold.OasesTopAppBarType
 import com.unimib.oases.ui.components.util.button.DeleteButton
 import com.unimib.oases.ui.components.util.button.DismissButton
 import com.unimib.oases.ui.navigation.Screen
@@ -100,55 +99,73 @@ fun PatientDashboardScreen(
 
     Column(
         modifier = Modifier
-            .padding(32.dp)
-            .fillMaxSize(),
-        horizontalAlignment = Alignment.End,
-        verticalArrangement = Arrangement.spacedBy(64.dp)
+            .fillMaxSize()
+            .padding(bottom = padding.calculateBottomPadding())
     ){
-        Box(
-            Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center
-        ){
-            TitleText("Patient Dashboard")
-        }
-
-        PatientItem(
-            patient = state.patient,
-            onClick = { patientDashboardViewModel.onEvent(PatientDashboardEvent.PatientItemClicked) },
-            errorText = "Could not load patient info, tap to retry \n${state.error}",
-            isLoading = state.isLoading
+        OasesTopAppBar(
+            title = "Patient Dashboard",
+            type = OasesTopAppBarType.BACK,
+            onNavigationIconClick = {
+                patientDashboardViewModel.onEvent(PatientDashboardEvent.OnBack)
+            }
         )
 
         Column(
-            verticalArrangement = Arrangement.spacedBy(30.dp),
-            horizontalAlignment = Alignment.End
-        ){
-            for (button in state.buttons) {
+            modifier = Modifier
+                .padding(32.dp)
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.End,
+            verticalArrangement = Arrangement.spacedBy(64.dp)
+        ) {
+//        Box(
+//            Modifier.fillMaxWidth(),
+//            contentAlignment = Alignment.Center
+//        ){
+//            TitleText("Patient Dashboard")
+//        }
 
-                Row(verticalAlignment = Alignment.CenterVertically){
+            PatientItem(
+                patient = state.patient,
+                onClick = { patientDashboardViewModel.onEvent(PatientDashboardEvent.PatientItemClicked) },
+                errorText = "Could not load patient info, tap to retry \n${state.error}",
+                isLoading = state.isLoading
+            )
 
-                    Text(
-                        text = button.text,
-                        fontSize = 30.sp
-                    )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(30.dp),
+                horizontalAlignment = Alignment.End
+            ) {
+                for (button in state.buttons) {
 
-                    Spacer(Modifier.width(4.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
 
-                    IconButton(
-                        onClick = {
-                            patientDashboardViewModel.onEvent(PatientDashboardEvent.ActionButtonClicked(button))
-                        },
-                        colors = IconButtonDefaults.iconButtonColors(
-                            containerColor = button.buttonColor(),
-                            contentColor = button.buttonTintColor()
-                        ),
-                        modifier = Modifier.size(Dp(ButtonDefaults.IconSize.value * 4f))
-                    ){
-                        Icon(
-                            imageVector = button.icon,
-                            contentDescription = button.contentDescription,
-                            modifier = Modifier.size(Dp(ButtonDefaults.IconSize.value * 2f))
+                        Text(
+                            text = button.text,
+                            fontSize = 30.sp
                         )
+
+                        Spacer(Modifier.width(4.dp))
+
+                        IconButton(
+                            onClick = {
+                                patientDashboardViewModel.onEvent(
+                                    PatientDashboardEvent.ActionButtonClicked(
+                                        button
+                                    )
+                                )
+                            },
+                            colors = IconButtonDefaults.iconButtonColors(
+                                containerColor = button.buttonColor(),
+                                contentColor = button.buttonTintColor()
+                            ),
+                            modifier = Modifier.size(Dp(ButtonDefaults.IconSize.value * 4f))
+                        ) {
+                            Icon(
+                                imageVector = button.icon,
+                                contentDescription = button.contentDescription,
+                                modifier = Modifier.size(Dp(ButtonDefaults.IconSize.value * 2f))
+                            )
+                        }
                     }
                 }
             }
@@ -191,7 +208,7 @@ enum class PatientDashboardButton(
     val contentDescription: String,
     val route: String? = null
 ){
-    VIEW("View", Icons.Default.PersonSearch, "View patient data", Screen.RegistrationScreen.route + "?patientId="),
+    VIEW("View", Icons.Default.PersonSearch, "View patient data", Screen.ViewPatientDetailsScreen.route + "/patientId="),
     EDIT("Edit", Icons.Default.Edit, "Edit patient data", Screen.RegistrationScreen.route + "?patientId="),
     SEND("Send", Icons.AutoMirrored.Filled.Send, "Send patient data", Screen.SendPatient.route + "/patientId="),
     START_VISIT("Start visit", Icons.Default.MedicalServices , "Start a new visit", Screen.MedicalVisitScreen.route),

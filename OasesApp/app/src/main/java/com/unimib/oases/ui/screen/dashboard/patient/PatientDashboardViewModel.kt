@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.repository.PatientRepository
+import com.unimib.oases.ui.screen.dashboard.patient.PatientDashboardViewModel.NavigationEvent.Navigate
+import com.unimib.oases.ui.screen.dashboard.patient.PatientDashboardViewModel.NavigationEvent.NavigateBack
 import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -80,7 +82,7 @@ class PatientDashboardViewModel @Inject constructor(
 
                         else -> {
                             navigationEventsChannel.send(
-                                NavigationEvent.Navigate(
+                                Navigate(
                                     event.button.route + _state.value.receivedId
                                 )
                             )
@@ -105,6 +107,12 @@ class PatientDashboardViewModel @Inject constructor(
                     }
                     else if (result is Resource.Error)
                         _state.update { it.copy(toastMessage = "Patient deletion failed") }
+                }
+            }
+
+            PatientDashboardEvent.OnBack -> {
+                viewModelScope.launch(dispatcher){
+                    navigationEventsChannel.send(NavigateBack)
                 }
             }
         }
