@@ -4,7 +4,6 @@ import android.bluetooth.BluetoothDevice
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -53,15 +52,15 @@ fun DeviceList(
     }
 
     Column(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .padding(horizontal = 8.dp)
+            .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        SmallGrayText(devicesType, Modifier.align(Alignment.Start))
+        SmallGrayText(devicesType, Modifier.align(Alignment.Start).padding(start = 8.dp))
 
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(max = 300.dp)
+            modifier = Modifier.fillMaxWidth()
         ) {
             // The scrollable Column
             Column(

@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,6 +27,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.unimib.oases.ui.components.bluetooth.devices.DeviceList
+import com.unimib.oases.ui.components.scaffold.OasesTopAppBar
+import com.unimib.oases.ui.components.scaffold.OasesTopAppBarType
 import com.unimib.oases.ui.components.util.CenteredText
 import com.unimib.oases.ui.components.util.button.BottomButtons
 import com.unimib.oases.ui.components.util.circularprogressindicator.SmallCircularProgressIndicator
@@ -65,98 +66,105 @@ fun PairNewDeviceScreen(
     }
 
     Column(
-        verticalArrangement = Arrangement.SpaceBetween,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(padding)
-            .consumeWindowInsets(padding)
+        modifier = Modifier.fillMaxSize()
     ){
+        OasesTopAppBar(
+            title = "Pair New Device",
+            type = OasesTopAppBarType.BACK,
+            onNavigationIconClick = { navController.popBackStack() }
+        )
+
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
+            verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
         ) {
             Column(
                 modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth(),
-                verticalArrangement = Arrangement.SpaceEvenly,
+                    .fillMaxWidth()
+                    .weight(1f),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
-            ){
-                Spacer(modifier = Modifier.height(32.dp))
-
-                Row(
+            ) {
+                Column(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    verticalArrangement = Arrangement.spacedBy(48.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxWidth(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        TextButton(
-                            onClick = { pairNewDeviceScreenViewModel.onEvent(PairNewDeviceEvent.MakeDeviceDiscoverable()) },
-                            enabled = timeLeft == null,
-                        ) {
-                            Text(
-                                text = if (timeLeft == null) "Make this device visible to others" else "Currently visible"
-                            )
-                        }
-                    }
-
                     Row(
-                        modifier = Modifier.height(IntrinsicSize.Min),
+                        modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        VerticalDivider(Modifier.fillMaxHeight())
 
-                        if (isDiscovering) {
-                            Spacer(Modifier.width(4.dp))
-                            SmallCircularProgressIndicator()
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            TextButton(
+                                onClick = { pairNewDeviceScreenViewModel.onEvent(PairNewDeviceEvent.MakeDeviceDiscoverable()) },
+                                enabled = timeLeft == null,
+                            ) {
+                                Text(
+                                    text = if (timeLeft == null) "Make this device visible to others" else "Currently visible"
+                                )
+                            }
                         }
-                        TextButton(
-                            onClick = {
-                                if (!isDiscovering)
-                                    pairNewDeviceScreenViewModel.onEvent(PairNewDeviceEvent.StartScan)
-                                else
-                                    pairNewDeviceScreenViewModel.onEvent(PairNewDeviceEvent.StopScan)
-                            },
-                        ) { Text(if (!isDiscovering) "Scan" else "Stop") }
+
+                        Row(
+                            modifier = Modifier.height(IntrinsicSize.Min),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            VerticalDivider(Modifier.fillMaxHeight())
+
+                            if (isDiscovering) {
+                                Spacer(Modifier.width(4.dp))
+                                SmallCircularProgressIndicator()
+                            }
+                            TextButton(
+                                onClick = {
+                                    if (!isDiscovering)
+                                        pairNewDeviceScreenViewModel.onEvent(PairNewDeviceEvent.StartScan)
+                                    else
+                                        pairNewDeviceScreenViewModel.onEvent(PairNewDeviceEvent.StopScan)
+                                },
+                            ) { Text(if (!isDiscovering) "Scan" else "Stop") }
+                        }
+
                     }
+
+                    CenteredText("Make sure the device you want to pair with is visible to nearby devices.")
+
+                    if (timeLeft != null)
+                        CenteredText(text = "Your device ($deviceName) is visible to nearby devices for $timeLeft")
+                    else
+                        CenteredText(text = "Your device ($deviceName) is not visible to nearby devices")
 
                 }
 
-                Spacer(modifier = Modifier.height(32.dp))
-
-                CenteredText("Make sure the device you want to pair with is visible to nearby devices.")
-
-                Spacer(modifier = Modifier.height(32.dp))
-
-                if (timeLeft != null)
-                    CenteredText(text = "Your device ($deviceName) is visible to nearby devices for $timeLeft")
-                else
-                    CenteredText(text = "Your device ($deviceName) is not visible to nearby devices")
-
-                Spacer(modifier = Modifier.height(32.dp))
+                DeviceList(
+                    devices = discoveredDevices,
+                    devicesType = "Discovered Devices",
+                    onClick = {
+                        pairNewDeviceScreenViewModel.onEvent(
+                            PairNewDeviceEvent.PairDevice(
+                                it
+                            )
+                        )
+                    },
+                    modifier = Modifier.weight(1f)
+                )
             }
 
-            DeviceList(
-                devices = discoveredDevices,
-                devicesType = "Discovered Devices",
-                onClick = { pairNewDeviceScreenViewModel.onEvent(PairNewDeviceEvent.PairDevice(it)) },
-                modifier = Modifier.weight(1f)
+            BottomButtons(
+                onCancel = { navController.popBackStack() },
+                onConfirm = { navController.popBackStack() },
+                confirmButtonText = "Done"
             )
         }
-
-        BottomButtons(
-            onCancel = { navController.popBackStack() },
-            onConfirm = { navController.popBackStack() },
-            confirmButtonText = "Done"
-        )
     }
 }
