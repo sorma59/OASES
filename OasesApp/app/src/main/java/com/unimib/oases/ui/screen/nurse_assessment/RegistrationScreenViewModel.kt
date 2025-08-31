@@ -124,7 +124,7 @@ class RegistrationScreenViewModel @Inject constructor(
     private val validationEventsChannel = Channel<ValidationEvent>()
     val validationEvents = validationEventsChannel.receiveAsFlow()
 
-    private val retrievedPatientId = savedStateHandle.get<String>("patientId")
+    private val retrievedPatientId: String? = savedStateHandle["patientId"]
 
     private var errorHandler = CoroutineExceptionHandler { _, e ->
         e.printStackTrace()

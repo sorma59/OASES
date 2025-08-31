@@ -26,7 +26,7 @@ class PatientDashboardViewModel @Inject constructor(
 ): ViewModel(){
 
     private val _state = MutableStateFlow(
-        PatientDashboardState(receivedId = savedStateHandle.get<String>("patientId")!!)
+        PatientDashboardState(receivedId = savedStateHandle["patientId"]!!)
     )
     val state: StateFlow<PatientDashboardState> = _state.asStateFlow()
 

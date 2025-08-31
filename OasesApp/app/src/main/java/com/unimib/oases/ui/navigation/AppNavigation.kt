@@ -78,17 +78,15 @@ fun AppNavigation(
                         )
                     else -> null
                 }
-            }) {
+            }
+        ) {
             HomeScreen(navController, padding, authViewModel, bluetoothCustomManager)
         }
 
         composable(
             route = Screen.RegistrationScreen.route + "?patientId={patientId}",
             arguments =  listOf(
-                navArgument(
-                    name = "patientId"
-                )
-                {
+                navArgument("patientId"){
                     type = NavType.StringType
                     defaultValue = null
                     nullable = true
@@ -141,8 +139,7 @@ fun AppNavigation(
         composable(
             route = Screen.SendPatient.route + "/patientId={patientId}",
             arguments = listOf(
-                navArgument("patientId")
-                {
+                navArgument("patientId"){
                     type = NavType.StringType
                 }
             )
@@ -164,8 +161,7 @@ fun AppNavigation(
         composable(
             route = Screen.PatientDashboardScreen.route + "/patientId={patientId}",
             arguments =  listOf(
-                navArgument("patientId")
-                {
+                navArgument("patientId"){
                     type = NavType.StringType
                 }
             )
