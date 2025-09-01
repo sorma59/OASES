@@ -44,31 +44,6 @@ class HomeScreenViewModel @Inject constructor(
 
     fun onEvent(event: HomeScreenEvent) {
         when (event) {
-
-            is HomeScreenEvent.Delete -> {
-                viewModelScope.launch{
-                    val name = event.patient.name
-                    val result = useCases.deletePatient(event.patient)
-                    if (result is Resource.Success) {
-                        _state.update{
-                            _state.value.copy(
-                                toastMessage = "Deleted patient $name."
-                            )
-                        }
-                    } else if (result is Resource.Error) {
-                        _state.update{
-                            _state.value.copy(
-                                toastMessage = "Couldn't delete $name"
-                            )
-                        }
-                    }
-                }
-            }
-
-            is HomeScreenEvent.Share -> {
-                // share with bluetooth
-            }
-
             is HomeScreenEvent.ToastShown -> {
                 _state.update{
                     _state.value.copy(
@@ -94,6 +69,10 @@ class HomeScreenViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    init {
+        getPatients()
     }
 
     fun getPatients() {
