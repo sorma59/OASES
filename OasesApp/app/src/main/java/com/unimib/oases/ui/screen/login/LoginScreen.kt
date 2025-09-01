@@ -24,7 +24,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -32,17 +31,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.unimib.oases.data.local.model.Role
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
-import com.unimib.oases.ui.navigation.Screen
-import com.unimib.oases.ui.util.ToastUtils
 import com.unimib.oases.util.AuthStrings
 
 @Composable
@@ -54,43 +49,11 @@ fun LoginScreen(
 
     val authState = authViewModel.authState.observeAsState()
 
-    val context = LocalContext.current
-
-    if (authViewModel.currentUser() != null) {
-        when (authViewModel.currentUser()?.role) {
-            Role.ADMIN -> navController.navigate(Screen.AdminScreen.route) {
-                popUpTo(Screen.LoginScreen.route) { inclusive = true }
-            }
-
-            else -> navController.navigate(Screen.HomeScreen.route) {
-                popUpTo(Screen.LoginScreen.route) { inclusive = true }
-            }
-        }
-        return
-    }
-
-
     var username by remember { mutableStateOf("") }
 
     var passwordVisible by remember { mutableStateOf(false) }
 
     var password by remember { mutableStateOf("") }
-
-    LaunchedEffect(authState.value) {
-        when (authState.value) {
-            is AuthState.Authenticated ->
-                when (authViewModel.currentUser()?.role) {
-                    Role.ADMIN -> navController.navigate(Screen.AdminScreen.route)
-                    else -> navController.navigate(Screen.HomeScreen.route)
-                }
-
-            is AuthState.Error -> ToastUtils.showToast(context, (authState.value as AuthState.Error).message)
-
-            else -> Unit
-        }
-    }
-
-
 
     Column(
         modifier = Modifier
@@ -180,11 +143,3 @@ fun LoginScreen(
             }
     }
 }
-
-//@Preview(showBackground = true)
-//@Composable
-//fun LoginScreenPreview(){
-//    OasesTheme {
-//        LoginScreen(navController = rememberNavController(), padding = PaddingValues(0.dp), authViewModel = )
-//    }
-//}

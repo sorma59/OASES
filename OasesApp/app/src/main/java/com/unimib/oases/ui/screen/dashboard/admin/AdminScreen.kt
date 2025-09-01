@@ -20,8 +20,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -32,7 +30,6 @@ import com.unimib.oases.ui.components.scaffold.OasesTopAppBar
 import com.unimib.oases.ui.components.scaffold.OasesTopAppBarType
 import com.unimib.oases.ui.components.text.AutoResizedText
 import com.unimib.oases.ui.navigation.Screen
-import com.unimib.oases.ui.screen.login.AuthState
 import com.unimib.oases.ui.screen.login.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,22 +47,6 @@ fun AdminScreen(
 //        else -> 3
 //    }
 
-
-    val authState = authViewModel.authState.observeAsState()
-
-
-    LaunchedEffect(authState.value) {
-        when (authState.value) {
-            is AuthState.Unauthenticated ->
-                navController.navigate(Screen.LoginScreen.route) {
-                    popUpTo(0) { inclusive = true }
-                }
-
-            else -> Unit
-        }
-    }
-
-
     Column(modifier = Modifier.fillMaxSize()) {
 
         OasesTopAppBar(
@@ -78,7 +59,6 @@ fun AdminScreen(
             modifier = Modifier
                 .padding(horizontal = 10.dp)
                 .fillMaxSize()
-
                 .padding(bottom = padding.calculateBottomPadding()),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -91,20 +71,19 @@ fun AdminScreen(
                     else -> DpSize(maxWidth * 0.3f, maxHeight * 0.4f)
                 }
 
-
-
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(3),
                     contentPadding = PaddingValues(2.dp),
                     horizontalArrangement = Arrangement.Center
                 ) {
 
-
                     item {
                         Button(
                             onClick = { navController.navigate(Screen.UserManagementScreen.route) },
                             shape = MaterialTheme.shapes.extraSmall,
-                            modifier = Modifier.padding(5.dp).size(itemSize)
+                            modifier = Modifier
+                                .padding(5.dp)
+                                .size(itemSize)
                         ) {
                             Column(
                                 verticalArrangement = Arrangement.Center,
@@ -113,21 +92,15 @@ fun AdminScreen(
                                 Row {
                                     Icon(
                                         imageVector = Icons.Default.Person,
-
                                         contentDescription = "",
                                         modifier = Modifier.size(itemSize/2)
-
-
                                     )
                                 }
 
                                 Row {
                                     AutoResizedText(text = "Users", style = MaterialTheme.typography.bodyLarge)
                                 }
-
-
                             }
-
                         }
                     }
 
@@ -135,7 +108,9 @@ fun AdminScreen(
                         Button(
                             onClick = { navController.navigate(Screen.DiseaseManagementScreen.route) },
                             shape = MaterialTheme.shapes.extraSmall,
-                            modifier = Modifier.padding(5.dp).size(itemSize)
+                            modifier = Modifier
+                                .padding(5.dp)
+                                .size(itemSize)
                         ) {
                             Column(
                                 verticalArrangement = Arrangement.Center,
@@ -145,21 +120,15 @@ fun AdminScreen(
                                 Row {
                                     Icon(
                                         imageVector = Icons.Default.MedicalInformation,
-
                                         contentDescription = "",
                                         modifier = Modifier.size(itemSize/2)
-
-
                                     )
                                 }
 
                                 Row {
                                     AutoResizedText(text = "Diseases", style = MaterialTheme.typography.bodyLarge)
                                 }
-
-
                             }
-
                         }
                     }
 
@@ -167,7 +136,9 @@ fun AdminScreen(
                         Button(
                             onClick = { navController.navigate(Screen.VitalSignsManagementScreen.route) },
                             shape = MaterialTheme.shapes.extraSmall,
-                            modifier = Modifier.padding(5.dp).size(itemSize)
+                            modifier = Modifier
+                                .padding(5.dp)
+                                .size(itemSize)
                         ) {
                             Column(
                                 verticalArrangement = Arrangement.Center,
@@ -179,22 +150,15 @@ fun AdminScreen(
                                         imageVector = Icons.Default.Bloodtype,
                                         contentDescription = "",
                                         modifier = Modifier.size(itemSize/2)
-
-
                                     )
                                 }
 
                                 Row {
                                     AutoResizedText(text = "Vital Signs", style = MaterialTheme.typography.bodyLarge)
                                 }
-
-
                             }
-
                         }
                     }
-
-
                 }
             }
         }

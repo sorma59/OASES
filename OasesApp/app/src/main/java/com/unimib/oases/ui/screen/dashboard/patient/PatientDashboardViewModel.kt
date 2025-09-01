@@ -5,8 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.repository.PatientRepository
-import com.unimib.oases.ui.screen.dashboard.patient.PatientDashboardViewModel.NavigationEvent.Navigate
-import com.unimib.oases.ui.screen.dashboard.patient.PatientDashboardViewModel.NavigationEvent.NavigateBack
+import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -82,7 +81,7 @@ class PatientDashboardViewModel @Inject constructor(
 
                         else -> {
                             navigationEventsChannel.send(
-                                Navigate(
+                                NavigationEvent.Navigate(
                                     event.button.route + _state.value.receivedId
                                 )
                             )
@@ -112,7 +111,7 @@ class PatientDashboardViewModel @Inject constructor(
 
             PatientDashboardEvent.OnBack -> {
                 viewModelScope.launch(dispatcher){
-                    navigationEventsChannel.send(NavigateBack)
+                    navigationEventsChannel.send(NavigationEvent.NavigateBack)
                 }
             }
         }
@@ -122,10 +121,5 @@ class PatientDashboardViewModel @Inject constructor(
     sealed class UiEvent {
         data object ShowDialog: UiEvent()
         data object HideDialog: UiEvent()
-    }
-
-    sealed class NavigationEvent{
-        data class Navigate(val route: String): NavigationEvent()
-        data object NavigateBack: NavigationEvent()
     }
 }

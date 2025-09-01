@@ -6,14 +6,18 @@ import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.domain.usecase.PatientUseCase
+import com.unimib.oases.ui.navigation.NavigationEvent
+import com.unimib.oases.ui.navigation.Screen
 import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -26,9 +30,11 @@ class HomeScreenViewModel @Inject constructor(
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
 ): ViewModel() {
 
-
     private val _state = MutableStateFlow(HomeScreenState())
     val state: StateFlow<HomeScreenState> = _state
+
+    private val navigationEventsChannel = Channel<NavigationEvent>()
+    val navigationEvents = navigationEventsChannel.receiveAsFlow()
 
     private var getPatientsJob: Job? = null
     private var errorHandler = CoroutineExceptionHandler { _, e ->
@@ -48,6 +54,25 @@ class HomeScreenViewModel @Inject constructor(
                 _state.update{
                     _state.value.copy(
                         toastMessage = null
+                    )
+                }
+            }
+
+            HomeScreenEvent.AddButtonClicked -> {
+                viewModelScope.launch {
+                    navigationEventsChannel.send(
+                        NavigationEvent.Navigate(
+                            Screen.RegistrationScreen.route
+                        )
+                    )
+                }
+            }
+            is HomeScreenEvent.PatientItemClicked -> {
+                viewModelScope.launch {
+                    navigationEventsChannel.send(
+                        NavigationEvent.Navigate(
+                            Screen.PatientDashboardScreen.route + "/patientId=${event.patientId}"
+                        )
                     )
                 }
             }

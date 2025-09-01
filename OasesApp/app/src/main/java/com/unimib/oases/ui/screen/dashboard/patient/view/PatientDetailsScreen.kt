@@ -34,6 +34,8 @@ import com.unimib.oases.ui.components.scaffold.OasesTopAppBarType
 import com.unimib.oases.ui.components.util.button.BottomButtons
 import com.unimib.oases.ui.components.util.button.EditButton
 import com.unimib.oases.ui.components.util.button.RetryButton
+import com.unimib.oases.ui.navigation.NavigationEvent
+import com.unimib.oases.ui.navigation.navigateToLogin
 import com.unimib.oases.ui.screen.login.AuthViewModel
 import com.unimib.oases.util.StringFormatHelper.getAgeWithSuffix
 
@@ -52,11 +54,15 @@ fun PatientDetailsScreen(
     LaunchedEffect(Unit) {
         viewModel.navigationEvents.collect {
             when (it){
-                is PatientDetailsViewModel.NavigationEvent.Navigate -> {
+                is NavigationEvent.Navigate -> {
                     navController.navigate(it.route)
                 }
-                is PatientDetailsViewModel.NavigationEvent.NavigateBack -> {
+                is NavigationEvent.NavigateBack -> {
                     navController.popBackStack()
+                }
+
+                NavigationEvent.NavigateToLogin -> {
+                    navController.navigateToLogin()
                 }
             }
         }

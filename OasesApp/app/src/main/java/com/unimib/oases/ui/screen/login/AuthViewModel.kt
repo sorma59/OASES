@@ -41,7 +41,14 @@ class AuthViewModel @Inject constructor(
         if (auth.currentUser.value == null) {
             _authState.value = AuthState.Unauthenticated
         } else {
-            _authState.value = AuthState.Authenticated(User(auth.currentUser.value!!.username, auth.currentUser.value!!.pwHash, auth.currentUser.value!!.role, auth.currentUser.value!!.salt))
+            _authState.value = AuthState.Authenticated(
+                User(
+                    auth.currentUser.value!!.username,
+                    auth.currentUser.value!!.pwHash,
+                    auth.currentUser.value!!.role,
+                    auth.currentUser.value!!.salt
+                )
+            )
         }
     }
 

@@ -40,9 +40,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.unimib.oases.data.local.model.Role
 import com.unimib.oases.ui.components.util.button.BottomButtons
+import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Screen
+import com.unimib.oases.ui.navigation.navigateToLogin
 import com.unimib.oases.ui.screen.login.AuthViewModel
-import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreenViewModel.NavigationEvent
 import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreenViewModel.ValidationEvent
 import com.unimib.oases.ui.screen.nurse_assessment.malnutrition_screening.MalnutritionScreeningScreen
 import com.unimib.oases.ui.screen.nurse_assessment.past_medical_history.PastHistoryScreen
@@ -67,8 +68,6 @@ fun RegistrationScreen(
     val registrationScreenViewModel: RegistrationScreenViewModel = hiltViewModel()
 
     val state by registrationScreenViewModel.state.collectAsState()
-
-    val navigationEvents by registrationScreenViewModel.navigationEvents.collectAsState(null)
 
     val validationEvents = registrationScreenViewModel.validationEvents
 
@@ -125,13 +124,19 @@ fun RegistrationScreen(
         else
             registrationScreenViewModel::onNext
 
-    LaunchedEffect(key1 = navigationEvents) {
-        when (navigationEvents) {
-            is NavigationEvent.NavigateBack -> {
-                navController.popBackStack()
+    LaunchedEffect(Unit) {
+        registrationScreenViewModel.navigationEvents.collect {
+            when (it) {
+                NavigationEvent.NavigateBack -> {
+                    navController.popBackStack()
+                }
+                is NavigationEvent.Navigate -> {
+                    navController.navigate(it.route)
+                }
+                NavigationEvent.NavigateToLogin -> {
+                    navController.navigateToLogin()
+                }
             }
-
-            null -> {}
         }
     }
 

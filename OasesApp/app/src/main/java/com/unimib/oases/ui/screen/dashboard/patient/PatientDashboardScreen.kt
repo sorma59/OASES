@@ -43,7 +43,9 @@ import com.unimib.oases.ui.components.scaffold.OasesTopAppBar
 import com.unimib.oases.ui.components.scaffold.OasesTopAppBarType
 import com.unimib.oases.ui.components.util.button.DeleteButton
 import com.unimib.oases.ui.components.util.button.DismissButton
+import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Screen
+import com.unimib.oases.ui.navigation.navigateToLogin
 import com.unimib.oases.ui.screen.login.AuthViewModel
 import com.unimib.oases.ui.util.ToastUtils
 
@@ -66,12 +68,16 @@ fun PatientDashboardScreen(
 
         patientDashboardViewModel.navigationEvents.collect {
             when (it) {
-                is PatientDashboardViewModel.NavigationEvent.Navigate -> {
+                is NavigationEvent.Navigate -> {
                     navController.navigate(it.route)
                 }
 
-                is PatientDashboardViewModel.NavigationEvent.NavigateBack -> {
+                is NavigationEvent.NavigateBack -> {
                     navController.popBackStack()
+                }
+
+                NavigationEvent.NavigateToLogin -> {
+                    navController.navigateToLogin()
                 }
             }
         }
@@ -80,11 +86,11 @@ fun PatientDashboardScreen(
     LaunchedEffect(Unit) {
         patientDashboardViewModel.uiEvents.collect {
             showAlertDialog = when(it){
-                is PatientDashboardViewModel.UiEvent.ShowDialog -> {
+                PatientDashboardViewModel.UiEvent.ShowDialog -> {
                     true
                 }
 
-                is PatientDashboardViewModel.UiEvent.HideDialog -> {
+                PatientDashboardViewModel.UiEvent.HideDialog -> {
                     false
                 }
             }

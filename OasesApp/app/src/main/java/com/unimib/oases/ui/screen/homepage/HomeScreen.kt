@@ -21,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,8 +43,8 @@ import com.unimib.oases.ui.components.search.SearchBar
 import com.unimib.oases.ui.components.util.BluetoothPermissionHandler
 import com.unimib.oases.ui.components.util.NoPermissionMessage
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
-import com.unimib.oases.ui.navigation.Screen
-import com.unimib.oases.ui.screen.login.AuthState
+import com.unimib.oases.ui.navigation.NavigationEvent
+import com.unimib.oases.ui.navigation.navigateToLogin
 import com.unimib.oases.ui.screen.login.AuthViewModel
 import com.unimib.oases.ui.util.ToastUtils
 import kotlinx.coroutines.launch
@@ -65,13 +64,15 @@ fun HomeScreen(
 
     val hasPermissions by bluetoothManager.hasPermissions.collectAsState()
 
-    val authState = authViewModel.authState.observeAsState()
-
     val state by homeScreenViewModel.state.collectAsState()
 
     var searchText by remember { mutableStateOf("") }
     var active by remember { mutableStateOf(false) }
     val listState = remember { mutableStateListOf<String>() }
+
+    val onPatientItemClick = { patientId: String ->
+        homeScreenViewModel.onEvent(HomeScreenEvent.PatientItemClicked(patientId))
+    }
 
 
     val filteredItems = state.patients.filter { item ->
@@ -88,14 +89,13 @@ fun HomeScreen(
         }
     )
 
-    LaunchedEffect(authState.value) {
-        when (authState.value) {
-            is AuthState.Unauthenticated ->
-                navController.navigate(Screen.LoginScreen.route) {
-                    popUpTo(0) { inclusive = true }
-                }
-
-            else -> Unit
+    LaunchedEffect(Unit) {
+        homeScreenViewModel.navigationEvents.collect{
+            when(it){
+                is NavigationEvent.Navigate -> navController.navigate(it.route)
+                NavigationEvent.NavigateBack -> navController.popBackStack()
+                NavigationEvent.NavigateToLogin -> navController.navigateToLogin()
+            }
         }
     }
 
@@ -173,14 +173,14 @@ fun HomeScreen(
                                     onHistoryItemClick = { searchText = it })
                             }
                         }
-                        RecentlyReceivedPatientList(state.receivedPatients, navController)
+                        RecentlyReceivedPatientList(state.receivedPatients)
                         if(state.isLoading){
                             CustomCircularProgressIndicator()
                         }
                         else if (state.patients.isNotEmpty()) {
                             PatientList(
                                 patients = filteredItems,
-                                navController = navController,
+                                onItemClick = onPatientItemClick
                             )
                         }
                         if (state.errorMessage != null){
@@ -190,14 +190,14 @@ fun HomeScreen(
                     }
                     if (authViewModel.currentUser()?.role == Role.NURSE) { //TODO(Refactor this?)
                         FloatingActionButton(
-                            onClick = { navController.navigate(Screen.RegistrationScreen.route) },
+                            onClick = { homeScreenViewModel.onEvent(HomeScreenEvent.AddButtonClicked) },
                             modifier = Modifier.padding(30.dp),
                             containerColor = MaterialTheme.colorScheme.primary
                         ) {
                             Icon(
                                 tint = MaterialTheme.colorScheme.surface,
                                 imageVector = Icons.Default.Add,
-                                contentDescription = "History",
+                                contentDescription = "Add a patient",
                             )
                         }
                     }

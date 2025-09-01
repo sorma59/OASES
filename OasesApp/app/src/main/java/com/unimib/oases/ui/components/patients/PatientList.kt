@@ -14,19 +14,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.ui.components.card.PatientCard
 import com.unimib.oases.ui.components.card.PatientUi
 import com.unimib.oases.ui.components.util.CenteredText
 import com.unimib.oases.ui.components.util.SmallGrayText
-import com.unimib.oases.ui.navigation.Screen
 
 @Composable
 fun PatientList(
     modifier: Modifier = Modifier,
     patients: List<Patient> = emptyList(),
-    navController: NavController,
+    onItemClick: (String) -> Unit = {},
     title: String = "Patient List",
     noPatientsMessage: String = "No patients found."
 ) {
@@ -74,7 +72,7 @@ fun PatientList(
                             },
                             actions = {},
                             onCardClick = { patientId ->
-                                navController.navigate(Screen.PatientDashboardScreen.route + "/patientId=$patientId")
+                                onItemClick(patientId)
                             },
                         )
                     }

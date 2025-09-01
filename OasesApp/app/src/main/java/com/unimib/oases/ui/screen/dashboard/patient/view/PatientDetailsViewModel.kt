@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.repository.PatientRepository
+import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -87,10 +88,5 @@ class PatientDetailsViewModel @Inject constructor(
             }
         }
 
-    }
-
-    sealed class NavigationEvent{
-        data class Navigate(val route: String): NavigationEvent()
-        object NavigateBack: NavigationEvent()
     }
 }

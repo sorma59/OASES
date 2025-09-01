@@ -27,6 +27,7 @@ import com.unimib.oases.domain.usecase.VisitUseCase
 import com.unimib.oases.domain.usecase.VisitVitalSignsUseCase
 import com.unimib.oases.domain.usecase.VitalSignUseCase
 import com.unimib.oases.domain.usecase.VitalSigns
+import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.screen.login.AuthManager
 import com.unimib.oases.ui.screen.nurse_assessment.handler.PastHistoryHandler
 import com.unimib.oases.ui.screen.nurse_assessment.handler.PatientInfoHandler
@@ -883,10 +884,6 @@ class RegistrationScreenViewModel @Inject constructor(
 
     fun mustSkipContinueToTriagePage(): Boolean {
         return !_state.value.patientInfoState.isEdited && !_state.value.patientInfoState.isNew
-    }
-
-    sealed class NavigationEvent {
-        data object NavigateBack : NavigationEvent()
     }
 
     sealed class ValidationEvent {
