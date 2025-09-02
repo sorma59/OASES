@@ -35,7 +35,6 @@ import com.unimib.oases.ui.components.util.button.BottomButtons
 import com.unimib.oases.ui.components.util.button.EditButton
 import com.unimib.oases.ui.components.util.button.RetryButton
 import com.unimib.oases.ui.navigation.NavigationEvent
-import com.unimib.oases.ui.navigation.navigateToLogin
 import com.unimib.oases.ui.screen.login.AuthViewModel
 import com.unimib.oases.util.StringFormatHelper.getAgeWithSuffix
 
@@ -61,9 +60,11 @@ fun PatientDetailsScreen(
                     navController.popBackStack()
                 }
 
-                NavigationEvent.NavigateToLogin -> {
-                    navController.navigateToLogin()
-                }
+//                NavigationEvent.NavigateToLogin -> {
+//                    navController.navigateToLogin()
+//                }
+
+//                is NavigationEvent.NavigateAfterLogin -> Unit
             }
         }
     }

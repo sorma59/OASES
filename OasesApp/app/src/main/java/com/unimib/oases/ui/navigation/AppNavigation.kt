@@ -4,9 +4,6 @@ import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -14,7 +11,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.unimib.oases.data.bluetooth.BluetoothCustomManager
-import com.unimib.oases.data.local.model.Role
 import com.unimib.oases.ui.screen.bluetooth.pairing.PairNewDeviceScreen
 import com.unimib.oases.ui.screen.bluetooth.sending.SendPatientViaBluetoothScreen
 import com.unimib.oases.ui.screen.dashboard.admin.AdminScreen
@@ -24,19 +20,17 @@ import com.unimib.oases.ui.screen.dashboard.admin.vitalsigns.VitalSignManagement
 import com.unimib.oases.ui.screen.dashboard.patient.PatientDashboardScreen
 import com.unimib.oases.ui.screen.dashboard.patient.view.PatientDetailsScreen
 import com.unimib.oases.ui.screen.homepage.HomeScreen
-import com.unimib.oases.ui.screen.login.AuthState
 import com.unimib.oases.ui.screen.login.AuthViewModel
-import com.unimib.oases.ui.screen.login.LoginScreen
 import com.unimib.oases.ui.screen.medical_visit.MedicalVisitScreen
 import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreen
-import com.unimib.oases.ui.util.ToastUtils
+import com.unimib.oases.ui.screen.root.AppViewModel
 
 /**
  * Navigates to the login screen clearing the whole backstack beforehand
  */
 
 fun NavController.navigateToLogin(){
-    clearBackStackAndNavigate(Screen.LoginScreen.route)
+//    clearBackStackAndNavigate(Screen.LoginScreen.route)
 }
 
 fun NavController.clearBackStackAndNavigate(route: String){
@@ -49,36 +43,37 @@ fun NavController.clearBackStackAndNavigate(route: String){
 
 @Composable
 fun AppNavigation(
+    startDestination: String,
     navController: NavHostController,
     padding: PaddingValues,
-    bluetoothCustomManager: BluetoothCustomManager
+    bluetoothCustomManager: BluetoothCustomManager,
+    authViewModel: AuthViewModel,
+    appViewModel: AppViewModel
 ){
 
-    val authViewModel: AuthViewModel = hiltViewModel()
+//    val authState = authViewModel.authState.collectAsState()
 
-    val authState = authViewModel.authState.observeAsState()
-
-    LaunchedEffect(authState.value) {
-        when (val state = authState.value) {
-            is AuthState.Authenticated -> {
-                when (state.user.role) {
-                    Role.ADMIN -> navController.clearBackStackAndNavigate(Screen.AdminScreen.route)
-                    Role.DOCTOR, Role.NURSE -> navController.clearBackStackAndNavigate(Screen.HomeScreen.route)
-                }
-            }
-            AuthState.Unauthenticated -> {
-                navController.navigateToLogin()
-            }
-            is AuthState.Error -> {
-                ToastUtils.showToast(navController.context, (authState.value as AuthState.Error).message)
-            }
-            else -> Unit
-        }
-    }
+//    LaunchedEffect(authState.value) {
+//        when (val state = authState.value) {
+//            is AuthState.Authenticated -> {
+//                when (state.user.role) {
+//                    Role.ADMIN -> navController.clearBackStackAndNavigate(Screen.AdminScreen.route)
+//                    Role.DOCTOR, Role.NURSE -> navController.clearBackStackAndNavigate(Screen.HomeScreen.route)
+//                }
+//            }
+//            AuthState.Unauthenticated -> {
+//                navController.navigateToLogin()
+//            }
+//            is AuthState.Error -> {
+//                ToastUtils.showToast(navController.context, (authState.value as AuthState.Error).message)
+//            }
+//            else -> Unit
+//        }
+//    }
 
     NavHost(
         navController = navController,
-        startDestination = Screen.LoginScreen.route,
+        startDestination = startDestination,
     ) {
 
         composable(Screen.AdminScreen.route) {
@@ -97,33 +92,33 @@ fun AppNavigation(
             DiseaseManagementScreen (navController, padding)
         }
 
-        composable(Screen.LoginScreen.route) {
-            LoginScreen(navController, padding, authViewModel)
-        }
+//        composable(Screen.LoginScreen.route) {
+//            LoginScreen(authViewModel)
+//        }
 
         composable(Screen.HomeScreen.route,
-            exitTransition = {
-                when (targetState.destination.route) {
-                    Screen.LoginScreen.route ->
-                        slideOutOfContainer(
-                            SlideDirection.Right,
-                            animationSpec = tween(400)
-                        )
-                    else -> null
-                }
-            },
-            popExitTransition = {
-                when (targetState.destination.route) {
-                    Screen.LoginScreen.route ->
-                        slideOutOfContainer(
-                            SlideDirection.Left,
-                            animationSpec = tween(400)
-                        )
-                    else -> null
-                }
-            }
+//            exitTransition = {
+//                when (targetState.destination.route) {
+//                    Screen.LoginScreen.route ->
+//                        slideOutOfContainer(
+//                            SlideDirection.Right,
+//                            animationSpec = tween(400)
+//                        )
+//                    else -> null
+//                }
+//            },
+//            popExitTransition = {
+//                when (targetState.destination.route) {
+//                    Screen.LoginScreen.route ->
+//                        slideOutOfContainer(
+//                            SlideDirection.Left,
+//                            animationSpec = tween(400)
+//                        )
+//                    else -> null
+//                }
+//            }
         ) {
-            HomeScreen(navController, padding, authViewModel, bluetoothCustomManager)
+            HomeScreen(navController, padding, authViewModel, bluetoothCustomManager, appViewModel)
         }
 
         composable(
@@ -209,7 +204,7 @@ fun AppNavigation(
                 }
             )
         ) {
-            PatientDashboardScreen(navController, authViewModel, padding)
+            PatientDashboardScreen(navController, padding, authViewModel, appViewModel)
         }
 
         composable(

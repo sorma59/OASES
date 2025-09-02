@@ -43,9 +43,8 @@ import com.unimib.oases.ui.components.search.SearchBar
 import com.unimib.oases.ui.components.util.BluetoothPermissionHandler
 import com.unimib.oases.ui.components.util.NoPermissionMessage
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
-import com.unimib.oases.ui.navigation.NavigationEvent
-import com.unimib.oases.ui.navigation.navigateToLogin
 import com.unimib.oases.ui.screen.login.AuthViewModel
+import com.unimib.oases.ui.screen.root.AppViewModel
 import com.unimib.oases.ui.util.ToastUtils
 import kotlinx.coroutines.launch
 
@@ -57,7 +56,8 @@ fun HomeScreen(
     padding: PaddingValues,
     authViewModel: AuthViewModel,
     bluetoothManager: BluetoothCustomManager,
-    homeScreenViewModel: HomeScreenViewModel = hiltViewModel(),
+    appViewModel: AppViewModel,
+    homeScreenViewModel: HomeScreenViewModel = hiltViewModel()
 ) {
 
     val context = LocalContext.current
@@ -91,11 +91,7 @@ fun HomeScreen(
 
     LaunchedEffect(Unit) {
         homeScreenViewModel.navigationEvents.collect{
-            when(it){
-                is NavigationEvent.Navigate -> navController.navigate(it.route)
-                NavigationEvent.NavigateBack -> navController.popBackStack()
-                NavigationEvent.NavigateToLogin -> navController.navigateToLogin()
-            }
+            appViewModel.onNavEvent(it)
         }
     }
 
@@ -160,9 +156,7 @@ fun HomeScreen(
                             ) {
                                 SearchBar(
                                     query = searchText,
-                                    onQueryChange = {
-
-                                        searchText = it },
+                                    onQueryChange = { searchText = it },
                                     onSearch = {
                                         listState.add(searchText)
                                         active = false
@@ -188,7 +182,7 @@ fun HomeScreen(
                         }
 
                     }
-                    if (authViewModel.currentUser()?.role == Role.NURSE) { //TODO(Refactor this?)
+                    if (authViewModel.userRole == Role.NURSE) { //TODO(Refactor this?)
                         FloatingActionButton(
                             onClick = { homeScreenViewModel.onEvent(HomeScreenEvent.AddButtonClicked) },
                             modifier = Modifier.padding(30.dp),

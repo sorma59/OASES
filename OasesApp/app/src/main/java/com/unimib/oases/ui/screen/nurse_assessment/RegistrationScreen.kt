@@ -42,7 +42,6 @@ import com.unimib.oases.data.local.model.Role
 import com.unimib.oases.ui.components.util.button.BottomButtons
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Screen
-import com.unimib.oases.ui.navigation.navigateToLogin
 import com.unimib.oases.ui.screen.login.AuthViewModel
 import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreenViewModel.ValidationEvent
 import com.unimib.oases.ui.screen.nurse_assessment.malnutrition_screening.MalnutritionScreeningScreen
@@ -71,7 +70,7 @@ fun RegistrationScreen(
 
     val validationEvents = registrationScreenViewModel.validationEvents
 
-    val userRole = authViewModel.currentUser()?.role
+    val userRole = authViewModel.userRole
 
     var showAlertDialog by remember { mutableStateOf(false) }
 
@@ -133,9 +132,11 @@ fun RegistrationScreen(
                 is NavigationEvent.Navigate -> {
                     navController.navigate(it.route)
                 }
-                NavigationEvent.NavigateToLogin -> {
-                    navController.navigateToLogin()
-                }
+//                NavigationEvent.NavigateToLogin -> {
+//                    navController.navigateToLogin()
+//                }
+
+//                is NavigationEvent.NavigateAfterLogin -> Unit
             }
         }
     }

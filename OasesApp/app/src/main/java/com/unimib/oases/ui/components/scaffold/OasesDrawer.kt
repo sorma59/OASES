@@ -49,7 +49,7 @@ fun OasesDrawer(
     navController: NavController,
     content: @Composable () -> Unit
 ){
-    val currentUser = remember { authViewModel.currentUser() }
+    val currentUser = remember { authViewModel.currentUser }
 
     ModalNavigationDrawer(
         modifier = Modifier.fillMaxHeight(),

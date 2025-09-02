@@ -45,18 +45,18 @@ import com.unimib.oases.ui.components.util.button.DeleteButton
 import com.unimib.oases.ui.components.util.button.DismissButton
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Screen
-import com.unimib.oases.ui.navigation.navigateToLogin
 import com.unimib.oases.ui.screen.login.AuthViewModel
+import com.unimib.oases.ui.screen.root.AppViewModel
 import com.unimib.oases.ui.util.ToastUtils
 
 @Composable
 fun PatientDashboardScreen(
     navController: NavController,
+    padding: PaddingValues,
     authViewModel: AuthViewModel,
-    padding: PaddingValues
+    appViewModel: AppViewModel,
+    patientDashboardViewModel: PatientDashboardViewModel = hiltViewModel()
 ) {
-
-    val patientDashboardViewModel: PatientDashboardViewModel = hiltViewModel()
 
     val state by patientDashboardViewModel.state.collectAsState()
 
@@ -76,9 +76,11 @@ fun PatientDashboardScreen(
                     navController.popBackStack()
                 }
 
-                NavigationEvent.NavigateToLogin -> {
-                    navController.navigateToLogin()
-                }
+//                NavigationEvent.NavigateToLogin -> {
+//                    navController.navigateToLogin()
+//                }
+
+//                is NavigationEvent.NavigateAfterLogin -> Unit
             }
         }
     }

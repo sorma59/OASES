@@ -8,10 +8,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.navigation.compose.rememberNavController
 import com.unimib.oases.data.bluetooth.BluetoothCustomManager
 import com.unimib.oases.data.util.FirestoreManager
-import com.unimib.oases.ui.components.scaffold.MainScaffold
+import com.unimib.oases.ui.screen.root.OasesRoot
 import com.unimib.oases.ui.theme.OasesTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -55,8 +54,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             OasesTheme {
-                val navController = rememberNavController()
-                MainScaffold(navController, bluetoothCustomManager)
+                OasesRoot(bluetoothCustomManager)
             }
         }
 
