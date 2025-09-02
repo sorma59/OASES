@@ -26,6 +26,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.unimib.oases.R
+import com.unimib.oases.ui.util.debounce
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,6 +37,13 @@ fun OasesTopAppBar(
     showLogo: Boolean = false,
     actions: @Composable RowScope.() -> Unit = {}
 ){
+
+    val handleIconButtonClick =
+        if (type == OasesTopAppBarType.BACK) {
+            {onNavigationIconClick()}.debounce()
+        } else {
+            onNavigationIconClick
+        }
 
     CenterAlignedTopAppBar(
         title = {
@@ -69,7 +77,7 @@ fun OasesTopAppBar(
         ),
         navigationIcon = {
             IconButton(
-                onClick = onNavigationIconClick
+                onClick = handleIconButtonClick
             ) {
                 Icon(
                     imageVector = type.icon,
