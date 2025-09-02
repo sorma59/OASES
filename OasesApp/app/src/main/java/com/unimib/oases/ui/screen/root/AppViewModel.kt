@@ -4,9 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unimib.oases.ui.navigation.NavigationEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -14,8 +14,8 @@ import javax.inject.Inject
 class AppViewModel @Inject constructor(
 ): ViewModel() {
 
-    private val _navEvents = MutableStateFlow<NavigationEvent?>(null)
-    val navEvents: StateFlow<NavigationEvent?> = _navEvents.asStateFlow()
+    private val _navEvents = MutableSharedFlow<NavigationEvent>()
+    val navEvents: SharedFlow<NavigationEvent> = _navEvents.asSharedFlow()
 
     fun navigateTo(route: String) {
         viewModelScope.launch {
@@ -24,7 +24,7 @@ class AppViewModel @Inject constructor(
     }
 
     fun onNavEvent(event: NavigationEvent){
-        _navEvents.value = event
+        viewModelScope.launch { _navEvents.emit(event) }
     }
 
 }

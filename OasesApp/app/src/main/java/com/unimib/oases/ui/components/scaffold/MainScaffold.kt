@@ -26,12 +26,6 @@ fun MainScaffold(
     }
 
 //    LaunchedEffect(Unit) {
-//        patientViewModel.events.collect { event ->
-//            appViewModel.onPatientEvent(event)
-//        }
-//    }
-
-//    LaunchedEffect(Unit) {
 //        appViewModel.uiEvents.collect { uiEvent ->
 //            when (uiEvent) {
 //                is UiEvent.Toast -> ToastUtils.showToast(context, uiEvent.message)
@@ -41,15 +35,12 @@ fun MainScaffold(
 //    }
 
     // Collect global navigation/UI events
-    LaunchedEffect(appViewModel.navEvents, /*appViewModel.uiEvents*/) {
+    LaunchedEffect(Unit) {
         launch {
             appViewModel.navEvents.collect { event ->
                 when (event) {
                     is NavigationEvent.Navigate -> navController.navigate(event.route)
-//                    is NavigationEvent.NavigateAfterLogin -> navController.clearBackStackAndNavigate(event.route)
                     NavigationEvent.NavigateBack -> navController.popBackStack()
-//                    NavigationEvent.NavigateToLogin -> navController.navigateToLogin()
-                    null -> Unit
                 }
             }
         }
