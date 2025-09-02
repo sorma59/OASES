@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.MedicalServices
 import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -33,15 +32,12 @@ import com.unimib.oases.ui.components.scaffold.OasesTopAppBarType
 import com.unimib.oases.ui.components.util.button.BottomButtons
 import com.unimib.oases.ui.components.util.button.EditButton
 import com.unimib.oases.ui.components.util.button.RetryButton
-import com.unimib.oases.ui.screen.login.AuthViewModel
 import com.unimib.oases.ui.screen.root.AppViewModel
 import com.unimib.oases.util.StringFormatHelper.getAgeWithSuffix
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PatientDetailsScreen(
     padding: PaddingValues,
-    authViewModel: AuthViewModel,
     appViewModel: AppViewModel
 ) {
 

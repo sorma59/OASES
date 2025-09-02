@@ -108,7 +108,7 @@ fun AppNavigation(
                 }
             }
         ) {
-            RegistrationScreen(navController, padding, authViewModel)
+            RegistrationScreen(navController, padding, authViewModel, appViewModel)
         }
 
         composable(
@@ -141,7 +141,7 @@ fun AppNavigation(
                 }
             )
         ) {
-            PatientDashboardScreen(navController, padding, authViewModel, appViewModel)
+            PatientDashboardScreen(padding, appViewModel)
         }
 
         composable(
@@ -152,7 +152,7 @@ fun AppNavigation(
                 }
             )
         ){
-            PatientDetailsScreen(padding, authViewModel, appViewModel)
+            PatientDetailsScreen(padding, appViewModel)
         }
     }
 }

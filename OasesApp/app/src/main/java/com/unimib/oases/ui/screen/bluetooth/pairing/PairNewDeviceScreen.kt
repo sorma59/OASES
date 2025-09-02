@@ -71,7 +71,7 @@ fun PairNewDeviceScreen(
         OasesTopAppBar(
             title = "Pair New Device",
             type = OasesTopAppBarType.BACK,
-            onNavigationIconClick = { navController.popBackStack() }
+            onNavigationIconClick = navController::popBackStack
         )
 
         Column(

@@ -1,26 +1,16 @@
 package com.unimib.oases.ui.screen.nurse_assessment
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -32,16 +22,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.unimib.oases.data.local.model.Role
+import com.unimib.oases.ui.components.scaffold.OasesTopAppBar
+import com.unimib.oases.ui.components.scaffold.OasesTopAppBarType
 import com.unimib.oases.ui.components.util.button.BottomButtons
-import com.unimib.oases.ui.navigation.NavigationEvent
-import com.unimib.oases.ui.navigation.Screen
 import com.unimib.oases.ui.screen.login.AuthViewModel
 import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreenViewModel.ValidationEvent
 import com.unimib.oases.ui.screen.nurse_assessment.malnutrition_screening.MalnutritionScreeningScreen
@@ -55,13 +42,14 @@ import com.unimib.oases.ui.screen.nurse_assessment.triage.RedCodeScreen
 import com.unimib.oases.ui.screen.nurse_assessment.triage.YellowCodeScreen
 import com.unimib.oases.ui.screen.nurse_assessment.visit_history.VisitHistoryScreen
 import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.VitalSignsScreen
+import com.unimib.oases.ui.screen.root.AppViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegistrationScreen(
     navController: NavController,
     padding: PaddingValues,
-    authViewModel: AuthViewModel
+    authViewModel: AuthViewModel,
+    appViewModel: AppViewModel
 ) {
 
     val registrationScreenViewModel: RegistrationScreenViewModel = hiltViewModel()
@@ -125,19 +113,7 @@ fun RegistrationScreen(
 
     LaunchedEffect(Unit) {
         registrationScreenViewModel.navigationEvents.collect {
-            when (it) {
-                NavigationEvent.NavigateBack -> {
-                    navController.popBackStack()
-                }
-                is NavigationEvent.Navigate -> {
-                    navController.navigate(it.route)
-                }
-//                NavigationEvent.NavigateToLogin -> {
-//                    navController.navigateToLogin()
-//                }
-
-//                is NavigationEvent.NavigateAfterLogin -> Unit
-            }
+            appViewModel.onNavEvent(it)
         }
     }
 
@@ -157,40 +133,10 @@ fun RegistrationScreen(
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        CenterAlignedTopAppBar(
-            title = {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        "Patient Registration",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-            },
-            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                containerColor = MaterialTheme.colorScheme.onPrimary,
-                scrolledContainerColor = MaterialTheme.colorScheme.onPrimary,
-                navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
-                titleContentColor = MaterialTheme.colorScheme.onBackground,
-                actionIconContentColor = MaterialTheme.colorScheme.onBackground,
-            ),
-            navigationIcon = {
-                IconButton(onClick = {
-                    navController.navigate(Screen.HomeScreen.route)
-                }) {
-                    Icon(
-                        imageVector = Icons.Filled.ArrowBackIosNew,
-                        contentDescription = "Arrow back"
-                    )
-                }
-            },
-            actions = {},
-            scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+        OasesTopAppBar(
+            title = "Patient registration",
+            type = OasesTopAppBarType.BACK,
+            onNavigationIconClick = navController::popBackStack
         )
 
         Column(

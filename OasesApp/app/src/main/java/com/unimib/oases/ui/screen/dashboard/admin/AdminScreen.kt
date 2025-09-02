@@ -17,7 +17,6 @@ import androidx.compose.material.icons.filled.MedicalInformation
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.rememberDrawerState
@@ -37,7 +36,6 @@ import com.unimib.oases.ui.navigation.Screen
 import com.unimib.oases.ui.screen.login.AuthViewModel
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminScreen(
     navController: NavController,

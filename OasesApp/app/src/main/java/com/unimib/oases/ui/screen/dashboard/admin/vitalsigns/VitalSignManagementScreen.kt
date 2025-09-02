@@ -14,15 +14,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -31,8 +28,6 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -44,23 +39,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.unimib.oases.domain.model.NumericPrecision
 import com.unimib.oases.domain.model.VitalSign
+import com.unimib.oases.ui.components.scaffold.OasesTopAppBar
+import com.unimib.oases.ui.components.scaffold.OasesTopAppBarType
 import com.unimib.oases.ui.components.util.button.DeleteButton
 import com.unimib.oases.ui.components.util.button.DismissButton
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
-import com.unimib.oases.ui.navigation.Screen
 import com.unimib.oases.ui.util.ToastUtils
 import kotlinx.coroutines.launch
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VitalSignManagementScreen(
     navController: NavController,
@@ -71,7 +63,7 @@ fun VitalSignManagementScreen(
     val state by vitalSignsManagementViewModel.state.collectAsState()
 
     val snackbarHostState =
-        remember { SnackbarHostState() } // for hosting snackbars, if I delete a intem I get a snackbar to undo the item
+        remember { SnackbarHostState() } // for hosting snackbars, if I delete a item I get a snackbar to undo the item
 
     val scope = rememberCoroutineScope()
 
@@ -101,43 +93,10 @@ fun VitalSignManagementScreen(
 
     Column(modifier = Modifier.fillMaxSize()) {
 
-        CenterAlignedTopAppBar(
-            title = {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-
-                    Text(
-                        "Admin Panel",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-
-            },
-            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                containerColor = MaterialTheme.colorScheme.onPrimary,
-                scrolledContainerColor = MaterialTheme.colorScheme.onPrimary,
-                navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
-                titleContentColor = MaterialTheme.colorScheme.onBackground,
-                actionIconContentColor = MaterialTheme.colorScheme.onBackground,
-            ),
-            navigationIcon = {
-                IconButton(onClick = {
-                    navController.navigate(Screen.AdminScreen.route)
-                }) {
-                    Icon(
-                        imageVector = Icons.Filled.ArrowBackIosNew,
-                        contentDescription = "Arrow back"
-                    )
-                }
-            },
-            actions = {},
-            scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
-
+        OasesTopAppBar(
+            title = "Vital Signs Management",
+            type = OasesTopAppBarType.BACK,
+            onNavigationIconClick = navController::popBackStack
         )
 
         Column(

@@ -37,22 +37,18 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import com.unimib.oases.ui.components.patients.PatientItem
 import com.unimib.oases.ui.components.scaffold.OasesTopAppBar
 import com.unimib.oases.ui.components.scaffold.OasesTopAppBarType
 import com.unimib.oases.ui.components.util.button.DeleteButton
 import com.unimib.oases.ui.components.util.button.DismissButton
 import com.unimib.oases.ui.navigation.Screen
-import com.unimib.oases.ui.screen.login.AuthViewModel
 import com.unimib.oases.ui.screen.root.AppViewModel
 import com.unimib.oases.ui.util.ToastUtils
 
 @Composable
 fun PatientDashboardScreen(
-    navController: NavController,
     padding: PaddingValues,
-    authViewModel: AuthViewModel,
     appViewModel: AppViewModel,
     patientDashboardViewModel: PatientDashboardViewModel = hiltViewModel()
 ) {
