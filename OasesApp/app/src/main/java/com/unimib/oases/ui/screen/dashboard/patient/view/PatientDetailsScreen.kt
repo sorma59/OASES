@@ -27,23 +27,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.ui.components.scaffold.OasesTopAppBar
 import com.unimib.oases.ui.components.scaffold.OasesTopAppBarType
 import com.unimib.oases.ui.components.util.button.BottomButtons
 import com.unimib.oases.ui.components.util.button.EditButton
 import com.unimib.oases.ui.components.util.button.RetryButton
-import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.screen.login.AuthViewModel
+import com.unimib.oases.ui.screen.root.AppViewModel
 import com.unimib.oases.util.StringFormatHelper.getAgeWithSuffix
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PatientDetailsScreen(
-    navController: NavController,
+    padding: PaddingValues,
     authViewModel: AuthViewModel,
-    padding: PaddingValues
+    appViewModel: AppViewModel
 ) {
 
     val viewModel: PatientDetailsViewModel = hiltViewModel()
@@ -52,20 +51,7 @@ fun PatientDetailsScreen(
 
     LaunchedEffect(Unit) {
         viewModel.navigationEvents.collect {
-            when (it){
-                is NavigationEvent.Navigate -> {
-                    navController.navigate(it.route)
-                }
-                is NavigationEvent.NavigateBack -> {
-                    navController.popBackStack()
-                }
-
-//                NavigationEvent.NavigateToLogin -> {
-//                    navController.navigateToLogin()
-//                }
-
-//                is NavigationEvent.NavigateAfterLogin -> Unit
-            }
+            appViewModel.onNavEvent(it)
         }
     }
 

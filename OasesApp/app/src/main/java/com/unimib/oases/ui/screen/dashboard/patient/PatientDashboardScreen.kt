@@ -43,7 +43,6 @@ import com.unimib.oases.ui.components.scaffold.OasesTopAppBar
 import com.unimib.oases.ui.components.scaffold.OasesTopAppBarType
 import com.unimib.oases.ui.components.util.button.DeleteButton
 import com.unimib.oases.ui.components.util.button.DismissButton
-import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Screen
 import com.unimib.oases.ui.screen.login.AuthViewModel
 import com.unimib.oases.ui.screen.root.AppViewModel
@@ -65,23 +64,8 @@ fun PatientDashboardScreen(
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-
         patientDashboardViewModel.navigationEvents.collect {
-            when (it) {
-                is NavigationEvent.Navigate -> {
-                    navController.navigate(it.route)
-                }
-
-                is NavigationEvent.NavigateBack -> {
-                    navController.popBackStack()
-                }
-
-//                NavigationEvent.NavigateToLogin -> {
-//                    navController.navigateToLogin()
-//                }
-
-//                is NavigationEvent.NavigateAfterLogin -> Unit
-            }
+            appViewModel.onNavEvent(it)
         }
     }
 
@@ -125,12 +109,6 @@ fun PatientDashboardScreen(
             horizontalAlignment = Alignment.End,
             verticalArrangement = Arrangement.spacedBy(64.dp)
         ) {
-//        Box(
-//            Modifier.fillMaxWidth(),
-//            contentAlignment = Alignment.Center
-//        ){
-//            TitleText("Patient Dashboard")
-//        }
 
             PatientItem(
                 patient = state.patient,

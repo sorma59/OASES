@@ -16,21 +16,26 @@ import androidx.compose.material.icons.filled.Bloodtype
 import androidx.compose.material.icons.filled.MedicalInformation
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.unimib.oases.ui.components.scaffold.OasesDrawer
 import com.unimib.oases.ui.components.scaffold.OasesTopAppBar
 import com.unimib.oases.ui.components.scaffold.OasesTopAppBarType
 import com.unimib.oases.ui.components.text.AutoResizedText
 import com.unimib.oases.ui.navigation.Screen
 import com.unimib.oases.ui.screen.login.AuthViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,114 +52,127 @@ fun AdminScreen(
 //        else -> 3
 //    }
 
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+
+    val scope = rememberCoroutineScope()
+
     Column(modifier = Modifier.fillMaxSize()) {
 
-        OasesTopAppBar(
-            title = "Admin Panel",
-            type = OasesTopAppBarType.BACK,
-            onNavigationIconClick = authViewModel::signOut,
-        )
-
-        Column(
-            modifier = Modifier
-                .padding(horizontal = 10.dp)
-                .fillMaxSize()
-                .padding(bottom = padding.calculateBottomPadding()),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
+        OasesDrawer(
+            drawerState = drawerState,
+            padding = padding,
+            authViewModel = authViewModel,
+            navController = navController,
         ) {
 
-            BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                val itemSize = when (configuration.orientation) {
-                    Configuration.ORIENTATION_PORTRAIT -> DpSize(maxWidth * 1f, maxHeight * 0.20f)
-                    Configuration.ORIENTATION_LANDSCAPE -> DpSize(maxWidth * 0.4f, maxHeight * 0.3f)
-                    else -> DpSize(maxWidth * 0.3f, maxHeight * 0.4f)
-                }
+            OasesTopAppBar(
+                title = "Admin Panel",
+                type = OasesTopAppBarType.MENU,
+                showLogo = true,
+                onNavigationIconClick = { scope.launch { drawerState.open() } }
+            )
 
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(3),
-                    contentPadding = PaddingValues(2.dp),
-                    horizontalArrangement = Arrangement.Center
-                ) {
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = 10.dp)
+                    .fillMaxSize()
+                    .padding(bottom = padding.calculateBottomPadding()),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
 
-                    item {
-                        Button(
-                            onClick = { navController.navigate(Screen.UserManagementScreen.route) },
-                            shape = MaterialTheme.shapes.extraSmall,
-                            modifier = Modifier
-                                .padding(5.dp)
-                                .size(itemSize)
-                        ) {
-                            Column(
-                                verticalArrangement = Arrangement.Center,
-                                horizontalAlignment = Alignment.CenterHorizontally,
+                BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    val itemSize = when (configuration.orientation) {
+                        Configuration.ORIENTATION_PORTRAIT -> DpSize(maxWidth * 1f, maxHeight * 0.20f)
+                        Configuration.ORIENTATION_LANDSCAPE -> DpSize(maxWidth * 0.4f, maxHeight * 0.3f)
+                        else -> DpSize(maxWidth * 0.3f, maxHeight * 0.4f)
+                    }
+
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(3),
+                        contentPadding = PaddingValues(2.dp),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+
+                        item {
+                            Button(
+                                onClick = { navController.navigate(Screen.UserManagementScreen.route) },
+                                shape = MaterialTheme.shapes.extraSmall,
+                                modifier = Modifier
+                                    .padding(5.dp)
+                                    .size(itemSize)
                             ) {
-                                Row {
-                                    Icon(
-                                        imageVector = Icons.Default.Person,
-                                        contentDescription = "",
-                                        modifier = Modifier.size(itemSize/2)
-                                    )
-                                }
+                                Column(
+                                    verticalArrangement = Arrangement.Center,
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                ) {
+                                    Row {
+                                        Icon(
+                                            imageVector = Icons.Default.Person,
+                                            contentDescription = "",
+                                            modifier = Modifier.size(itemSize/2)
+                                        )
+                                    }
 
-                                Row {
-                                    AutoResizedText(text = "Users", style = MaterialTheme.typography.bodyLarge)
+                                    Row {
+                                        AutoResizedText(text = "Users", style = MaterialTheme.typography.bodyLarge)
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    item {
-                        Button(
-                            onClick = { navController.navigate(Screen.DiseaseManagementScreen.route) },
-                            shape = MaterialTheme.shapes.extraSmall,
-                            modifier = Modifier
-                                .padding(5.dp)
-                                .size(itemSize)
-                        ) {
-                            Column(
-                                verticalArrangement = Arrangement.Center,
-                                horizontalAlignment = Alignment.CenterHorizontally,
-
+                        item {
+                            Button(
+                                onClick = { navController.navigate(Screen.DiseaseManagementScreen.route) },
+                                shape = MaterialTheme.shapes.extraSmall,
+                                modifier = Modifier
+                                    .padding(5.dp)
+                                    .size(itemSize)
                             ) {
-                                Row {
-                                    Icon(
-                                        imageVector = Icons.Default.MedicalInformation,
-                                        contentDescription = "",
-                                        modifier = Modifier.size(itemSize/2)
-                                    )
-                                }
+                                Column(
+                                    verticalArrangement = Arrangement.Center,
+                                    horizontalAlignment = Alignment.CenterHorizontally,
 
-                                Row {
-                                    AutoResizedText(text = "Diseases", style = MaterialTheme.typography.bodyLarge)
+                                ) {
+                                    Row {
+                                        Icon(
+                                            imageVector = Icons.Default.MedicalInformation,
+                                            contentDescription = "",
+                                            modifier = Modifier.size(itemSize/2)
+                                        )
+                                    }
+
+                                    Row {
+                                        AutoResizedText(text = "Diseases", style = MaterialTheme.typography.bodyLarge)
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    item {
-                        Button(
-                            onClick = { navController.navigate(Screen.VitalSignsManagementScreen.route) },
-                            shape = MaterialTheme.shapes.extraSmall,
-                            modifier = Modifier
-                                .padding(5.dp)
-                                .size(itemSize)
-                        ) {
-                            Column(
-                                verticalArrangement = Arrangement.Center,
-                                horizontalAlignment = Alignment.CenterHorizontally,
-
+                        item {
+                            Button(
+                                onClick = { navController.navigate(Screen.VitalSignsManagementScreen.route) },
+                                shape = MaterialTheme.shapes.extraSmall,
+                                modifier = Modifier
+                                    .padding(5.dp)
+                                    .size(itemSize)
                             ) {
-                                Row {
-                                    Icon(
-                                        imageVector = Icons.Default.Bloodtype,
-                                        contentDescription = "",
-                                        modifier = Modifier.size(itemSize/2)
-                                    )
-                                }
+                                Column(
+                                    verticalArrangement = Arrangement.Center,
+                                    horizontalAlignment = Alignment.CenterHorizontally,
 
-                                Row {
-                                    AutoResizedText(text = "Vital Signs", style = MaterialTheme.typography.bodyLarge)
+                                ) {
+                                    Row {
+                                        Icon(
+                                            imageVector = Icons.Default.Bloodtype,
+                                            contentDescription = "",
+                                            modifier = Modifier.size(itemSize/2)
+                                        )
+                                    }
+
+                                    Row {
+                                        AutoResizedText(text = "Vital Signs", style = MaterialTheme.typography.bodyLarge)
+                                    }
                                 }
                             }
                         }

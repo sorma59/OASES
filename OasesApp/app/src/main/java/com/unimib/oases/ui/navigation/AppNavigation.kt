@@ -4,7 +4,6 @@ import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -25,22 +24,6 @@ import com.unimib.oases.ui.screen.medical_visit.MedicalVisitScreen
 import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreen
 import com.unimib.oases.ui.screen.root.AppViewModel
 
-/**
- * Navigates to the login screen clearing the whole backstack beforehand
- */
-
-fun NavController.navigateToLogin(){
-//    clearBackStackAndNavigate(Screen.LoginScreen.route)
-}
-
-fun NavController.clearBackStackAndNavigate(route: String){
-    navigate(route) {
-        popUpTo(0){
-            inclusive = true
-        }
-    }
-}
-
 @Composable
 fun AppNavigation(
     startDestination: String,
@@ -50,27 +33,6 @@ fun AppNavigation(
     authViewModel: AuthViewModel,
     appViewModel: AppViewModel
 ){
-
-//    val authState = authViewModel.authState.collectAsState()
-
-//    LaunchedEffect(authState.value) {
-//        when (val state = authState.value) {
-//            is AuthState.Authenticated -> {
-//                when (state.user.role) {
-//                    Role.ADMIN -> navController.clearBackStackAndNavigate(Screen.AdminScreen.route)
-//                    Role.DOCTOR, Role.NURSE -> navController.clearBackStackAndNavigate(Screen.HomeScreen.route)
-//                }
-//            }
-//            AuthState.Unauthenticated -> {
-//                navController.navigateToLogin()
-//            }
-//            is AuthState.Error -> {
-//                ToastUtils.showToast(navController.context, (authState.value as AuthState.Error).message)
-//            }
-//            else -> Unit
-//        }
-//    }
-
     NavHost(
         navController = navController,
         startDestination = startDestination,
@@ -92,32 +54,7 @@ fun AppNavigation(
             DiseaseManagementScreen (navController, padding)
         }
 
-//        composable(Screen.LoginScreen.route) {
-//            LoginScreen(authViewModel)
-//        }
-
-        composable(Screen.HomeScreen.route,
-//            exitTransition = {
-//                when (targetState.destination.route) {
-//                    Screen.LoginScreen.route ->
-//                        slideOutOfContainer(
-//                            SlideDirection.Right,
-//                            animationSpec = tween(400)
-//                        )
-//                    else -> null
-//                }
-//            },
-//            popExitTransition = {
-//                when (targetState.destination.route) {
-//                    Screen.LoginScreen.route ->
-//                        slideOutOfContainer(
-//                            SlideDirection.Left,
-//                            animationSpec = tween(400)
-//                        )
-//                    else -> null
-//                }
-//            }
-        ) {
+        composable(Screen.HomeScreen.route) {
             HomeScreen(navController, padding, authViewModel, bluetoothCustomManager, appViewModel)
         }
 
@@ -215,7 +152,7 @@ fun AppNavigation(
                 }
             )
         ){
-            PatientDetailsScreen(navController, authViewModel, padding)
+            PatientDetailsScreen(padding, authViewModel, appViewModel)
         }
     }
 }
