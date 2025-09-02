@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -44,7 +45,6 @@ import com.unimib.oases.ui.screen.login.AuthViewModel
 @Composable
 fun OasesDrawer(
     drawerState: DrawerState,
-    padding: PaddingValues,
     authViewModel: AuthViewModel,
     navController: NavController,
     content: @Composable () -> Unit
@@ -59,6 +59,7 @@ fun OasesDrawer(
             ModalDrawerSheet(
                 modifier = Modifier
                     .width(280.dp)
+                    .systemBarsPadding()
                     .fillMaxHeight(),
                 (RoundedCornerShape(0.dp)),
                 windowInsets = WindowInsets(top = 0),
@@ -70,7 +71,7 @@ fun OasesDrawer(
                             .background(Color.Transparent)
                             .fillMaxWidth()
                             .padding(
-                                top = padding.calculateTopPadding() + 10.dp,
+                                top = 10.dp,
                                 end = 16.dp,
                                 start = 10.dp,
                                 bottom = 16.dp

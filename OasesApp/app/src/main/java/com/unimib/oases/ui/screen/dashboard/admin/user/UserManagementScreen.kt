@@ -3,7 +3,6 @@ package com.unimib.oases.ui.screen.dashboard.admin.user
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -45,11 +44,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import com.unimib.oases.data.local.model.Role
 import com.unimib.oases.data.local.model.User
-import com.unimib.oases.ui.components.scaffold.OasesTopAppBar
-import com.unimib.oases.ui.components.scaffold.OasesTopAppBarType
 import com.unimib.oases.ui.components.util.button.DeleteButton
 import com.unimib.oases.ui.components.util.button.DismissButton
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
@@ -59,8 +55,6 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun UserManagementScreen(
-    navController: NavController,
-    padding : PaddingValues,
     userManagementViewModel: UserManagementViewModel = hiltViewModel(),
 ) {
 
@@ -96,17 +90,8 @@ fun UserManagementScreen(
 
     Column(modifier = Modifier.fillMaxSize()) {
 
-
-        OasesTopAppBar(
-            title = "Users Management",
-            type = OasesTopAppBarType.BACK,
-            onNavigationIconClick = navController::popBackStack
-        )
-
         Column(
-            modifier = Modifier
-                .padding(horizontal = 20.dp)
-                .padding(bottom = padding.calculateBottomPadding()),
+            modifier = Modifier.padding(horizontal = 20.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {

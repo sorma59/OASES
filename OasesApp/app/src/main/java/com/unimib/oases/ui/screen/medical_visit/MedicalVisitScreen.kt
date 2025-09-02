@@ -2,7 +2,6 @@ package com.unimib.oases.ui.screen.medical_visit
 
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -14,8 +13,7 @@ import com.unimib.oases.ui.screen.login.AuthViewModel
 @Composable
 fun MedicalVisitScreen(
     navController: NavController,
-    authViewModel: AuthViewModel,
-    padding: PaddingValues,
+    authViewModel: AuthViewModel
 ) {
 
     Box(

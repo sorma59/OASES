@@ -3,7 +3,6 @@ package com.unimib.oases.ui.screen.dashboard.patient.view
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,17 +26,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.unimib.oases.domain.model.Patient
-import com.unimib.oases.ui.components.scaffold.OasesTopAppBar
-import com.unimib.oases.ui.components.scaffold.OasesTopAppBarType
 import com.unimib.oases.ui.components.util.button.BottomButtons
-import com.unimib.oases.ui.components.util.button.EditButton
 import com.unimib.oases.ui.components.util.button.RetryButton
 import com.unimib.oases.ui.screen.root.AppViewModel
 import com.unimib.oases.util.StringFormatHelper.getAgeWithSuffix
 
 @Composable
 fun PatientDetailsScreen(
-    padding: PaddingValues,
     appViewModel: AppViewModel
 ) {
 
@@ -53,24 +48,10 @@ fun PatientDetailsScreen(
 
     Column(Modifier.fillMaxSize()){
 
-        OasesTopAppBar(
-            title = "Patient Details",
-            type = OasesTopAppBarType.BACK,
-            onNavigationIconClick = { viewModel.onEvent(PatientDetailsEvent.OnBack) },
-            actions = {
-                EditButton(
-                    onClick = { viewModel.onEvent(PatientDetailsEvent.OnEdit) },
-                    contentDescription = "Edit patient details"
-                )
-            }
-        )
-
         state.patient?.let {
             Column(
                 verticalArrangement = Arrangement.Bottom,
-                modifier = Modifier
-                    .padding(bottom = padding.calculateBottomPadding())
-                    .padding(horizontal = 16.dp)
+                modifier = Modifier.padding(horizontal = 16.dp)
             ) {
 
                 Spacer(Modifier.height(24.dp))

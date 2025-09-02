@@ -3,7 +3,6 @@ package com.unimib.oases.ui.screen.dashboard.admin.disease
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,12 +37,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import com.unimib.oases.domain.model.AgeSpecificity
 import com.unimib.oases.domain.model.Disease
 import com.unimib.oases.domain.model.SexSpecificity
-import com.unimib.oases.ui.components.scaffold.OasesTopAppBar
-import com.unimib.oases.ui.components.scaffold.OasesTopAppBarType
 import com.unimib.oases.ui.components.util.OutlinedDropdown
 import com.unimib.oases.ui.components.util.button.DeleteButton
 import com.unimib.oases.ui.components.util.button.DismissButton
@@ -53,8 +49,6 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun DiseaseManagementScreen(
-    navController: NavController,
-    padding : PaddingValues,
     diseaseManagementViewModel: DiseaseManagementViewModel = hiltViewModel(),
 ) {
 
@@ -80,16 +74,8 @@ fun DiseaseManagementScreen(
 
     Column(modifier = Modifier.fillMaxSize()) {
 
-        OasesTopAppBar(
-            title = "Diseases Management",
-            type = OasesTopAppBarType.BACK,
-            onNavigationIconClick = navController::popBackStack
-        )
-
         Column(
-            modifier = Modifier
-                .padding(horizontal = 20.dp)
-                .padding(bottom = padding.calculateBottomPadding()),
+            modifier = Modifier.padding(horizontal = 20.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {

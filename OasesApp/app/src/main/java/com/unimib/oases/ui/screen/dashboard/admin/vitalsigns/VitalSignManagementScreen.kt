@@ -3,7 +3,6 @@ package com.unimib.oases.ui.screen.dashboard.admin.vitalsigns
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -41,11 +40,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import com.unimib.oases.domain.model.NumericPrecision
 import com.unimib.oases.domain.model.VitalSign
-import com.unimib.oases.ui.components.scaffold.OasesTopAppBar
-import com.unimib.oases.ui.components.scaffold.OasesTopAppBarType
 import com.unimib.oases.ui.components.util.button.DeleteButton
 import com.unimib.oases.ui.components.util.button.DismissButton
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
@@ -55,8 +51,6 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun VitalSignManagementScreen(
-    navController: NavController,
-    padding : PaddingValues,
     vitalSignsManagementViewModel: VitalSignManagementViewModel = hiltViewModel(),
 ) {
 
@@ -93,16 +87,8 @@ fun VitalSignManagementScreen(
 
     Column(modifier = Modifier.fillMaxSize()) {
 
-        OasesTopAppBar(
-            title = "Vital Signs Management",
-            type = OasesTopAppBarType.BACK,
-            onNavigationIconClick = navController::popBackStack
-        )
-
         Column(
-            modifier = Modifier
-                .padding(horizontal = 20.dp)
-                .padding(bottom = padding.calculateBottomPadding()),
+            modifier = Modifier.padding(horizontal = 20.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {

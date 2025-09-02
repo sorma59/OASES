@@ -2,20 +2,17 @@ package com.unimib.oases.ui.screen.homepage
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -23,21 +20,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import com.unimib.oases.data.bluetooth.BluetoothCustomManager
 import com.unimib.oases.data.local.model.Role
 import com.unimib.oases.ui.components.patients.PatientList
 import com.unimib.oases.ui.components.patients.RecentlyReceivedPatientList
-import com.unimib.oases.ui.components.scaffold.OasesDrawer
-import com.unimib.oases.ui.components.scaffold.OasesTopAppBar
-import com.unimib.oases.ui.components.scaffold.OasesTopAppBarType
 import com.unimib.oases.ui.components.search.SearchBar
 import com.unimib.oases.ui.components.util.BluetoothPermissionHandler
 import com.unimib.oases.ui.components.util.NoPermissionMessage
@@ -45,13 +37,10 @@ import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircu
 import com.unimib.oases.ui.screen.login.AuthViewModel
 import com.unimib.oases.ui.screen.root.AppViewModel
 import com.unimib.oases.ui.util.ToastUtils
-import kotlinx.coroutines.launch
 
 
 @Composable
 fun HomeScreen(
-    navController: NavController,
-    padding: PaddingValues,
     authViewModel: AuthViewModel,
     bluetoothManager: BluetoothCustomManager,
     appViewModel: AppViewModel,
@@ -100,36 +89,13 @@ fun HomeScreen(
         homeScreenViewModel.onToastMessageShown()
     }
 
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-
-    val scope = rememberCoroutineScope()
-
     if (!hasPermissions) {
         NoPermissionMessage(context, bluetoothManager)
     } else {
-        OasesDrawer(
-            drawerState = drawerState,
-            padding = padding,
-            authViewModel = authViewModel,
-            navController = navController
-        ){
 
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(bottom = padding.calculateBottomPadding())
+                modifier = Modifier.fillMaxSize()
             ) {
-
-                OasesTopAppBar(
-                    title = "OASES",
-                    type = OasesTopAppBarType.MENU,
-                    showLogo = true,
-                    onNavigationIconClick = {
-                        scope.launch{
-                            drawerState.open()
-                        }
-                    }
-                )
 
                 Column(
                     modifier = Modifier
@@ -195,6 +161,6 @@ fun HomeScreen(
                     }
                 }
             }
-        }
+//        }
     }
 }

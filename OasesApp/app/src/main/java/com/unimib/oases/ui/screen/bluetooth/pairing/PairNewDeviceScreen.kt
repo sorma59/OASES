@@ -4,14 +4,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -27,8 +25,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.unimib.oases.ui.components.bluetooth.devices.DeviceList
-import com.unimib.oases.ui.components.scaffold.OasesTopAppBar
-import com.unimib.oases.ui.components.scaffold.OasesTopAppBarType
 import com.unimib.oases.ui.components.util.CenteredText
 import com.unimib.oases.ui.components.util.button.BottomButtons
 import com.unimib.oases.ui.components.util.circularprogressindicator.SmallCircularProgressIndicator
@@ -36,8 +32,7 @@ import com.unimib.oases.ui.util.ToastUtils
 
 @Composable
 fun PairNewDeviceScreen(
-    navController: NavController,
-    padding: PaddingValues
+    navController: NavController
 ) {
     val context = LocalContext.current
 
@@ -68,18 +63,11 @@ fun PairNewDeviceScreen(
     Column(
         modifier = Modifier.fillMaxSize()
     ){
-        OasesTopAppBar(
-            title = "Pair New Device",
-            type = OasesTopAppBarType.BACK,
-            onNavigationIconClick = navController::popBackStack
-        )
 
         Column(
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
+            modifier = Modifier.fillMaxSize()
         ) {
             Column(
                 modifier = Modifier

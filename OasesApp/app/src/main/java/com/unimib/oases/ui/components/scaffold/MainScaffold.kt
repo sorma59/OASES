@@ -1,13 +1,22 @@
 package com.unimib.oases.ui.components.scaffold
 
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.unimib.oases.data.bluetooth.BluetoothCustomManager
 import com.unimib.oases.ui.navigation.AppNavigation
 import com.unimib.oases.ui.navigation.NavigationEvent
+import com.unimib.oases.ui.navigation.Screen.Companion.screenOf
 import com.unimib.oases.ui.screen.login.AuthViewModel
 import com.unimib.oases.ui.screen.root.AppViewModel
 import kotlinx.coroutines.launch
@@ -21,8 +30,50 @@ fun MainScaffold(
 ) {
     val navController = rememberNavController()
 
-    Scaffold { padding ->
-        AppNavigation(startDestination, navController, padding, bluetoothManager, authViewModel, appViewModel)
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+
+    val backStackEntry = navController.currentBackStackEntryAsState()
+    val currentRoute = backStackEntry.value?.destination?.route
+    val screen = remember(currentRoute) { screenOf(currentRoute ?: startDestination) }
+
+    val scope = rememberCoroutineScope()
+
+    val onNavigationIconClick = { screenType: OasesTopAppBarType ->
+        when (screenType) {
+            OasesTopAppBarType.MENU -> {
+                scope.launch {
+                    drawerState.open()
+                }
+            }
+            OasesTopAppBarType.BACK -> appViewModel.onNavEvent(NavigationEvent.NavigateBack)
+        }
+    }
+    OasesDrawer(
+        drawerState = drawerState,
+        authViewModel = authViewModel,
+        navController = navController,
+    ) {
+        Scaffold(
+            topBar = {
+                OasesTopAppBar(
+                    onNavigationIconClick = { onNavigationIconClick(screen.type) },
+                    screen = screen
+                )
+
+            }
+        ) { padding ->
+
+            AppNavigation(
+                startDestination,
+                navController,
+                bluetoothManager,
+                authViewModel,
+                appViewModel,
+                Modifier
+                    .consumeWindowInsets(padding)
+                    .padding(padding)
+            )
+        }
     }
 
 //    LaunchedEffect(Unit) {

@@ -62,7 +62,7 @@ class HomeScreenViewModel @Inject constructor(
                 viewModelScope.launch {
                     navigationEventsChannel.send(
                         NavigationEvent.Navigate(
-                            Screen.RegistrationScreen.route
+                            Screen.PatientRegistration.route
                         )
                     )
                 }
@@ -71,7 +71,7 @@ class HomeScreenViewModel @Inject constructor(
                 viewModelScope.launch {
                     navigationEventsChannel.send(
                         NavigationEvent.Navigate(
-                            Screen.PatientDashboardScreen.route + "/patientId=${event.patientId}"
+                            Screen.PatientDashboard.route + "/patientId=${event.patientId}"
                         )
                     )
                 }

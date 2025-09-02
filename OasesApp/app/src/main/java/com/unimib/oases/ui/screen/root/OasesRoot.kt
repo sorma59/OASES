@@ -23,8 +23,8 @@ fun OasesRoot(
         is Authenticated -> {
 
             val startDestination = when ((authState as Authenticated).user.role) {
-                Role.ADMIN -> Screen.AdminScreen.route
-                Role.DOCTOR, Role.NURSE -> Screen.HomeScreen.route
+                Role.ADMIN -> Screen.AdminDashboard.route
+                Role.DOCTOR, Role.NURSE -> Screen.Home.route
             }
 
             MainScaffold(startDestination, bluetoothCustomManager, authViewModel)

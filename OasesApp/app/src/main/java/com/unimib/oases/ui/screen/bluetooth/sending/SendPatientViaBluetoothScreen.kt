@@ -3,7 +3,6 @@ package com.unimib.oases.ui.screen.bluetooth.sending
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,8 +27,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.unimib.oases.ui.components.bluetooth.devices.DeviceList
 import com.unimib.oases.ui.components.patients.PatientItem
-import com.unimib.oases.ui.components.scaffold.OasesTopAppBar
-import com.unimib.oases.ui.components.scaffold.OasesTopAppBarType
 import com.unimib.oases.ui.components.util.TitleText
 import com.unimib.oases.ui.components.util.button.BottomButtons
 import com.unimib.oases.ui.navigation.Screen
@@ -38,8 +35,7 @@ import com.unimib.oases.ui.util.ToastUtils
 
 @Composable
 fun SendPatientViaBluetoothScreen(
-    navController: NavController,
-    padding: PaddingValues
+    navController: NavController
 ) {
 
     var showResultDialog by remember { mutableStateOf(false) }
@@ -76,18 +72,11 @@ fun SendPatientViaBluetoothScreen(
     Column(
         Modifier.fillMaxSize()
     ){
-        OasesTopAppBar(
-            title = "Send Patient",
-            type = OasesTopAppBarType.BACK,
-            onNavigationIconClick = { navController.popBackStack() }
-        )
 
         Column(
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
+            modifier = Modifier.fillMaxSize()
         ) {
             Box(
                 modifier = Modifier

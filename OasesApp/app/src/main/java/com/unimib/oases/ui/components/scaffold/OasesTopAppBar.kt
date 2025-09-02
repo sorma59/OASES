@@ -26,20 +26,19 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.unimib.oases.R
+import com.unimib.oases.ui.navigation.Screen
 import com.unimib.oases.ui.util.debounce
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OasesTopAppBar(
-    title: String,
-    type: OasesTopAppBarType,
+    screen: Screen,
     onNavigationIconClick: () -> Unit,
-    showLogo: Boolean = false,
     actions: @Composable RowScope.() -> Unit = {}
 ){
 
     val handleIconButtonClick =
-        if (type == OasesTopAppBarType.BACK) {
+        if (screen.type == OasesTopAppBarType.BACK) {
             {onNavigationIconClick()}.debounce()
         } else {
             onNavigationIconClick
@@ -50,7 +49,7 @@ fun OasesTopAppBar(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ){
-                if(showLogo)
+                if(screen.type.showLogo)
                     Image(
                         painter = painterResource(R.drawable.ic_launcher_round),
                         contentDescription = "Icon",
@@ -60,7 +59,7 @@ fun OasesTopAppBar(
                     )
 
                 Text(
-                    title,
+                    text = screen.title,
                     fontWeight = FontWeight.Bold,
                     fontSize = 22.sp,
                     maxLines = 1,
@@ -80,8 +79,8 @@ fun OasesTopAppBar(
                 onClick = handleIconButtonClick
             ) {
                 Icon(
-                    imageVector = type.icon,
-                    contentDescription = type.contentDescription
+                    imageVector = screen.type.icon,
+                    contentDescription = screen.type.contentDescription
                 )
             }
         },
@@ -91,7 +90,7 @@ fun OasesTopAppBar(
 
 }
 
-enum class OasesTopAppBarType(val icon: ImageVector, val contentDescription: String){
-    MENU(Icons.Default.Menu, "Menu"),
+enum class OasesTopAppBarType(val icon: ImageVector, val contentDescription: String, val showLogo: Boolean = false){
+    MENU(Icons.Default.Menu, "Menu", true),
     BACK(Icons.Default.ArrowBackIosNew, "Go Back")
 }

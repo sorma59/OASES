@@ -2,7 +2,6 @@ package com.unimib.oases.ui.screen.dashboard.patient
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,8 +37,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.unimib.oases.ui.components.patients.PatientItem
-import com.unimib.oases.ui.components.scaffold.OasesTopAppBar
-import com.unimib.oases.ui.components.scaffold.OasesTopAppBarType
 import com.unimib.oases.ui.components.util.button.DeleteButton
 import com.unimib.oases.ui.components.util.button.DismissButton
 import com.unimib.oases.ui.navigation.Screen
@@ -48,7 +45,6 @@ import com.unimib.oases.ui.util.ToastUtils
 
 @Composable
 fun PatientDashboardScreen(
-    padding: PaddingValues,
     appViewModel: AppViewModel,
     patientDashboardViewModel: PatientDashboardViewModel = hiltViewModel()
 ) {
@@ -86,17 +82,8 @@ fun PatientDashboardScreen(
     }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(bottom = padding.calculateBottomPadding())
+        modifier = Modifier.fillMaxSize()
     ){
-        OasesTopAppBar(
-            title = "Patient Dashboard",
-            type = OasesTopAppBarType.BACK,
-            onNavigationIconClick = {
-                patientDashboardViewModel.onEvent(PatientDashboardEvent.OnBack)
-            }
-        )
 
         Column(
             modifier = Modifier
@@ -190,10 +177,10 @@ enum class PatientDashboardButton(
     val contentDescription: String,
     val route: String? = null
 ){
-    VIEW("View", Icons.Default.PersonSearch, "View patient data", Screen.ViewPatientDetailsScreen.route + "/patientId="),
-    EDIT("Edit", Icons.Default.Edit, "Edit patient data", Screen.RegistrationScreen.route + "?patientId="),
+    VIEW("View", Icons.Default.PersonSearch, "View patient data", Screen.ViewPatientDetails.route + "/patientId="),
+    EDIT("Edit", Icons.Default.Edit, "Edit patient data", Screen.PatientRegistration.route + "?patientId="),
     SEND("Send", Icons.AutoMirrored.Filled.Send, "Send patient data", Screen.SendPatient.route + "/patientId="),
-    START_VISIT("Start visit", Icons.Default.MedicalServices , "Start a new visit", Screen.MedicalVisitScreen.route),
+    START_VISIT("Start visit", Icons.Default.MedicalServices , "Start a new visit", Screen.MedicalVisit.route),
     DELETE("Delete", Icons.Default.Delete, "Delete patient data");
 
     /**
