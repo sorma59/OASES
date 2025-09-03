@@ -26,13 +26,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.unimib.oases.data.bluetooth.BluetoothCustomManager
 import com.unimib.oases.data.local.model.Role
 import com.unimib.oases.ui.components.patients.PatientList
 import com.unimib.oases.ui.components.patients.RecentlyReceivedPatientList
 import com.unimib.oases.ui.components.search.SearchBar
-import com.unimib.oases.ui.components.util.BluetoothPermissionHandler
-import com.unimib.oases.ui.components.util.NoPermissionMessage
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 import com.unimib.oases.ui.screen.login.AuthViewModel
 import com.unimib.oases.ui.screen.root.AppViewModel
@@ -42,14 +39,11 @@ import com.unimib.oases.ui.util.ToastUtils
 @Composable
 fun HomeScreen(
     authViewModel: AuthViewModel,
-    bluetoothManager: BluetoothCustomManager,
     appViewModel: AppViewModel,
     homeScreenViewModel: HomeScreenViewModel = hiltViewModel()
 ) {
 
     val context = LocalContext.current
-
-    val hasPermissions by bluetoothManager.hasPermissions.collectAsState()
 
     val state by homeScreenViewModel.state.collectAsState()
 
@@ -67,15 +61,6 @@ fun HomeScreen(
         item.name.contains(searchText, ignoreCase = true)        // Name
     }
 
-
-    BluetoothPermissionHandler(
-        context = context,
-        onPermissionGranted = {
-            bluetoothManager.updatePermissions()
-            bluetoothManager.initialize()
-        }
-    )
-
     LaunchedEffect(Unit) {
         homeScreenViewModel.navigationEvents.collect{
             appViewModel.onNavEvent(it)
@@ -89,78 +74,74 @@ fun HomeScreen(
         homeScreenViewModel.onToastMessageShown()
     }
 
-    if (!hasPermissions) {
-        NoPermissionMessage(context, bluetoothManager)
-    } else {
 
+
+    Column(
+        modifier = Modifier.fillMaxSize()
+    ) {
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.SpaceBetween,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             Column(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    verticalArrangement = Arrangement.SpaceBetween,
-                    horizontalAlignment = Alignment.CenterHorizontally
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Column(
+
+                    Row(
                         modifier = Modifier
-                            .weight(1f)
-                            .fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                            .fillMaxWidth()
+                            .padding(vertical = 12.dp, horizontal = 12.dp)
                     ) {
-                        Surface(
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 12.dp, horizontal = 12.dp)
-                            ) {
-                                SearchBar(
-                                    query = searchText,
-                                    onQueryChange = { searchText = it },
-                                    onSearch = {
-                                        listState.add(searchText)
-                                        active = false
-                                    },
-                                    active = active,
-                                    onActiveChange = { active = it },
-                                    searchHistory = listState,
-                                    onHistoryItemClick = { searchText = it })
-                            }
-                        }
-                        RecentlyReceivedPatientList(state.receivedPatients)
-                        if(state.isLoading){
-                            CustomCircularProgressIndicator()
-                        }
-                        else if (state.patients.isNotEmpty()) {
-                            PatientList(
-                                patients = filteredItems,
-                                onItemClick = onPatientItemClick
-                            )
-                        }
-                        if (state.errorMessage != null){
-                            Text(state.errorMessage!!)
-                        }
-
-                    }
-                    if (authViewModel.userRole == Role.NURSE) { //TODO(Refactor this?)
-                        FloatingActionButton(
-                            onClick = { homeScreenViewModel.onEvent(HomeScreenEvent.AddButtonClicked) },
-                            modifier = Modifier.padding(30.dp),
-                            containerColor = MaterialTheme.colorScheme.primary
-                        ) {
-                            Icon(
-                                tint = MaterialTheme.colorScheme.surface,
-                                imageVector = Icons.Default.Add,
-                                contentDescription = "Add a patient",
-                            )
-                        }
+                        SearchBar(
+                            query = searchText,
+                            onQueryChange = { searchText = it },
+                            onSearch = {
+                                listState.add(searchText)
+                                active = false
+                            },
+                            active = active,
+                            onActiveChange = { active = it },
+                            searchHistory = listState,
+                            onHistoryItemClick = { searchText = it })
                     }
                 }
+                RecentlyReceivedPatientList(state.receivedPatients)
+                if(state.isLoading){
+                    CustomCircularProgressIndicator()
+                }
+                else if (state.patients.isNotEmpty()) {
+                    PatientList(
+                        patients = filteredItems,
+                        onItemClick = onPatientItemClick
+                    )
+                }
+                if (state.errorMessage != null){
+                    Text(state.errorMessage!!)
+                }
+
             }
-//        }
+            if (authViewModel.userRole == Role.NURSE) { //TODO(Refactor this?)
+                FloatingActionButton(
+                    onClick = { homeScreenViewModel.onEvent(HomeScreenEvent.AddButtonClicked) },
+                    modifier = Modifier.padding(30.dp),
+                    containerColor = MaterialTheme.colorScheme.primary
+                ) {
+                    Icon(
+                        tint = MaterialTheme.colorScheme.surface,
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Add a patient",
+                    )
+                }
+            }
+        }
     }
 }

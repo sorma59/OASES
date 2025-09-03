@@ -7,13 +7,18 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.unimib.oases.data.bluetooth.BluetoothCustomManager
+import com.unimib.oases.ui.components.util.BluetoothPermissionHandler
+import com.unimib.oases.ui.components.util.NoPermissionMessage
 import com.unimib.oases.ui.navigation.AppNavigation
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Screen.Companion.screenOf
@@ -38,6 +43,10 @@ fun MainScaffold(
 
     val scope = rememberCoroutineScope()
 
+    val context = LocalContext.current
+
+    val hasPermissions by bluetoothManager.hasPermissions.collectAsState()
+
     val onNavigationIconClick = { screenType: OasesTopAppBarType ->
         when (screenType) {
             OasesTopAppBarType.MENU -> {
@@ -48,31 +57,43 @@ fun MainScaffold(
             OasesTopAppBarType.BACK -> appViewModel.onNavEvent(NavigationEvent.NavigateBack)
         }
     }
-    OasesDrawer(
-        drawerState = drawerState,
-        authViewModel = authViewModel,
-        navController = navController,
-    ) {
-        Scaffold(
-            topBar = {
-                OasesTopAppBar(
-                    onNavigationIconClick = { onNavigationIconClick(screen.type) },
-                    screen = screen
+
+    BluetoothPermissionHandler(
+        context = context,
+        onPermissionGranted = {
+            bluetoothManager.updatePermissions()
+            bluetoothManager.initialize()
+        }
+    )
+
+    if (!hasPermissions)
+        NoPermissionMessage(context, bluetoothManager)
+    else {
+        OasesDrawer(
+            drawerState = drawerState,
+            authViewModel = authViewModel,
+            navController = navController,
+        ) {
+            Scaffold(
+                topBar = {
+                    OasesTopAppBar(
+                        onNavigationIconClick = { onNavigationIconClick(screen.type) },
+                        screen = screen
+                    )
+
+                }
+            ) { padding ->
+
+                AppNavigation(
+                    startDestination,
+                    navController,
+                    authViewModel,
+                    appViewModel,
+                    Modifier
+                        .consumeWindowInsets(padding)
+                        .padding(padding)
                 )
-
             }
-        ) { padding ->
-
-            AppNavigation(
-                startDestination,
-                navController,
-                bluetoothManager,
-                authViewModel,
-                appViewModel,
-                Modifier
-                    .consumeWindowInsets(padding)
-                    .padding(padding)
-            )
         }
     }
 

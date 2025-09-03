@@ -9,7 +9,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.unimib.oases.data.bluetooth.BluetoothCustomManager
 import com.unimib.oases.ui.screen.bluetooth.pairing.PairNewDeviceScreen
 import com.unimib.oases.ui.screen.bluetooth.sending.SendPatientViaBluetoothScreen
 import com.unimib.oases.ui.screen.dashboard.admin.AdminScreen
@@ -28,7 +27,6 @@ import com.unimib.oases.ui.screen.root.AppViewModel
 fun AppNavigation(
     startDestination: String,
     navController: NavHostController,
-    bluetoothCustomManager: BluetoothCustomManager,
     authViewModel: AuthViewModel,
     appViewModel: AppViewModel,
     modifier: Modifier = Modifier
@@ -56,7 +54,7 @@ fun AppNavigation(
         }
 
         composable(Screen.Home.route) {
-            HomeScreen(authViewModel, bluetoothCustomManager, appViewModel)
+            HomeScreen(authViewModel, appViewModel)
         }
 
         composable(
