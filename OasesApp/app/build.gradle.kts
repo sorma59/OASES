@@ -63,6 +63,7 @@ dependencies {
     implementation(libs.firebase.storage.ktx)
     implementation(libs.firebase.database.ktx)
     implementation(libs.firebase.firestore)
+    implementation(libs.androidx.material3.window.size.class1.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

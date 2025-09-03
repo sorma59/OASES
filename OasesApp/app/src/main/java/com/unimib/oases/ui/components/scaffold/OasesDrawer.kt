@@ -37,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -46,6 +47,7 @@ import com.unimib.oases.data.local.model.User
 import com.unimib.oases.ui.navigation.Screen
 import com.unimib.oases.ui.screen.login.AuthViewModel
 import kotlinx.coroutines.launch
+
 
 @Composable
 fun OasesDrawer(
@@ -61,10 +63,18 @@ fun OasesDrawer(
         drawerState = drawerState,
         drawerContent = {
 
+            val screenWidthDp = LocalWindowInfo.current.containerSize.width
+
+            val drawerWidth = when {
+                screenWidthDp < 600 -> 280.dp // phone
+                screenWidthDp < 840 -> 360.dp // small tablet
+                else -> 400.dp               // large tablet
+            }
+
             ModalDrawerSheet(
                 drawerState = drawerState,
                 modifier = Modifier
-                    .width(280.dp)
+                    .width(drawerWidth)
                     .systemBarsPadding()
                     .fillMaxHeight(),
                 windowInsets = WindowInsets(top = 0),
@@ -78,7 +88,7 @@ fun OasesDrawer(
                     thickness = 0.5.dp
                 )
 
-                Buttons(drawerState, navController, authViewModel)
+                Buttons(drawerState, navController)
             }
         },
         content = content
@@ -142,8 +152,7 @@ private fun UserRow(currentUser: User?, authViewModel: AuthViewModel) {
 @Composable
 private fun Buttons(
     drawerState: DrawerState,
-    navController: NavController,
-    authViewModel: AuthViewModel
+    navController: NavController
 ) {
     Column(
         modifier = Modifier
@@ -157,14 +166,6 @@ private fun Buttons(
             contentDescription = "Bluetooth",
             onClick = { navController.navigate(Screen.PairDevice.route) }
         )
-
-//        DrawerButton(
-//            drawerState = drawerState,
-//            icon = Icons.AutoMirrored.Default.Logout,
-//            label = "Logout",
-//            contentDescription = "Logout",
-//            onClick = authViewModel::signOut
-//        )
     }
 }
 
