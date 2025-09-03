@@ -29,6 +29,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Text
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -37,7 +38,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -46,8 +46,8 @@ import androidx.navigation.NavController
 import com.unimib.oases.data.local.model.User
 import com.unimib.oases.ui.navigation.Screen
 import com.unimib.oases.ui.screen.login.AuthViewModel
+import com.unimib.oases.util.LocalWindowSizeClass
 import kotlinx.coroutines.launch
-
 
 @Composable
 fun OasesDrawer(
@@ -63,12 +63,13 @@ fun OasesDrawer(
         drawerState = drawerState,
         drawerContent = {
 
-            val screenWidthDp = LocalWindowInfo.current.containerSize.width
+            val windowSizeClass = LocalWindowSizeClass.current
 
-            val drawerWidth = when {
-                screenWidthDp < 600 -> 280.dp // phone
-                screenWidthDp < 840 -> 360.dp // small tablet
-                else -> 400.dp               // large tablet
+            val drawerWidth = when(windowSizeClass.widthSizeClass){
+                WindowWidthSizeClass.Compact -> 280.dp
+                WindowWidthSizeClass.Medium -> 360.dp
+                WindowWidthSizeClass.Expanded -> 400.dp
+                else -> 280.dp
             }
 
             ModalDrawerSheet(

@@ -8,10 +8,14 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import androidx.compose.runtime.CompositionLocalProvider
 import com.unimib.oases.data.bluetooth.BluetoothCustomManager
 import com.unimib.oases.data.util.FirestoreManager
 import com.unimib.oases.ui.screen.root.OasesRoot
 import com.unimib.oases.ui.theme.OasesTheme
+import com.unimib.oases.util.LocalWindowSizeClass
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -23,8 +27,6 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var bluetoothCustomManager: BluetoothCustomManager
-
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,9 +54,14 @@ class MainActivity : ComponentActivity() {
         bluetoothCustomManager.setDiscoverableBluetoothLauncher(discoverableBluetoothLauncher)
 
         enableEdgeToEdge()
+
+        @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
         setContent {
             OasesTheme {
-                OasesRoot(bluetoothCustomManager)
+                val windowSizeClass = calculateWindowSizeClass(this)
+                CompositionLocalProvider(LocalWindowSizeClass provides windowSizeClass) {
+                    OasesRoot(bluetoothCustomManager)
+                }
             }
         }
 
