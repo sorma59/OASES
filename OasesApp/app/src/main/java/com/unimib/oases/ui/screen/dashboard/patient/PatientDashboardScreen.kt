@@ -39,7 +39,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.unimib.oases.ui.components.patients.PatientItem
 import com.unimib.oases.ui.components.util.button.DeleteButton
 import com.unimib.oases.ui.components.util.button.DismissButton
-import com.unimib.oases.ui.navigation.Screen
+import com.unimib.oases.ui.navigation.Screen.MedicalVisit
+import com.unimib.oases.ui.navigation.Screen.PatientRegistration
+import com.unimib.oases.ui.navigation.Screen.SendPatient
+import com.unimib.oases.ui.navigation.Screen.ViewPatientDetails
 import com.unimib.oases.ui.screen.root.AppViewModel
 import com.unimib.oases.ui.util.ToastUtils
 
@@ -177,10 +180,10 @@ enum class PatientDashboardButton(
     val contentDescription: String,
     val route: String? = null
 ){
-    VIEW("View", Icons.Default.PersonSearch, "View patient data", Screen.ViewPatientDetails.route + "/patientId="),
-    EDIT("Edit", Icons.Default.Edit, "Edit patient data", Screen.PatientRegistration.route + "?patientId="),
-    SEND("Send", Icons.AutoMirrored.Filled.Send, "Send patient data", Screen.SendPatient.route + "/patientId="),
-    START_VISIT("Start visit", Icons.Default.MedicalServices , "Start a new visit", Screen.MedicalVisit.route),
+    VIEW("View", Icons.Default.PersonSearch, "View patient data", ViewPatientDetails.route + "/patientId="),
+    EDIT("Edit", Icons.Default.Edit, "Edit patient data", PatientRegistration.route + "?patientId="),
+    SEND("Send", Icons.AutoMirrored.Filled.Send, "Send patient data", SendPatient.route + "/patientId="),
+    START_VISIT("Start visit", Icons.Default.MedicalServices , "Start a new visit", MedicalVisit.route + "/patientId="),
     DELETE("Delete", Icons.Default.Delete, "Delete patient data");
 
     /**

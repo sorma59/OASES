@@ -9,6 +9,18 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.unimib.oases.ui.navigation.Screen.AdminDashboard
+import com.unimib.oases.ui.navigation.Screen.DiseaseManagement
+import com.unimib.oases.ui.navigation.Screen.Home
+import com.unimib.oases.ui.navigation.Screen.MainComplaintScreen
+import com.unimib.oases.ui.navigation.Screen.MedicalVisit
+import com.unimib.oases.ui.navigation.Screen.PairDevice
+import com.unimib.oases.ui.navigation.Screen.PatientDashboard
+import com.unimib.oases.ui.navigation.Screen.PatientRegistration
+import com.unimib.oases.ui.navigation.Screen.SendPatient
+import com.unimib.oases.ui.navigation.Screen.UserManagement
+import com.unimib.oases.ui.navigation.Screen.ViewPatientDetails
+import com.unimib.oases.ui.navigation.Screen.VitalSignsManagement
 import com.unimib.oases.ui.screen.bluetooth.pairing.PairNewDeviceScreen
 import com.unimib.oases.ui.screen.bluetooth.sending.SendPatientViaBluetoothScreen
 import com.unimib.oases.ui.screen.dashboard.admin.AdminScreen
@@ -20,6 +32,7 @@ import com.unimib.oases.ui.screen.dashboard.patient.view.PatientDetailsScreen
 import com.unimib.oases.ui.screen.homepage.HomeScreen
 import com.unimib.oases.ui.screen.login.AuthViewModel
 import com.unimib.oases.ui.screen.medical_visit.MedicalVisitScreen
+import com.unimib.oases.ui.screen.medical_visit.maincomplaint.MainComplaintScreen
 import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreen
 import com.unimib.oases.ui.screen.root.AppViewModel
 
@@ -37,28 +50,28 @@ fun AppNavigation(
         modifier = modifier
     ) {
 
-        composable(Screen.AdminDashboard.route) {
+        composable(AdminDashboard.route) {
             AdminScreen(navController)
         }
 
-        composable(Screen.VitalSignsManagement.route) {
+        composable(VitalSignsManagement.route) {
             VitalSignManagementScreen()
         }
 
-        composable(Screen.UserManagement.route) {
+        composable(UserManagement.route) {
             UserManagementScreen ()
         }
 
-        composable(Screen.DiseaseManagement.route) {
+        composable(DiseaseManagement.route) {
             DiseaseManagementScreen ()
         }
 
-        composable(Screen.Home.route) {
+        composable(Home.route) {
             HomeScreen(authViewModel, appViewModel)
         }
 
         composable(
-            route = Screen.PatientRegistration.route + "?patientId={patientId}",
+            route = PatientRegistration.route + "?patientId={patientId}",
             arguments =  listOf(
                 navArgument("patientId"){
                     type = NavType.StringType
@@ -68,7 +81,7 @@ fun AppNavigation(
             ),
             enterTransition = {
                 when (initialState.destination.route) {
-                    Screen.Home.route ->
+                    Home.route ->
                         slideIntoContainer(
                             SlideDirection.Left,
                             animationSpec = tween(400)
@@ -78,7 +91,7 @@ fun AppNavigation(
             },
             exitTransition = {
                 when (targetState.destination.route) {
-                    Screen.Home.route ->
+                    Home.route ->
                         slideOutOfContainer(
                             SlideDirection.Right,
                             animationSpec = tween(400)
@@ -88,7 +101,7 @@ fun AppNavigation(
             },
             popEnterTransition = {
                 when (initialState.destination.route) {
-                    Screen.Home.route ->
+                    Home.route ->
                         slideIntoContainer(
                             SlideDirection.Right,
                             animationSpec = tween(400)
@@ -98,7 +111,7 @@ fun AppNavigation(
             },
             popExitTransition = {
                 when (targetState.destination.route) {
-                    Screen.Home.route ->
+                    Home.route ->
                         slideOutOfContainer(
                             SlideDirection.Right,
                             animationSpec = tween(400)
@@ -111,7 +124,7 @@ fun AppNavigation(
         }
 
         composable(
-            route = Screen.SendPatient.route + "/patientId={patientId}",
+            route = SendPatient.route + "/patientId={patientId}",
             arguments = listOf(
                 navArgument("patientId"){
                     type = NavType.StringType
@@ -121,16 +134,23 @@ fun AppNavigation(
             SendPatientViaBluetoothScreen(navController)
         }
 
-        composable(Screen.PairDevice.route){
+        composable(PairDevice.route){
             PairNewDeviceScreen(navController)
         }
 
-        composable(Screen.MedicalVisit.route) {
-            MedicalVisitScreen(navController, authViewModel)
+        composable(
+            route = MedicalVisit.route + "/patientId={patientId}",
+            arguments =  listOf(
+                navArgument("patientId"){
+                    type = NavType.StringType
+                }
+            )
+        ) {
+            MedicalVisitScreen(appViewModel)
         }
 
         composable(
-            route = Screen.PatientDashboard.route + "/patientId={patientId}",
+            route = PatientDashboard.route + "/patientId={patientId}",
             arguments =  listOf(
                 navArgument("patientId"){
                     type = NavType.StringType
@@ -141,7 +161,7 @@ fun AppNavigation(
         }
 
         composable(
-            route = Screen.ViewPatientDetails.route + "/patientId={patientId}",
+            route = ViewPatientDetails.route + "/patientId={patientId}",
             arguments =  listOf(
                 navArgument("patientId"){
                     type = NavType.StringType
@@ -149,6 +169,20 @@ fun AppNavigation(
             )
         ){
             PatientDetailsScreen(appViewModel)
+        }
+
+        composable(
+            route = MainComplaintScreen.route + "/patientId={patientId}" + "/treeId={treeId}",
+            arguments =  listOf(
+                navArgument("patientId"){
+                    type = NavType.StringType
+                },
+                navArgument("treeId"){
+                    type = NavType.StringType
+                }
+            )
+        ){
+            MainComplaintScreen()
         }
     }
 }

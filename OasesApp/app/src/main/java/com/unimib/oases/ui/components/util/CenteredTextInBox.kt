@@ -9,11 +9,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun CenteredTextInBox(
     text: String,
+    textSize: TextUnit = TextUnit.Unspecified,
     color: Color = Color.Unspecified
 ){
     Box(
@@ -25,6 +27,7 @@ fun CenteredTextInBox(
         Text(
             text = text,
             textAlign = TextAlign.Center,
+            fontSize = textSize,
             color = color
         )
     }
