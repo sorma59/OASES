@@ -178,12 +178,12 @@ fun AppNavigation(
         }
 
         composable(
-            route = MainComplaintScreen.route + "/patientId={patientId}" + "/treeId={treeId}",
+            route = MainComplaintScreen.route + "/patientId={patientId}" + "/complaintId={complaintId}",
             arguments =  listOf(
                 navArgument("patientId"){
                     type = NavType.StringType
                 },
-                navArgument("treeId"){
+                navArgument("complaintId"){
                     type = NavType.StringType
                 }
             )

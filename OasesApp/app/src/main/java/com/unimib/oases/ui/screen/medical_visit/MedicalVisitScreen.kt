@@ -43,7 +43,9 @@ fun MedicalVisitScreen(
     ){
         Spacer(Modifier.height(64.dp))
 
-        TitleText("Beginning of the medical visit")
+        HorizontalDivider()
+
+        TitleText("View or edit PMH")
 
         PastMedicalHistoryBox(patientId, appViewModel)
 
@@ -95,7 +97,7 @@ private fun DiarrheaBox(
     MedicalVisitBoxButton(
         label = "Diarrhea",
         destination = MainComplaintScreen.route +
-            "/patientId=$patientId" +
+            "/patientId=${patientId}" +
             "/complaintId=${TreeId.DIARRHEA.id}",
         appViewModel
     )

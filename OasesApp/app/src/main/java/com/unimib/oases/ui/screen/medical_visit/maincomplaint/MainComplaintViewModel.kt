@@ -43,7 +43,7 @@ class MainComplaintViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(MainComplaintState(
         receivedId = savedStateHandle["patientId"]!!,
-        treeId = savedStateHandle["treeId"]!!
+        complaintId = savedStateHandle["complaintId"]!!
     ))
     val state: StateFlow<MainComplaintState> = _state.asStateFlow()
 
@@ -51,7 +51,7 @@ class MainComplaintViewModel @Inject constructor(
 
         getPatientData()
 
-        when(_state.value.treeId){
+        when(_state.value.complaintId){
             TreeId.DIARRHEA.id -> {
                 viewModelScope.launch(dispatcher) {
 

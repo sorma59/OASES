@@ -31,6 +31,7 @@ import com.unimib.oases.ui.components.util.button.RetryButton
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 import com.unimib.oases.ui.screen.root.AppViewModel
 import com.unimib.oases.ui.util.ToastUtils
+import com.unimib.oases.util.reactToKeyboardAppearance
 
 @Composable
 fun PastHistoryScreen(
@@ -181,6 +182,7 @@ fun ChronicConditionsForm(
             modifier = modifier
                 .fillMaxWidth()
                 .verticalScroll(scrollState)
+                .reactToKeyboardAppearance()
         ) {
             for (disease in state.diseases) {
                 RadioButtonsInputWithDateAndText(

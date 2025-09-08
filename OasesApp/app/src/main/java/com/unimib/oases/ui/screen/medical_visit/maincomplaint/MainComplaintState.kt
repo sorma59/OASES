@@ -7,7 +7,7 @@ import com.unimib.oases.util.datastructure.binarytree.Tree
 
 data class MainComplaintState(
     val receivedId: String,
-    val treeId: String,
+    val complaintId: String,
     val tree: Tree? = null,
     val patient: Patient? = null,
     val questions: List<QuestionState> = emptyList(),
