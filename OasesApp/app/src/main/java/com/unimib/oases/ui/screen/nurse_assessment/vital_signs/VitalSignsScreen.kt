@@ -21,6 +21,7 @@ import com.unimib.oases.domain.model.NumericPrecision
 import com.unimib.oases.ui.components.util.AnimatedLabelOutlinedTextField
 import com.unimib.oases.ui.components.util.FadeOverlay
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
+import com.unimib.oases.util.reactToKeyboardAppearance
 
 @Composable
 fun VitalSignsScreen(
@@ -60,8 +61,9 @@ fun VitalSignsScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp)
                     .verticalScroll(scrollState)
+                    .reactToKeyboardAppearance()
+                    .padding(16.dp)
             ) {
 
                 for (vitalSign in state.vitalSigns) {

@@ -14,15 +14,17 @@ class Diarrhea(val ageInYears: Int): Tree {
 
     // Therapies
     val shockOrSevereDehydrationAndMalnutritionTreatmentPlan = TreatmentPlan(
-        "This is a high-risk patient with shock/severe dehydration and malnutrition.\n" +
-            "Rapidly perform the following actions:\n" +
-                "- set 2 large bore IV lines\n" +
-                "- infuse 15 ml/kg IV in 1 hour using Ringer’s lactate (RL) with 5% glucose (dextrose) → remove 50 ml from RL 500 ml and add 50 ml of dextrose 50%. Use 0.45% NaCl plus 5% glucose (dextrose) if RL not available\n" +
-                "- if there are signs of improvement (pulse rate falls, pulse volume increases or respiratory rate falls) and no evidence of pulmonary edema, repeat IV infusion at 15 ml/kg over 1 h\n" +
-                "- then switch to oral or nasogastric rehydration with ReSoMal at 10 ml/kg/hr up to 10 h\n" +
-                "- initiate re-feeding with starter F-75\n" +
-                "- hospitalize high-risk malnourished children\n" +
-                "If the patient deteriorates during IV rehydration (breathing rate increases by 5 bpm and pulse rate increases by 15 bpm, liver enlarges, fine crackles throughout lung fields, jugular venous pressure increases, galloping heart rhythm develops), stop the infusion, because IV fluid can induce pulmonary edema."
+        """
+            This is a high-risk patient with shock/severe dehydration and malnutrition.
+            Rapidly perform the following actions:
+                - set 2 large bore IV lines\
+                - infuse 15 ml/kg IV in 1 hour using Ringer’s lactate (RL) with 5% glucose (dextrose) → remove 50 ml from RL 500 ml and add 50 ml of dextrose 50%. Use 0.45% NaCl plus 5% glucose (dextrose) if RL not available
+                - if there are signs of improvement (pulse rate falls, pulse volume increases or respiratory rate falls) and no evidence of pulmonary edema, repeat IV infusion at 15 ml/kg over 1 h
+                - then switch to oral or nasogastric rehydration with ReSoMal at 10 ml/kg/hr up to 10 h
+                - initiate re-feeding with starter F-75
+                - hospitalize high-risk malnourished children
+                If the patient deteriorates during IV rehydration (breathing rate increases by 5 bpm and pulse rate increases by 15 bpm, liver enlarges, fine crackles throughout lung fields, jugular venous pressure increases, galloping heart rhythm develops), stop the infusion, because IV fluid can induce pulmonary edema.
+        """.trimIndent()
     )
 
     val shockOrSevereDehydrationWithoutMalnutritionAndFiveYearsOldOrOlderTreatmentPlan = TreatmentPlan(

@@ -29,6 +29,7 @@ import com.unimib.oases.ui.components.util.OutlinedDropdown
 import com.unimib.oases.ui.components.util.button.RetryButton
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreenViewModel.ValidationEvent
+import com.unimib.oases.util.reactToKeyboardAppearance
 import kotlinx.coroutines.flow.Flow
 
 @Composable
@@ -105,7 +106,9 @@ fun PatientInfoScreen(
             Column(
                 modifier = Modifier
                     .verticalScroll(scrollState)
+                    .reactToKeyboardAppearance()
                     .padding(16.dp),
+
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 AnimatedLabelOutlinedTextField(
@@ -202,50 +205,7 @@ fun PatientInfoScreen(
             }
             FadeOverlay(modifier = Modifier.align(Alignment.BottomCenter))
         }
-//            Row(
-//                modifier = Modifier
-//                    .padding(24.dp)
-//                    .fillMaxWidth(),
-//                horizontalArrangement = Arrangement.End
-//            ) {
-//                Button(
-//                    onClick = onNextButtonPressed
-//                ) {
-//                    Text(if (state.isEdited) "Submit" else "Next")
-//                }
-//            }
-
     }
-
-//    if (showAlertDialog) {
-//        AlertDialog(
-//            onDismissRequest = {
-//                showAlertDialog = false
-//            },
-//            title = {
-//                Text(text = "Confirm patient saving")
-//            },
-//            text = {
-//                Text(text = "Do you want to save the patient to the database?")
-//            },
-//            confirmButton = {
-//                TextButton(
-//                    onClick = onConfirmSubmission
-//                ) {
-//                    Text("Confirm")
-//                }
-//            },
-//            dismissButton = {
-//                TextButton(
-//                    onClick = {
-//                        showAlertDialog = false
-//                    }
-//                ) {
-//                    Text("Cancel")
-//                }
-//            }
-//        )
-//    }
 }
 
 enum class Sex(val displayName: String) {
