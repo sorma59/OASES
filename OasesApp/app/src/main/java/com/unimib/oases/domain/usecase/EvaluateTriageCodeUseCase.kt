@@ -18,7 +18,7 @@ class EvaluateTriageCodeUseCase @Inject constructor() {
         selectedSymptoms.forEach { id ->
             val symptom = symptoms[id]
             if (symptom == null)
-                throw IllegalArgumentException("Symptom $id not found")
+                throw IllegalArgumentException("TriageSymptom $id not found")
             if (symptom.parent != null)
                 if (!selectedSymptoms.contains(symptom.parent.id))
                     selectedSymptoms.minus(id) // A child without its parent does not count

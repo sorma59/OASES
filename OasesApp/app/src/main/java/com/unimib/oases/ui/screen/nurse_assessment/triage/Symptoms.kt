@@ -42,13 +42,13 @@ fun nullForAdultRedForKid(category: PatientCategory) =
         PatientCategory.ADULT -> null
     }
 
-val symptoms = Symptom.entries.associateBy { it.id }
+val symptoms = TriageSymptom.entries.associateBy { it.id }
 
-enum class Symptom(
+enum class TriageSymptom(
     val id: String,
     val label: String,
     val colorAssigner: (PatientCategory) -> SymptomTriageCode?,
-    val parent: Symptom? = null,
+    val parent: TriageSymptom? = null,
     val isParent: Boolean = false,
     val isComputed: Boolean = false
 ) {

@@ -1,8 +1,8 @@
 package com.unimib.oases.domain.usecase
 
-import com.unimib.oases.ui.screen.nurse_assessment.triage.Symptom
 import com.unimib.oases.ui.screen.nurse_assessment.triage.SymptomTriageCode
 import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageConfig
+import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageSymptom
 import javax.inject.Inject
 
 class ConfigTriageUseCase @Inject constructor(
@@ -12,10 +12,10 @@ class ConfigTriageUseCase @Inject constructor(
 
         val category = getPatientCategoryUseCase(ageInMonths)
 
-        val redOptions = mutableListOf<Symptom>()
-        val yellowOptions = mutableListOf<Symptom>()
+        val redOptions = mutableListOf<TriageSymptom>()
+        val yellowOptions = mutableListOf<TriageSymptom>()
 
-        Symptom.entries.forEach {
+        TriageSymptom.entries.forEach {
             when (it.colorAssigner(category)) {
                 SymptomTriageCode.RED -> redOptions.add(it)
                 SymptomTriageCode.YELLOW -> yellowOptions.add(it)
