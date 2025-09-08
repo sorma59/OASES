@@ -22,3 +22,7 @@ fun PatientDisease.toEntity(): PatientDiseaseEntity {
         additionalInfo = additionalInfo
     )
 }
+
+fun List<PatientDisease>.toEntities(): List<PatientDiseaseEntity> {
+    return map { it.toEntity() }
+}

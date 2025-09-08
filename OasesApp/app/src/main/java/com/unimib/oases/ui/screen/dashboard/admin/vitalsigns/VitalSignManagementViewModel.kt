@@ -226,8 +226,6 @@ class VitalSignManagementViewModel @Inject constructor(
                             )
                         }
                     }
-
-                    is Resource.None -> {}
                 }
             }
         }

@@ -210,8 +210,6 @@ class UserManagementViewModel @Inject constructor(
                             )
                         }
                     }
-
-                    is Resource.None -> {}
                 }
             }
         }

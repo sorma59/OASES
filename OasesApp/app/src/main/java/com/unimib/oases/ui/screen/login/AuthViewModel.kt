@@ -62,8 +62,6 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             setAuthState(Loading)
 
-//            delay(2000)
-
             when (val result = userRepository.authenticate(username, password)) {
                 is Resource.Success -> {
                     val user = result.data
@@ -80,7 +78,6 @@ class AuthViewModel @Inject constructor(
                 }
 
                 is Resource.Loading<*> -> Unit
-                is Resource.None<*> -> Unit
             }
         }
     }

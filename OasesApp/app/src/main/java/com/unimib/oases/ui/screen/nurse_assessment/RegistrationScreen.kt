@@ -22,12 +22,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.unimib.oases.data.local.model.Role
 import com.unimib.oases.ui.components.util.button.BottomButtons
-import com.unimib.oases.ui.screen.login.AuthViewModel
 import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreenViewModel.ValidationEvent
 import com.unimib.oases.ui.screen.nurse_assessment.malnutrition_screening.MalnutritionScreeningScreen
-import com.unimib.oases.ui.screen.nurse_assessment.past_medical_history.PastHistoryScreen
 import com.unimib.oases.ui.screen.nurse_assessment.patient_registration.PatientInfoEvent
 import com.unimib.oases.ui.screen.nurse_assessment.patient_registration.PatientInfoScreen
 import com.unimib.oases.ui.screen.nurse_assessment.transitionscreens.ContinueToTriageDecisionScreen
@@ -41,7 +38,6 @@ import com.unimib.oases.ui.screen.root.AppViewModel
 
 @Composable
 fun RegistrationScreen(
-    authViewModel: AuthViewModel,
     appViewModel: AppViewModel
 ) {
 
@@ -50,8 +46,6 @@ fun RegistrationScreen(
     val state by registrationScreenViewModel.state.collectAsState()
 
     val validationEvents = registrationScreenViewModel.validationEvents
-
-    val userRole = authViewModel.userRole
 
     var showAlertDialog by remember { mutableStateOf(false) }
 
@@ -79,7 +73,7 @@ fun RegistrationScreen(
                         "Next"
                 }
                 Tab.CONTINUE_TO_TRIAGE -> "Triage"
-                Tab.VITAL_SIGNS, Tab.RED_CODE, Tab.YELLOW_CODE, Tab.PAST_MEDICAL_HISTORY, Tab.HISTORY, Tab.MALNUTRITION_SCREENING -> "Next"
+                Tab.VITAL_SIGNS, Tab.RED_CODE, Tab.YELLOW_CODE, Tab.HISTORY, Tab.MALNUTRITION_SCREENING -> "Next"
                 Tab.SUBMIT_ALL -> "Submit"
             }
         }
@@ -168,11 +162,6 @@ fun RegistrationScreen(
                         state = state.triageState,
                         onEvent = registrationScreenViewModel::onTriageEvent
                     )
-                    Tab.PAST_MEDICAL_HISTORY -> PastHistoryScreen(
-                        state = state.pastHistoryState,
-                        onEvent = registrationScreenViewModel::onPastHistoryEvent,
-                        readOnly = userRole == Role.NURSE
-                    )
                     Tab.HISTORY -> VisitHistoryScreen(
                         state = state.visitHistoryState,
                         onEvent = registrationScreenViewModel::onVisitHistoryEvent
@@ -235,7 +224,6 @@ enum class Tab(val title: String){
     RED_CODE("Triage"),
     YELLOW_CODE("Triage"),
     HISTORY("History"),
-    PAST_MEDICAL_HISTORY("Past Medical History"),
     MALNUTRITION_SCREENING("Malnutrition Screening"),
     SUBMIT_ALL("Submit everything")
 }

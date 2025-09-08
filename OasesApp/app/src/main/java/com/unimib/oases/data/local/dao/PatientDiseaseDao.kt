@@ -12,6 +12,9 @@ interface PatientDiseaseDao {
     @Upsert
     suspend fun insert(patientDisease: PatientDiseaseEntity)
 
+    @Upsert
+    suspend fun insertAll(patientDiseases: List<PatientDiseaseEntity>)
+
     @Query("DELETE FROM " + TableNames.PATIENT_DISEASE + " WHERE patient_id = :patientId AND disease_name = :diseaseName")
     suspend fun delete(patientId: String, diseaseName: String)
 

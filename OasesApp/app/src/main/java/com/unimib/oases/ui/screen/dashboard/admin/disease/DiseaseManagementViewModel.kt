@@ -180,8 +180,6 @@ class DiseaseManagementViewModel @Inject constructor(
                             error = resource.message,
                         )
                     }
-
-                    is Resource.None -> {}
                 }
             }
         }

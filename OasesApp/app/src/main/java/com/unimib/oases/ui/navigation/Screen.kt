@@ -10,7 +10,8 @@ sealed class Screen(val route: String, val title: String, val type: OasesTopAppB
     object MedicalVisit: Screen("medical_visit", "Medical Visit")
     object PatientDashboard: Screen("patient_dashboard", "Patient Dashboard")
     object ViewPatientDetails: Screen("view_patient_details", "Patient Details")
-    object MainComplaintScreen: Screen("main_complaint_screen", "Main Complaint Screen")
+    object PastMedicalHistoryScreen: Screen("past_medical_history_screen", "Past Medical History")
+    object MainComplaintScreen: Screen("main_complaint_screen", "Main Complaint")
 
     // Admin
     object AdminDashboard: Screen("admin_dashboard", "Admin Panel", OasesTopAppBarType.MENU)
@@ -30,6 +31,7 @@ sealed class Screen(val route: String, val title: String, val type: OasesTopAppB
                 MedicalVisit.route to MedicalVisit,
                 PatientDashboard.route to PatientDashboard,
                 ViewPatientDetails.route to ViewPatientDetails,
+                PastMedicalHistoryScreen.route to PastMedicalHistoryScreen,
                 MainComplaintScreen.route to MainComplaintScreen,
 
                 AdminDashboard.route to AdminDashboard,

@@ -33,6 +33,7 @@ import com.unimib.oases.ui.screen.homepage.HomeScreen
 import com.unimib.oases.ui.screen.login.AuthViewModel
 import com.unimib.oases.ui.screen.medical_visit.MedicalVisitScreen
 import com.unimib.oases.ui.screen.medical_visit.maincomplaint.MainComplaintScreen
+import com.unimib.oases.ui.screen.medical_visit.pmh.PastHistoryScreen
 import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreen
 import com.unimib.oases.ui.screen.root.AppViewModel
 
@@ -120,7 +121,7 @@ fun AppNavigation(
                 }
             }
         ) {
-            RegistrationScreen(authViewModel, appViewModel)
+            RegistrationScreen(appViewModel)
         }
 
         composable(
@@ -138,15 +139,9 @@ fun AppNavigation(
             PairNewDeviceScreen(navController)
         }
 
-        composable(
-            route = MedicalVisit.route + "/patientId={patientId}",
-            arguments =  listOf(
-                navArgument("patientId"){
-                    type = NavType.StringType
-                }
-            )
-        ) {
-            MedicalVisitScreen(appViewModel)
+        composable(MedicalVisit.route + "/{patientId}") { backStackEntry ->
+            val patientId = backStackEntry.arguments?.getString("patientId")!!
+            MedicalVisitScreen(patientId, appViewModel)
         }
 
         composable(
@@ -169,6 +164,17 @@ fun AppNavigation(
             )
         ){
             PatientDetailsScreen(appViewModel)
+        }
+
+        composable(
+            route = Screen.PastMedicalHistoryScreen.route + "/patientId={patientId}",
+            arguments =  listOf(
+                navArgument("patientId"){
+                    type = NavType.StringType
+                }
+            )
+        ){
+            PastHistoryScreen(appViewModel)
         }
 
         composable(

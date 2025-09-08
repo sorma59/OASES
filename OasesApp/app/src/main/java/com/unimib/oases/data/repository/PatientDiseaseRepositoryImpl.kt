@@ -3,6 +3,7 @@ package com.unimib.oases.data.repository
 import android.util.Log
 import com.unimib.oases.data.local.RoomDataSource
 import com.unimib.oases.data.mapper.toDomain
+import com.unimib.oases.data.mapper.toEntities
 import com.unimib.oases.data.mapper.toEntity
 import com.unimib.oases.domain.model.PatientDisease
 import com.unimib.oases.domain.repository.PatientDiseaseRepository
@@ -20,6 +21,16 @@ class PatientDiseaseRepositoryImpl @Inject constructor(
     override suspend fun addPatientDisease(patientDisease: PatientDisease):Resource<Unit> {
         return try {
             roomDataSource.insertPatientDisease(patientDisease.toEntity())
+            Resource.Success(Unit)
+        } catch (e: Exception) {
+            Log.e("PatientDiseaseRepository", "Error adding patient disease: ${e.message}")
+            Resource.Error(e.message ?: "An error occurred")
+        }
+    }
+
+    override suspend fun addPatientDiseases(patientDiseases: List<PatientDisease>): Resource<Unit> {
+        return try {
+            roomDataSource.insertPatientDiseases(patientDiseases.toEntities())
             Resource.Success(Unit)
         } catch (e: Exception) {
             Log.e("PatientDiseaseRepository", "Error adding patient disease: ${e.message}")

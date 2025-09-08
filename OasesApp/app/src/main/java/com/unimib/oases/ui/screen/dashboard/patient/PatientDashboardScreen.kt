@@ -183,7 +183,7 @@ enum class PatientDashboardButton(
     VIEW("View", Icons.Default.PersonSearch, "View patient data", ViewPatientDetails.route + "/patientId="),
     EDIT("Edit", Icons.Default.Edit, "Edit patient data", PatientRegistration.route + "?patientId="),
     SEND("Send", Icons.AutoMirrored.Filled.Send, "Send patient data", SendPatient.route + "/patientId="),
-    START_VISIT("Start visit", Icons.Default.MedicalServices , "Start a new visit", MedicalVisit.route + "/patientId="),
+    START_VISIT("Start visit", Icons.Default.MedicalServices , "Start a new visit", MedicalVisit.route + "/"),
     DELETE("Delete", Icons.Default.Delete, "Delete patient data");
 
     /**

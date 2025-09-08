@@ -1,6 +1,7 @@
-package com.unimib.oases.ui.screen.nurse_assessment.past_medical_history
+package com.unimib.oases.ui.screen.medical_visit.pmh
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,27 +12,35 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.unimib.oases.ui.components.form.DateSelector
 import com.unimib.oases.ui.components.util.AnimatedLabelOutlinedTextField
+import com.unimib.oases.ui.components.util.button.BottomButtons
+import com.unimib.oases.ui.components.util.button.RetryButton
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
+import com.unimib.oases.ui.screen.root.AppViewModel
 import com.unimib.oases.ui.util.ToastUtils
 
 @Composable
 fun PastHistoryScreen(
-    state: PastHistoryState,
-    onEvent: (PastHistoryEvent) -> Unit,
+    appViewModel: AppViewModel,
     readOnly: Boolean = false
 ) {
+
+    val viewModel: PastHistoryViewModel = hiltViewModel()
+
+    val state by viewModel.state.collectAsState()
 
     val context = LocalContext.current
 
@@ -39,7 +48,13 @@ fun PastHistoryScreen(
         state.toastMessage?.let { message ->
             ToastUtils.showToast(context, message)
         }
-        onEvent(PastHistoryEvent.ToastShown)
+        viewModel.onEvent(PastHistoryEvent.ToastShown)
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.navigationEvents.collect {
+            appViewModel.onNavEvent(it)
+        }
     }
 
     Column(
@@ -48,31 +63,27 @@ fun PastHistoryScreen(
         verticalArrangement = Arrangement.Bottom
     ){
 
-        if (state.error != null) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Text(text = state.error)
-
-                Button(
-                    onClick = {
-                        onEvent(PastHistoryEvent.Retry)
-                    }
-                ) {
-                    Text("Retry")
-                }
+        Box(Modifier.weight(1f)){
+            state.error?.let {
+                RetryButton(
+                    error = it,
+                    onClick = { viewModel.onEvent(PastHistoryEvent.Retry) }
+                )
+            } ?: if (state.isLoading) {
+                CustomCircularProgressIndicator()
+            } else {
+                ChronicConditionsForm(
+                    state = state,
+                    onEvent = viewModel::onEvent,
+                    readOnly = readOnly
+                )
             }
-        } else if (state.isLoading) {
-            CustomCircularProgressIndicator()
-        } else {
-            ChronicConditionsForm(
-                state = state,
-                onEvent = onEvent,
-                readOnly = readOnly
-            )
         }
+
+        BottomButtons(
+            onCancel = { viewModel.onEvent(PastHistoryEvent.Cancel) },
+            onConfirm = { viewModel.onEvent(PastHistoryEvent.Save) }
+        )
     }
 }
 

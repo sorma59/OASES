@@ -133,8 +133,6 @@ class HomeScreenViewModel @Inject constructor(
                             )
                         }
                     }
-
-                    is Resource.None -> {}
                 }
             }
         }

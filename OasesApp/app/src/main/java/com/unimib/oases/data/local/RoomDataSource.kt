@@ -94,6 +94,10 @@ class RoomDataSource @Inject constructor(
         patientDiseaseDao.insert(patientDisease)
     }
 
+    suspend fun insertPatientDiseases(patientDiseases: List<PatientDiseaseEntity>){
+        patientDiseaseDao.insertAll(patientDiseases)
+    }
+
     suspend fun deletePatientDisease(patientId: String, diseaseName: String) {
         patientDiseaseDao.delete(patientId, diseaseName)
     }
