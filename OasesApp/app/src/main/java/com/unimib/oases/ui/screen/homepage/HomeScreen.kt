@@ -55,6 +55,9 @@ fun HomeScreen(
         homeScreenViewModel.onEvent(HomeScreenEvent.PatientItemClicked(patientId))
     }
 
+    val userRole by authViewModel.userRole.collectAsState()
+
+    val shouldShowAddPatientButton = userRole == Role.NURSE
 
     val filteredItems = state.patients.filter { item ->
         item.publicId.contains(searchText, ignoreCase = true) || // Public id
@@ -129,7 +132,7 @@ fun HomeScreen(
                 }
 
             }
-            if (authViewModel.userRole == Role.NURSE) { //TODO(Refactor this?)
+            if (shouldShowAddPatientButton) { //TODO(Refactor this?)
                 FloatingActionButton(
                     onClick = { homeScreenViewModel.onEvent(HomeScreenEvent.AddButtonClicked) },
                     modifier = Modifier.padding(30.dp),

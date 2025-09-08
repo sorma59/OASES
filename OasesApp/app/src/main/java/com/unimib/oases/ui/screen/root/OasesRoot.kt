@@ -9,7 +9,6 @@ import com.unimib.oases.data.local.model.Role
 import com.unimib.oases.ui.components.scaffold.LoginScaffold
 import com.unimib.oases.ui.components.scaffold.MainScaffold
 import com.unimib.oases.ui.navigation.Screen
-import com.unimib.oases.ui.screen.login.AuthState.Authenticated
 import com.unimib.oases.ui.screen.login.AuthViewModel
 
 @Composable
@@ -17,12 +16,14 @@ fun OasesRoot(
     bluetoothCustomManager: BluetoothCustomManager,
     authViewModel: AuthViewModel = hiltViewModel()
 ) {
-    val authState by authViewModel.authState.collectAsState()
+    val role by authViewModel.userRole.collectAsState()
 
-    when(authState){
-        is Authenticated -> {
+    val isAuthenticated by authViewModel.isAuthenticated.collectAsState()
 
-            val startDestination = when ((authState as Authenticated).user.role) {
+    when(isAuthenticated){
+        true -> {
+
+            val startDestination = when (role!!) {
                 Role.ADMIN -> Screen.AdminDashboard.route
                 Role.DOCTOR, Role.NURSE -> Screen.Home.route
             }

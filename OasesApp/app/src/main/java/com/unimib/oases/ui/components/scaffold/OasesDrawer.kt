@@ -31,7 +31,8 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,7 +57,7 @@ fun OasesDrawer(
     navController: NavController,
     content: @Composable () -> Unit
 ){
-    val currentUser = remember { authViewModel.currentUser }
+    val currentUser by authViewModel.currentUser.collectAsState()
 
     ModalNavigationDrawer(
         modifier = Modifier.fillMaxHeight(),

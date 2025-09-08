@@ -18,9 +18,12 @@ import javax.inject.Singleton
 class AuthManager @Inject constructor(
     private val userPreferences: UserPreferences
 ) {
+
+    // SSOT: current user
     private val _currentUser = MutableStateFlow<User?>(null)
     val currentUser: StateFlow<User?> = _currentUser
 
+    // Derived state: user role
     val userRole: StateFlow<Role?> = _currentUser
         .map { it?.role }
         .stateIn(
@@ -43,5 +46,8 @@ class AuthManager @Inject constructor(
         _currentUser.value = null
         userPreferences.clear()
     }
-}
 
+    // For synchronous access in non-composables
+    fun getCurrentUser(): User? = _currentUser.value
+    fun getCurrentRole(): Role? = _currentUser.value?.role
+}

@@ -5,79 +5,57 @@ import androidx.lifecycle.viewModelScope
 import com.unimib.oases.data.local.model.Role
 import com.unimib.oases.data.local.model.User
 import com.unimib.oases.domain.repository.UserRepository
-import com.unimib.oases.ui.screen.login.AuthState.Authenticated
-import com.unimib.oases.ui.screen.login.AuthState.Error
-import com.unimib.oases.ui.screen.login.AuthState.Loading
-import com.unimib.oases.ui.screen.login.AuthState.Unauthenticated
-import com.unimib.oases.ui.screen.login.AuthState.Uninitialized
 import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val userRepository: UserRepository,
-    private val auth: AuthManager
+    private val auth: AuthManager,
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
-    private val _authState = MutableStateFlow<AuthState>(Uninitialized)
-    val authState: StateFlow<AuthState> = _authState.asStateFlow()
+    // Expose SSOT flows from AuthManager
+    val currentUser: StateFlow<User?> = auth.currentUser
+    val userRole: StateFlow<Role?> = auth.userRole
 
-    val isAuthenticated: Boolean
-        get() = authState.value is Authenticated
+    val isAuthenticated: StateFlow<Boolean> = currentUser
+        .map { it != null }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
-    val currentUser: User?
-        get() = (authState.value as? Authenticated)?.user
-
-    val userRole: Role?
-        get () = currentUser?.role
-
-    init {
-        checkAuthStatus()
-    }
-
-    private fun setAuthState(state: AuthState) {
-        _authState.value = state
-    }
-
-    private fun checkAuthStatus() {
-        val user = auth.currentUser.value
-        if (user != null) {
-            setAuthState(Authenticated(user))
-        } else {
-            setAuthState(Unauthenticated)
-        }
-    }
+    // UI-level login state (loading/error)
+    private val _loginState = MutableStateFlow<AuthState>(AuthState.Idle)
+    val loginState: StateFlow<AuthState> = _loginState.asStateFlow()
 
     fun signOut() {
         auth.logout()
-        setAuthState(Unauthenticated)
     }
 
     fun authenticate(username: String, password: String) {
         viewModelScope.launch {
-            setAuthState(Loading)
+            _loginState.value = AuthState.Loading
 
             when (val result = userRepository.authenticate(username, password)) {
                 is Resource.Success -> {
                     val user = result.data
                     if (user != null) {
-                        auth.login(user)
-                        setAuthState(Authenticated(user))
+                        auth.login(user) // updates SSOT
+                        _loginState.value = AuthState.Idle
                     } else {
-                        setAuthState(Error("User not found"))
+                        _loginState.value = AuthState.Error("User not found")
                     }
                 }
                 is Resource.Error -> {
-                    val message = result.message ?: "Unknown error"
-                    setAuthState(Error(message))
+                    _loginState.value = AuthState.Error(result.message ?: "Unknown error")
                 }
-
-                is Resource.Loading<*> -> Unit
+                else -> Unit
             }
         }
     }
