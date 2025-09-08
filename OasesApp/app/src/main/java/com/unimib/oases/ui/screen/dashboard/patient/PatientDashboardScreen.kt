@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.unimib.oases.data.local.model.Role
 import com.unimib.oases.ui.components.patients.PatientItem
 import com.unimib.oases.ui.components.util.button.DeleteButton
 import com.unimib.oases.ui.components.util.button.DismissButton
@@ -178,12 +179,13 @@ enum class PatientDashboardButton(
     val text: String,
     val icon: ImageVector,
     val contentDescription: String,
-    val route: String? = null
+    val route: String? = null,
+    val roles: List<Role> = Role.entries
 ){
     VIEW("View", Icons.Default.PersonSearch, "View patient data", ViewPatientDetails.route + "/patientId="),
     EDIT("Edit", Icons.Default.Edit, "Edit patient data", PatientRegistration.route + "?patientId="),
     SEND("Send", Icons.AutoMirrored.Filled.Send, "Send patient data", SendPatient.route + "/patientId="),
-    START_VISIT("Start visit", Icons.Default.MedicalServices , "Start a new visit", MedicalVisit.route + "/"),
+    START_VISIT("Start visit", Icons.Default.MedicalServices , "Start a new visit", MedicalVisit.route + "/", listOf(Role.DOCTOR)),
     DELETE("Delete", Icons.Default.Delete, "Delete patient data");
 
     /**

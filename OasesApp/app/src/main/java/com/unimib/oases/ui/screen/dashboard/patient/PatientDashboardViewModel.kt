@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.repository.PatientRepository
+import com.unimib.oases.domain.usecase.ConfigPatientDashboardButtonsUseCase
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,12 +23,16 @@ import javax.inject.Inject
 @HiltViewModel
 class PatientDashboardViewModel @Inject constructor(
     private val patientRepository: PatientRepository,
+    configurePatientDashboardButtonsUseCase: ConfigPatientDashboardButtonsUseCase,
     savedStateHandle: SavedStateHandle,
     @IoDispatcher private val dispatcher: CoroutineDispatcher
 ): ViewModel(){
 
     private val _state = MutableStateFlow(
-        PatientDashboardState(receivedId = savedStateHandle["patientId"]!!)
+        PatientDashboardState(
+            receivedId = savedStateHandle["patientId"]!!,
+            buttons = configurePatientDashboardButtonsUseCase()
+        )
     )
     val state: StateFlow<PatientDashboardState> = _state.asStateFlow()
 
