@@ -5,10 +5,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unimib.oases.di.IoDispatcher
+import com.unimib.oases.domain.model.complaints.ComplaintId
+import com.unimib.oases.domain.model.complaints.Diarrhea
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.util.Resource
-import com.unimib.oases.util.datastructure.binarytree.ComplaintId
-import com.unimib.oases.util.datastructure.binarytree.Diarrhea
 import com.unimib.oases.util.datastructure.binarytree.LeafNode
 import com.unimib.oases.util.datastructure.binarytree.ManualNode
 import com.unimib.oases.util.datastructure.binarytree.evaluate
@@ -63,7 +63,7 @@ class MainComplaintViewModel @Inject constructor(
                     patient?.let{
                         val age = it.ageInMonths / 12
 
-                        Diarrhea(age).evaluate(
+                        Diarrhea(age).tree.evaluate(
                             onManual = { node ->
                                 val answer = awaitUserInput { callback ->
                                     openNode(node, callback)

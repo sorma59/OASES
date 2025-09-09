@@ -21,13 +21,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.unimib.oases.domain.model.complaints.ComplaintId
 import com.unimib.oases.ui.components.util.CenteredTextInBox
 import com.unimib.oases.ui.components.util.TitleText
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Screen
 import com.unimib.oases.ui.navigation.Screen.MainComplaintScreen
 import com.unimib.oases.ui.screen.root.AppViewModel
-import com.unimib.oases.util.datastructure.binarytree.ComplaintId
 
 @Composable
 fun MedicalVisitScreen(
