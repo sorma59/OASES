@@ -21,14 +21,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.unimib.oases.ui.components.util.CenteredText
 import com.unimib.oases.ui.components.util.CenteredTextInBox
 import com.unimib.oases.ui.components.util.TitleText
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Screen
 import com.unimib.oases.ui.navigation.Screen.MainComplaintScreen
 import com.unimib.oases.ui.screen.root.AppViewModel
-import com.unimib.oases.util.datastructure.binarytree.TreeId
+import com.unimib.oases.util.datastructure.binarytree.ComplaintId
 
 @Composable
 fun MedicalVisitScreen(
@@ -79,7 +78,7 @@ fun MainComplaintsGrid(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ){
 
-        CenteredText("Choose a main complaint")
+        TitleText("Choose a main complaint")
 
         FlowRow(
             Modifier.padding(8.dp)
@@ -98,7 +97,7 @@ private fun DiarrheaBox(
         label = "Diarrhea",
         destination = MainComplaintScreen.route +
             "/patientId=${patientId}" +
-            "/complaintId=${TreeId.DIARRHEA.id}",
+            "/complaintId=${ComplaintId.DIARRHEA.id}",
         appViewModel
     )
 }

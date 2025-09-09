@@ -33,10 +33,10 @@ suspend fun Tree.evaluate(
 }
 
 sealed interface Tree {
-    val id: TreeId
+    val id: ComplaintId
     val root: ManualNode
 }
 
-enum class TreeId(val id: String) {
+enum class ComplaintId(val id: String) {
     DIARRHEA("diarrhea")
 }

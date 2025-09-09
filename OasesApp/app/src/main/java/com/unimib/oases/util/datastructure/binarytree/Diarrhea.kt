@@ -2,7 +2,7 @@ package com.unimib.oases.util.datastructure.binarytree
 
 class Diarrhea(val ageInYears: Int): Tree {
 
-    override val id = TreeId.DIARRHEA
+    override val id = ComplaintId.DIARRHEA
 
     // Questions
 

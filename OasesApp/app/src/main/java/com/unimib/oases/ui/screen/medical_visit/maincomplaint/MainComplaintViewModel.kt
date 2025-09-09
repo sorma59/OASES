@@ -7,10 +7,10 @@ import androidx.lifecycle.viewModelScope
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.util.Resource
+import com.unimib.oases.util.datastructure.binarytree.ComplaintId
 import com.unimib.oases.util.datastructure.binarytree.Diarrhea
 import com.unimib.oases.util.datastructure.binarytree.LeafNode
 import com.unimib.oases.util.datastructure.binarytree.ManualNode
-import com.unimib.oases.util.datastructure.binarytree.TreeId
 import com.unimib.oases.util.datastructure.binarytree.evaluate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -41,10 +41,12 @@ class MainComplaintViewModel @Inject constructor(
         }
     }
 
-    private val _state = MutableStateFlow(MainComplaintState(
-        receivedId = savedStateHandle["patientId"]!!,
-        complaintId = savedStateHandle["complaintId"]!!
-    ))
+    private val _state = MutableStateFlow(
+        MainComplaintState(
+            receivedId = savedStateHandle["patientId"]!!,
+            complaintId = savedStateHandle["complaintId"]!!
+        )
+    )
     val state: StateFlow<MainComplaintState> = _state.asStateFlow()
 
     init {
@@ -52,7 +54,7 @@ class MainComplaintViewModel @Inject constructor(
         getPatientData()
 
         when(_state.value.complaintId){
-            TreeId.DIARRHEA.id -> {
+            ComplaintId.DIARRHEA.id -> {
                 viewModelScope.launch(dispatcher) {
 
                     delay(500) // let the patient be found
@@ -85,7 +87,7 @@ class MainComplaintViewModel @Inject constructor(
             else -> {
                 _state.update{
                     it.copy(
-                        error = "Tree not found"
+                        error = "Complaint data not found"
                     )
                 }
             }
