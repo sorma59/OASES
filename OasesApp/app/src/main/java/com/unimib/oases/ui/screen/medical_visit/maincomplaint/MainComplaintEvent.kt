@@ -6,7 +6,5 @@ sealed class MainComplaintEvent {
 
     data class NodeAnswered(val answer: Boolean, val node: ManualNode): MainComplaintEvent()
 
-    data object NodeAnsweredAgain: MainComplaintEvent()
-
     data object ToastShown: MainComplaintEvent()
 }

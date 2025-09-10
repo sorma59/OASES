@@ -1,9 +1,20 @@
 package com.unimib.oases.util.datastructure.binarytree
 
-interface Node {
+fun ManualNode.next(boolean: Boolean): ShowableNode {
+    var node = if (boolean) children.left else children.right
+    while (true){
+        when (node) {
+            is AutoNode -> node = if (node.predicate()) node.children.left else node.children.right
+            is ShowableNode -> return node
+        }
+    }
+}
+sealed interface Node {
     val value: Any?
     val children: Children? // Full tree: 0 or 2 children
 }
+
+sealed interface ShowableNode: Node
 
 // Internal node
 sealed interface InternalNode: Node {
@@ -22,10 +33,11 @@ data class AutoNode(
 data class ManualNode(
     override val value: String,
     override val children: Children,
-) : InternalNode
+) : InternalNode, ShowableNode
 
 // Leaf node: therapy suggested
 data class LeafNode(
     override val value: TreatmentPlan?,
     override val children: Nothing? = null
-) : Node
+) : Node, ShowableNode
+

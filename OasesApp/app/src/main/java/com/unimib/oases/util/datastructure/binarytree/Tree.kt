@@ -1,36 +1,8 @@
 package com.unimib.oases.util.datastructure.binarytree
 
-suspend fun Tree.evaluate(
-    onManual: suspend (ManualNode) -> Boolean,
-    onLeafReached: (LeafNode) -> Unit
-){
-    // true -> left, false -> right
-    var node: Node = this.root
-    while (true) {
-        node = when (node) {
-            is AutoNode -> {
-                if (node.predicate()){
-                    node.children.left
-                }
-                else{
-                    node.children.right
-                }
-            }
-            is ManualNode -> {
-                val answer = onManual(node)
-                if (answer)
-                    node.children.left
-                else
-                    node.children.right
-            }
-            is LeafNode -> {
-                onLeafReached(node)
-                break
-            }
-            else -> break
-        }
-    }
-}
+data class Branch(
+    val nodes: List<ShowableNode> = emptyList()
+)
 
 sealed interface Tree {
     val root: ManualNode

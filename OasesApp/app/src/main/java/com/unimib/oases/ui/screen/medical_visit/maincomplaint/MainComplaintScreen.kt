@@ -16,9 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -54,29 +51,34 @@ fun MainComplaintScreen(){
 
         TitleText("Ask these questions:")
 
-        for((node, answer, callback) in state.questions){
+        QuestionsWithAnswers(state, viewModel)
+    }
+}
 
-            Question(
-                question = node.value,
-                onAnswer = {
-                    viewModel.onEvent(MainComplaintEvent.NodeAnswered(it, node))
-                    callback?.invoke(it)
-                },
-                onEditAttempt = {
-                    viewModel.onEvent(MainComplaintEvent.NodeAnsweredAgain)
-                },
-                enabled = answer == null,
-                answer = answer
-            )
-        }
+@Composable
+private fun QuestionsWithAnswers(
+    state: MainComplaintState,
+    viewModel: MainComplaintViewModel,
+    readOnly: Boolean = false
+) {
+    for ((node, answer) in state.questions) {
 
+        Question(
+            question = node.value,
+            onAnswer = {
+                viewModel.onEvent(MainComplaintEvent.NodeAnswered(it, node))
+            },
+            enabled = !readOnly,
+            answer = answer
+        )
+    }
+
+    Spacer(Modifier.height(8.dp))
+
+    state.treatmentPlan?.let {
+        TitleText("Treatment Plan")
         Spacer(Modifier.height(8.dp))
-
-        state.treatmentPlan?.let {
-            TitleText("Treatment Plan")
-            Spacer(Modifier.height(8.dp))
-            Text(it.text)
-        }
+        Text(it.text)
     }
 }
 
@@ -84,12 +86,9 @@ fun MainComplaintScreen(){
 fun Question(
     question: String,
     onAnswer: (Boolean) -> Unit,
-    onEditAttempt: () -> Unit,
     enabled: Boolean,
     answer: Boolean?
 ){
-
-    var answeredYes by remember { mutableStateOf<Boolean?>(answer) }
 
     Column{
         Text(question)
@@ -101,13 +100,11 @@ fun Question(
             Text("Yes")
 
             RadioButton(
-                selected = answeredYes == true,
+                selected = answer == true,
                 onClick = {
-                    if (enabled) {
-                        answeredYes = true
+                    if (enabled && answer != true) {
                         onAnswer(true)
-                    } else
-                        onEditAttempt()
+                    }
                 },
             )
 
@@ -116,13 +113,11 @@ fun Question(
             Text("No")
 
             RadioButton(
-                selected = answeredYes == false,
+                selected = answer == false,
                 onClick = {
-                    if (enabled) {
-                        answeredYes = false
+                    if (enabled && answer != false) {
                         onAnswer(false)
-                    } else
-                        onEditAttempt()
+                    }
                 },
             )
         }

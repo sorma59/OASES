@@ -1,6 +1,5 @@
 package com.unimib.oases.ui.screen.medical_visit.maincomplaint
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,10 +7,8 @@ import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.model.complaints.ComplaintId
 import com.unimib.oases.domain.model.complaints.Diarrhea
 import com.unimib.oases.domain.repository.PatientRepository
+import com.unimib.oases.domain.usecase.AnswerTreatmentPlanQuestionUseCase
 import com.unimib.oases.util.Resource
-import com.unimib.oases.util.datastructure.binarytree.LeafNode
-import com.unimib.oases.util.datastructure.binarytree.ManualNode
-import com.unimib.oases.util.datastructure.binarytree.evaluate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -22,11 +19,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
 import javax.inject.Inject
 
 @HiltViewModel
 class MainComplaintViewModel @Inject constructor(
+    private val answerTreatmentPlanQuestionUseCase: AnswerTreatmentPlanQuestionUseCase,
     savedStateHandle: SavedStateHandle,
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
     private val patientRepository: PatientRepository
@@ -50,46 +47,45 @@ class MainComplaintViewModel @Inject constructor(
     val state: StateFlow<MainComplaintState> = _state.asStateFlow()
 
     init {
-
         getPatientData()
 
-        when(_state.value.complaintId){
+        handleComplaint()
+    }
+
+    private fun handleComplaint() {
+        when (_state.value.complaintId) {
             ComplaintId.DIARRHEA.id -> {
-                viewModelScope.launch(dispatcher) {
-
-                    delay(500) // let the patient be found
-
-                    val patient = _state.value.patient
-                    patient?.let{
-                        val age = it.ageInMonths / 12
-
-                        Diarrhea(age).tree.evaluate(
-                            onManual = { node ->
-                                val answer = awaitUserInput { callback ->
-                                    openNode(node, callback)
-                                }
-
-                                return@evaluate answer
-                            },
-                            onLeafReached = {
-                                showTherapy(it)
-                            }
-                        )
-                    } ?: run {
-                        _state.update{
-                            it.copy(
-                                error =  "Patient not found"
-                            )
-                        }
-                    }
-                }
+                handleDiarrhea()
             }
+
             else -> {
-                _state.update{
-                    it.copy(
-                        error = "Complaint data not found"
-                    )
-                }
+                updateError("Complaint data not found")
+            }
+        }
+    }
+
+    private fun updateError(error: String?) {
+        _state.update {
+            it.copy(
+                error = error
+            )
+        }
+    }
+
+    private fun handleDiarrhea() {
+        viewModelScope.launch(dispatcher) {
+
+            delay(500) // let the patient be found
+
+            val patient = _state.value.patient
+            patient?.let {
+                val age = it.ageInMonths / 12
+
+                val diarrhea = Diarrhea(age)
+
+                _state.update { it.copy(questions = listOf(QuestionState(diarrhea.tree.root))) }
+            } ?: run {
+                updateError("Patient not found")
             }
         }
     }
@@ -121,63 +117,11 @@ class MainComplaintViewModel @Inject constructor(
         }
     }
 
-    private fun openNode(
-        node: ManualNode,
-        callback: (Boolean) -> Unit
-    ){
-        _state.update {
-            it.copy(
-                questions = it.questions + QuestionState(
-                    node = node,
-                    answer = null,
-                    callback = callback
-                )
-            )
-        }
-    }
-
-    private fun showTherapy(node: LeafNode){
-        node.value?.let { treatmentPlan ->
-            _state.update {
-                it.copy(
-                    treatmentPlan = treatmentPlan
-                )
-            }
-        }
-    }
-
-    private suspend fun awaitUserInput(onRequestInput: (continuation: (Boolean) -> Unit) -> Unit): Boolean {
-        return suspendCancellableCoroutine { continuation ->
-            // Tell the UI: "I'm waiting for input"
-            onRequestInput { input ->
-                continuation.resume(input) { cause, _, _ -> {
-                    Log.e("MainComplaintViewModel", "awaitUserInput: $cause")
-                } } // resume when input is provided
-            }
-        }
-    }
-
     fun onEvent(event: MainComplaintEvent){
         when(event){
             is MainComplaintEvent.NodeAnswered -> {
                 _state.update {
-                    it.copy(
-                        questions = it.questions.map { question ->
-                            if (question.node == event.node) {
-                                question.copy(answer = event.answer)
-                            } else {
-                                question
-                            }
-                        }
-                    )
-                }
-            }
-
-            MainComplaintEvent.NodeAnsweredAgain -> {
-                _state.update {
-                    it.copy(
-                        toastMessage = "You cannot change your answer once it has been provided."
-                    )
+                    answerTreatmentPlanQuestionUseCase(event.answer, event.node, it)
                 }
             }
 
