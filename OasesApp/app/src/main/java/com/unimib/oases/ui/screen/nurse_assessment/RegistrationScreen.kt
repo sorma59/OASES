@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.unimib.oases.domain.model.symptom.PatientCategory
 import com.unimib.oases.ui.components.util.button.BottomButtons
 import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreenViewModel.ValidationEvent
 import com.unimib.oases.ui.screen.nurse_assessment.malnutrition_screening.MalnutritionScreeningScreen
@@ -29,7 +30,6 @@ import com.unimib.oases.ui.screen.nurse_assessment.patient_registration.PatientI
 import com.unimib.oases.ui.screen.nurse_assessment.patient_registration.PatientInfoScreen
 import com.unimib.oases.ui.screen.nurse_assessment.transitionscreens.ContinueToTriageDecisionScreen
 import com.unimib.oases.ui.screen.nurse_assessment.transitionscreens.SubmissionScreen
-import com.unimib.oases.ui.screen.nurse_assessment.triage.PatientCategory
 import com.unimib.oases.ui.screen.nurse_assessment.triage.RedCodeScreen
 import com.unimib.oases.ui.screen.nurse_assessment.triage.YellowCodeScreen
 import com.unimib.oases.ui.screen.nurse_assessment.visit_history.VisitHistoryScreen

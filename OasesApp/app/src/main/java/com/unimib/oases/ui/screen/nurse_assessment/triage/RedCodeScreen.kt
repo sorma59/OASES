@@ -122,10 +122,10 @@ fun RedCodeScreen(
                         .verticalScroll(scrollState)
                 ) {
                     state.triageConfig!!.redOptions.forEach {
-                        val id = it.id
+                        val id = it.symptom.symptomId.value.string
                         ConditionalAnimatedVisibility(
                             applyWrapper = it.parent != null,
-                            visible = state.selectedReds.contains(it.parent?.id),
+                            visible = state.selectedReds.contains(it.parent?.symptom?.symptomId?.value?.string),
                             content = {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
@@ -136,8 +136,8 @@ fun RedCodeScreen(
                                     } else Modifier
                                 ) {
                                     LabeledCheckbox(
-                                        label = it.label,
-                                        checked = state.selectedReds.contains(it.id),
+                                        label = it.symptom.label,
+                                        checked = state.selectedReds.contains(id),
                                         onCheckedChange = { boolean: Boolean ->
                                             if (it.isParent)
                                                 handlePregnancyChangeAndScroll(boolean)
@@ -149,7 +149,7 @@ fun RedCodeScreen(
 
                                     if (it.isParent) {
                                         ShowMoreArrow(
-                                            expanded = state.selectedReds.contains(it.id),
+                                            expanded = state.selectedReds.contains(id),
                                             onClick = {
                                                 handlePregnancyChangeAndScroll(it)
                                             }

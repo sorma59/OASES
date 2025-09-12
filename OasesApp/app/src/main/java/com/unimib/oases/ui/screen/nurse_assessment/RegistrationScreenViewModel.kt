@@ -9,6 +9,7 @@ import com.unimib.oases.di.ApplicationScope
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.model.NumericPrecision
 import com.unimib.oases.domain.model.Visit
+import com.unimib.oases.domain.model.symptom.symptoms
 import com.unimib.oases.domain.repository.MalnutritionScreeningRepository
 import com.unimib.oases.domain.repository.TriageEvaluationRepository
 import com.unimib.oases.domain.usecase.ComputeSymptomsUseCase
@@ -35,7 +36,6 @@ import com.unimib.oases.ui.screen.nurse_assessment.patient_registration.PatientI
 import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageEvent
 import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageState
 import com.unimib.oases.ui.screen.nurse_assessment.triage.mapToTriageEvaluation
-import com.unimib.oases.ui.screen.nurse_assessment.triage.symptoms
 import com.unimib.oases.ui.screen.nurse_assessment.visit_history.VisitHistoryEvent
 import com.unimib.oases.ui.screen.nurse_assessment.visit_history.VisitHistoryState
 import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.PatientVitalSignState
@@ -631,7 +631,7 @@ class RegistrationScreenViewModel @Inject constructor(
             updateTriageState { it.copy(toastMessage = "This field is computed") }
         else {
             updateTriageState {
-                if (it.triageConfig?.redOptions?.any { it.id == fieldId } == true){
+                if (it.triageConfig?.redOptions?.any { it.symptom.id == fieldId } == true){
                     it.copy(
                         selectedReds = it.selectedReds.toggle(fieldId)
                     )

@@ -1,7 +1,7 @@
 package com.unimib.oases.domain.usecase
 
 import com.unimib.oases.domain.model.TriageCode
-import com.unimib.oases.ui.screen.nurse_assessment.triage.symptoms
+import com.unimib.oases.domain.model.symptom.symptoms
 import javax.inject.Inject
 
 class EvaluateTriageCodeUseCase @Inject constructor() {
@@ -20,7 +20,7 @@ class EvaluateTriageCodeUseCase @Inject constructor() {
             if (symptom == null)
                 throw IllegalArgumentException("TriageSymptom $id not found")
             if (symptom.parent != null)
-                if (!selectedSymptoms.contains(symptom.parent.id))
+                if (!selectedSymptoms.contains(symptom.parent.symptom.id))
                     selectedSymptoms.minus(id) // A child without its parent does not count
         }
         // True only if not all symptoms are parents because parents need at least
