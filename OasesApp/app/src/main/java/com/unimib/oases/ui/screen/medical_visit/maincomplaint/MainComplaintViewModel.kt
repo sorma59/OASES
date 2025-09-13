@@ -4,15 +4,16 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unimib.oases.di.IoDispatcher
-import com.unimib.oases.domain.model.complaints.ComplaintId
-import com.unimib.oases.domain.model.complaints.Diarrhea
+import com.unimib.oases.domain.model.complaint.ComplaintId
+import com.unimib.oases.domain.model.complaint.Diarrhea
+import com.unimib.oases.domain.model.complaint.binarytree.ManualNode
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.domain.usecase.AnswerTreatmentPlanQuestionUseCase
 import com.unimib.oases.util.Resource
+import com.unimib.oases.util.toggle
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -47,21 +48,54 @@ class MainComplaintViewModel @Inject constructor(
     val state: StateFlow<MainComplaintState> = _state.asStateFlow()
 
     init {
-        getPatientData()
+        initialize()
+    }
 
-        handleComplaint()
+    private fun initialize(){
+        viewModelScope.launch(dispatcher + errorHandler){
+            updateError(null)
+            getPatientData()
+            getComplaint()
+            handleComplaint()
+        }
+    }
+
+    private fun getComplaint() {
+
+        val patient = _state.value.patient
+        patient?.let {
+            val age = it.ageInMonths / 12
+
+            when (_state.value.complaintId) {
+                ComplaintId.DIARRHEA.id -> {
+                    _state.update{
+                        it.copy(complaint = Diarrhea(age))
+                    }
+                }
+
+                else -> {
+                    updateError("Complaint data not found")
+                }
+            }
+
+        } ?: run {
+            updateError("Patient not found")
+        }
+
     }
 
     private fun handleComplaint() {
+
         when (_state.value.complaintId) {
             ComplaintId.DIARRHEA.id -> {
-                handleDiarrhea()
+                showFirstQuestion((_state.value.complaint!! as Diarrhea).tree.root)
             }
 
             else -> {
                 updateError("Complaint data not found")
             }
         }
+
     }
 
     private fun updateError(error: String?) {
@@ -72,49 +106,40 @@ class MainComplaintViewModel @Inject constructor(
         }
     }
 
-    private fun handleDiarrhea() {
-        viewModelScope.launch(dispatcher) {
-
-            delay(500) // let the patient be found
-
-            val patient = _state.value.patient
-            patient?.let {
-                val age = it.ageInMonths / 12
-
-                val diarrhea = Diarrhea(age)
-
-                _state.update { it.copy(questions = listOf(QuestionState(diarrhea.tree.root))) }
-            } ?: run {
-                updateError("Patient not found")
-            }
+    private fun showFirstQuestion(firstNode: ManualNode) {
+        _state.update {
+            it.copy(
+                treatmentPlanQuestions = listOf(
+                    TreatmentPlanQuestionState(firstNode)
+                )
+            )
         }
     }
 
-    private fun getPatientData() {
+    private suspend fun getPatientData() {
 
-        viewModelScope.launch(dispatcher + errorHandler) {
-            try {
-                _state.update { it.copy(isLoading = true, error = null) }
+        try {
+            _state.update { it.copy(isLoading = true, error = null) }
 
-                val resource = patientRepository.getPatientById(_state.value.receivedId).first {
-                    it is Resource.Success || it is Resource.Error
-                }
-
-                when (resource) {
-                    is Resource.Success -> {
-                        _state.update { it.copy(patient = resource.data) }
-                    }
-                    is Resource.Error -> {
-                        _state.update { it.copy(error = resource.message) }
-                    }
-                    else -> Unit
-                }
-            } catch (e: Exception) {
-                _state.update { it.copy(error = e.message) }
-            } finally {
-                _state.update { it.copy(isLoading = false) }
+            val resource = patientRepository.getPatientById(_state.value.receivedId).first {
+                it is Resource.Success || it is Resource.Error
             }
+
+            when (resource) {
+                is Resource.Success -> {
+                    _state.update { it.copy(patient = resource.data) }
+                }
+                is Resource.Error -> {
+                    _state.update { it.copy(error = resource.message) }
+                }
+                else -> Unit
+            }
+        } catch (e: Exception) {
+            _state.update { it.copy(error = e.message) }
+        } finally {
+            _state.update { it.copy(isLoading = false) }
         }
+
     }
 
     fun onEvent(event: MainComplaintEvent){
@@ -125,12 +150,48 @@ class MainComplaintViewModel @Inject constructor(
                 }
             }
 
+            is MainComplaintEvent.SymptomSelected -> {
+                _state.update {
+                    it.copy(
+                        symptoms = it.symptoms.toggle(event.symptom)
+                    )
+                }
+            }
+
+            is MainComplaintEvent.DurationSelected -> {
+                _state.update {
+                    it.copy(
+                        durationOption = event.duration
+                    )
+                }
+            }
+
+            is MainComplaintEvent.FrequencySelected -> {
+                _state.update {
+                    it.copy(
+                        frequencyOption = event.frequency
+                    )
+                }
+            }
+
+            is MainComplaintEvent.AspectSelected -> {
+                _state.update {
+                    it.copy(
+                        aspectOption = event.aspect
+                    )
+                }
+            }
+
             MainComplaintEvent.ToastShown -> {
                 _state.update {
                     it.copy(
                         toastMessage = null
                     )
                 }
+            }
+
+            MainComplaintEvent.RetryButtonClicked -> {
+                initialize()
             }
         }
     }

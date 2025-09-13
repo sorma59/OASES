@@ -29,6 +29,14 @@ fun <T> Flow<T>.debounce(timeoutMillis: Long): Flow<T> = channelFlow {
     }
 }
 
+fun <T> Set<T>.toggle(element: T): Set<T> {
+    return if (this.contains(element)) {
+        this.minus(element)
+    } else {
+        this.plus(element)
+    }
+}
+
 /**
 * This function makes the receiver react to the keyboard being shown or hidden.
 * It calculates the bottom inset of the keyboard and applies it to the receiver.

@@ -1,4 +1,6 @@
-package com.unimib.oases.util.datastructure.binarytree
+package com.unimib.oases.domain.model.complaint.binarytree
+
+import com.unimib.oases.domain.model.complaint.TreatmentPlan
 
 class DiarrheaTree(val ageInYears: Int): Tree {
 
@@ -25,8 +27,9 @@ class DiarrheaTree(val ageInYears: Int): Tree {
         """.trimIndent()
     )
 
-    val shockOrSevereDehydrationWithoutMalnutritionAndFiveYearsOldOrOlderTreatmentPlan = TreatmentPlan(
-        """
+    val shockOrSevereDehydrationWithoutMalnutritionAndFiveYearsOldOrOlderTreatmentPlan =
+        TreatmentPlan(
+            """
             This is a high-risk patient with shock/severe dehydration. Rapidly perform the following actions:
             - set 2 large bore IV lines
             - infuse IV fluids (Ringer's lactate or Normal Saline 0.9%) 20 ml/kg boluses according to response (repeat up to 3 times)
@@ -47,10 +50,11 @@ class DiarrheaTree(val ageInYears: Int): Tree {
 
             NB: If IV fluids are not available within 30 minutes, start rehydration by nasogastric tube (or by mouth) with ORS at 20 ml/kg/hr for 6 h (total: 120 ml/kg divided in 6 hours)
         """.trimIndent()
-    )
+        )
 
-    val shockOrSevereDehydrationWithoutMalnutritionAndYoungerThanFiveYearsOldTreatmentPlan = TreatmentPlan(
-        """
+    val shockOrSevereDehydrationWithoutMalnutritionAndYoungerThanFiveYearsOldTreatmentPlan =
+        TreatmentPlan(
+            """
             This is a high-risk patient with shock/severe dehydration. Rapidly perform the following actions:
             - set 2 large bore IV lines
             - infuse IV fluids (Ringer's lactate or Normal Saline 0.9%) 20 ml/kg boluses according to response (repeat up to 3 times)
@@ -64,7 +68,7 @@ class DiarrheaTree(val ageInYears: Int): Tree {
 
             NB: If IV fluids are not available within 30 minutes, start rehydration by nasogastric tube (or by mouth) with ORS at 20 ml/kg/hr for 6 h (total: 120 ml/kg divided in 6 hours)
         """.trimIndent()
-    )
+        )
 
     val moderateDehydrationAndMalnutritionTreatmentPlan = TreatmentPlan(
         """
@@ -84,14 +88,15 @@ class DiarrheaTree(val ageInYears: Int): Tree {
         """.trimIndent()
     )
 
-    val moderateDehydrationWithoutMalnutritionAndYoungerThanFiveYearsOldTreatmentPlan = TreatmentPlan(
-        """
+    val moderateDehydrationWithoutMalnutritionAndYoungerThanFiveYearsOldTreatmentPlan =
+        TreatmentPlan(
+            """
             This is a patient with moderate dehydration. Perform the following actions:
             - give ORS 75 ml/kg in the first 4 hours. Give frequent small sips from a cup. If the child vomits, wait 10 minutes, then continue more slowly
             - for infants < 6 months who are not breastfed, also give 100-200 ml of clean water during the first 4 hours
             - observe for at least 4 hr, then if the patient improves and tolerates ORS, discharge with ORS
         """.trimIndent()
-    )
+        )
 
     val noShockNorSevereDehydrationAndNoMalnutritionTherapy = null
 

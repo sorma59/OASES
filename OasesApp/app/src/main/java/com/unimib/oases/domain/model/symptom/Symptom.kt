@@ -1,5 +1,7 @@
 package com.unimib.oases.domain.model.symptom
 
+import com.unimib.oases.domain.model.symptom.SymptomId.AbdominalDistensionAndTendernessWithAlteredBowelSoundsId
+import com.unimib.oases.domain.model.symptom.SymptomId.AbdominalPainId
 import com.unimib.oases.domain.model.symptom.SymptomId.ActiveConvulsionsId
 import com.unimib.oases.domain.model.symptom.SymptomId.AcuteLimbDeformityOrOpenFractureId
 import com.unimib.oases.domain.model.symptom.SymptomId.AcuteTesticularOrScrotalPainOrPriapismId
@@ -7,7 +9,11 @@ import com.unimib.oases.domain.model.symptom.SymptomId.AgeOverEightyYearsId
 import com.unimib.oases.domain.model.symptom.SymptomId.AggressiveBehaviorId
 import com.unimib.oases.domain.model.symptom.SymptomId.AirwaySwellingOrAirwayMassId
 import com.unimib.oases.domain.model.symptom.SymptomId.AnimalBiteOrNeedlestickPunctureId
+import com.unimib.oases.domain.model.symptom.SymptomId.CholeraOutbreakId
+import com.unimib.oases.domain.model.symptom.SymptomId.ConvulsionsId
+import com.unimib.oases.domain.model.symptom.SymptomId.EasyBruisingId
 import com.unimib.oases.domain.model.symptom.SymptomId.EdemaOfBothFeetId
+import com.unimib.oases.domain.model.symptom.SymptomId.FeverAboveThirtyEightDegrees
 import com.unimib.oases.domain.model.symptom.SymptomId.FocalNeurologicDeficitOrFocalVisualDeficitId
 import com.unimib.oases.domain.model.symptom.SymptomId.HeadacheWithStiffNeckId
 import com.unimib.oases.domain.model.symptom.SymptomId.HeavyBleedingId
@@ -17,6 +23,8 @@ import com.unimib.oases.domain.model.symptom.SymptomId.HighRiskTraumaOrHighRiskB
 import com.unimib.oases.domain.model.symptom.SymptomId.HighRrId
 import com.unimib.oases.domain.model.symptom.SymptomId.HighSbpId
 import com.unimib.oases.domain.model.symptom.SymptomId.HighTempId
+import com.unimib.oases.domain.model.symptom.SymptomId.HivPositiveId
+import com.unimib.oases.domain.model.symptom.SymptomId.HypoglycemiaId
 import com.unimib.oases.domain.model.symptom.SymptomId.LethargyOrConfusionOrAgitationId
 import com.unimib.oases.domain.model.symptom.SymptomId.LethargyOrRestlessOrIrritableOrConfusedId
 import com.unimib.oases.domain.model.symptom.SymptomId.LowHrId
@@ -24,6 +32,7 @@ import com.unimib.oases.domain.model.symptom.SymptomId.LowRrId
 import com.unimib.oases.domain.model.symptom.SymptomId.LowSbpId
 import com.unimib.oases.domain.model.symptom.SymptomId.LowSpo2Id
 import com.unimib.oases.domain.model.symptom.SymptomId.LowTempId
+import com.unimib.oases.domain.model.symptom.SymptomId.MalnutritionId
 import com.unimib.oases.domain.model.symptom.SymptomId.OngoingBleedingId
 import com.unimib.oases.domain.model.symptom.SymptomId.OngoingSevereVomitingOrOngoingSevereDiarrheaId
 import com.unimib.oases.domain.model.symptom.SymptomId.OtherPregnancyRelatedComplaintsId
@@ -51,6 +60,8 @@ import com.unimib.oases.domain.model.symptom.SymptomId.ThreatenedLimbId
 import com.unimib.oases.domain.model.symptom.SymptomId.UnableToFeedOrDrinkId
 import com.unimib.oases.domain.model.symptom.SymptomId.UnableToPassUrineId
 import com.unimib.oases.domain.model.symptom.SymptomId.UnconsciousnessId
+import com.unimib.oases.domain.model.symptom.SymptomId.VomitingId
+import com.unimib.oases.domain.model.symptom.SymptomId.WeightLossId
 import com.unimib.oases.domain.model.symptom.SymptomId.YoungerThanEightDaysId
 import com.unimib.oases.domain.model.symptom.SymptomId.YoungerThanSixMonthsId
 import com.unimib.oases.domain.model.symptom.SymptomId.YoungerThanTwoMonthsAndLowOrHighTemperatureId
@@ -281,6 +292,65 @@ sealed interface Symptom {
         override val symptomId = HighSbpId
         override val label = "High SBP"
     }
+
+    //---------------------------------------------------
+
+    data object Vomiting: Symptom {
+        override val symptomId = VomitingId
+        override val label = "Vomiting"
+    }
+
+    data object AbdominalPain: Symptom, Pain {
+        override val symptomId = AbdominalPainId
+        override val label = "Abdominal pain"
+    }
+
+    data object AbdominalDistensionAndTendernessWithAlteredBowelSounds: Symptom {
+        override val symptomId = AbdominalDistensionAndTendernessWithAlteredBowelSoundsId
+        override val label = "Abdominal distension and tenderness with altered bowel sounds"
+    }
+
+    data object WeightLoss: Symptom {
+        override val symptomId = WeightLossId
+        override val label = "Weight loss"
+    }
+
+    data object Malnutrition: Symptom {
+        override val symptomId = MalnutritionId
+        override val label = "Malnutrition"
+    }
+
+    data object FeverAbove38Degrees: Symptom, Fever {
+        override val symptomId = FeverAboveThirtyEightDegrees
+        override val label = "Fever > 38°C"
+    }
+
+    data object Convulsions: Symptom {
+        override val symptomId = ConvulsionsId
+        override val label = "Convulsions"
+    }
+
+    data object EasyBruising: Symptom {
+        override val symptomId = EasyBruisingId
+        override val label = "Easy bruising"
+    }
+
+    data object Hypoglycemia: Symptom {
+        override val symptomId = HypoglycemiaId
+        override val label = "Hypoglycemia"
+    }
+
+    // --------High-risk------------
+
+    data object HivPositive: Symptom {
+        override val symptomId = HivPositiveId
+        override val label = "HIV positive"
+    }
+
+    data object CholeraOutbreak: Symptom {
+        override val symptomId = CholeraOutbreakId
+        override val label = "Cholera outbreak in the region the patient comes from"
+    }
 }
 
 sealed interface Pain
@@ -350,6 +420,21 @@ sealed class SymptomId (
     object HighHrId: SymptomId(snakeCase("high_hr"))
     object LowSbpId: SymptomId(snakeCase("low_sbp"))
     object HighSbpId: SymptomId(snakeCase("high_sbp"))
+
+    //--------------------------------------------------------------
+
+    object VomitingId: SymptomId(snakeCase("vomiting"))
+    object AbdominalPainId: SymptomId(snakeCase("abdominal_pain"))
+    object AbdominalDistensionAndTendernessWithAlteredBowelSoundsId: SymptomId(snakeCase("abdominal_distension_and_tenderness_with_altered_bowel_sounds"))
+    object WeightLossId: SymptomId(snakeCase("weight_loss"))
+    object MalnutritionId: SymptomId(snakeCase("malnutrition"))
+    object FeverAboveThirtyEightDegrees: SymptomId(snakeCase("fever_above_thirty_eight_degrees"))
+    object ConvulsionsId: SymptomId(snakeCase("convulsions"))
+    object EasyBruisingId: SymptomId(snakeCase("easy_bruising"))
+    object HypoglycemiaId: SymptomId(snakeCase("hypoglycemia"))
+
+    object HivPositiveId: SymptomId(snakeCase("hiv_positive"))
+    object CholeraOutbreakId: SymptomId(snakeCase("cholera_outbreak"))
 }
 
 

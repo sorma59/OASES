@@ -1,4 +1,6 @@
-package com.unimib.oases.util.datastructure.binarytree
+package com.unimib.oases.domain.model.complaint.binarytree
+
+import com.unimib.oases.domain.model.complaint.TreatmentPlan
 
 fun ManualNode.next(boolean: Boolean): ShowableNode {
     var node = if (boolean) children.left else children.right

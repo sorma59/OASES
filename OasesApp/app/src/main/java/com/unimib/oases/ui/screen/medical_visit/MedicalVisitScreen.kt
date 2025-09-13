@@ -21,7 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.unimib.oases.domain.model.complaints.ComplaintId
+import com.unimib.oases.domain.model.complaint.ComplaintId
 import com.unimib.oases.ui.components.util.CenteredTextInBox
 import com.unimib.oases.ui.components.util.TitleText
 import com.unimib.oases.ui.navigation.NavigationEvent

@@ -45,6 +45,7 @@ import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.toVisitVitalSigns
 import com.unimib.oases.util.DateTimeFormatter
 import com.unimib.oases.util.Resource
 import com.unimib.oases.util.debounce
+import com.unimib.oases.util.toggle
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -60,14 +61,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
-
-private fun <T> Set<T>.toggle(element: T): Set<T> {
-    return if (this.contains(element)) {
-        this.minus(element)
-    } else {
-        this.plus(element)
-    }
-}
 
 fun Array<Tab>.next(currentIndex: Int) = if (currentIndex != this.lastIndex) this[(currentIndex + 1)] else null
 

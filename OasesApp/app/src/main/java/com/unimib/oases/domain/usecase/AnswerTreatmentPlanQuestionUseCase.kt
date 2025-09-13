@@ -1,11 +1,11 @@
 package com.unimib.oases.domain.usecase
 
+import com.unimib.oases.domain.model.complaint.binarytree.LeafNode
+import com.unimib.oases.domain.model.complaint.binarytree.ManualNode
+import com.unimib.oases.domain.model.complaint.binarytree.next
 import com.unimib.oases.ui.screen.medical_visit.maincomplaint.MainComplaintState
-import com.unimib.oases.ui.screen.medical_visit.maincomplaint.QuestionState
+import com.unimib.oases.ui.screen.medical_visit.maincomplaint.TreatmentPlanQuestionState
 import com.unimib.oases.ui.screen.medical_visit.maincomplaint.rebranch
-import com.unimib.oases.util.datastructure.binarytree.LeafNode
-import com.unimib.oases.util.datastructure.binarytree.ManualNode
-import com.unimib.oases.util.datastructure.binarytree.next
 import javax.inject.Inject
 
 class AnswerTreatmentPlanQuestionUseCase @Inject constructor() {
@@ -15,16 +15,21 @@ class AnswerTreatmentPlanQuestionUseCase @Inject constructor() {
         return when (nextNode){
             is LeafNode -> {
                 state.copy(
-                    questions = state.questions.rebranch(node, answer),
-                    leaf = nextNode
+                    treatmentPlanQuestions = state.treatmentPlanQuestions.rebranch(node, answer),
+                    leaf = nextNode,
+                    detailsQuestions = getDetailsQuestion(state)
                 )
             }
             is ManualNode -> {
                 state.copy(
-                    questions = state.questions.rebranch(node, answer) + QuestionState(nextNode),
+                    treatmentPlanQuestions =
+                        state.treatmentPlanQuestions.rebranch(node, answer) +
+                        TreatmentPlanQuestionState(nextNode),
                     leaf = null
                 )
             }
         }
     }
+
+    private fun getDetailsQuestion(state: MainComplaintState) = state.complaint!!.details.questions
 }
