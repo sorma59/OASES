@@ -11,13 +11,22 @@ import com.unimib.oases.domain.model.symptom.SymptomId.AirwaySwellingOrAirwayMas
 import com.unimib.oases.domain.model.symptom.SymptomId.AnimalBiteOrNeedlestickPunctureId
 import com.unimib.oases.domain.model.symptom.SymptomId.CholeraOutbreakId
 import com.unimib.oases.domain.model.symptom.SymptomId.ConvulsionsId
+import com.unimib.oases.domain.model.symptom.SymptomId.DiarrheaBloodyStoolsId
+import com.unimib.oases.domain.model.symptom.SymptomId.DiarrheaEpisodesOnceOrTwiceADayId
+import com.unimib.oases.domain.model.symptom.SymptomId.DiarrheaEpisodesSixOrMoreTimesADayId
+import com.unimib.oases.domain.model.symptom.SymptomId.DiarrheaEpisodesThreeToFiveTimesADayId
+import com.unimib.oases.domain.model.symptom.SymptomId.DiarrheaInTheLastEightToFourteenDaysId
+import com.unimib.oases.domain.model.symptom.SymptomId.DiarrheaInTheLastFifteenToThirtyDaysId
+import com.unimib.oases.domain.model.symptom.SymptomId.DiarrheaInTheLastOneToSevenDaysId
+import com.unimib.oases.domain.model.symptom.SymptomId.DiarrheaInTheLastThirtyPlusDaysId
+import com.unimib.oases.domain.model.symptom.SymptomId.DiarrheaOilyOrGreasyOrFoulSmellingStoolsId
+import com.unimib.oases.domain.model.symptom.SymptomId.DiarrheaWateryStoolsId
 import com.unimib.oases.domain.model.symptom.SymptomId.EasyBruisingId
 import com.unimib.oases.domain.model.symptom.SymptomId.EdemaOfBothFeetId
 import com.unimib.oases.domain.model.symptom.SymptomId.FeverAboveThirtyEightDegrees
 import com.unimib.oases.domain.model.symptom.SymptomId.FocalNeurologicDeficitOrFocalVisualDeficitId
 import com.unimib.oases.domain.model.symptom.SymptomId.HeadacheWithStiffNeckId
 import com.unimib.oases.domain.model.symptom.SymptomId.HeavyBleedingId
-import com.unimib.oases.domain.model.symptom.SymptomId.HighBloodPressureId
 import com.unimib.oases.domain.model.symptom.SymptomId.HighHrId
 import com.unimib.oases.domain.model.symptom.SymptomId.HighRiskTraumaOrHighRiskBurnsId
 import com.unimib.oases.domain.model.symptom.SymptomId.HighRrId
@@ -42,6 +51,7 @@ import com.unimib.oases.domain.model.symptom.SymptomId.PregnancyId
 import com.unimib.oases.domain.model.symptom.SymptomId.PregnancyWithActiveLaborId
 import com.unimib.oases.domain.model.symptom.SymptomId.PregnancyWithAlteredMentalStatusId
 import com.unimib.oases.domain.model.symptom.SymptomId.PregnancyWithHeavyBleedingId
+import com.unimib.oases.domain.model.symptom.SymptomId.PregnancyWithHighBloodPressureId
 import com.unimib.oases.domain.model.symptom.SymptomId.PregnancyWithSeizuresId
 import com.unimib.oases.domain.model.symptom.SymptomId.PregnancyWithSevereAbdominalPainId
 import com.unimib.oases.domain.model.symptom.SymptomId.PregnancyWithSevereHeadacheId
@@ -72,6 +82,8 @@ private fun snakeCase(string: String) = SnakeCaseString.of(string)
 sealed interface Symptom {
     val symptomId: SymptomId
     val label: String
+    val group: SymptomGroup?
+        get() = null
 
     val id: String
         get() = symptomId.value.string
@@ -136,8 +148,8 @@ sealed interface Symptom {
         override val symptomId = PregnancyId
         override val label = "Pregnancy with any of:"
     }
-    data object HighBloodPressure: Symptom {
-        override val symptomId = HighBloodPressureId
+    data object PregnancyWithHighBloodPressure: Symptom {
+        override val symptomId = PregnancyWithHighBloodPressureId
         override val label = "High blood pressure"
     }
     data object PregnancyWithHeavyBleeding: Symptom {
@@ -295,6 +307,68 @@ sealed interface Symptom {
 
     //---------------------------------------------------
 
+    data object DiarrheaInTheLastOneToSevenDays: Symptom {
+        override val symptomId = DiarrheaInTheLastOneToSevenDaysId
+        override val label = "1-7 days"
+        override val group = SymptomGroup.DiarrheaDuration
+    }
+
+    data object DiarrheaInTheLastEightToFourteenDays: Symptom {
+        override val symptomId = DiarrheaInTheLastEightToFourteenDaysId
+        override val label = "8-14 days"
+        override val group = SymptomGroup.DiarrheaDuration
+    }
+
+    data object DiarrheaInTheLastFifteenToThirtyDays: Symptom {
+        override val symptomId = DiarrheaInTheLastFifteenToThirtyDaysId
+        override val label = "15-30 days"
+        override val group = SymptomGroup.DiarrheaDuration
+    }
+
+    data object DiarrheaInTheLastThirtyPlusDays: Symptom {
+        override val symptomId = DiarrheaInTheLastThirtyPlusDaysId
+        override val label = "30+ days"
+        override val group = SymptomGroup.DiarrheaDuration
+    }
+
+
+    data object DiarrheaEpisodesOnceOrTwiceADay: Symptom {
+        override val symptomId = DiarrheaEpisodesOnceOrTwiceADayId
+        override val label = "1-2 episodes/day"
+        override val group = SymptomGroup.DiarrheaFrequency
+    }
+
+    data object DiarrheaEpisodesThreeToFiveTimesADay: Symptom {
+        override val symptomId = DiarrheaEpisodesThreeToFiveTimesADayId
+        override val label = "3-5 episodes/day"
+        override val group = SymptomGroup.DiarrheaFrequency
+    }
+
+    data object DiarrheaEpisodesSixOrMoreTimesADay: Symptom {
+        override val symptomId = DiarrheaEpisodesSixOrMoreTimesADayId
+        override val label = "6+ episodes/day"
+        override val group = SymptomGroup.DiarrheaFrequency
+    }
+
+    data object DiarrheaWateryStools: Symptom {
+        override val symptomId = DiarrheaWateryStoolsId
+        override val label = "watery"
+        override val group = SymptomGroup.DiarrheaAspect
+    }
+
+    data object DiarrheaBloodyStools: Symptom {
+        override val symptomId = DiarrheaBloodyStoolsId
+        override val label = "with blood"
+        override val group = SymptomGroup.DiarrheaAspect
+    }
+
+    data object DiarrheaOilyOrGreasyOrFoulSmellingStools: Symptom {
+        override val symptomId = DiarrheaOilyOrGreasyOrFoulSmellingStoolsId
+        override val label = "oily/greasy/foul-smelling"
+        override val group = SymptomGroup.DiarrheaAspect
+    }
+    //--------------------------------------------
+
     data object Vomiting: Symptom {
         override val symptomId = VomitingId
         override val label = "Vomiting"
@@ -351,6 +425,96 @@ sealed interface Symptom {
         override val symptomId = CholeraOutbreakId
         override val label = "Cholera outbreak in the region the patient comes from"
     }
+
+    companion object {
+        val symptoms: Map<String, Symptom> by lazy {
+            buildMap {
+                put(Unconsciousness.id, Unconsciousness)
+                put(ActiveConvulsions.id, ActiveConvulsions)
+                put(RespiratoryDistress.id, RespiratoryDistress)
+                put(HeavyBleeding.id, HeavyBleeding)
+                put(SevereDehydration.id, SevereDehydration)
+                put(HighRiskTraumaOrHighRiskBurns.id, HighRiskTraumaOrHighRiskBurns)
+                put(ThreatenedLimb.id, ThreatenedLimb)
+                put(PoisoningIntoxication.id, PoisoningIntoxication)
+                put(AcuteTesticularOrScrotalPainOrPriapism.id, AcuteTesticularOrScrotalPainOrPriapism)
+                put(SnakeBite.id, SnakeBite)
+                put(AggressiveBehavior.id, AggressiveBehavior)
+                put(YoungerThanEightDays.id, YoungerThanEightDays)
+                put(PretermAndUnderOneMonth.id, PretermAndUnderOneMonth)
+                put(YoungerThanTwoMonthsAndLowOrHighTemperature.id, YoungerThanTwoMonthsAndLowOrHighTemperature)
+
+                put(Pregnancy.id, Pregnancy)
+                put(PregnancyWithHighBloodPressure.id, PregnancyWithHighBloodPressure)
+                put(PregnancyWithHeavyBleeding.id, PregnancyWithHeavyBleeding)
+                put(PregnancyWithSevereAbdominalPain.id, PregnancyWithSevereAbdominalPain)
+                put(PregnancyWithSeizures.id, PregnancyWithSeizures)
+                put(PregnancyWithAlteredMentalStatus.id, PregnancyWithAlteredMentalStatus)
+                put(PregnancyWithSevereHeadache.id, PregnancyWithSevereHeadache)
+                put(PregnancyWithVisualChanges.id, PregnancyWithVisualChanges)
+                put(PregnancyWithTrauma.id, PregnancyWithTrauma)
+                put(PregnancyWithActiveLabor.id, PregnancyWithActiveLabor)
+
+                put(AirwaySwellingOrAirwayMass.id, AirwaySwellingOrAirwayMass)
+                put(OngoingBleeding.id, OngoingBleeding)
+                put(SeverePallor.id, SeverePallor)
+                put(OngoingSevereVomitingOrOngoingSevereDiarrhea.id, OngoingSevereVomitingOrOngoingSevereDiarrhea)
+                put(UnableToFeedOrDrink.id, UnableToFeedOrDrink)
+                put(RecentFainting.id, RecentFainting)
+                put(LethargyOrConfusionOrAgitation.id, LethargyOrConfusionOrAgitation)
+                put(LethargyOrRestlessOrIrritableOrConfused.id, LethargyOrRestlessOrIrritableOrConfused)
+                put(FocalNeurologicDeficitOrFocalVisualDeficit.id, FocalNeurologicDeficitOrFocalVisualDeficit)
+                put(HeadacheWithStiffNeck.id, HeadacheWithStiffNeck)
+                put(SeverePain.id, SeverePain)
+                put(UnableToPassUrine.id, UnableToPassUrine)
+                put(AcuteLimbDeformityOrOpenFracture.id, AcuteLimbDeformityOrOpenFracture)
+                put(OtherTraumaOrOtherBurns.id, OtherTraumaOrOtherBurns)
+                put(SexualAssault.id, SexualAssault)
+                put(AnimalBiteOrNeedlestickPuncture.id, AnimalBiteOrNeedlestickPuncture)
+                put(SevereVisibleMalnutrition.id, SevereVisibleMalnutrition)
+                put(EdemaOfBothFeet.id, EdemaOfBothFeet)
+                put(YoungerThanSixMonths.id, YoungerThanSixMonths)
+                put(OtherPregnancyRelatedComplaints.id, OtherPregnancyRelatedComplaints)
+
+                put(AgeOverEightyYears.id, AgeOverEightyYears)
+                put(LowSpo2.id, LowSpo2)
+                put(LowRr.id, LowRr)
+                put(HighRr.id, HighRr)
+                put(LowTemp.id, LowTemp)
+                put(HighTemp.id, HighTemp)
+                put(LowHr.id, LowHr)
+                put(HighHr.id, HighHr)
+                put(LowSbp.id, LowSbp)
+                put(HighSbp.id, HighSbp)
+
+                put(DiarrheaInTheLastOneToSevenDays.id, DiarrheaInTheLastOneToSevenDays)
+                put(DiarrheaInTheLastEightToFourteenDays.id, DiarrheaInTheLastEightToFourteenDays)
+                put(DiarrheaInTheLastFifteenToThirtyDays.id, DiarrheaInTheLastFifteenToThirtyDays)
+                put(DiarrheaInTheLastThirtyPlusDays.id, DiarrheaInTheLastThirtyPlusDays)
+
+                put(DiarrheaEpisodesOnceOrTwiceADay.id, DiarrheaEpisodesOnceOrTwiceADay)
+                put(DiarrheaEpisodesThreeToFiveTimesADay.id, DiarrheaEpisodesThreeToFiveTimesADay)
+                put(DiarrheaEpisodesSixOrMoreTimesADay.id, DiarrheaEpisodesSixOrMoreTimesADay)
+
+                put(DiarrheaWateryStools.id, DiarrheaWateryStools)
+                put(DiarrheaBloodyStools.id, DiarrheaBloodyStools)
+                put(DiarrheaOilyOrGreasyOrFoulSmellingStools.id, DiarrheaOilyOrGreasyOrFoulSmellingStools)
+
+                put(Vomiting.id, Vomiting)
+                put(AbdominalPain.id, AbdominalPain)
+                put(AbdominalDistensionAndTendernessWithAlteredBowelSounds.id, AbdominalDistensionAndTendernessWithAlteredBowelSounds)
+                put(WeightLoss.id, WeightLoss)
+                put(Malnutrition.id, Malnutrition)
+                put(FeverAbove38Degrees.id, FeverAbove38Degrees)
+                put(Convulsions.id, Convulsions)
+                put(EasyBruising.id, EasyBruising)
+                put(Hypoglycemia.id, Hypoglycemia)
+
+                put(HivPositive.id, HivPositive)
+                put(CholeraOutbreak.id, CholeraOutbreak)
+            }
+        }
+    }
 }
 
 sealed interface Pain
@@ -381,7 +545,7 @@ sealed class SymptomId (
     object PretermAndUnderOneMonthId: SymptomId(snakeCase("preterm_and_under_one_month"))
     object YoungerThanTwoMonthsAndLowOrHighTemperatureId: SymptomId(snakeCase("younger_than_two_months_and_low_or_high_temperature"))
     object PregnancyId: SymptomId(snakeCase("pregnancy"))
-    object HighBloodPressureId: SymptomId(snakeCase("high_blood_pressure"))
+    object PregnancyWithHighBloodPressureId: SymptomId(snakeCase("pregnancy_with_high_blood_pressure"))
     object PregnancyWithHeavyBleedingId: SymptomId(snakeCase("pregnancy_with_heavy_bleeding"))
     object PregnancyWithSevereAbdominalPainId: SymptomId(snakeCase("pregnancy_with_severe_abdominal_pain"))
     object PregnancyWithSeizuresId: SymptomId(snakeCase("pregnancy_with_seizures"))
@@ -421,6 +585,21 @@ sealed class SymptomId (
     object LowSbpId: SymptomId(snakeCase("low_sbp"))
     object HighSbpId: SymptomId(snakeCase("high_sbp"))
 
+    //---------------------------------------------------------------
+
+    object DiarrheaInTheLastOneToSevenDaysId: SymptomId(snakeCase("diarrhea_in_the_last_one_to_seven_days"))
+    object DiarrheaInTheLastEightToFourteenDaysId: SymptomId(snakeCase("diarrhea_in_the_last_eight_to_fourteen_days"))
+    object DiarrheaInTheLastFifteenToThirtyDaysId: SymptomId(snakeCase("diarrhea_in_the_last_fifteen_to_thirty_days"))
+    object DiarrheaInTheLastThirtyPlusDaysId: SymptomId(snakeCase("diarrhea_in_the_last_thirty_plus_days"))
+
+    object DiarrheaEpisodesOnceOrTwiceADayId: SymptomId(snakeCase("diarrhea_episodes_once_or_twice_a_day"))
+    object DiarrheaEpisodesThreeToFiveTimesADayId: SymptomId(snakeCase("diarrhea_episodes_three_to_five_times_a_day"))
+    object DiarrheaEpisodesSixOrMoreTimesADayId: SymptomId(snakeCase("diarrhea_episodes_six_or_more_times_a_day"))
+
+    object DiarrheaWateryStoolsId: SymptomId(snakeCase("diarrhea_watery_stools"))
+    object DiarrheaBloodyStoolsId: SymptomId(snakeCase("diarrhea_bloody_stools"))
+    object DiarrheaOilyOrGreasyOrFoulSmellingStoolsId: SymptomId(snakeCase("diarrhea_oily_or_greasy_or_foul_smelling_stools"))
+
     //--------------------------------------------------------------
 
     object VomitingId: SymptomId(snakeCase("vomiting"))
@@ -435,6 +614,12 @@ sealed class SymptomId (
 
     object HivPositiveId: SymptomId(snakeCase("hiv_positive"))
     object CholeraOutbreakId: SymptomId(snakeCase("cholera_outbreak"))
+}
+
+enum class SymptomGroup{
+    DiarrheaDuration,
+    DiarrheaFrequency,
+    DiarrheaAspect
 }
 
 

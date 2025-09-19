@@ -11,7 +11,6 @@ import com.unimib.oases.domain.model.symptom.Symptom.EdemaOfBothFeet
 import com.unimib.oases.domain.model.symptom.Symptom.FocalNeurologicDeficitOrFocalVisualDeficit
 import com.unimib.oases.domain.model.symptom.Symptom.HeadacheWithStiffNeck
 import com.unimib.oases.domain.model.symptom.Symptom.HeavyBleeding
-import com.unimib.oases.domain.model.symptom.Symptom.HighBloodPressure
 import com.unimib.oases.domain.model.symptom.Symptom.HighHr
 import com.unimib.oases.domain.model.symptom.Symptom.HighRiskTraumaOrHighRiskBurns
 import com.unimib.oases.domain.model.symptom.Symptom.HighRr
@@ -33,6 +32,7 @@ import com.unimib.oases.domain.model.symptom.Symptom.Pregnancy
 import com.unimib.oases.domain.model.symptom.Symptom.PregnancyWithActiveLabor
 import com.unimib.oases.domain.model.symptom.Symptom.PregnancyWithAlteredMentalStatus
 import com.unimib.oases.domain.model.symptom.Symptom.PregnancyWithHeavyBleeding
+import com.unimib.oases.domain.model.symptom.Symptom.PregnancyWithHighBloodPressure
 import com.unimib.oases.domain.model.symptom.Symptom.PregnancyWithSeizures
 import com.unimib.oases.domain.model.symptom.Symptom.PregnancyWithSevereAbdominalPain
 import com.unimib.oases.domain.model.symptom.Symptom.PregnancyWithSevereHeadache
@@ -170,7 +170,7 @@ enum class TriageSymptom(
         isParent = true
     ),
     PREGNANCY_HIGH_BP(
-        HighBloodPressure,
+        PregnancyWithHighBloodPressure,
         ::redForAdultNullForKid,
         parent = PREGNANCY,
         isComputed = true

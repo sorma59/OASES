@@ -10,4 +10,5 @@ class Diarrhea(ageInYears: Int): Complaint {
 
     override val details = DiarrheaDetails()
 
+    override val tests = DiarrheaTests()
 }

@@ -1,72 +1,64 @@
 package com.unimib.oases.domain.model.complaint
 
-import com.unimib.oases.domain.model.complaint.OtherHighRiskSymptomsQuestion.DiarrheaOtherHighRiskSymptoms
-import com.unimib.oases.domain.model.complaint.OtherSymptomsQuestion.DiarrheaOtherSymptoms
+import com.unimib.oases.domain.model.symptom.Symptom
 
 class DiarrheaDetails: ComplaintDetails {
 
-    val durationQuestion = DurationQuestion(
-        "For how long did the patient experience diarrhea?",
-        DiarrheaDuration.entries
-    )
-
-    val frequencyQuestion = FrequencyQuestion(
-        "How many episodes of diarrhea does the patient have?",
-        DiarrheaFrequency.entries
-    )
-
-    val aspectQuestion = AspectQuestion(
-        "What do the stools look like?",
-        DiarrheaAspect.entries
-    )
-
-    val otherSymptomsQuestion = DiarrheaOtherSymptoms
-
-    val otherHighRiskFeaturesQuestion = DiarrheaOtherHighRiskSymptoms
-
     override val questions = listOf(
-        durationQuestion,
-        frequencyQuestion,
-        aspectQuestion,
-        otherSymptomsQuestion,
-        otherHighRiskFeaturesQuestion
+        DiarrheaDurationQuestion,
+        DiarrheaFrequencyQuestion,
+        DiarrheaAspectQuestion,
+        DiarrheaOtherSymptoms,
+        DiarrheaOtherHighRiskSymptoms
     )
 }
 
-sealed interface Option {
-    val displayText: String
+data object DiarrheaDurationQuestion: SingleChoiceComplaintQuestion{
+    override val question = "How long did the patient experience diarrhea for?"
+    override val options = listOf(
+        Symptom.DiarrheaInTheLastOneToSevenDays,
+        Symptom.DiarrheaInTheLastEightToFourteenDays,
+        Symptom.DiarrheaInTheLastFifteenToThirtyDays,
+        Symptom.DiarrheaInTheLastThirtyPlusDays
+    )
 }
 
-enum class DiarrheaDuration(override val displayText: String): Option{
-    ONE_TO_SEVEN_DAYS("1-7 days"),
-    EIGHT_TO_FOURTEEN_DAYS("8-14 days"),
-    FIFTEEN_TO_THIRTY_DAYS("15-30 days"),
-    MORE_THAN_THIRTY_DAYS("more than 30 days")
+data object DiarrheaFrequencyQuestion: SingleChoiceComplaintQuestion{
+    override val question = "How many episodes of diarrhea does the patient have?"
+    override val options = listOf(
+        Symptom.DiarrheaEpisodesOnceOrTwiceADay,
+        Symptom.DiarrheaEpisodesThreeToFiveTimesADay,
+        Symptom.DiarrheaEpisodesSixOrMoreTimesADay
+    )
 }
 
-enum class DiarrheaFrequency(override val displayText: String): Option{
-    ONE_TO_TWO_TIMES_A_DAY("1-2 episodes/day"),
-    THREE_TO_FIVE_TIMES_A_DAY("3-5 episodes/day"),
-    SIX_OR_MORE_TIMES_A_DAY("6 or more episodes/day")
+data object DiarrheaAspectQuestion: SingleChoiceComplaintQuestion{
+    override val question = "How do the stools look like?"
+    override val options = listOf(
+        Symptom.DiarrheaWateryStools,
+        Symptom.DiarrheaBloodyStools,
+        Symptom.DiarrheaOilyOrGreasyOrFoulSmellingStools
+    )
 }
 
-enum class DiarrheaAspect(override val displayText: String): Option{
-    WATERY("Watery"),
-    WITH_BLOOD("With blood"),
-    OILY_OR_GREASY_OR_FOUL_SMELLING("Oily/greasy/foul-smelling")
+data object DiarrheaOtherSymptoms: OtherSymptomsQuestion() {
+    override val options = listOf(
+        Symptom.Vomiting,
+        Symptom.AbdominalPain,
+        Symptom.AbdominalDistensionAndTendernessWithAlteredBowelSounds,
+        Symptom.WeightLoss,
+        Symptom.Malnutrition,
+        Symptom.FeverAbove38Degrees,
+        Symptom.Convulsions,
+        Symptom.EasyBruising,
+        Symptom.SeverePallor,
+        Symptom.Hypoglycemia
+    )
 }
 
-class DurationQuestion(
-    override val question: String,
-    override val options: List<Option>
-): SingleChoiceComplaintQuestion
-
-class FrequencyQuestion(
-    override val question: String,
-    override val options: List<Option>
-): SingleChoiceComplaintQuestion
-
-class AspectQuestion(
-    override val question: String,
-    override val options: List<Option>
-): SingleChoiceComplaintQuestion
+data object DiarrheaOtherHighRiskSymptoms: OtherHighRiskSymptomsQuestion() {
+    override val options = listOf(
+        Symptom.HivPositive,
+        Symptom.CholeraOutbreak
+    )
+}

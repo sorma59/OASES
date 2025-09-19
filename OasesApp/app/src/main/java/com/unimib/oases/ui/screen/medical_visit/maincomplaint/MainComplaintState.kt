@@ -3,8 +3,8 @@ package com.unimib.oases.ui.screen.medical_visit.maincomplaint
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.domain.model.complaint.Complaint
 import com.unimib.oases.domain.model.complaint.ComplaintQuestion
-import com.unimib.oases.domain.model.complaint.Option
-import com.unimib.oases.domain.model.complaint.Question
+import com.unimib.oases.domain.model.complaint.Condition
+import com.unimib.oases.domain.model.complaint.Test
 import com.unimib.oases.domain.model.complaint.TreatmentPlan
 import com.unimib.oases.domain.model.complaint.binarytree.Branch
 import com.unimib.oases.domain.model.complaint.binarytree.LeafNode
@@ -49,9 +49,9 @@ data class MainComplaintState(
 
     val symptoms: Set<Symptom> = emptySet(),
 
-    val durationOption: Option? = null,
-    val frequencyOption: Option? = null,
-    val aspectOption: Option? = null,
+    val conditions: List<Condition> = emptyList(),
+
+    val requestedTests: Set<Test> = emptySet(),
 
     val isLoading: Boolean = false,
     val toastMessage: String? = null,
@@ -64,9 +64,4 @@ data class MainComplaintState(
 data class TreatmentPlanQuestionState(
     val node: ManualNode,
     val answer: Boolean? = null
-)
-
-data class DetailsQuestionState(
-    val question: Question,
-    val selected: Set<ComplaintQuestion>
 )

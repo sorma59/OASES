@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.union
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.unimib.oases.domain.model.symptom.Symptom
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -35,6 +36,35 @@ fun <T> Set<T>.toggle(element: T): Set<T> {
     } else {
         this.plus(element)
     }
+}
+
+/**
+ * Selects a symptom from a set of symptoms.
+ *
+ * This function is used to ensure that only one symptom from each group is selected.
+ * If a symptom from a group is already selected, it will be replaced by the new symptom.
+ * If no symptom from the group is selected, the new symptom will be added.
+ *
+ * @param symptom The symptom to select.
+ * @return A new set of symptoms with the selected symptom.
+ * @throws IllegalArgumentException if the symptom is not part of a symptom group.
+ */
+fun Set<Symptom>.select(symptom: Symptom): Set<Symptom> {
+
+    if (symptom.group == null)
+        throw IllegalArgumentException("Symptom must be part of a symptom group")
+
+    // Create a mutable copy of the original set to modify
+    val mutableSet = this.toMutableSet()
+
+    // Remove all symptoms that belong to the same group as the symptom
+    mutableSet.removeAll { it.group == symptom.group }
+
+    // Add the symptom
+    mutableSet.add(symptom)
+
+    // Return an immutable set
+    return mutableSet.toSet()
 }
 
 /**

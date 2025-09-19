@@ -6,11 +6,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,22 +24,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.unimib.oases.domain.model.complaint.AspectQuestion
-import com.unimib.oases.domain.model.complaint.DurationQuestion
-import com.unimib.oases.domain.model.complaint.FrequencyQuestion
 import com.unimib.oases.domain.model.complaint.MultipleChoiceComplaintQuestion
-import com.unimib.oases.domain.model.complaint.Option
 import com.unimib.oases.domain.model.complaint.SingleChoiceComplaintQuestion
+import com.unimib.oases.domain.model.complaint.Test
 import com.unimib.oases.domain.model.symptom.Symptom
 import com.unimib.oases.ui.components.input.LabeledCheckbox
 import com.unimib.oases.ui.components.input.LabeledRadioButton
 import com.unimib.oases.ui.components.util.TitleText
 import com.unimib.oases.ui.components.util.button.RetryButton
-import com.unimib.oases.ui.screen.medical_visit.maincomplaint.MainComplaintEvent.AspectSelected
-import com.unimib.oases.ui.screen.medical_visit.maincomplaint.MainComplaintEvent.DurationSelected
-import com.unimib.oases.ui.screen.medical_visit.maincomplaint.MainComplaintEvent.FrequencySelected
+import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 import com.unimib.oases.ui.screen.medical_visit.maincomplaint.MainComplaintEvent.SymptomSelected
 import com.unimib.oases.ui.util.ToastUtils
+import com.unimib.oases.util.toggle
 
 @Composable
 fun MainComplaintScreen(){
@@ -69,22 +67,72 @@ fun MainComplaintScreen(){
         }
     } ?:
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp)
-            .verticalScroll(scrollState),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+    if (state.isLoading)
+        CustomCircularProgressIndicator()
+    else
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp)
+                .verticalScroll(scrollState),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ){
+
+            TitleText("Ask these questions:")
+
+            TreatmentPlanQuestions(state, viewModel)
+
+            DetailsQuestions(
+                state,
+                viewModel::onEvent
+            )
+
+            GenerateTestsButton(viewModel)
+
+            state.complaint?.let {
+                Tests(
+                    state,
+                    isChecked = { state.requestedTests.contains(it) },
+                    onCheckedChange = { state.requestedTests.toggle(it) }
+                )
+            }
+        }
+}
+
+@Composable
+private fun GenerateTestsButton(
+    viewModel: MainComplaintViewModel
+) {
+    Box(
+        Modifier.fillMaxWidth()
     ){
+        Button(
+            onClick = { viewModel.onEvent(MainComplaintEvent.GenerateTestsPressed) },
+        ) {
+            Text("Suggest tests")
+        }
+    }
+}
 
-        TitleText("Ask these questions:")
-
-        TreatmentPlanQuestions(state, viewModel)
-
-        DetailsQuestions(
-            state,
-            viewModel::onEvent
-        )
+@Composable
+fun Tests(
+    state: MainComplaintState,
+    isChecked: (Test) -> Boolean,
+    onCheckedChange: (Test) -> Unit
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ){
+        for (condition in state.conditions) {
+            TitleText(condition.label, fontSize = 18)
+            for (test in condition.suggestedTests){
+                LabeledCheckbox(
+                    label = test.label,
+                    checked = isChecked(test),
+                    onCheckedChange = { onCheckedChange(test) }
+                )
+            }
+        }
     }
 }
 
@@ -108,37 +156,12 @@ private fun DetailsQuestions(
                 }
 
                 is SingleChoiceComplaintQuestion -> {
-
-                    val isSelected = when(question){
-                        is DurationQuestion -> { option: Option ->
-                            state.durationOption == option
-                        }
-                        is FrequencyQuestion -> { option: Option ->
-                            state.frequencyOption == option
-                        }
-
-                        is AspectQuestion -> { option: Option ->
-                            state.aspectOption == option
-                        }
-                    }
-
-                    val onSelected = when(question){
-                        is DurationQuestion -> { option: Option ->
-                            onEvent(DurationSelected(option))
-                        }
-                        is FrequencyQuestion -> { option: Option ->
-                            onEvent(FrequencySelected(option))
-                        }
-
-                        is AspectQuestion -> { option: Option ->
-                            onEvent(AspectSelected(option))
-                        }
-                    }
-
                     SingleChoiceQuestion(
                         question = question,
-                        isSelected = isSelected,
-                        onSelected = onSelected
+                        isSelected = {
+                            state.symptoms.contains(it)
+                        },
+                        onSelected = { onEvent(SymptomSelected(it)) }
                     )
                 }
             }
@@ -217,15 +240,15 @@ fun YesOrNoQuestion(
 @Composable
 fun SingleChoiceQuestion(
     question: SingleChoiceComplaintQuestion,
-    isSelected: (Option) -> Boolean,
-    onSelected: (Option) -> Unit,
+    isSelected: (Symptom) -> Boolean,
+    onSelected: (Symptom) -> Unit,
 ){
     Column{
         TitleText(question.question)
 
         for (option in question.options) {
             LabeledRadioButton(
-                label = option.displayText,
+                label = option.label,
                 selected = isSelected(option),
                 onClick = { onSelected(option) }
             )
