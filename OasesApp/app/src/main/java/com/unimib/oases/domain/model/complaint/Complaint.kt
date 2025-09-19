@@ -53,6 +53,6 @@ sealed class OtherSymptomsQuestion(): MultipleChoiceComplaintQuestion{
 }
 
 sealed class OtherHighRiskSymptomsQuestion(): MultipleChoiceComplaintQuestion{
-    override val question = "Which other high-risk symptoms does the patient have?"
+    override val question = "Which other high-risk features are present?"
     override val options: List<Symptom> = emptyList()
 }

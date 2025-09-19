@@ -1,6 +1,6 @@
 package com.unimib.oases.domain.model.complaint.binarytree
 
-import com.unimib.oases.domain.model.complaint.TreatmentPlan
+import com.unimib.oases.domain.model.complaint.ImmediateTreatment
 
 class DiarrheaTree(val ageInYears: Int): Tree {
 
@@ -13,7 +13,7 @@ class DiarrheaTree(val ageInYears: Int): Tree {
     val malnutritionQuestion = "Is the patient malnourished?"
 
     // Therapies
-    val shockOrSevereDehydrationAndMalnutritionTreatmentPlan = TreatmentPlan(
+    val shockOrSevereDehydrationAndMalnutritionImmediateTreatment = ImmediateTreatment(
         """
             This is a high-risk patient with shock/severe dehydration and malnutrition.
             Rapidly perform the following actions:
@@ -27,8 +27,8 @@ class DiarrheaTree(val ageInYears: Int): Tree {
         """.trimIndent()
     )
 
-    val shockOrSevereDehydrationWithoutMalnutritionAndFiveYearsOldOrOlderTreatmentPlan =
-        TreatmentPlan(
+    val shockOrSevereDehydrationWithoutMalnutritionAndFiveYearsOldOrOlderImmediateTreatment =
+        ImmediateTreatment(
             """
             This is a high-risk patient with shock/severe dehydration. Rapidly perform the following actions:
             - set 2 large bore IV lines
@@ -52,8 +52,8 @@ class DiarrheaTree(val ageInYears: Int): Tree {
         """.trimIndent()
         )
 
-    val shockOrSevereDehydrationWithoutMalnutritionAndYoungerThanFiveYearsOldTreatmentPlan =
-        TreatmentPlan(
+    val shockOrSevereDehydrationWithoutMalnutritionAndYoungerThanFiveYearsOldImmediateTreatment =
+        ImmediateTreatment(
             """
             This is a high-risk patient with shock/severe dehydration. Rapidly perform the following actions:
             - set 2 large bore IV lines
@@ -70,7 +70,7 @@ class DiarrheaTree(val ageInYears: Int): Tree {
         """.trimIndent()
         )
 
-    val moderateDehydrationAndMalnutritionTreatmentPlan = TreatmentPlan(
+    val moderateDehydrationAndMalnutritionImmediateTreatment = ImmediateTreatment(
         """
             This is a high-risk patient with moderate dehydration and malnutrition. Rapidly perform the following actions:
             - give oral ReSoMal 5 ml/kg every 30 min for the first 2 h.
@@ -80,7 +80,7 @@ class DiarrheaTree(val ageInYears: Int): Tree {
         """.trimIndent()
     )
 
-    val moderateDehydrationWithoutMalnutritionAndFiveYearsOldOrOlderTreatmentPlan = TreatmentPlan(
+    val moderateDehydrationWithoutMalnutritionAndFiveYearsOldOrOlderImmediateTreatment = ImmediateTreatment(
         """
             This is a patient with moderate dehydration. Perform the following actions:
             - give ORS 50 ml/kg in the first 4 hours. Initially, adults can take up to 750 ml ORS/hour (3 L in 4 hours)
@@ -88,8 +88,8 @@ class DiarrheaTree(val ageInYears: Int): Tree {
         """.trimIndent()
     )
 
-    val moderateDehydrationWithoutMalnutritionAndYoungerThanFiveYearsOldTreatmentPlan =
-        TreatmentPlan(
+    val moderateDehydrationWithoutMalnutritionAndYoungerThanFiveYearsOldImmediateTreatment =
+        ImmediateTreatment(
             """
             This is a patient with moderate dehydration. Perform the following actions:
             - give ORS 75 ml/kg in the first 4 hours. Give frequent small sips from a cup. If the child vomits, wait 10 minutes, then continue more slowly
@@ -104,27 +104,27 @@ class DiarrheaTree(val ageInYears: Int): Tree {
 
       // Leaves
     val shockOrSevereDehydrationAndMalnutritionNode = LeafNode(
-          shockOrSevereDehydrationAndMalnutritionTreatmentPlan
+          shockOrSevereDehydrationAndMalnutritionImmediateTreatment
       )
 
     val shockOrSevereDehydrationWithoutMalnutritionAndFiveYearsOldOrOlderNode = LeafNode(
-        shockOrSevereDehydrationWithoutMalnutritionAndFiveYearsOldOrOlderTreatmentPlan
+        shockOrSevereDehydrationWithoutMalnutritionAndFiveYearsOldOrOlderImmediateTreatment
     )
 
     val shockOrSevereDehydrationWithoutMalnutritionAndYoungerThanFiveYearsOldNode = LeafNode(
-        shockOrSevereDehydrationWithoutMalnutritionAndYoungerThanFiveYearsOldTreatmentPlan
+        shockOrSevereDehydrationWithoutMalnutritionAndYoungerThanFiveYearsOldImmediateTreatment
     )
 
     val moderateDehydrationAndMalnutritionNode = LeafNode(
-        moderateDehydrationAndMalnutritionTreatmentPlan
+        moderateDehydrationAndMalnutritionImmediateTreatment
     )
 
     val moderateDehydrationWithoutMalnutritionAndFiveYearsOldOrOlderNode = LeafNode(
-        moderateDehydrationWithoutMalnutritionAndFiveYearsOldOrOlderTreatmentPlan
+        moderateDehydrationWithoutMalnutritionAndFiveYearsOldOrOlderImmediateTreatment
     )
 
     val moderateDehydrationWithoutMalnutritionAndYoungerThanFiveYearsOldNode = LeafNode(
-        moderateDehydrationWithoutMalnutritionAndYoungerThanFiveYearsOldTreatmentPlan
+        moderateDehydrationWithoutMalnutritionAndYoungerThanFiveYearsOldImmediateTreatment
     )
 
     val noShockNorSevereDehydrationAndNoMalnutritionNode = LeafNode(

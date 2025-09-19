@@ -9,7 +9,7 @@ import com.unimib.oases.domain.model.complaint.Diarrhea
 import com.unimib.oases.domain.model.complaint.binarytree.ManualNode
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.domain.repository.TriageEvaluationRepository
-import com.unimib.oases.domain.usecase.AnswerTreatmentPlanQuestionUseCase
+import com.unimib.oases.domain.usecase.AnswerImmediateTreatmentQuestionUseCase
 import com.unimib.oases.domain.usecase.GenerateSuggestedTestsUseCase
 import com.unimib.oases.domain.usecase.SelectSymptomUseCase
 import com.unimib.oases.domain.usecase.TranslateTriageSymptomIdsToSymptomsUseCase
@@ -28,7 +28,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainComplaintViewModel @Inject constructor(
-    private val answerTreatmentPlanQuestionUseCase: AnswerTreatmentPlanQuestionUseCase,
+    private val answerImmediateTreatmentQuestionUseCase: AnswerImmediateTreatmentQuestionUseCase,
     private val generateSuggestedTestsUseCase: GenerateSuggestedTestsUseCase,
     private val translateTriageSymptomIdsToSymptomsUseCase: TranslateTriageSymptomIdsToSymptomsUseCase,
     private val selectSymptomUseCase: SelectSymptomUseCase,
@@ -131,8 +131,8 @@ class MainComplaintViewModel @Inject constructor(
     private fun showFirstQuestion(firstNode: ManualNode) {
         _state.update {
             it.copy(
-                treatmentPlanQuestions = listOf(
-                    TreatmentPlanQuestionState(firstNode)
+                immediateTreatmentQuestions = listOf(
+                    ImmediateTreatmentQuestionState(firstNode)
                 )
             )
         }
@@ -198,7 +198,7 @@ class MainComplaintViewModel @Inject constructor(
         when(event){
             is MainComplaintEvent.NodeAnswered -> {
                 _state.update {
-                    answerTreatmentPlanQuestionUseCase(event.answer, event.node, it)
+                    answerImmediateTreatmentQuestionUseCase(event.answer, event.node, it)
                 }
             }
 

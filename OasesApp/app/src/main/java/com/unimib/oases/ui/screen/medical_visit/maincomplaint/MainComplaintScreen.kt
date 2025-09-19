@@ -80,7 +80,7 @@ fun MainComplaintScreen(){
 
             TitleText("Ask these questions:")
 
-            TreatmentPlanQuestions(state, viewModel)
+            ImmediateTreatmentQuestions(state, viewModel)
 
             DetailsQuestions(
                 state,
@@ -96,6 +96,8 @@ fun MainComplaintScreen(){
                     onCheckedChange = { state.requestedTests.toggle(it) }
                 )
             }
+
+
         }
 }
 
@@ -170,12 +172,12 @@ private fun DetailsQuestions(
 }
 
 @Composable
-private fun TreatmentPlanQuestions(
+private fun ImmediateTreatmentQuestions(
     state: MainComplaintState,
     viewModel: MainComplaintViewModel,
     readOnly: Boolean = false
 ) {
-    for ((node, answer) in state.treatmentPlanQuestions) {
+    for ((node, answer) in state.immediateTreatmentQuestions) {
 
         YesOrNoQuestion(
             question = node.value,
@@ -189,8 +191,8 @@ private fun TreatmentPlanQuestions(
 
     Spacer(Modifier.height(8.dp))
 
-    state.treatmentPlan?.let {
-        TitleText("Treatment Plan")
+    state.immediateTreatment?.let {
+        TitleText("Immediate Treatment")
         Text(it.text)
     }
 }

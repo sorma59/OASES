@@ -210,7 +210,7 @@ sealed interface Symptom {
     }
     data object LethargyOrConfusionOrAgitation: Symptom {
         override val symptomId = LethargyOrConfusionOrAgitationId
-        override val label = "Lethargy, confusion orDixit"
+        override val label = "Lethargy, confusion or agitation"
     }
     data object LethargyOrRestlessOrIrritableOrConfused: Symptom {
         override val symptomId = LethargyOrRestlessOrIrritableOrConfusedId

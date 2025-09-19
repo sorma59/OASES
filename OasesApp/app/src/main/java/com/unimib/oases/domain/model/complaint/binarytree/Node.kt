@@ -1,6 +1,6 @@
 package com.unimib.oases.domain.model.complaint.binarytree
 
-import com.unimib.oases.domain.model.complaint.TreatmentPlan
+import com.unimib.oases.domain.model.complaint.ImmediateTreatment
 
 fun ManualNode.next(boolean: Boolean): ShowableNode {
     var node = if (boolean) children.left else children.right
@@ -39,7 +39,7 @@ data class ManualNode(
 
 // Leaf node: therapy suggested
 data class LeafNode(
-    override val value: TreatmentPlan?,
+    override val value: ImmediateTreatment?,
     override val children: Nothing? = null
 ) : Node, ShowableNode
 
