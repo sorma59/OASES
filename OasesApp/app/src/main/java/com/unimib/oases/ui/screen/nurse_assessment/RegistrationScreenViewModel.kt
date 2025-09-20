@@ -9,7 +9,7 @@ import com.unimib.oases.di.ApplicationScope
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.model.NumericPrecision
 import com.unimib.oases.domain.model.Visit
-import com.unimib.oases.domain.model.symptom.symptoms
+import com.unimib.oases.domain.model.symptom.triageSymptoms
 import com.unimib.oases.domain.repository.MalnutritionScreeningRepository
 import com.unimib.oases.domain.repository.TriageEvaluationRepository
 import com.unimib.oases.domain.usecase.ComputeSymptomsUseCase
@@ -616,7 +616,7 @@ class RegistrationScreenViewModel @Inject constructor(
     }
 
     private fun handleTriageFieldToggle(fieldId: String) {
-        val symptom = symptoms[fieldId]
+        val symptom = triageSymptoms[fieldId]
 
         if (symptom == null)
             Log.e("TriageScreenViewModel", "Field not found: bug")
@@ -624,7 +624,7 @@ class RegistrationScreenViewModel @Inject constructor(
             updateTriageState { it.copy(toastMessage = "This field is computed") }
         else {
             updateTriageState {
-                if (it.triageConfig?.redOptions?.any { it.symptom.id == fieldId } == true){
+                if (it.triageConfig?.redOptions?.any { it.symptom.symptom.id == fieldId } == true){
                     it.copy(
                         selectedReds = it.selectedReds.toggle(fieldId)
                     )

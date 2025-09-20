@@ -1,7 +1,7 @@
 package com.unimib.oases.domain.usecase
 
 import com.unimib.oases.domain.model.TriageCode
-import com.unimib.oases.domain.model.symptom.symptoms
+import com.unimib.oases.domain.model.symptom.triageSymptoms
 import javax.inject.Inject
 
 class EvaluateTriageCodeUseCase @Inject constructor() {
@@ -16,7 +16,7 @@ class EvaluateTriageCodeUseCase @Inject constructor() {
 
     fun hasValidSymptoms(selectedSymptoms: Set<String>): Boolean {
         selectedSymptoms.forEach { id ->
-            val symptom = symptoms[id]
+            val symptom = triageSymptoms[id]
             if (symptom == null)
                 throw IllegalArgumentException("TriageSymptom $id not found")
             if (symptom.parent != null)
@@ -25,6 +25,6 @@ class EvaluateTriageCodeUseCase @Inject constructor() {
         }
         // True only if not all symptoms are parents because parents need at least
         // one child to be considered a symptom (empty set contains parents only)
-        return !selectedSymptoms.all { symptoms[it]?.isParent == true}
+        return !selectedSymptoms.all { triageSymptoms[it]?.isParent == true}
     }
 }

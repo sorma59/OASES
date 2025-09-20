@@ -12,7 +12,7 @@ class DiarrheaTree(val ageInYears: Int): Tree {
 
     val malnutritionQuestion = "Is the patient malnourished?"
 
-    // Therapies
+    // Immediate treatments
     val shockOrSevereDehydrationAndMalnutritionImmediateTreatment = ImmediateTreatment(
         """
             This is a high-risk patient with shock/severe dehydration and malnutrition.

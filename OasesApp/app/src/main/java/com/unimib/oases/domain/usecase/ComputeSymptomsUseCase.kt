@@ -2,29 +2,29 @@ package com.unimib.oases.domain.usecase
 
 import com.unimib.oases.domain.model.symptom.PatientCategory
 import com.unimib.oases.domain.model.symptom.TriageSymptom
-import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageState.Companion.HR_HIGH
-import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageState.Companion.HR_HIGH_FOR_FIVE_TO_TWELVE_YEARS_OLDS
-import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageState.Companion.HR_HIGH_FOR_ONE_TO_FOUR_YEARS_OLDS
-import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageState.Companion.HR_HIGH_FOR_ONE_YEAR_OLDS
-import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageState.Companion.HR_LOW
-import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageState.Companion.HR_LOW_FOR_FIVE_TO_TWELVE_YEARS_OLDS
-import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageState.Companion.HR_LOW_FOR_ONE_TO_FOUR_YEARS_OLDS
-import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageState.Companion.HR_LOW_FOR_ONE_YEAR_OLDS
-import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageState.Companion.PREGNANCY_HIGH_DBP
-import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageState.Companion.PREGNANCY_HIGH_SBP
-import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageState.Companion.RR_HIGH
-import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageState.Companion.RR_HIGH_FOR_FIVE_TO_TWELVE_YEARS_OLDS
-import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageState.Companion.RR_HIGH_FOR_ONE_TO_FOUR_YEARS_OLDS
-import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageState.Companion.RR_HIGH_FOR_ONE_YEAR_OLDS
-import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageState.Companion.RR_LOW
-import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageState.Companion.RR_LOW_FOR_FIVE_TO_TWELVE_YEARS_OLDS
-import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageState.Companion.RR_LOW_FOR_ONE_TO_FOUR_YEARS_OLDS
-import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageState.Companion.RR_LOW_FOR_ONE_YEAR_OLDS
-import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageState.Companion.SBP_HIGH
-import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageState.Companion.SBP_LOW
-import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageState.Companion.SPO2_LOW
-import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageState.Companion.TEMP_HIGH
-import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageState.Companion.TEMP_LOW
+import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.HR_HIGH
+import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.HR_HIGH_FOR_FIVE_TO_TWELVE_YEARS_OLDS
+import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.HR_HIGH_FOR_ONE_TO_FOUR_YEARS_OLDS
+import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.HR_HIGH_FOR_ONE_YEAR_OLDS
+import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.HR_LOW
+import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.HR_LOW_FOR_FIVE_TO_TWELVE_YEARS_OLDS
+import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.HR_LOW_FOR_ONE_TO_FOUR_YEARS_OLDS
+import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.HR_LOW_FOR_ONE_YEAR_OLDS
+import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.PREGNANCY_HIGH_DBP
+import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.PREGNANCY_HIGH_SBP
+import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.RR_HIGH
+import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.RR_HIGH_FOR_FIVE_TO_TWELVE_YEARS_OLDS
+import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.RR_HIGH_FOR_ONE_TO_FOUR_YEARS_OLDS
+import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.RR_HIGH_FOR_ONE_YEAR_OLDS
+import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.RR_LOW
+import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.RR_LOW_FOR_FIVE_TO_TWELVE_YEARS_OLDS
+import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.RR_LOW_FOR_ONE_TO_FOUR_YEARS_OLDS
+import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.RR_LOW_FOR_ONE_YEAR_OLDS
+import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.SBP_HIGH
+import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.SBP_LOW
+import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.SPO2_LOW
+import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.TEMP_HIGH
+import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.TEMP_LOW
 import javax.inject.Inject
 
 class ComputeSymptomsUseCase @Inject constructor(
@@ -125,11 +125,11 @@ class ComputeSymptomsUseCase @Inject constructor(
                     newReds.add(TriageSymptom.PREGNANCY_HIGH_BP.symptom.id)
             }
             PatientCategory.PEDIATRIC -> {
-                if (ageInMonths < 2 &&
-                    vitalSigns.temp != null &&
-                    (vitalSigns.temp < TEMP_LOW || vitalSigns.temp > TEMP_HIGH)
-                )
-                    newReds.add(TriageSymptom.YOUNGER_THAN_TWO_MONTHS_AND_LOW_OR_HIGH_TEMPERATURE.symptom.id)
+//                if (ageInMonths < 2 &&
+//                    vitalSigns.temp != null &&
+//                    (vitalSigns.temp < TEMP_LOW || vitalSigns.temp > TEMP_HIGH)
+//                )
+//                    newReds.add(TriageSymptom.YOUNGER_THAN_TWO_MONTHS_AND_LOW_OR_HIGH_TEMPERATURE.symptom.id)
             }
         }
         return newReds.toSet() // Make it immutable

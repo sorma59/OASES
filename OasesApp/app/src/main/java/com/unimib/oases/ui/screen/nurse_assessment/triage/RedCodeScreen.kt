@@ -122,14 +122,14 @@ fun RedCodeScreen(
                         .verticalScroll(scrollState)
                 ) {
                     state.triageConfig!!.redOptions.forEach {
-                        val id = it.symptom.symptomId.value.string
+                        val id = it.symptom.symptom.id
                         ConditionalAnimatedVisibility(
-                            applyWrapper = it.parent != null,
-                            visible = state.selectedReds.contains(it.parent?.symptom?.symptomId?.value?.string),
+                            applyWrapper = it.symptom.parent != null,
+                            visible = state.selectedReds.contains(it.symptom.parent?.symptom?.symptomId?.value?.string),
                             content = {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
-                                    modifier = if (it.isParent) Modifier.onGloballyPositioned { coordinates ->
+                                    modifier = if (it.symptom.isParent) Modifier.onGloballyPositioned { coordinates ->
                                         // This gives the Y position of the top of this Row
                                         // relative to the content area of the scrollable Column
                                         pregnancyRowScrollTargetY = coordinates.positionInParent().y
@@ -139,15 +139,15 @@ fun RedCodeScreen(
                                         label = it.label,
                                         checked = state.selectedReds.contains(id),
                                         onCheckedChange = { boolean: Boolean ->
-                                            if (it.isParent)
+                                            if (it.symptom.isParent)
                                                 handlePregnancyChangeAndScroll(boolean)
                                             else
                                                 onEvent(TriageEvent.FieldToggled(id))
                                         },
-                                        modifier = if (it.parent != null) Modifier.padding(start = 16.dp) else Modifier
+                                        modifier = if (it.symptom.parent != null) Modifier.padding(start = 16.dp) else Modifier
                                     )
 
-                                    if (it.isParent) {
+                                    if (it.symptom.isParent) {
                                         ShowMoreArrow(
                                             expanded = state.selectedReds.contains(id),
                                             onClick = {

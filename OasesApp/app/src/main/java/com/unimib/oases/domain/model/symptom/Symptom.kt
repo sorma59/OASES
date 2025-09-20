@@ -6,7 +6,7 @@ import com.unimib.oases.domain.model.symptom.SymptomId.AcuteLimbDeformityOrOpenF
 import com.unimib.oases.domain.model.symptom.SymptomId.AcuteTesticularOrScrotalPainOrPriapismId
 import com.unimib.oases.domain.model.symptom.SymptomId.AgeOverEightyYearsId
 import com.unimib.oases.domain.model.symptom.SymptomId.AggressiveBehaviorId
-import com.unimib.oases.domain.model.symptom.SymptomId.AirwaySwellingOrAirwayMassId
+import com.unimib.oases.domain.model.symptom.SymptomId.AirwaySwellingOrMassOfMouthOrThroatOrNeckId
 import com.unimib.oases.domain.model.symptom.SymptomId.AnimalBiteOrNeedlestickPunctureId
 import com.unimib.oases.domain.model.symptom.SymptomId.CholeraOutbreakId
 import com.unimib.oases.domain.model.symptom.SymptomId.ConvulsionsId
@@ -27,7 +27,7 @@ import com.unimib.oases.domain.model.symptom.SymptomId.FocalNeurologicDeficitOrF
 import com.unimib.oases.domain.model.symptom.SymptomId.HeadacheWithStiffNeckId
 import com.unimib.oases.domain.model.symptom.SymptomId.HeavyBleedingId
 import com.unimib.oases.domain.model.symptom.SymptomId.HighHrId
-import com.unimib.oases.domain.model.symptom.SymptomId.HighRiskTraumaOrHighRiskBurnsId
+import com.unimib.oases.domain.model.symptom.SymptomId.HighRiskTraumaId
 import com.unimib.oases.domain.model.symptom.SymptomId.HighRrId
 import com.unimib.oases.domain.model.symptom.SymptomId.HighSbpId
 import com.unimib.oases.domain.model.symptom.SymptomId.HighTempId
@@ -40,11 +40,14 @@ import com.unimib.oases.domain.model.symptom.SymptomId.LowRrId
 import com.unimib.oases.domain.model.symptom.SymptomId.LowSbpId
 import com.unimib.oases.domain.model.symptom.SymptomId.LowSpo2Id
 import com.unimib.oases.domain.model.symptom.SymptomId.LowTempId
+import com.unimib.oases.domain.model.symptom.SymptomId.MajorBurnsId
 import com.unimib.oases.domain.model.symptom.SymptomId.MalnutritionId
-import com.unimib.oases.domain.model.symptom.SymptomId.OngoingBleedingId
+import com.unimib.oases.domain.model.symptom.SymptomId.ModerateDehydrationId
+import com.unimib.oases.domain.model.symptom.SymptomId.NonHeavyBleedingId
+import com.unimib.oases.domain.model.symptom.SymptomId.NonHighRiskPregnancyRelatedComplaintsId
+import com.unimib.oases.domain.model.symptom.SymptomId.NonHighRiskTraumaId
+import com.unimib.oases.domain.model.symptom.SymptomId.NonMajorBurnsId
 import com.unimib.oases.domain.model.symptom.SymptomId.OngoingSevereVomitingOrOngoingSevereDiarrheaId
-import com.unimib.oases.domain.model.symptom.SymptomId.OtherPregnancyRelatedComplaintsId
-import com.unimib.oases.domain.model.symptom.SymptomId.OtherTraumaOrOtherBurnsId
 import com.unimib.oases.domain.model.symptom.SymptomId.PoisoningIntoxicationId
 import com.unimib.oases.domain.model.symptom.SymptomId.PregnancyId
 import com.unimib.oases.domain.model.symptom.SymptomId.PregnancyWithActiveLaborId
@@ -60,10 +63,11 @@ import com.unimib.oases.domain.model.symptom.SymptomId.PretermAndUnderOneMonthId
 import com.unimib.oases.domain.model.symptom.SymptomId.RecentFaintingId
 import com.unimib.oases.domain.model.symptom.SymptomId.RespiratoryDistressId
 import com.unimib.oases.domain.model.symptom.SymptomId.SevereDehydrationId
+import com.unimib.oases.domain.model.symptom.SymptomId.SevereMalnutritionId
 import com.unimib.oases.domain.model.symptom.SymptomId.SeverePainId
 import com.unimib.oases.domain.model.symptom.SymptomId.SeverePallorId
-import com.unimib.oases.domain.model.symptom.SymptomId.SevereVisibleMalnutritionId
 import com.unimib.oases.domain.model.symptom.SymptomId.SexualAssaultId
+import com.unimib.oases.domain.model.symptom.SymptomId.ShockId
 import com.unimib.oases.domain.model.symptom.SymptomId.SnakeBiteId
 import com.unimib.oases.domain.model.symptom.SymptomId.ThreatenedLimbId
 import com.unimib.oases.domain.model.symptom.SymptomId.UnableToFeedOrDrinkId
@@ -71,6 +75,7 @@ import com.unimib.oases.domain.model.symptom.SymptomId.UnableToPassUrineId
 import com.unimib.oases.domain.model.symptom.SymptomId.UnconsciousnessId
 import com.unimib.oases.domain.model.symptom.SymptomId.VomitingId
 import com.unimib.oases.domain.model.symptom.SymptomId.WeightLossId
+import com.unimib.oases.domain.model.symptom.SymptomId.WheezingId
 import com.unimib.oases.domain.model.symptom.SymptomId.YoungerThanEightDaysId
 import com.unimib.oases.domain.model.symptom.SymptomId.YoungerThanSixMonthsId
 import com.unimib.oases.domain.model.symptom.SymptomId.YoungerThanTwoMonthsAndLowOrHighTemperatureId
@@ -94,6 +99,10 @@ sealed interface Symptom {
         override val symptomId = RespiratoryDistressId
         override val label = "Respiratory distress"
     }
+    data object Shock: Symptom {
+        override val symptomId = ShockId
+        override val label = "Shock"
+    }
     data object HeavyBleeding: Symptom {
         override val symptomId = HeavyBleedingId
         override val label = "Heavy bleeding"
@@ -102,9 +111,13 @@ sealed interface Symptom {
         override val symptomId = SevereDehydrationId
         override val label = "Severe dehydration"
     }
-    data object HighRiskTraumaOrHighRiskBurns: Symptom {
-        override val symptomId = HighRiskTraumaOrHighRiskBurnsId
-        override val label = "High risk trauma/burns"
+    data object HighRiskTrauma: Symptom {
+        override val symptomId = HighRiskTraumaId
+        override val label = "High risk trauma"
+    }
+    data object MajorBurns: Symptom {
+        override val symptomId = MajorBurnsId
+        override val label = "Major burns"
     }
     data object ThreatenedLimb: Symptom {
         override val symptomId = ThreatenedLimbId
@@ -116,7 +129,7 @@ sealed interface Symptom {
     }
     data object AcuteTesticularOrScrotalPainOrPriapism: Symptom {
         override val symptomId = AcuteTesticularOrScrotalPainOrPriapismId
-        override val label = "Acute truculent/scrotal pain or priapism"
+        override val label = "Acute testicular/scrotal pain or priapism"
     }
     data object SnakeBite: Symptom {
         override val symptomId = SnakeBiteId
@@ -128,11 +141,11 @@ sealed interface Symptom {
     }
     data object YoungerThanEightDays: Symptom {
         override val symptomId = YoungerThanEightDaysId
-        override val label = "Younger than 8 days"
+        override val label = "Infant < 8 days old"
     }
     data object PretermAndUnderOneMonth: Symptom {
         override val symptomId = PretermAndUnderOneMonthId
-        override val label = "Preterm baby younger than one month old"
+        override val label = "Preterm baby < 1 month old"
     }
     data object YoungerThanTwoMonthsAndLowOrHighTemperature: Symptom {
         override val symptomId = YoungerThanTwoMonthsAndLowOrHighTemperatureId
@@ -178,13 +191,18 @@ sealed interface Symptom {
         override val symptomId = PregnancyWithActiveLaborId
         override val label = "Active labor"
     }
-    data object AirwaySwellingOrAirwayMass: Symptom {
-        override val symptomId = AirwaySwellingOrAirwayMassId
-        override val label = "Airway swelling/mass"
+
+    data object AirwaySwellingOrMassOfMouthOrThroatOrNeck: Symptom {
+        override val symptomId = AirwaySwellingOrMassOfMouthOrThroatOrNeckId
+        override val label = "Airway swelling or mass of mouth, throat or neck"
     }
-    data object OngoingBleeding: Symptom {
-        override val symptomId = OngoingBleedingId
-        override val label = "Ongoing bleeding (no red criteria)"
+    data object Wheezing: Symptom {
+        override val symptomId = WheezingId
+        override val label = "Wheezing"
+    }
+    data object NonHeavyBleeding: Symptom {
+        override val symptomId = NonHeavyBleedingId
+        override val label = "Active bleeding (not heavy)"
     }
     data object SeverePallor: Symptom {
         override val symptomId = SeverePallorId
@@ -192,7 +210,11 @@ sealed interface Symptom {
     }
     data object OngoingSevereVomitingOrOngoingSevereDiarrhea: Symptom {
         override val symptomId = OngoingSevereVomitingOrOngoingSevereDiarrheaId
-        override val label = "Ongoing severe vomiting or ongoing severe diarrhea"
+        override val label = "Ongoing severe vomiting/diarrhea"
+    }
+    data object ModerateDehydration: Symptom {
+        override val symptomId = ModerateDehydrationId
+        override val label = "Moderate dehydration"
     }
     data object UnableToFeedOrDrink: Symptom {
         override val symptomId = UnableToFeedOrDrinkId
@@ -204,11 +226,11 @@ sealed interface Symptom {
     }
     data object LethargyOrConfusionOrAgitation: Symptom {
         override val symptomId = LethargyOrConfusionOrAgitationId
-        override val label = "Lethargy, confusion or agitation"
+        override val label = "Lethargy / confusion / agitation"
     }
     data object LethargyOrRestlessOrIrritableOrConfused: Symptom {
         override val symptomId = LethargyOrRestlessOrIrritableOrConfusedId
-        override val label = "Lethargy, restless, irritable or confused"
+        override val label = "Lethargic / restless / irritable / confused"
     }
     data object FocalNeurologicDeficitOrFocalVisualDeficit: Symptom {
         override val symptomId = FocalNeurologicDeficitOrFocalVisualDeficitId
@@ -230,9 +252,13 @@ sealed interface Symptom {
         override val symptomId = AcuteLimbDeformityOrOpenFractureId
         override val label = "Acute limb/deformity or open fracture"
     }
-    data object OtherTraumaOrOtherBurns: Symptom {
-        override val symptomId = OtherTraumaOrOtherBurnsId
-        override val label = "Other trauma or other burns"
+    data object NonHighRiskTrauma: Symptom {
+        override val symptomId = NonHighRiskTraumaId
+        override val label = "Other trauma (non high-risk)"
+    }
+    data object NonMajorBurns: Symptom {
+        override val symptomId = NonMajorBurnsId
+        override val label = "Other burns (non major)"
     }
     data object SexualAssault: Symptom {
         override val symptomId = SexualAssaultId
@@ -242,9 +268,9 @@ sealed interface Symptom {
         override val symptomId = AnimalBiteOrNeedlestickPunctureId
         override val label = "Animal bite or needlestick puncture"
     }
-    data object SevereVisibleMalnutrition: Symptom {
-        override val symptomId = SevereVisibleMalnutritionId
-        override val label = "Severe visible malnutrition"
+    data object SevereMalnutrition: Symptom {
+        override val symptomId = SevereMalnutritionId
+        override val label = "Severe malnutrition"
     }
     data object EdemaOfBothFeet: Symptom {
         override val symptomId = EdemaOfBothFeetId
@@ -252,15 +278,15 @@ sealed interface Symptom {
     }
     data object YoungerThanSixMonths: Symptom {
         override val symptomId = YoungerThanSixMonthsId
-        override val label = "Younger than six months"
+        override val label = "Age < 6 months"
     }
-    data object OtherPregnancyRelatedComplaints: Symptom {
-        override val symptomId = OtherPregnancyRelatedComplaintsId
+    data object NonHighRiskPregnancyRelatedComplaints: Symptom {
+        override val symptomId = NonHighRiskPregnancyRelatedComplaintsId
         override val label = "Other pregnancy-related complaints"
     }
     data object AgeOverEightyYears: Symptom {
         override val symptomId = AgeOverEightyYearsId
-        override val label = "Age over 80 years"
+        override val label = "Age > 80 years"
     }
     data object LowSpo2: Symptom {
         override val symptomId = LowSpo2Id
@@ -425,9 +451,11 @@ sealed interface Symptom {
             buildMap {
                 put(Unconsciousness.id, Unconsciousness)
                 put(RespiratoryDistress.id, RespiratoryDistress)
+                put(Shock.id, Shock)
                 put(HeavyBleeding.id, HeavyBleeding)
                 put(SevereDehydration.id, SevereDehydration)
-                put(HighRiskTraumaOrHighRiskBurns.id, HighRiskTraumaOrHighRiskBurns)
+                put(HighRiskTrauma.id, HighRiskTrauma)
+                put(MajorBurns.id, MajorBurns)
                 put(ThreatenedLimb.id, ThreatenedLimb)
                 put(PoisoningIntoxication.id, PoisoningIntoxication)
                 put(AcuteTesticularOrScrotalPainOrPriapism.id, AcuteTesticularOrScrotalPainOrPriapism)
@@ -448,10 +476,12 @@ sealed interface Symptom {
                 put(PregnancyWithTrauma.id, PregnancyWithTrauma)
                 put(PregnancyWithActiveLabor.id, PregnancyWithActiveLabor)
 
-                put(AirwaySwellingOrAirwayMass.id, AirwaySwellingOrAirwayMass)
-                put(OngoingBleeding.id, OngoingBleeding)
+                put(AirwaySwellingOrMassOfMouthOrThroatOrNeck.id, AirwaySwellingOrMassOfMouthOrThroatOrNeck)
+                put(Wheezing.id, Wheezing)
+                put(NonHeavyBleeding.id, NonHeavyBleeding)
                 put(SeverePallor.id, SeverePallor)
                 put(OngoingSevereVomitingOrOngoingSevereDiarrhea.id, OngoingSevereVomitingOrOngoingSevereDiarrhea)
+                put(ModerateDehydration.id, ModerateDehydration)
                 put(UnableToFeedOrDrink.id, UnableToFeedOrDrink)
                 put(RecentFainting.id, RecentFainting)
                 put(LethargyOrConfusionOrAgitation.id, LethargyOrConfusionOrAgitation)
@@ -461,13 +491,14 @@ sealed interface Symptom {
                 put(SeverePain.id, SeverePain)
                 put(UnableToPassUrine.id, UnableToPassUrine)
                 put(AcuteLimbDeformityOrOpenFracture.id, AcuteLimbDeformityOrOpenFracture)
-                put(OtherTraumaOrOtherBurns.id, OtherTraumaOrOtherBurns)
+                put(NonHighRiskTrauma.id, NonHighRiskTrauma)
+                put(NonMajorBurns.id, NonMajorBurns)
                 put(SexualAssault.id, SexualAssault)
                 put(AnimalBiteOrNeedlestickPuncture.id, AnimalBiteOrNeedlestickPuncture)
-                put(SevereVisibleMalnutrition.id, SevereVisibleMalnutrition)
+                put(SevereMalnutrition.id, SevereMalnutrition)
                 put(EdemaOfBothFeet.id, EdemaOfBothFeet)
                 put(YoungerThanSixMonths.id, YoungerThanSixMonths)
-                put(OtherPregnancyRelatedComplaints.id, OtherPregnancyRelatedComplaints)
+                put(NonHighRiskPregnancyRelatedComplaints.id, NonHighRiskPregnancyRelatedComplaints)
 
                 put(AgeOverEightyYears.id, AgeOverEightyYears)
                 put(LowSpo2.id, LowSpo2)
@@ -525,9 +556,11 @@ sealed class SymptomId (
 ){
     object UnconsciousnessId: SymptomId(snakeCase("unconsciousness"))
     object RespiratoryDistressId: SymptomId(snakeCase("respiratory_distress"))
+    object ShockId: SymptomId(snakeCase("shock"))
     object HeavyBleedingId: SymptomId(snakeCase("heavy_bleeding"))
     object SevereDehydrationId: SymptomId(snakeCase("severe_dehydration"))
-    object HighRiskTraumaOrHighRiskBurnsId: SymptomId(snakeCase("high_risk_trauma_or_high_risk_burns"))
+    object HighRiskTraumaId: SymptomId(snakeCase("high_risk_trauma"))
+    object MajorBurnsId: SymptomId(snakeCase("major_burns"))
     object ThreatenedLimbId: SymptomId(snakeCase("threatened_limb"))
     object PoisoningIntoxicationId: SymptomId(snakeCase("poisoning_intoxication"))
     object AcuteTesticularOrScrotalPainOrPriapismId: SymptomId(snakeCase("acute_testicular_or_scrotal_pain_or_priapism"))
@@ -546,10 +579,13 @@ sealed class SymptomId (
     object PregnancyWithVisualChangesId: SymptomId(snakeCase("pregnancy_with_visual_changes"))
     object PregnancyWithTraumaId: SymptomId(snakeCase("pregnancy_with_trauma"))
     object PregnancyWithActiveLaborId: SymptomId(snakeCase("pregnancy_with_active_labor"))
-    object AirwaySwellingOrAirwayMassId: SymptomId(snakeCase("airway_swelling_or_airway_mass"))
-    object OngoingBleedingId: SymptomId(snakeCase("ongoing_bleeding"))
+
+    object AirwaySwellingOrMassOfMouthOrThroatOrNeckId: SymptomId(snakeCase("airway_swelling_or_mass_of_mouth_or_throat_or_neck"))
+    object WheezingId: SymptomId(snakeCase("wheezing"))
+    object NonHeavyBleedingId: SymptomId(snakeCase("non_heavy_bleeding"))
     object SeverePallorId: SymptomId(snakeCase("severe_pallor"))
     object OngoingSevereVomitingOrOngoingSevereDiarrheaId: SymptomId(snakeCase("ongoing_severe_vomiting_or_ongoing_severe_diarrhea"))
+    object ModerateDehydrationId: SymptomId(snakeCase("moderate_dehydration"))
     object UnableToFeedOrDrinkId: SymptomId(snakeCase("unable_to_feed_or_drink"))
     object RecentFaintingId: SymptomId(snakeCase("recent_fainting"))
     object LethargyOrConfusionOrAgitationId: SymptomId(snakeCase("lethargy_or_confusion_or_agitation"))
@@ -559,13 +595,14 @@ sealed class SymptomId (
     object SeverePainId: SymptomId(snakeCase("severe_pain"))
     object UnableToPassUrineId: SymptomId(snakeCase("unable_to_pass_urine"))
     object AcuteLimbDeformityOrOpenFractureId: SymptomId(snakeCase("acute_limb_deformity_or_open_fracture"))
-    object OtherTraumaOrOtherBurnsId: SymptomId(snakeCase("other_trauma_or_other_burns"))
+    object NonHighRiskTraumaId: SymptomId(snakeCase("non_high_risk_trauma"))
+    object NonMajorBurnsId: SymptomId(snakeCase("non_major_burns"))
     object SexualAssaultId: SymptomId(snakeCase("sexual_assault"))
     object AnimalBiteOrNeedlestickPunctureId: SymptomId(snakeCase("animal_bite_or_needlestick_puncture"))
-    object SevereVisibleMalnutritionId: SymptomId(snakeCase("severe_visible_malnutrition"))
+    object SevereMalnutritionId: SymptomId(snakeCase("severe_malnutrition"))
     object EdemaOfBothFeetId: SymptomId(snakeCase("edema_of_both_feet"))
     object YoungerThanSixMonthsId: SymptomId(snakeCase("younger_than_six_months"))
-    object OtherPregnancyRelatedComplaintsId: SymptomId(snakeCase("other_pregnancy_related_complaints"))
+    object NonHighRiskPregnancyRelatedComplaintsId: SymptomId(snakeCase("non_high_risk_pregnancy_related_complaints"))
     object AgeOverEightyYearsId: SymptomId(snakeCase("age_over_eighty_years"))
     object LowSpo2Id: SymptomId(snakeCase("low_spo2"))
     object LowRrId: SymptomId(snakeCase("low_rr"))
