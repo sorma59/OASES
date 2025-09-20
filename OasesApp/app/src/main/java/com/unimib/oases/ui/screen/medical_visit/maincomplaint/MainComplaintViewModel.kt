@@ -10,11 +10,13 @@ import com.unimib.oases.domain.model.complaint.binarytree.ManualNode
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.domain.repository.TriageEvaluationRepository
 import com.unimib.oases.domain.usecase.AnswerImmediateTreatmentQuestionUseCase
+import com.unimib.oases.domain.usecase.GenerateSuggestedSupportiveTherapiesUseCase
 import com.unimib.oases.domain.usecase.GenerateSuggestedTestsUseCase
 import com.unimib.oases.domain.usecase.SelectSymptomUseCase
 import com.unimib.oases.domain.usecase.TranslateTriageSymptomIdsToSymptomsUseCase
 import com.unimib.oases.domain.usecase.VisitUseCase
 import com.unimib.oases.util.Resource
+import com.unimib.oases.util.toggle
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -30,6 +32,7 @@ import javax.inject.Inject
 class MainComplaintViewModel @Inject constructor(
     private val answerImmediateTreatmentQuestionUseCase: AnswerImmediateTreatmentQuestionUseCase,
     private val generateSuggestedTestsUseCase: GenerateSuggestedTestsUseCase,
+    private val generateSuggestedSupportiveTherapiesUseCase: GenerateSuggestedSupportiveTherapiesUseCase,
     private val translateTriageSymptomIdsToSymptomsUseCase: TranslateTriageSymptomIdsToSymptomsUseCase,
     private val selectSymptomUseCase: SelectSymptomUseCase,
     private val visitUseCase: VisitUseCase,
@@ -210,6 +213,14 @@ class MainComplaintViewModel @Inject constructor(
                 }
             }
 
+            is MainComplaintEvent.TestSelected -> {
+                _state.update {
+                    it.copy(
+                        requestedTests = it.requestedTests.toggle(event.test)
+                    )
+                }
+            }
+
             MainComplaintEvent.ToastShown -> {
                 _state.update {
                     it.copy(
@@ -225,7 +236,8 @@ class MainComplaintViewModel @Inject constructor(
             MainComplaintEvent.GenerateTestsPressed -> {
                 _state.update {
                     it.copy(
-                        conditions = generateSuggestedTestsUseCase(complaint = it.complaint!!, symptoms = it.symptoms)
+                        conditions = generateSuggestedTestsUseCase(it.complaint!!, it.symptoms),
+                        supportiveTherapies = generateSuggestedSupportiveTherapiesUseCase(it.complaint, it.symptoms)
                     )
                 }
             }

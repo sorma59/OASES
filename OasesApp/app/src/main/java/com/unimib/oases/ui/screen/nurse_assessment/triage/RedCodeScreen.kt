@@ -136,7 +136,7 @@ fun RedCodeScreen(
                                     } else Modifier
                                 ) {
                                     LabeledCheckbox(
-                                        label = it.symptom.label,
+                                        label = it.label,
                                         checked = state.selectedReds.contains(id),
                                         onCheckedChange = { boolean: Boolean ->
                                             if (it.isParent)

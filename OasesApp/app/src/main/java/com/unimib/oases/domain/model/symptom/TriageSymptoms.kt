@@ -1,12 +1,12 @@
 package com.unimib.oases.domain.model.symptom
 
-import com.unimib.oases.domain.model.symptom.Symptom.ActiveConvulsions
 import com.unimib.oases.domain.model.symptom.Symptom.AcuteLimbDeformityOrOpenFracture
 import com.unimib.oases.domain.model.symptom.Symptom.AcuteTesticularOrScrotalPainOrPriapism
 import com.unimib.oases.domain.model.symptom.Symptom.AgeOverEightyYears
 import com.unimib.oases.domain.model.symptom.Symptom.AggressiveBehavior
 import com.unimib.oases.domain.model.symptom.Symptom.AirwaySwellingOrAirwayMass
 import com.unimib.oases.domain.model.symptom.Symptom.AnimalBiteOrNeedlestickPuncture
+import com.unimib.oases.domain.model.symptom.Symptom.Convulsions
 import com.unimib.oases.domain.model.symptom.Symptom.EdemaOfBothFeet
 import com.unimib.oases.domain.model.symptom.Symptom.FocalNeurologicDeficitOrFocalVisualDeficit
 import com.unimib.oases.domain.model.symptom.Symptom.HeadacheWithStiffNeck
@@ -102,6 +102,7 @@ val symptoms = TriageSymptom.entries.associateBy { it.symptom.id }
 enum class TriageSymptom(
     val symptom: Symptom,
     val colorAssigner: (PatientCategory) -> SymptomTriageCode?,
+    val label: String = symptom.label,
     val parent: TriageSymptom? = null,
     val isParent: Boolean = false,
     val isComputed: Boolean = false
@@ -111,9 +112,10 @@ enum class TriageSymptom(
         Unconsciousness,
         ::redForAll
     ),
-    ACTIVE_CONVULSIONS(
-        ActiveConvulsions,
-        ::redForAll
+    CONVULSIONS(
+        Convulsions,
+        ::redForAll,
+        "Active convulsions"
     ),
     RESPIRATORY_DISTRESS(
         RespiratoryDistress,

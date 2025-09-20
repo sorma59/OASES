@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,7 +36,6 @@ import com.unimib.oases.ui.components.util.button.RetryButton
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 import com.unimib.oases.ui.screen.medical_visit.maincomplaint.MainComplaintEvent.SymptomSelected
 import com.unimib.oases.ui.util.ToastUtils
-import com.unimib.oases.util.toggle
 
 @Composable
 fun MainComplaintScreen(){
@@ -90,15 +90,34 @@ fun MainComplaintScreen(){
             GenerateTestsButton(viewModel)
 
             state.complaint?.let {
+
                 Tests(
                     state,
                     isChecked = { state.requestedTests.contains(it) },
-                    onCheckedChange = { state.requestedTests.toggle(it) }
+                    onCheckedChange = { viewModel.onEvent(MainComplaintEvent.TestSelected(it)) }
                 )
+
+                SupportiveTherapies(state)
             }
-
-
         }
+}
+
+@Composable
+fun SupportiveTherapies(
+    state: MainComplaintState
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ){
+        if (state.supportiveTherapies.isNotEmpty()){
+            TitleText("Supportive therapies", fontSize = 18)
+            HorizontalDivider(thickness = 0.8.dp)
+            for (supportiveTherapy in state.supportiveTherapies) {
+                Text(supportiveTherapy.text)
+                HorizontalDivider(thickness = 0.8.dp)
+            }
+        }
+    }
 }
 
 @Composable
@@ -111,7 +130,7 @@ private fun GenerateTestsButton(
         Button(
             onClick = { viewModel.onEvent(MainComplaintEvent.GenerateTestsPressed) },
         ) {
-            Text("Suggest tests")
+            Text("Suggest tests and supportive therapies")
         }
     }
 }
@@ -125,14 +144,18 @@ fun Tests(
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ){
-        for (condition in state.conditions) {
-            TitleText(condition.label, fontSize = 18)
-            for (test in condition.suggestedTests){
-                LabeledCheckbox(
-                    label = test.label,
-                    checked = isChecked(test),
-                    onCheckedChange = { onCheckedChange(test) }
-                )
+        if (state.conditions.isNotEmpty()){
+            TitleText("Flag the tests you order")
+            Spacer(Modifier.height(8.dp))
+            for (condition in state.conditions) {
+                TitleText(condition.label, fontSize = 18)
+                for (test in condition.suggestedTests) {
+                    LabeledCheckbox(
+                        label = test.label,
+                        checked = isChecked(test),
+                        onCheckedChange = { onCheckedChange(test) }
+                    )
+                }
             }
         }
     }

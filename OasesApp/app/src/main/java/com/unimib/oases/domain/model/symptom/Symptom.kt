@@ -2,7 +2,6 @@ package com.unimib.oases.domain.model.symptom
 
 import com.unimib.oases.domain.model.symptom.SymptomId.AbdominalDistensionAndTendernessWithAlteredBowelSoundsId
 import com.unimib.oases.domain.model.symptom.SymptomId.AbdominalPainId
-import com.unimib.oases.domain.model.symptom.SymptomId.ActiveConvulsionsId
 import com.unimib.oases.domain.model.symptom.SymptomId.AcuteLimbDeformityOrOpenFractureId
 import com.unimib.oases.domain.model.symptom.SymptomId.AcuteTesticularOrScrotalPainOrPriapismId
 import com.unimib.oases.domain.model.symptom.SymptomId.AgeOverEightyYearsId
@@ -76,8 +75,7 @@ import com.unimib.oases.domain.model.symptom.SymptomId.YoungerThanEightDaysId
 import com.unimib.oases.domain.model.symptom.SymptomId.YoungerThanSixMonthsId
 import com.unimib.oases.domain.model.symptom.SymptomId.YoungerThanTwoMonthsAndLowOrHighTemperatureId
 import com.unimib.oases.util.StringFormatHelper.SnakeCaseString
-
-private fun snakeCase(string: String) = SnakeCaseString.of(string)
+import com.unimib.oases.util.StringFormatHelper.snakeCase
 
 sealed interface Symptom {
     val symptomId: SymptomId
@@ -91,10 +89,6 @@ sealed interface Symptom {
     data object Unconsciousness: Symptom {
         override val symptomId = UnconsciousnessId
         override val label = "Unconsciousness"
-    }
-    data object ActiveConvulsions: Symptom {
-        override val symptomId = ActiveConvulsionsId
-        override val label = "Active convulsions"
     }
     data object RespiratoryDistress: Symptom {
         override val symptomId = RespiratoryDistressId
@@ -430,7 +424,6 @@ sealed interface Symptom {
         val symptoms: Map<String, Symptom> by lazy {
             buildMap {
                 put(Unconsciousness.id, Unconsciousness)
-                put(ActiveConvulsions.id, ActiveConvulsions)
                 put(RespiratoryDistress.id, RespiratoryDistress)
                 put(HeavyBleeding.id, HeavyBleeding)
                 put(SevereDehydration.id, SevereDehydration)
@@ -531,7 +524,6 @@ sealed class SymptomId (
     val value: SnakeCaseString
 ){
     object UnconsciousnessId: SymptomId(snakeCase("unconsciousness"))
-    object ActiveConvulsionsId: SymptomId(snakeCase("active_convulsions"))
     object RespiratoryDistressId: SymptomId(snakeCase("respiratory_distress"))
     object HeavyBleedingId: SymptomId(snakeCase("heavy_bleeding"))
     object SevereDehydrationId: SymptomId(snakeCase("severe_dehydration"))

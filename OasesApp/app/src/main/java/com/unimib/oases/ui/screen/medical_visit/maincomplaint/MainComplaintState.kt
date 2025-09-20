@@ -5,6 +5,7 @@ import com.unimib.oases.domain.model.complaint.Complaint
 import com.unimib.oases.domain.model.complaint.ComplaintQuestion
 import com.unimib.oases.domain.model.complaint.Condition
 import com.unimib.oases.domain.model.complaint.ImmediateTreatment
+import com.unimib.oases.domain.model.complaint.SupportiveTherapy
 import com.unimib.oases.domain.model.complaint.Test
 import com.unimib.oases.domain.model.complaint.binarytree.Branch
 import com.unimib.oases.domain.model.complaint.binarytree.LeafNode
@@ -52,6 +53,8 @@ data class MainComplaintState(
     val conditions: List<Condition> = emptyList(),
 
     val requestedTests: Set<Test> = emptySet(),
+
+    val supportiveTherapies: List<SupportiveTherapy> = emptyList(),
 
     val isLoading: Boolean = false,
     val toastMessage: String? = null,

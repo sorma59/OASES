@@ -1,15 +1,24 @@
 package com.unimib.oases.domain.model.complaint
 
 import com.unimib.oases.domain.model.symptom.Symptom
+import com.unimib.oases.util.StringFormatHelper.SnakeCaseString
+import com.unimib.oases.util.StringFormatHelper.snakeCase
 
 sealed interface Complaint {
-    val id: ComplaintId
+    val complaintId: ComplaintId
     val details: ComplaintDetails
     val tests: ComplaintTests
+    val supportiveTherapies: ComplaintSupportiveTherapies
+
+    val therapies get() = supportiveTherapies.therapies
 }
 
-enum class ComplaintId(val id: String) {
-    DIARRHEA("diarrhea");
+enum class ComplaintId(val value: SnakeCaseString) {
+
+    DIARRHEA(snakeCase("diarrhea"));
+
+    val id: String
+        get() = value.string
 }
 
 interface ComplaintDetails {
@@ -18,6 +27,10 @@ interface ComplaintDetails {
 
 interface ComplaintTests {
     val conditions: List<Condition>
+}
+
+interface ComplaintSupportiveTherapies {
+    val therapies: List<SupportiveTherapy>
 }
 
 sealed interface Question {

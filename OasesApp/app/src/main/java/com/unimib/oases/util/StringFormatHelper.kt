@@ -41,4 +41,6 @@ object StringFormatHelper {
             }
         }
     }
+
+    fun snakeCase(string: String) = SnakeCaseString.of(string)
 }

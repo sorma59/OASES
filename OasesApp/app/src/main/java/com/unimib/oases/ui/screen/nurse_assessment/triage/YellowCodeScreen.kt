@@ -92,7 +92,7 @@ fun YellowCodeScreen(
                     state.triageConfig!!.yellowOptions.forEach {
                         val id = it.symptom.symptomId.value.string
                         LabeledCheckbox(
-                            label = it.symptom.label,
+                            label = it.label,
                             checked = state.selectedYellows.contains(id),
                             onCheckedChange = { onEvent(TriageEvent.FieldToggled(id)) }
                         )
