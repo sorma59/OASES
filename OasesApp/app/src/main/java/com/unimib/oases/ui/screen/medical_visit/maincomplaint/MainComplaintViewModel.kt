@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.model.complaint.ComplaintId
+import com.unimib.oases.domain.model.complaint.ComplaintQuestion
 import com.unimib.oases.domain.model.complaint.Diarrhea
 import com.unimib.oases.domain.model.complaint.binarytree.ManualNode
 import com.unimib.oases.domain.repository.PatientRepository
@@ -21,9 +22,12 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -53,11 +57,20 @@ class MainComplaintViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(
         MainComplaintState(
-            receivedId = savedStateHandle["patientId"]!!,
+            patientId = savedStateHandle["patientId"]!!,
             complaintId = savedStateHandle["complaintId"]!!
         )
     )
     val state: StateFlow<MainComplaintState> = _state.asStateFlow()
+
+    val additionalTestsText: StateFlow<String> =
+        _state
+            .map { it.additionalTestsText }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = ""
+            )
 
     init {
         initialize()
@@ -145,7 +158,7 @@ class MainComplaintViewModel @Inject constructor(
 
         try {
 
-            val resource = patientRepository.getPatientById(_state.value.receivedId).first {
+            val resource = patientRepository.getPatientById(_state.value.patientId).first {
                 it is Resource.Success || it is Resource.Error
             }
 
@@ -166,7 +179,7 @@ class MainComplaintViewModel @Inject constructor(
     private fun getTriageData(){
         try {
 
-            val visit = visitUseCase.getCurrentVisit(_state.value.receivedId)
+            val visit = visitUseCase.getCurrentVisit(_state.value.patientId)
 
             visit?.let {
                 val resource = triageEvaluationRepository.getTriageEvaluation(visit.id)
@@ -208,7 +221,8 @@ class MainComplaintViewModel @Inject constructor(
             is MainComplaintEvent.SymptomSelected -> {
                 _state.update {
                     it.copy(
-                        symptoms = selectSymptomUseCase(event.symptom, it.symptoms)
+                        symptoms = selectSymptomUseCase(event.symptom, it.symptoms),
+                        detailsQuestionsToShow = calculateNumberOfDetailsQuestionsToShow(event.question)
                     )
                 }
             }
@@ -217,6 +231,14 @@ class MainComplaintViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         requestedTests = it.requestedTests.toggle(event.test)
+                    )
+                }
+            }
+
+            is MainComplaintEvent.AdditionalTestsTextChanged -> {
+                _state.update {
+                    it.copy(
+                        additionalTestsText = event.text
                     )
                 }
             }
@@ -240,6 +262,39 @@ class MainComplaintViewModel @Inject constructor(
                         supportiveTherapies = generateSuggestedSupportiveTherapiesUseCase(it.complaint, it.symptoms)
                     )
                 }
+            }
+        }
+    }
+
+    /**
+     * Calculates the number of details questions to show.
+     *
+     * The logic is as follows:
+     * - If the answered question is not required, the number of questions to show does not change.
+     * - If the answered question is required:
+     *     - If the answered question is not the last one currently shown, the number of questions to show does not change.
+     *     - If the answered question is the last one currently shown:
+     *         - If the next question in the list is required, increment the number of questions to show by 1.
+     *         - If the next question in the list is not required, show all questions. This assumes that all required questions are listed before non-required ones.
+     *
+     * @param question The [ComplaintQuestion] that was just answered.
+     * @return The updated number of details questions to be shown.
+     */
+    private fun calculateNumberOfDetailsQuestionsToShow(question: ComplaintQuestion): Int {
+        return if (!question.isRequired)
+            state.value.detailsQuestionsToShow
+        else {
+            val questionOrdinal = state.value.detailsQuestions.indexOf(question) + 1
+            if (questionOrdinal != state.value.detailsQuestionsToShow)
+                state.value.detailsQuestionsToShow
+            else {
+                // The next question happens to be at the index "questionOrdinal"
+                // Reason being the ordinal is index of the question + 1
+                val nextQuestion = state.value.detailsQuestions.elementAt(questionOrdinal)
+                if (nextQuestion.isRequired)
+                    state.value.detailsQuestionsToShow + 1
+                else
+                    state.value.detailsQuestions.size
             }
         }
     }

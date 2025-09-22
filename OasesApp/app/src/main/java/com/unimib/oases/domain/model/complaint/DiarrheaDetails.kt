@@ -15,6 +15,7 @@ class DiarrheaDetails: ComplaintDetails {
 
 data object DiarrheaDurationQuestion: SingleChoiceComplaintQuestion{
     override val question = "How long did the patient experience diarrhea for?"
+    override val isRequired = true
     override val options = listOf(
         Symptom.DiarrheaInTheLastOneToSevenDays,
         Symptom.DiarrheaInTheLastEightToFourteenDays,
@@ -25,6 +26,7 @@ data object DiarrheaDurationQuestion: SingleChoiceComplaintQuestion{
 
 data object DiarrheaFrequencyQuestion: SingleChoiceComplaintQuestion{
     override val question = "How many episodes of diarrhea does the patient have?"
+    override val isRequired = true
     override val options = listOf(
         Symptom.DiarrheaEpisodesOnceOrTwiceADay,
         Symptom.DiarrheaEpisodesThreeToFiveTimesADay,
@@ -34,6 +36,7 @@ data object DiarrheaFrequencyQuestion: SingleChoiceComplaintQuestion{
 
 data object DiarrheaAspectQuestion: SingleChoiceComplaintQuestion{
     override val question = "How do the stools look like?"
+    override val isRequired = true
     override val options = listOf(
         Symptom.DiarrheaWateryStools,
         Symptom.DiarrheaBloodyStools,
@@ -42,6 +45,7 @@ data object DiarrheaAspectQuestion: SingleChoiceComplaintQuestion{
 }
 
 data object DiarrheaOtherSymptoms: OtherSymptomsQuestion() {
+    override val isRequired = false
     override val options = listOf(
         Symptom.Vomiting,
         Symptom.AbdominalPain,
@@ -57,6 +61,7 @@ data object DiarrheaOtherSymptoms: OtherSymptomsQuestion() {
 }
 
 data object DiarrheaOtherHighRiskSymptoms: OtherHighRiskSymptomsQuestion() {
+    override val isRequired = false
     override val options = listOf(
         Symptom.HivPositive,
         Symptom.CholeraOutbreak

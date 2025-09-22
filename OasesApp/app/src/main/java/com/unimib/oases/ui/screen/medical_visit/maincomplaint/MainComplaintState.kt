@@ -39,7 +39,7 @@ fun MainComplaintState.toBranch(): Branch{
 }
 
 data class MainComplaintState(
-    val receivedId: String,
+    val patientId: String,
     val complaintId: String,
     val patient: Patient? = null,
     val complaint: Complaint? = null,
@@ -47,6 +47,7 @@ data class MainComplaintState(
     val leaf: LeafNode? = null,
 
     val detailsQuestions: List<ComplaintQuestion> = emptyList(),
+    val detailsQuestionsToShow: Int = 0,
 
     val symptoms: Set<Symptom> = emptySet(),
 
@@ -54,7 +55,9 @@ data class MainComplaintState(
 
     val requestedTests: Set<Test> = emptySet(),
 
-    val supportiveTherapies: List<SupportiveTherapy> = emptyList(),
+    val additionalTestsText: String = "",
+
+    val supportiveTherapies: List<SupportiveTherapy>? = null,
 
     val isLoading: Boolean = false,
     val toastMessage: String? = null,

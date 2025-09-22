@@ -36,6 +36,7 @@ interface ComplaintSupportiveTherapies {
 sealed interface Question {
     val question: String
     val type: QuestionType
+    val isRequired: Boolean
     val options: List<Any>
 }
 

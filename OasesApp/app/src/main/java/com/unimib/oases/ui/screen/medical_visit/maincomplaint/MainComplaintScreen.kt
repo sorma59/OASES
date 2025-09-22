@@ -14,12 +14,15 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -48,13 +51,40 @@ fun MainComplaintScreen(){
 
     val context = LocalContext.current
 
+    val additionalTestsText by viewModel.additionalTestsText.collectAsState()
+
+    val onAdditionalTestsChanged: (String) -> Unit = {
+        viewModel.onEvent(
+            MainComplaintEvent.AdditionalTestsTextChanged(it)
+        )
+    }
+
+    val onCheckedChange: (Test) -> Unit = {
+        viewModel.onEvent(
+            MainComplaintEvent.TestSelected(it)
+        )
+    }
+
+    val isChecked: (Test) -> Boolean = { state.requestedTests.contains(it) }
+
+    val onGenerateTestsPressed: () -> Unit = {
+        viewModel.onEvent(MainComplaintEvent.GenerateTestsPressed)
+    }
+
+    val shouldShowGenerateTestsButton = remember {
+        derivedStateOf {
+            state.detailsQuestions.isNotEmpty() &&
+            state.detailsQuestionsToShow == state.detailsQuestions.size
+        }
+    }
+
     LaunchedEffect(state.toastMessage){
         state.toastMessage?.let {
             ToastUtils.showToast(context, it)
         }
         viewModel.onEvent(MainComplaintEvent.ToastShown)
     }
-    
+
     state.error?.let{
         Box(
             Modifier
@@ -75,7 +105,7 @@ fun MainComplaintScreen(){
                 .fillMaxSize()
                 .padding(24.dp)
                 .verticalScroll(scrollState),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ){
 
             TitleText("Ask these questions:")
@@ -87,77 +117,116 @@ fun MainComplaintScreen(){
                 viewModel::onEvent
             )
 
-            GenerateTestsButton(viewModel)
+            GenerateTestsButton(
+                onGenerateTestsPressed,
+                shouldShowGenerateTestsButton.value
+            )
 
             state.complaint?.let {
 
+
                 Tests(
                     state,
-                    isChecked = { state.requestedTests.contains(it) },
-                    onCheckedChange = { viewModel.onEvent(MainComplaintEvent.TestSelected(it)) }
+                    isChecked,
+                    onCheckedChange,
+                    additionalTestsText,
+                    onAdditionalTestsChanged
                 )
 
                 SupportiveTherapies(state)
             }
+
+            Spacer(Modifier.height(256.dp))
         }
 }
 
 @Composable
-fun SupportiveTherapies(
+private fun SupportiveTherapies(
     state: MainComplaintState
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ){
-        if (state.supportiveTherapies.isNotEmpty()){
+        state.supportiveTherapies?.let {
             TitleText("Supportive therapies", fontSize = 18)
-            HorizontalDivider(thickness = 0.8.dp)
-            for (supportiveTherapy in state.supportiveTherapies) {
-                Text(supportiveTherapy.text)
+
+            if (it.isNotEmpty()){
                 HorizontalDivider(thickness = 0.8.dp)
-            }
+                for (supportiveTherapy in it) {
+                    Text(supportiveTherapy.text)
+                    HorizontalDivider(thickness = 0.8.dp)
+                }
+            } else
+                Text("No supportive therapies suggested")
         }
     }
 }
 
 @Composable
 private fun GenerateTestsButton(
-    viewModel: MainComplaintViewModel
+    onClick: () -> Unit,
+    visible: Boolean
 ) {
-    Box(
-        Modifier.fillMaxWidth()
-    ){
-        Button(
-            onClick = { viewModel.onEvent(MainComplaintEvent.GenerateTestsPressed) },
+    if (visible){
+        Box(
+            Modifier.fillMaxWidth()
         ) {
-            Text("Suggest tests and supportive therapies")
+            Button(
+                onClick = onClick
+            ) {
+                Text("Suggest tests and supportive therapies")
+            }
         }
     }
 }
 
 @Composable
-fun Tests(
+private fun Tests(
     state: MainComplaintState,
     isChecked: (Test) -> Boolean,
-    onCheckedChange: (Test) -> Unit
+    onCheckedChange: (Test) -> Unit,
+    additionalTestsText: String,
+    onAdditionalTestsChanged: (String) -> Unit
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ){
         if (state.conditions.isNotEmpty()){
-            TitleText("Flag the tests you order")
-            Spacer(Modifier.height(8.dp))
+            TitleText("Suggested tests (flag if you do order)")
             for (condition in state.conditions) {
-                TitleText(condition.label, fontSize = 18)
-                for (test in condition.suggestedTests) {
-                    LabeledCheckbox(
-                        label = test.label,
-                        checked = isChecked(test),
-                        onCheckedChange = { onCheckedChange(test) }
-                    )
+                Column{
+                    TitleText(condition.label, fontSize = 18)
+                    Column(verticalArrangement =  Arrangement.spacedBy(8.dp)){
+                        for (test in condition.suggestedTests) {
+                            LabeledCheckbox(
+                                label = test.label,
+                                checked = isChecked(test),
+                                onCheckedChange = { onCheckedChange(test) }
+                            )
+                        }
+                    }
                 }
             }
+            AdditionalTests(additionalTestsText, onAdditionalTestsChanged)
         }
+    }
+}
+
+@Composable
+private fun AdditionalTests(
+    text: String,
+    onValueChange: (String) -> Unit
+) {
+    Column{
+        TitleText("Additional tests", fontSize = 18)
+
+        OutlinedTextField(
+            value = text,
+            onValueChange = onValueChange,
+            label = { Text("Write here any additional test you have ordered") },
+            minLines = 3,
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }
 
@@ -168,7 +237,7 @@ private fun DetailsQuestions(
 ) {
 
     Column {
-        for (question in state.detailsQuestions) {
+        for (question in state.detailsQuestions.take(state.detailsQuestionsToShow)) {
             when(question){
                 is MultipleChoiceComplaintQuestion -> {
                     MultipleChoiceQuestion(
@@ -176,7 +245,7 @@ private fun DetailsQuestions(
                         isChecked = {
                             state.symptoms.contains(it)
                         },
-                        onCheckedChange = { onEvent(SymptomSelected(it)) }
+                        onCheckedChange = { onEvent(SymptomSelected(it, question)) }
                     )
                 }
 
@@ -186,7 +255,7 @@ private fun DetailsQuestions(
                         isSelected = {
                             state.symptoms.contains(it)
                         },
-                        onSelected = { onEvent(SymptomSelected(it)) }
+                        onSelected = { onEvent(SymptomSelected(it, question)) }
                     )
                 }
             }
@@ -200,28 +269,30 @@ private fun ImmediateTreatmentQuestions(
     viewModel: MainComplaintViewModel,
     readOnly: Boolean = false
 ) {
-    for ((node, answer) in state.immediateTreatmentQuestions) {
+    Column{
+        for ((node, answer) in state.immediateTreatmentQuestions) {
 
-        YesOrNoQuestion(
-            question = node.value,
-            onAnswer = {
-                viewModel.onEvent(MainComplaintEvent.NodeAnswered(it, node))
-            },
-            enabled = !readOnly,
-            answer = answer
-        )
-    }
+            YesOrNoQuestion(
+                question = node.value,
+                onAnswer = {
+                    viewModel.onEvent(MainComplaintEvent.NodeAnswered(it, node))
+                },
+                enabled = !readOnly,
+                answer = answer
+            )
+        }
 
-    Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(8.dp))
 
-    state.immediateTreatment?.let {
-        TitleText("Immediate Treatment")
-        Text(it.text)
+        state.immediateTreatment?.let {
+            TitleText("Immediate Treatment")
+            Text(it.text)
+        }
     }
 }
 
 @Composable
-fun YesOrNoQuestion(
+private fun YesOrNoQuestion(
     question: String,
     onAnswer: (Boolean) -> Unit,
     enabled: Boolean,
@@ -263,7 +334,7 @@ fun YesOrNoQuestion(
 }
 
 @Composable
-fun SingleChoiceQuestion(
+private fun SingleChoiceQuestion(
     question: SingleChoiceComplaintQuestion,
     isSelected: (Symptom) -> Boolean,
     onSelected: (Symptom) -> Unit,
@@ -282,7 +353,7 @@ fun SingleChoiceQuestion(
 }
 
 @Composable
-fun MultipleChoiceQuestion(
+private fun MultipleChoiceQuestion(
     question: MultipleChoiceComplaintQuestion,
     isChecked: (Symptom) -> Boolean,
     onCheckedChange: (Symptom) -> Unit

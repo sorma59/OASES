@@ -68,7 +68,7 @@ private fun PastMedicalHistoryBox(
 }
 
 @Composable
-fun MainComplaintsGrid(
+private fun MainComplaintsGrid(
     patientId: String,
     appViewModel: AppViewModel
 ) {

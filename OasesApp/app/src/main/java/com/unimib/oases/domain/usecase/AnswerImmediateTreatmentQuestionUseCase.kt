@@ -17,7 +17,8 @@ class AnswerImmediateTreatmentQuestionUseCase @Inject constructor() {
                 state.copy(
                     immediateTreatmentQuestions = state.immediateTreatmentQuestions.rebranch(node, answer),
                     leaf = nextNode,
-                    detailsQuestions = getDetailsQuestion(state)
+                    detailsQuestions = getDetailsQuestion(state),
+                    detailsQuestionsToShow = if (state.detailsQuestionsToShow == 0) 1 else state.detailsQuestionsToShow
                 )
             }
             is ManualNode -> {
