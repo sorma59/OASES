@@ -5,6 +5,8 @@ import com.unimib.oases.data.local.model.PatientStatus
 import com.unimib.oases.domain.model.Patient
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 object PatientSerializer {
 
@@ -21,6 +23,9 @@ object PatientSerializer {
         val nextOfKinBytes = patient.nextOfKin.toByteArray(Charsets.UTF_8)
         val contactBytes = patient.contact.toByteArray(Charsets.UTF_8)
         val statusBytes = patient.status.toByteArray(Charsets.UTF_8)
+        val roomBytes = patient.room.toByteArray(Charsets.UTF_8)
+        val arrivalTimeBytes = patient.arrivalTime.toString().toByteArray(Charsets.UTF_8)
+        val codeBytes = patient.code.toByteArray(Charsets.UTF_8)
         val imageBytes = patient.image ?: ByteArray(0)
 
         val buffer = ByteBuffer.allocate(
@@ -36,6 +41,10 @@ object PatientSerializer {
                     4 + districtBytes.size +
                     4 + nextOfKinBytes.size +
                     4 + contactBytes.size +
+                    4 + statusBytes.size +
+                    4 + roomBytes.size +
+                    4 + arrivalTimeBytes.size +
+                    4 + codeBytes.size +
                     4 + statusBytes.size +
                     4 + imageBytes.size
         ).order(ByteOrder.BIG_ENDIAN)
@@ -75,6 +84,15 @@ object PatientSerializer {
         buffer.putInt(contactBytes.size)
         buffer.put(contactBytes)
 
+        buffer.putInt(roomBytes.size)
+        buffer.put(roomBytes)
+
+        buffer.putInt(arrivalTimeBytes.size)
+        buffer.put(arrivalTimeBytes)
+
+        buffer.putInt(codeBytes.size)
+        buffer.put(codeBytes)
+
         buffer.putInt(statusBytes.size)
         buffer.put(statusBytes)
 
@@ -101,6 +119,9 @@ object PatientSerializer {
         val nextOfKin = buffer.readString()
         val contact = buffer.readString()
         val status = buffer.readString()
+        val room = buffer.readString()
+        val arrivalTime = buffer.readString()
+        val code = buffer.readString()
 
         val imageLength = buffer.int
         val image = if (imageLength > 0) {
@@ -123,7 +144,11 @@ object PatientSerializer {
             nextOfKin = nextOfKin,
             contact = contact,
             status = status,
-            image = image
+            room = room,
+            arrivalTime = LocalDateTime.parse(arrivalTime),
+            code = code,
+            image = image,
+
         )
     }
 
@@ -140,7 +165,10 @@ object PatientSerializer {
             district = "District",
             nextOfKin = "Next of kin",
             contact = "123456789",
-            status = PatientStatus.WAITING_FOR_TRIAGE.name
+            status = PatientStatus.WAITING_FOR_TRIAGE.name,
+            room = "",
+            arrivalTime = LocalDateTime.now(),
+            code = ""
         )
         Log.d("PatientSerializer", "Original: $original")
         val bytes = serialize(original)

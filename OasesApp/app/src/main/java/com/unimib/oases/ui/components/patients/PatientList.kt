@@ -6,6 +6,9 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -16,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.ui.components.card.PatientCard
-import com.unimib.oases.ui.components.card.PatientUi
 import com.unimib.oases.ui.components.util.CenteredText
 import com.unimib.oases.ui.components.util.SmallGrayText
 
@@ -29,18 +31,11 @@ fun PatientList(
     noPatientsMessage: String = "No patients found."
 ) {
 
-    val wrappedPatientList = remember { mutableStateListOf<PatientUi>() }
+    val patientList = remember { mutableStateListOf<Patient>() }
 
     LaunchedEffect(patients) {
-        wrappedPatientList.clear()
-        wrappedPatientList.addAll(
-            patients.map { patient ->
-                PatientUi(
-                    isOptionsRevealed = false,
-                    item = patient
-                )
-            }
-        )
+        patientList.clear()
+        patientList.addAll(patients)
     }
 
 
@@ -53,23 +48,21 @@ fun PatientList(
             modifier = modifier.align(Alignment.Start)
         )
 
-        if (wrappedPatientList.isNotEmpty()){
+        if (patientList.isNotEmpty()){
 
-            LazyColumn(
+            LazyVerticalGrid (
                 modifier = modifier.fillMaxWidth(),
-                contentPadding = PaddingValues( vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                contentPadding = PaddingValues( vertical = 10.dp),
+                horizontalArrangement = Arrangement.spacedBy(20.dp),
+                verticalArrangement = Arrangement.spacedBy(20.dp),
+                columns = GridCells.Fixed(2),
                 content = {
 
-                    items(wrappedPatientList) { patient ->
+                    items(patientList) { patient ->
                         PatientCard(
-                            patient = patient.item,
-                            isRevealed = patient.isOptionsRevealed,
-                            onExpanded = {
-                                wrappedPatientList.replaceAll { p ->
-                                    p.copy(isOptionsRevealed = p.item.id == patient.item.id)
-                                }
-                            },
+                            patient = patient,
+                            isRevealed = false,
+                            onExpanded = {},
                             actions = {},
                             onCardClick = { patientId ->
                                 onItemClick(patientId)

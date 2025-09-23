@@ -18,6 +18,7 @@ sealed class Screen(val route: String, val title: String, val type: OasesTopAppB
     object DiseaseManagement: Screen("disease_management", "Diseases Management")
     object UserManagement: Screen("user_management", "Users Management")
     object VitalSignsManagement: Screen("vital_signs_management", "Vital Signs Management")
+    object RoomsManagement: Screen("rooms_management", "Rooms Management")
 
     // Common
     object PairDevice: Screen("pair_device", "Pair Device")
@@ -38,6 +39,7 @@ sealed class Screen(val route: String, val title: String, val type: OasesTopAppB
                 DiseaseManagement.route to DiseaseManagement,
                 UserManagement.route to UserManagement,
                 VitalSignsManagement.route to VitalSignsManagement,
+                RoomsManagement.route to RoomsManagement,
 
                 PairDevice.route to PairDevice,
             )

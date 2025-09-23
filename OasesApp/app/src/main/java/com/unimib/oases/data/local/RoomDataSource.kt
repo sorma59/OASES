@@ -4,6 +4,7 @@ import com.unimib.oases.data.local.dao.DiseaseDao
 import com.unimib.oases.data.local.dao.MalnutritionScreeningDao
 import com.unimib.oases.data.local.dao.PatientDao
 import com.unimib.oases.data.local.dao.PatientDiseaseDao
+import com.unimib.oases.data.local.dao.RoomsDao
 import com.unimib.oases.data.local.dao.TriageEvaluationDao
 import com.unimib.oases.data.local.dao.UserDao
 import com.unimib.oases.data.local.dao.VisitDao
@@ -16,11 +17,13 @@ import com.unimib.oases.data.local.model.MalnutritionScreeningEntity
 import com.unimib.oases.data.local.model.PatientDiseaseEntity
 import com.unimib.oases.data.local.model.PatientEntity
 import com.unimib.oases.data.local.model.Role
+import com.unimib.oases.data.local.model.RoomEntity
 import com.unimib.oases.data.local.model.TriageEvaluationEntity
 import com.unimib.oases.data.local.model.User
 import com.unimib.oases.data.local.model.VisitEntity
 import com.unimib.oases.data.local.model.VisitVitalSignEntity
 import com.unimib.oases.data.local.model.VitalSignEntity
+import com.unimib.oases.domain.model.Room
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -37,6 +40,7 @@ class RoomDataSource @Inject constructor(
     private val visitDao: VisitDao get() = appDatabase.visitDao()
     private val visitVitalSignDao: VisitVitalSignDao get() = appDatabase.visitVitalSignDao()
     private val vitalSignDao: VitalSignsDao get() = appDatabase.vitalSignDao()
+    private val roomsDao: RoomsDao get() = appDatabase.roomsDao()
 
     // -------------------Patients-------------------
     suspend fun insertPatient(patient: PatientEntity) {
@@ -63,8 +67,8 @@ class RoomDataSource @Inject constructor(
 //        patientDao.updateTriageState(patient.id, triageState)
 //    }
 
-    suspend fun updateStatus(patient: PatientEntity, status: String) {
-        patientDao.updateStatus(patient.id, status)
+    suspend fun updateStatus(patient: PatientEntity, status: String, code: String, room: String) {
+        patientDao.updateStatus(patient.id, status, code, room)
     }
 
     // ----------------Users---------------
@@ -88,6 +92,25 @@ class RoomDataSource @Inject constructor(
     suspend fun deleteUser(user: User) {
         userDao.delete(user)
     }
+
+    // ----------------Rooms---------------
+    suspend fun insertRoom(room: RoomEntity) {
+        roomsDao.insert(room)
+    }
+
+    fun getAllRooms(): Flow<List<RoomEntity>> {
+        return roomsDao.getAllRooms()
+    }
+
+    suspend fun deleteRoom(room: RoomEntity) {
+        roomsDao.delete(room)
+    }
+
+    fun getRoom(name: String): Flow<RoomEntity?> {
+        return roomsDao.getRoom(name)
+    }
+
+
 
     // ------------Patients Diseases----------------
     suspend fun insertPatientDisease(patientDisease: PatientDiseaseEntity) {

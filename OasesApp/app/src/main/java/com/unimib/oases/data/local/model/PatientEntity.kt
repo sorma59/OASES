@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.unimib.oases.data.local.TableNames
 import com.unimib.oases.ui.screen.nurse_assessment.patient_registration.Sex
+import java.time.LocalDateTime
 
 @Entity(tableName = TableNames.PATIENT)
 data class PatientEntity (
@@ -20,6 +21,9 @@ data class PatientEntity (
     @ColumnInfo(name = "next_of_kin") val nextOfKin: String,
     @ColumnInfo(name = "contact") val contact: String,
     @ColumnInfo(name = "status") val status: String,
+    @ColumnInfo(name = "code") val code: String,
+    @ColumnInfo(name = "room") val room: String,
+    @ColumnInfo(name = "arrival_time") val arrivalTime: String,
     @ColumnInfo(name = "image") val image: ByteArray? = null
 )
 

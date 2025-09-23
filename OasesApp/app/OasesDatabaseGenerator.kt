@@ -54,6 +54,13 @@ fun main() {
         )
     """.trimIndent())
 
+    stmt.execute("DROP TABLE IF EXISTS rooms")
+    stmt.execute("""
+        CREATE TABLE rooms (
+            name TEXT NOT NULL PRIMARY KEY
+        )
+    """.trimIndent())
+
     stmt.execute("DROP TABLE IF EXISTS patients")
     stmt.execute("""
         CREATE TABLE patients (
@@ -69,7 +76,10 @@ fun main() {
             next_of_kin TEXT NOT NULL,
             contact TEXT NOT NULL,
             status TEXT NOT NULL,
-            image BLOB DEFAULT NULL
+            image BLOB DEFAULT NULL,
+            arrival_time TEXT NOT NULL,
+            code TEXT NOT NULL,
+            room TEXT NOT NULL
         )
     """.trimIndent())
 
@@ -215,6 +225,7 @@ fun main() {
         Triple("Prematurity/low birth weight", "ALL", "CHILDREN"),
     )
 
+
     val insertDiseasesStmt =
         conn.prepareStatement("INSERT INTO diseases (name, sex_specificity, age_specificity) VALUES (?, ?, ?)")
 
@@ -224,6 +235,22 @@ fun main() {
         insertDiseasesStmt.setString(3, ageSpecificity)
         insertDiseasesStmt.executeUpdate()
         println("✔ Disease added: $name $sexSpecificity $ageSpecificity")
+    }
+
+    val rooms = listOf(
+        "Emergency Room",
+        "Trauma Bedroom",
+        "Children & Male Room",
+        "Female Room",
+        "Specialty Clinics Room"
+    )
+
+    val insertRooms = conn.prepareStatement("INSERT INTO rooms (name) VALUES (?)")
+
+    for (name in rooms) {
+        insertRooms.setString( 1,name)
+        insertRooms.executeUpdate()
+        println("✔ Rooms added: $name")
     }
 
     stmt.executeUpdate("PRAGMA oases_version = $dbVersion;")

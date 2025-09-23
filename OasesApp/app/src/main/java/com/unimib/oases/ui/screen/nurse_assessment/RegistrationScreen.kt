@@ -28,6 +28,7 @@ import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreenViewModel.V
 import com.unimib.oases.ui.screen.nurse_assessment.malnutrition_screening.MalnutritionScreeningScreen
 import com.unimib.oases.ui.screen.nurse_assessment.patient_registration.PatientInfoEvent
 import com.unimib.oases.ui.screen.nurse_assessment.patient_registration.PatientInfoScreen
+import com.unimib.oases.ui.screen.nurse_assessment.room_selection.RoomScreen
 import com.unimib.oases.ui.screen.nurse_assessment.transitionscreens.ContinueToTriageDecisionScreen
 import com.unimib.oases.ui.screen.nurse_assessment.transitionscreens.SubmissionScreen
 import com.unimib.oases.ui.screen.nurse_assessment.triage.RedCodeScreen
@@ -73,7 +74,7 @@ fun RegistrationScreen(
                         "Next"
                 }
                 Tab.CONTINUE_TO_TRIAGE -> "Triage"
-                Tab.VITAL_SIGNS, Tab.RED_CODE, Tab.YELLOW_CODE, Tab.HISTORY, Tab.MALNUTRITION_SCREENING -> "Next"
+                Tab.VITAL_SIGNS, Tab.ROOM_SELECTION, Tab.RED_CODE, Tab.YELLOW_CODE, Tab.HISTORY, Tab.MALNUTRITION_SCREENING -> "Next"
                 Tab.SUBMIT_ALL -> "Submit"
             }
         }
@@ -119,6 +120,7 @@ fun RegistrationScreen(
         }
     }
 
+
     Column(modifier = Modifier.fillMaxSize()) {
 
         Column(
@@ -162,6 +164,12 @@ fun RegistrationScreen(
                         state = state.triageState,
                         onEvent = registrationScreenViewModel::onTriageEvent
                     )
+
+                    Tab.ROOM_SELECTION -> RoomScreen(
+                        state = state.roomState,
+                        onEvent = registrationScreenViewModel::onRoomEvent,
+                    )
+
                     Tab.HISTORY -> VisitHistoryScreen(
                         state = state.visitHistoryState,
                         onEvent = registrationScreenViewModel::onVisitHistoryEvent
@@ -224,6 +232,7 @@ enum class Tab(val title: String){
     RED_CODE("Triage"),
     YELLOW_CODE("Triage"),
     HISTORY("History"),
+    ROOM_SELECTION("Room Selection"),
     MALNUTRITION_SCREENING("Malnutrition Screening"),
     SUBMIT_ALL("Submit everything")
 }

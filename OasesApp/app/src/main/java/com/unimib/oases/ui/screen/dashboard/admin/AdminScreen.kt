@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BedroomChild
 import androidx.compose.material.icons.filled.Bloodtype
 import androidx.compose.material.icons.filled.MedicalInformation
 import androidx.compose.material.icons.filled.Person
@@ -136,6 +137,34 @@ fun AdminScreen(
 
                                 Row {
                                     AutoResizedText(text = "Vital Signs", style = MaterialTheme.typography.bodyLarge)
+                                }
+                            }
+                        }
+                    }
+
+                    item {
+                        Button(
+                            onClick = { navController.navigate(Screen.RoomsManagement.route) },
+                            shape = MaterialTheme.shapes.extraSmall,
+                            modifier = Modifier
+                                .padding(5.dp)
+                                .size(itemSize)
+                        ) {
+                            Column(
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally,
+
+                                ) {
+                                Row {
+                                    Icon(
+                                        imageVector = Icons.Default.BedroomChild,
+                                        contentDescription = "",
+                                        modifier = Modifier.size(itemSize/2)
+                                    )
+                                }
+
+                                Row {
+                                    AutoResizedText(text = "Rooms", style = MaterialTheme.typography.bodyLarge)
                                 }
                             }
                         }

@@ -138,9 +138,9 @@ class PatientRepositoryImpl @Inject constructor(
 //        }
 //    }
 
-    override suspend fun updateStatus(patient: Patient, status: String): Resource<Unit> {
+    override suspend fun updateStatus(patient: Patient, status: String, code: String, room: String): Resource<Unit> {
         return try {
-            roomDataSource.updateStatus(patient.toEntity(), status)
+            roomDataSource.updateStatus(patient.toEntity(), status, code, room)
             Resource.Success(Unit)
         } catch (e: Exception) {
             Resource.Error(e.message ?: "An error occurred")

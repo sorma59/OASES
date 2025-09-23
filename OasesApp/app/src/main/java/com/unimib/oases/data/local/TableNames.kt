@@ -10,4 +10,5 @@ object TableNames {
     const val VITAL_SIGN = "vital_signs"
     const val TRIAGE_EVALUATION = "triage_evaluations"
     const val MALNUTRITION_SCREENING = "malnutrition_screenings"
+    const val ROOMS = "rooms"
 }

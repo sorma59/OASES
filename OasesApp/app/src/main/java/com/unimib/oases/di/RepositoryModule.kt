@@ -4,6 +4,7 @@ import com.unimib.oases.data.repository.DiseaseRepositoryImpl
 import com.unimib.oases.data.repository.MalnutritionScreeningRepositoryImpl
 import com.unimib.oases.data.repository.PatientDiseaseRepositoryImpl
 import com.unimib.oases.data.repository.PatientRepositoryImpl
+import com.unimib.oases.data.repository.RoomRepositoryImpl
 import com.unimib.oases.data.repository.TriageEvaluationRepositoryImpl
 import com.unimib.oases.data.repository.UserRepositoryImpl
 import com.unimib.oases.data.repository.VisitRepositoryImpl
@@ -13,6 +14,7 @@ import com.unimib.oases.domain.repository.DiseaseRepository
 import com.unimib.oases.domain.repository.MalnutritionScreeningRepository
 import com.unimib.oases.domain.repository.PatientDiseaseRepository
 import com.unimib.oases.domain.repository.PatientRepository
+import com.unimib.oases.domain.repository.RoomRepository
 import com.unimib.oases.domain.repository.TriageEvaluationRepository
 import com.unimib.oases.domain.repository.UserRepository
 import com.unimib.oases.domain.repository.VisitRepository
@@ -81,4 +83,10 @@ abstract class RepositoryModule {
     abstract fun bindVitalSignRepository(
         vitalSignRepositoryImpl: VitalSignRepositoryImpl // Hilt knows how to create this due to @Inject constructor
     ): VitalSignRepository // Return the interface
+
+    @Binds
+    @Singleton // The scope here must match or be wider than the scope on the repository
+    abstract fun bindRoomRepository(
+        roomRepositoryImpl: RoomRepositoryImpl // Hilt knows how to create this due to @Inject constructor
+    ): RoomRepository // Return the interface
 }

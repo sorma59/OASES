@@ -8,6 +8,7 @@ import com.unimib.oases.data.local.model.PatientStatus
 import com.unimib.oases.di.ApplicationScope
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.model.NumericPrecision
+import com.unimib.oases.domain.model.Room
 import com.unimib.oases.domain.model.Visit
 import com.unimib.oases.domain.model.symptom.triageSymptoms
 import com.unimib.oases.domain.repository.MalnutritionScreeningRepository
@@ -19,6 +20,7 @@ import com.unimib.oases.domain.usecase.GetPatientCategoryUseCase
 import com.unimib.oases.domain.usecase.GetVitalSignPrecisionUseCase
 import com.unimib.oases.domain.usecase.InsertPatientLocallyUseCase
 import com.unimib.oases.domain.usecase.PatientUseCase
+import com.unimib.oases.domain.usecase.RoomUseCase
 import com.unimib.oases.domain.usecase.VisitUseCase
 import com.unimib.oases.domain.usecase.VisitVitalSignsUseCase
 import com.unimib.oases.domain.usecase.VitalSignUseCase
@@ -33,6 +35,8 @@ import com.unimib.oases.ui.screen.nurse_assessment.malnutrition_screening.toMuac
 import com.unimib.oases.ui.screen.nurse_assessment.patient_registration.PatientInfoEffect
 import com.unimib.oases.ui.screen.nurse_assessment.patient_registration.PatientInfoEvent
 import com.unimib.oases.ui.screen.nurse_assessment.patient_registration.PatientInfoState
+import com.unimib.oases.ui.screen.nurse_assessment.room_selection.RoomEvent
+import com.unimib.oases.ui.screen.nurse_assessment.room_selection.RoomState
 import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageEvent
 import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageState
 import com.unimib.oases.ui.screen.nurse_assessment.triage.mapToTriageEvaluation
@@ -80,6 +84,7 @@ class RegistrationScreenViewModel @Inject constructor(
     private val getPatientCategoryUseCase: GetPatientCategoryUseCase,
     private val insertPatientLocallyUseCase: InsertPatientLocallyUseCase,
     private val vitalSignsUseCases: VitalSignUseCase,
+    private val roomUseCase: RoomUseCase,
     private val visitVitalSignsUseCases: VisitVitalSignsUseCase,
     private val getVitalSignPrecisionUseCase: GetVitalSignPrecisionUseCase,
     private val patientInfoHandler: PatientInfoHandler,
@@ -116,6 +121,7 @@ class RegistrationScreenViewModel @Inject constructor(
             is RegistrationEvent.PatientSubmitted -> handlePatientSubmission()
 
             is RegistrationEvent.VitalSignsSubmitted -> handleVitalSignsSubmission()
+
 
             is RegistrationEvent.Submit -> handleFinalSubmission()
         }
@@ -316,6 +322,57 @@ class RegistrationScreenViewModel @Inject constructor(
 
     }
 
+    // Rooms
+
+    private fun refreshRooms(){
+        updateRoomState { it.copy(error = null, isLoading = true) }
+        viewModelScope.launch(ioDispatcher + errorHandler) {
+            loadRooms()
+        }
+    }
+
+    private suspend fun loadRooms(){
+        updateRoomState { it.copy(isLoading = true) }
+
+        try {
+            // Collect only the first emission from the Flow
+            val roomsResource = roomUseCase.getRooms().first {
+                it is Resource.Success || it is Resource.Error
+            }
+
+            if (roomsResource is Resource.Success) {
+
+                val roomsData = roomsResource.data
+
+                if (roomsData != null) {
+//                    val newStates = roomsData.map { room -> // More efficient mapping
+//                        PatientVitalSignState(vitalSign.name, vitalSign.acronym, vitalSign.unit)
+//                    }
+                    updateRoomState {
+                        it.copy(
+                            rooms = roomsData, // Set the list, don't append if it's initial load
+                            currentRoom = Room(state.value.patientInfoState.patient.room),
+                            currentTriageCode = state.value.triageState.triageCode.name,
+                            error = null // Clear previous error
+                        )
+                    }
+
+                } else {
+                    // Handle case where Resource.Success has null data, if possible
+                    updateRoomState { it.copy(error = "Successful fetch but no data.") }
+                }
+            } else if (roomsResource is Resource.Error) {
+                updateRoomState { it.copy(error = roomsResource.message) }
+            }
+        } catch (e: Exception) {
+            // This can catch NoSuchElementException if the Flow completes
+            // or any other exception from the Flow upstream or the first() operator itself.
+            updateRoomState { it.copy(error = e.message ?: "An unexpected error occurred") }
+        } finally {
+            updateRoomState { it.copy(isLoading = false) } // Ensure isLoading is false in all cases
+        }
+    }
+
     private suspend fun loadVisitVitalSigns(visitId: String) {
 
         updateVitalSignsState { it.copy(isLoading = true) }
@@ -367,6 +424,21 @@ class RegistrationScreenViewModel @Inject constructor(
     }
 
     fun getPrecisionFor(name: String) = getVitalSignPrecisionUseCase(name)
+
+    // -----------------ROOM SELECTION----------------------
+
+    fun onRoomEvent(event: RoomEvent){
+        when(event){
+            is RoomEvent.RoomSelected -> {
+                updateRoomState { it.copy(currentRoom = event.room) }
+            }
+            RoomEvent.Retry -> {
+                refreshRooms()
+            }
+            RoomEvent.ConfirmSelection -> onNext()
+            RoomEvent.RoomDeselected -> {updateRoomState { it.copy(currentRoom = null) }}
+        }
+    }
 
     // -----------------Triage----------------------
 
@@ -584,7 +656,7 @@ class RegistrationScreenViewModel @Inject constructor(
                     _state.value.triageState.triageCode
                 else
                     null
-
+            val assigned_room = _state.value.roomState.currentRoom?.name ?: ""
             val visit =
                 currentVisit?.copy(triageCode = triageCode ?: currentVisit.triageCode)
                     ?: Visit(
@@ -601,7 +673,9 @@ class RegistrationScreenViewModel @Inject constructor(
                 visitVitalSignsUseCase.addVisitVitalSign(it)
             }
 
-            patientUseCase.updateStatus(patient, PatientStatus.WAITING_FOR_VISIT.displayValue)
+
+
+            patientUseCase.updateStatus(patient, PatientStatus.WAITING_FOR_VISIT.displayValue, triageCode.toString(), assigned_room.toString())
 
             if (state.value.triageState.loaded)
                 triageEvaluationRepository.insertTriageEvaluation(_state.value.triageState.mapToTriageEvaluation(visit.id))
@@ -668,6 +742,11 @@ class RegistrationScreenViewModel @Inject constructor(
         _state.update { it.copy(vitalSignsState = update(it.vitalSignsState)) }
     }
 
+
+    private fun updateRoomState(update: (RoomState) -> RoomState){
+        _state.update { it.copy(roomState = update(it.roomState)) }
+    }
+
     // --------------Flow-----------------
 
     fun onNext() {
@@ -719,6 +798,9 @@ class RegistrationScreenViewModel @Inject constructor(
             Tab.VITAL_SIGNS -> {
                 onEvent(RegistrationEvent.VitalSignsSubmitted)
             }
+
+
+
             Tab.SUBMIT_ALL -> {
                 onEvent(RegistrationEvent.Submit)
                 viewModelScope.launch(ioDispatcher + errorHandler) {

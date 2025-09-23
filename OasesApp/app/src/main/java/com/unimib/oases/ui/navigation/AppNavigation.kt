@@ -21,10 +21,12 @@ import com.unimib.oases.ui.navigation.Screen.SendPatient
 import com.unimib.oases.ui.navigation.Screen.UserManagement
 import com.unimib.oases.ui.navigation.Screen.ViewPatientDetails
 import com.unimib.oases.ui.navigation.Screen.VitalSignsManagement
+import com.unimib.oases.ui.navigation.Screen.RoomsManagement
 import com.unimib.oases.ui.screen.bluetooth.pairing.PairNewDeviceScreen
 import com.unimib.oases.ui.screen.bluetooth.sending.SendPatientViaBluetoothScreen
 import com.unimib.oases.ui.screen.dashboard.admin.AdminScreen
 import com.unimib.oases.ui.screen.dashboard.admin.disease.DiseaseManagementScreen
+import com.unimib.oases.ui.screen.dashboard.admin.rooms.RoomsManagementScreen
 import com.unimib.oases.ui.screen.dashboard.admin.user.UserManagementScreen
 import com.unimib.oases.ui.screen.dashboard.admin.vitalsigns.VitalSignManagementScreen
 import com.unimib.oases.ui.screen.dashboard.patient.PatientDashboardScreen
@@ -65,6 +67,10 @@ fun AppNavigation(
 
         composable(DiseaseManagement.route) {
             DiseaseManagementScreen ()
+        }
+
+        composable(RoomsManagement.route){
+            RoomsManagementScreen()
         }
 
         composable(Home.route) {

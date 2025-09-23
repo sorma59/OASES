@@ -4,6 +4,8 @@ import com.unimib.oases.data.local.model.PatientEntity
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.ui.screen.nurse_assessment.patient_registration.Sex.Companion.fromDisplayName
 import com.unimib.oases.util.DateTimeFormatter
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 fun PatientEntity.toDomain(): Patient {
     val ageInMonths = DateTimeFormatter().calculateAgeInMonths(birthDate)
@@ -21,7 +23,11 @@ fun PatientEntity.toDomain(): Patient {
         nextOfKin = nextOfKin,
         contact = contact,
         status = status,
-        image = image
+        code = code,
+        room = room,
+        arrivalTime = LocalDateTime.parse(arrivalTime),
+        image = image,
+
     )
 }
 
@@ -39,6 +45,9 @@ fun Patient.toEntity(): PatientEntity {
         nextOfKin = nextOfKin,
         contact = contact,
         status = status,
+        code = code,
+        room = room,
+        arrivalTime = arrivalTime.toString(),
         image = image
     )
 }
