@@ -265,7 +265,7 @@ fun PatientCard(
 
                 Row(modifier = Modifier.fillMaxWidth().padding(end = 10.dp), horizontalArrangement = Arrangement.End){
                     Text(
-                        text = patient.arrivalTime.format(DateTimeFormatter.ofPattern("d MMM uuuu, HH:mm")),
+                        text = patient.arrivalTime.format(DateTimeFormatter.ofPattern("HH:mm")),
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.surface,
                         fontWeight = FontWeight.Normal,
