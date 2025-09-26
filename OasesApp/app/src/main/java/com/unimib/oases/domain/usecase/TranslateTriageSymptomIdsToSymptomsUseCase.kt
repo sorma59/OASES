@@ -10,6 +10,8 @@ class TranslateTriageSymptomIdsToSymptomsUseCase @Inject constructor() {
 
         for (id in symptomIds){
             val symptom = Symptom.symptoms[id]
+//            if (symptom is Pregnancy)
+//                symptoms.add(Symptom.CurrentPregnancy)
             symptom?.let { symptoms.add(it) }
         }
 

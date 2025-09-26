@@ -17,11 +17,11 @@ import com.unimib.oases.ui.navigation.Screen.MedicalVisit
 import com.unimib.oases.ui.navigation.Screen.PairDevice
 import com.unimib.oases.ui.navigation.Screen.PatientDashboard
 import com.unimib.oases.ui.navigation.Screen.PatientRegistration
+import com.unimib.oases.ui.navigation.Screen.RoomsManagement
 import com.unimib.oases.ui.navigation.Screen.SendPatient
 import com.unimib.oases.ui.navigation.Screen.UserManagement
 import com.unimib.oases.ui.navigation.Screen.ViewPatientDetails
 import com.unimib.oases.ui.navigation.Screen.VitalSignsManagement
-import com.unimib.oases.ui.navigation.Screen.RoomsManagement
 import com.unimib.oases.ui.screen.bluetooth.pairing.PairNewDeviceScreen
 import com.unimib.oases.ui.screen.bluetooth.sending.SendPatientViaBluetoothScreen
 import com.unimib.oases.ui.screen.dashboard.admin.AdminScreen
@@ -145,9 +145,15 @@ fun AppNavigation(
             PairNewDeviceScreen(navController)
         }
 
-        composable(MedicalVisit.route + "/{patientId}") { backStackEntry ->
-            val patientId = backStackEntry.arguments?.getString("patientId")!!
-            MedicalVisitScreen(patientId, appViewModel)
+        composable(
+            route = MedicalVisit.route + "/patientId={patientId}",
+            arguments =  listOf(
+                navArgument("patientId"){
+                    type = NavType.StringType
+                }
+            )
+        ) {
+            MedicalVisitScreen(appViewModel)
         }
 
         composable(

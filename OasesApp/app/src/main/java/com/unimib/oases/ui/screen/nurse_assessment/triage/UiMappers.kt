@@ -1,6 +1,9 @@
 package com.unimib.oases.ui.screen.nurse_assessment.triage
 
 import com.unimib.oases.domain.model.TriageEvaluation
+import com.unimib.oases.domain.model.symptom.Pregnancy
+import com.unimib.oases.domain.model.symptom.TriageSymptom
+import com.unimib.oases.domain.model.symptom.triageSymptoms
 
 //fun TriageEvaluation.mapToTriageState(): TriageState{
 //    return TriageState(
@@ -10,7 +13,16 @@ import com.unimib.oases.domain.model.TriageEvaluation
 fun TriageState.mapToTriageEvaluation(visitId: String): TriageEvaluation{
     return TriageEvaluation(
         visitId = visitId,
-        redSymptomIds = selectedReds.minus("pregnancy").toList(),
+        redSymptomIds = removePregnancyIfChildless(selectedReds).toList(),
         yellowSymptomIds = selectedYellows.toList(),
     )
+}
+
+private fun removePregnancyIfChildless(selectedReds: Set<String>): Set<String> {
+    return if (selectedReds.minus(TriageSymptom.PREGNANCY.id).any {
+        triageSymptoms[it]!!.symptom is Pregnancy
+    })
+        selectedReds
+    else
+        selectedReds.minus(TriageSymptom.PREGNANCY.id)
 }

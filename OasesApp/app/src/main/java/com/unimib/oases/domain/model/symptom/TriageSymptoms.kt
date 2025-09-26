@@ -7,6 +7,7 @@ import com.unimib.oases.domain.model.symptom.Symptom.AggressiveBehavior
 import com.unimib.oases.domain.model.symptom.Symptom.AirwaySwellingOrMassOfMouthOrThroatOrNeck
 import com.unimib.oases.domain.model.symptom.Symptom.AnimalBiteOrNeedlestickPuncture
 import com.unimib.oases.domain.model.symptom.Symptom.Convulsions
+import com.unimib.oases.domain.model.symptom.Symptom.CurrentPregnancy
 import com.unimib.oases.domain.model.symptom.Symptom.FocalNeurologicDeficitOrFocalVisualDeficit
 import com.unimib.oases.domain.model.symptom.Symptom.HeadacheWithStiffNeck
 import com.unimib.oases.domain.model.symptom.Symptom.HeavyBleeding
@@ -30,7 +31,6 @@ import com.unimib.oases.domain.model.symptom.Symptom.NonHighRiskTrauma
 import com.unimib.oases.domain.model.symptom.Symptom.NonMajorBurns
 import com.unimib.oases.domain.model.symptom.Symptom.OngoingSevereVomitingOrOngoingSevereDiarrhea
 import com.unimib.oases.domain.model.symptom.Symptom.PoisoningIntoxication
-import com.unimib.oases.domain.model.symptom.Symptom.Pregnancy
 import com.unimib.oases.domain.model.symptom.Symptom.PregnancyWithActiveLabor
 import com.unimib.oases.domain.model.symptom.Symptom.PregnancyWithAlteredMentalStatus
 import com.unimib.oases.domain.model.symptom.Symptom.PregnancyWithHeavyBleeding
@@ -108,7 +108,6 @@ enum class TriageSymptom(
     val isParent: Boolean = false,
     val isComputed: Boolean = false
 ) {
-
     UNCONSCIOUSNESS(
         Unconsciousness,
         ::redForAll
@@ -175,7 +174,7 @@ enum class TriageSymptom(
 //        isComputed = true
 //    ),
     PREGNANCY(
-        Pregnancy,
+        CurrentPregnancy,
         ::redForAdultNullForKid,
         isParent = true
     ),
@@ -474,4 +473,7 @@ enum class TriageSymptom(
             else -> this.symptom.label
         }
     }
+
+    val id: String
+        get() = symptom.id
 }

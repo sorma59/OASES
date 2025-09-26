@@ -30,7 +30,7 @@ class PatientDashboardViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(
         PatientDashboardState(
-            receivedId = savedStateHandle["patientId"]!!,
+            patientId = savedStateHandle["patientId"]!!,
             buttons = configurePatientDashboardButtonsUseCase()
         )
     )
@@ -52,7 +52,7 @@ class PatientDashboardViewModel @Inject constructor(
             try {
                 _state.update { it.copy(isLoading = true, error = null) }
 
-                val resource = patientRepository.getPatientById(_state.value.receivedId).first {
+                val resource = patientRepository.getPatientById(_state.value.patientId).first {
                     it is Resource.Success || it is Resource.Error
                 }
 
@@ -87,7 +87,7 @@ class PatientDashboardViewModel @Inject constructor(
                         else -> {
                             navigationEventsChannel.send(
                                 NavigationEvent.Navigate(
-                                    event.button.route + _state.value.receivedId
+                                    event.button.route + _state.value.patientId
                                 )
                             )
                         }
@@ -102,7 +102,7 @@ class PatientDashboardViewModel @Inject constructor(
             PatientDashboardEvent.PatientDeletionConfirmed -> {
                 viewModelScope.launch(dispatcher) {
 
-                    val result = patientRepository.deletePatientById(_state.value.receivedId)
+                    val result = patientRepository.deletePatientById(_state.value.patientId)
 
                     if (result is Resource.Success){
                         uiEventsChannel.send(UiEvent.HideDialog)

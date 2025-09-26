@@ -122,7 +122,6 @@ class RegistrationScreenViewModel @Inject constructor(
 
             is RegistrationEvent.VitalSignsSubmitted -> handleVitalSignsSubmission()
 
-
             is RegistrationEvent.Submit -> handleFinalSubmission()
         }
     }
@@ -132,56 +131,58 @@ class RegistrationScreenViewModel @Inject constructor(
     // --------------Demographics-----------------------
 
     init {
-        refreshPatientInfo()
+        viewModelScope.launch(ioDispatcher + errorHandler) {
+            refreshPatientInfo()
+            refreshVitalSigns()
+            refreshRooms()
+        }
     }
 
-    private fun refreshPatientInfo() {
+    private suspend fun refreshPatientInfo() {
         retrievedPatientId?.let { id ->
-            viewModelScope.launch(ioDispatcher + errorHandler) {
 
-                try {
-                    updatePatientInfoState {
-                        it.copy(
-                            isLoading = true,
-                            error = null
-                        )
-                    }
+            try {
+                updatePatientInfoState {
+                    it.copy(
+                        isLoading = true,
+                        error = null
+                    )
+                }
 
-                    val resource = patientUseCase.getPatient(id).first {
-                        it is Resource.Success || it is Resource.Error
-                    }
+                val resource = patientUseCase.getPatient(id).first {
+                    it is Resource.Success || it is Resource.Error
+                }
 
-                    when (resource) {
+                when (resource) {
 
-                        is Resource.Success -> {
-                            updatePatientInfoState {
-                                it.copy(
-                                    patient = resource.data!!,
-                                    isNew = false,
-                                    isLoading = false,
-                                    error = null
-                                )
-                            }
+                    is Resource.Success -> {
+                        updatePatientInfoState {
+                            it.copy(
+                                patient = resource.data!!,
+                                isNew = false,
+                                isLoading = false,
+                                error = null
+                            )
                         }
+                    }
 
-                        is Resource.Error -> {
-                            updatePatientInfoState {
-                                it.copy(
-                                    error = resource.message,
-                                    isLoading = false
-                                )
-                            }
+                    is Resource.Error -> {
+                        updatePatientInfoState {
+                            it.copy(
+                                error = resource.message,
+                                isLoading = false
+                            )
                         }
+                    }
 
-                        else -> {} // Unreachable
-                    }
-                } catch (e: Exception) {
-                    updatePatientInfoState {
-                        it.copy(
-                            error = e.message,
-                            isLoading = false
-                        )
-                    }
+                    else -> {} // Unreachable
+                }
+            } catch (e: Exception) {
+                updatePatientInfoState {
+                    it.copy(
+                        error = e.message,
+                        isLoading = false
+                    )
                 }
             }
         }
@@ -218,7 +219,7 @@ class RegistrationScreenViewModel @Inject constructor(
                 }
             }
             PatientInfoEffect.Retry -> {
-                refreshPatientInfo()
+                viewModelScope.launch(ioDispatcher + errorHandler) { refreshPatientInfo() }
             }
         }
     }
@@ -250,7 +251,7 @@ class RegistrationScreenViewModel @Inject constructor(
     fun onVitalSignsEvent(event: VitalSignsEvent) {
         when (event) {
             is VitalSignsEvent.Retry -> {
-                refreshVitalSigns()
+                viewModelScope.launch(ioDispatcher + errorHandler) { refreshVitalSigns() }
             }
 
             is VitalSignsEvent.ValueChanged -> {
@@ -269,15 +270,13 @@ class RegistrationScreenViewModel @Inject constructor(
         }
     }
 
-    private fun refreshVitalSigns(){
+    private suspend fun refreshVitalSigns(){
         updateVitalSignsState { it.copy(error = null, isLoading = true) }
-        viewModelScope.launch(ioDispatcher + errorHandler) {
-            loadVitalSigns()
-            val currentVisit = state.value.currentVisit
-            if (currentVisit != null) {
-                if (_state.value.vitalSignsState.error == null)
-                    loadVisitVitalSigns(currentVisit.id)
-            }
+        loadVitalSigns()
+        val currentVisit = getCurrentVisit(patientId = state.value.patientInfoState.patient.id)
+        if (currentVisit != null) {
+            if (_state.value.vitalSignsState.error == null)
+                loadVisitVitalSigns(currentVisit.id)
         }
     }
 
@@ -324,11 +323,9 @@ class RegistrationScreenViewModel @Inject constructor(
 
     // Rooms
 
-    private fun refreshRooms(){
+    private suspend fun refreshRooms(){
         updateRoomState { it.copy(error = null, isLoading = true) }
-        viewModelScope.launch(ioDispatcher + errorHandler) {
-            loadRooms()
-        }
+        loadRooms()
     }
 
     private suspend fun loadRooms(){
@@ -391,7 +388,7 @@ class RegistrationScreenViewModel @Inject constructor(
                     val updatedVitalSignsList =
                         currentState.vitalSigns.map { uiState ->
 
-                            val visitSpecificVitalSignData =visitVitalSignsDbMap[uiState.name]
+                            val visitSpecificVitalSignData = visitVitalSignsDbMap[uiState.name]
 
                             if (visitSpecificVitalSignData != null) {
                                 val precision = getPrecisionFor(uiState.name)
@@ -433,7 +430,7 @@ class RegistrationScreenViewModel @Inject constructor(
                 updateRoomState { it.copy(currentRoom = event.room) }
             }
             RoomEvent.Retry -> {
-                refreshRooms()
+                viewModelScope.launch(ioDispatcher + errorHandler) { refreshRooms() }
             }
             RoomEvent.ConfirmSelection -> onNext()
             RoomEvent.RoomDeselected -> {updateRoomState { it.copy(currentRoom = null) }}
@@ -618,7 +615,9 @@ class RegistrationScreenViewModel @Inject constructor(
 
     private fun handleVitalSignsSubmission(){
         fun getVitalSignValue(name: String) =
-            _state.value.vitalSignsState.vitalSigns.firstOrNull { it.name == name && it.value.isNotEmpty()}?.value?.toDouble()
+            _state.value.vitalSignsState.vitalSigns.firstOrNull {
+                it.name == name && it.value.isNotEmpty()
+            }?.value?.toDouble()
 
         val vitalSigns = VitalSigns(
             sbp = getVitalSignValue("Systolic Blood Pressure")?.toInt(),
@@ -656,7 +655,7 @@ class RegistrationScreenViewModel @Inject constructor(
                     _state.value.triageState.triageCode
                 else
                     null
-            val assigned_room = _state.value.roomState.currentRoom?.name ?: ""
+            val assignedRoom = _state.value.roomState.currentRoom?.name ?: ""
             val visit =
                 currentVisit?.copy(triageCode = triageCode ?: currentVisit.triageCode)
                     ?: Visit(
@@ -673,9 +672,7 @@ class RegistrationScreenViewModel @Inject constructor(
                 visitVitalSignsUseCase.addVisitVitalSign(it)
             }
 
-
-
-            patientUseCase.updateStatus(patient, PatientStatus.WAITING_FOR_VISIT.displayValue, triageCode.toString(), assigned_room.toString())
+            patientUseCase.updateStatus(patient, PatientStatus.WAITING_FOR_VISIT.displayValue, triageCode.toString(), assignedRoom.toString())
 
             if (state.value.triageState.loaded)
                 triageEvaluationRepository.insertTriageEvaluation(_state.value.triageState.mapToTriageEvaluation(visit.id))
@@ -798,8 +795,6 @@ class RegistrationScreenViewModel @Inject constructor(
             Tab.VITAL_SIGNS -> {
                 onEvent(RegistrationEvent.VitalSignsSubmitted)
             }
-
-
 
             Tab.SUBMIT_ALL -> {
                 onEvent(RegistrationEvent.Submit)

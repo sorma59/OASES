@@ -73,12 +73,13 @@ data object DyspneaWithHypotensionOrShock: SupportiveTherapy(
     "If hypotension / signs of shock are present without signs of volume overload and without severe malnutrition, set 2 large bore IV lines and infuse IV fluids (Ringer's lactate or Normal Saline 0.9%) 20 ml/kg boluses (up to 1 L in adults) in 30 min according to response (repeat up to 2 times).Monitor closely for worsening signs of fluid overload (increasing respiratory rate or heart rate, worsening difficulty breathing, inability to lie flat and increasing crackles in the chest and peripheral edema): stop IV fluids if any of these signs develop.",
     { symptoms: Set<Symptom> ->
         symptoms.contains(Symptom.Shock)
+        || symptoms.contains(Symptom.Hypotension)
     }
 )
 
 data object DyspneaWithHypertensiveEmergency: SupportiveTherapy(
-    "If hypertensive emergency (BP >180/110 mmHg with symptoms and acute life threatening complications, eg. pulmonary edema): give hydralazine 10 mg IV over 20 minutes. Check blood pressure regularly, repeat dose after 20-30 minutes if necessary",
+    "If hypertensive emergency (BP > 180/110 mmHg with symptoms and acute life threatening complications, eg. pulmonary edema): give hydralazine 10 mg IV over 20 minutes. Check blood pressure regularly, repeat dose after 20-30 minutes if necessary",
     { symptoms: Set<Symptom> ->
-        true //TODO("Convert vital signs into symptoms")
+        symptoms.contains(Symptom.HypertensiveEmergency)
     }
 )

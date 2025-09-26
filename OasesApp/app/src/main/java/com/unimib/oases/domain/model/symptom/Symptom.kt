@@ -51,7 +51,9 @@ import com.unimib.oases.domain.model.symptom.SymptomId.HighTempId
 import com.unimib.oases.domain.model.symptom.SymptomId.HistoryOfHeartDiseaseId
 import com.unimib.oases.domain.model.symptom.SymptomId.HistoryOfRenalOrLiverDiseaseId
 import com.unimib.oases.domain.model.symptom.SymptomId.HivPositiveId
+import com.unimib.oases.domain.model.symptom.SymptomId.HypertensiveEmergencyId
 import com.unimib.oases.domain.model.symptom.SymptomId.HypoglycemiaId
+import com.unimib.oases.domain.model.symptom.SymptomId.HypotensionId
 import com.unimib.oases.domain.model.symptom.SymptomId.InabilityToBreastfeedOrDrinkId
 import com.unimib.oases.domain.model.symptom.SymptomId.IrregularPulseOrIrregularHeartSoundsId
 import com.unimib.oases.domain.model.symptom.SymptomId.LethargyId
@@ -184,43 +186,43 @@ sealed interface Symptom {
         override val symptomId = YoungerThanTwoMonthsAndLowOrHighTemperatureId
         override val label = "Younger than two months old and low or high temperature"
     }
-    data object Pregnancy: Symptom, com.unimib.oases.domain.model.symptom.Pregnancy {
+    data object CurrentPregnancy: Symptom, Pregnancy {
         override val symptomId = PregnancyId
         override val label = "Currently pregnant"
     }
-    data object PregnancyWithHighBloodPressure: Symptom {
+    data object PregnancyWithHighBloodPressure: Symptom, Pregnancy {
         override val symptomId = PregnancyWithHighBloodPressureId
         override val label = "High blood pressure"
     }
-    data object PregnancyWithHeavyBleeding: Symptom {
+    data object PregnancyWithHeavyBleeding: Symptom, Pregnancy {
         override val symptomId = PregnancyWithHeavyBleedingId
         override val label = "Heavy bleeding"
     }
-    data object PregnancyWithSevereAbdominalPain: Symptom, Pain {
+    data object PregnancyWithSevereAbdominalPain: Symptom, Pain, Pregnancy {
         override val symptomId = PregnancyWithSevereAbdominalPainId
         override val label = "Severe abdominal pain"
     }
-    data object PregnancyWithSeizures: Symptom {
+    data object PregnancyWithSeizures: Symptom , Pregnancy{
         override val symptomId = PregnancyWithSeizuresId
         override val label = "Seizures"
     }
-    data object PregnancyWithAlteredMentalStatus: Symptom {
+    data object PregnancyWithAlteredMentalStatus: Symptom, Pregnancy {
         override val symptomId = PregnancyWithAlteredMentalStatusId
         override val label = "Altered mental status"
     }
-    data object PregnancyWithSevereHeadache: Symptom {
+    data object PregnancyWithSevereHeadache: Symptom, Pregnancy {
         override val symptomId = PregnancyWithSevereHeadacheId
         override val label = "Severe headache"
     }
-    data object PregnancyWithVisualChanges: Symptom {
+    data object PregnancyWithVisualChanges: Symptom, Pregnancy {
         override val symptomId = PregnancyWithVisualChangesId
         override val label = "Visual changes"
     }
-    data object PregnancyWithTrauma: Symptom {
+    data object PregnancyWithTrauma: Symptom, Pregnancy {
         override val symptomId = PregnancyWithTraumaId
         override val label = "Trauma"
     }
-    data object PregnancyWithActiveLabor: Symptom {
+    data object PregnancyWithActiveLabor: Symptom, Pregnancy {
         override val symptomId = PregnancyWithActiveLaborId
         override val label = "Active labor"
     }
@@ -356,6 +358,16 @@ sealed interface Symptom {
     data object HighSbp: Symptom {
         override val symptomId = HighSbpId
         override val label = "High SBP"
+    }
+
+    data object Hypotension: Symptom {
+        override val symptomId = HypotensionId
+        override val label = "Hypotension"
+    }
+
+    data object HypertensiveEmergency: Symptom {
+        override val symptomId = HypertensiveEmergencyId
+        override val label = "Hypertensive emergency"
     }
 
     //---------------------------------------------------
@@ -677,7 +689,7 @@ sealed interface Symptom {
                 put(PretermAndUnderOneMonth.id, PretermAndUnderOneMonth)
                 put(YoungerThanTwoMonthsAndLowOrHighTemperature.id, YoungerThanTwoMonthsAndLowOrHighTemperature)
 
-                put(Pregnancy.id, Pregnancy)
+                put(CurrentPregnancy.id, CurrentPregnancy)
                 put(PregnancyWithHighBloodPressure.id, PregnancyWithHighBloodPressure)
                 put(PregnancyWithHeavyBleeding.id, PregnancyWithHeavyBleeding)
                 put(PregnancyWithSevereAbdominalPain.id, PregnancyWithSevereAbdominalPain)
@@ -863,6 +875,9 @@ sealed class SymptomId (
     object HighHrId: SymptomId(snakeCase("high_hr"))
     object LowSbpId: SymptomId(snakeCase("low_sbp"))
     object HighSbpId: SymptomId(snakeCase("high_sbp"))
+
+    object HypertensiveEmergencyId: SymptomId(snakeCase("hypertensive_emergency"))
+    object HypotensionId: SymptomId(snakeCase("hypotension"))
 
     //---------------------------------------------------------------
 

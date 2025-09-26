@@ -43,19 +43,19 @@ class ComputeSymptomsUseCase @Inject constructor(
         when (patientCategory){
             PatientCategory.ADULT -> {
                 if ((ageInMonths / 12) >= 80)
-                    newYellows.add(TriageSymptom.AGE_OVER_EIGHTY_YEARS.symptom.symptomId.value.string)
+                    newYellows.add(TriageSymptom.AGE_OVER_EIGHTY_YEARS.id)
                 if (vitalSigns.rr != null && vitalSigns.rr < RR_LOW)
-                    newYellows.add(TriageSymptom.LOW_RR.symptom.id)
+                    newYellows.add(TriageSymptom.LOW_RR.id)
                 if (vitalSigns.rr != null && vitalSigns.rr > RR_HIGH)
-                    newYellows.add(TriageSymptom.HIGH_RR.symptom.id)
+                    newYellows.add(TriageSymptom.HIGH_RR.id)
                 if (vitalSigns.hr != null && vitalSigns.hr < HR_LOW)
-                    newYellows.add(TriageSymptom.LOW_HR.symptom.id)
+                    newYellows.add(TriageSymptom.LOW_HR.id)
                 if (vitalSigns.hr != null && vitalSigns.hr > HR_HIGH)
-                    newYellows.add(TriageSymptom.HIGH_HR.symptom.id)
+                    newYellows.add(TriageSymptom.HIGH_HR.id)
                 if (vitalSigns.sbp != null && vitalSigns.sbp < SBP_LOW)
-                    newYellows.add(TriageSymptom.LOW_SBP.symptom.id)
+                    newYellows.add(TriageSymptom.LOW_SBP.id)
                 if (vitalSigns.sbp != null && vitalSigns.sbp > SBP_HIGH)
-                    newYellows.add(TriageSymptom.HIGH_SBP.symptom.id)
+                    newYellows.add(TriageSymptom.HIGH_SBP.id)
             }
             PatientCategory.PEDIATRIC -> {
                 var rrUpperBound: Int
@@ -65,7 +65,7 @@ class ComputeSymptomsUseCase @Inject constructor(
                 when (ageInMonths / 12) {
                     0 -> {
                         if (ageInMonths < 6)
-                            newYellows.add(TriageSymptom.YOUNGER_THAN_SIX_MONTHS.symptom.id)
+                            newYellows.add(TriageSymptom.YOUNGER_THAN_SIX_MONTHS.id)
                         rrUpperBound = RR_HIGH_FOR_ONE_YEAR_OLDS
                         rrLowerBound = RR_LOW_FOR_ONE_YEAR_OLDS
                         hrUpperBound = HR_HIGH_FOR_ONE_YEAR_OLDS
@@ -89,22 +89,22 @@ class ComputeSymptomsUseCase @Inject constructor(
                     else -> return newYellows
                 }
                 if (vitalSigns.rr != null && vitalSigns.rr < rrLowerBound)
-                    newYellows.add(TriageSymptom.LOW_RR.symptom.id)
+                    newYellows.add(TriageSymptom.LOW_RR.id)
                 if (vitalSigns.rr != null && vitalSigns.rr > rrUpperBound)
-                    newYellows.add(TriageSymptom.HIGH_RR.symptom.id)
+                    newYellows.add(TriageSymptom.HIGH_RR.id)
                 if (vitalSigns.hr != null && vitalSigns.hr < hrLowerBound)
-                    newYellows.add(TriageSymptom.LOW_HR.symptom.id)
+                    newYellows.add(TriageSymptom.LOW_HR.id)
                 if (vitalSigns.hr != null && vitalSigns.hr > hrUpperBound)
-                    newYellows.add(TriageSymptom.HIGH_HR.symptom.id)
+                    newYellows.add(TriageSymptom.HIGH_HR.id)
             }
         }
         // Common
         if (vitalSigns.spo2 != null && vitalSigns.spo2 < SPO2_LOW)
-            newYellows.add(TriageSymptom.LOW_SPO2.symptom.id)
+            newYellows.add(TriageSymptom.LOW_SPO2.id)
         if (vitalSigns.temp != null && vitalSigns.temp < TEMP_LOW)
-            newYellows.add(TriageSymptom.LOW_TEMP.symptom.id)
+            newYellows.add(TriageSymptom.LOW_TEMP.id)
         if (vitalSigns.temp != null && vitalSigns.temp > TEMP_HIGH)
-            newYellows.add(TriageSymptom.HIGH_TEMP.symptom.id)
+            newYellows.add(TriageSymptom.HIGH_TEMP.id)
 
         return newYellows.toSet() // Make it immutable
 
@@ -122,17 +122,17 @@ class ComputeSymptomsUseCase @Inject constructor(
                 if (vitalSigns.sbp != null && vitalSigns.sbp >= PREGNANCY_HIGH_SBP ||
                     vitalSigns.dbp != null && vitalSigns.dbp >= PREGNANCY_HIGH_DBP
                 )
-                    newReds.add(TriageSymptom.PREGNANCY_HIGH_BP.symptom.id)
+                    newReds.add(TriageSymptom.PREGNANCY_HIGH_BP.id)
             }
             PatientCategory.PEDIATRIC -> {
 //                if (ageInMonths < 2 &&
 //                    vitalSigns.temp != null &&
 //                    (vitalSigns.temp < TEMP_LOW || vitalSigns.temp > TEMP_HIGH)
 //                )
-//                    newReds.add(TriageSymptom.YOUNGER_THAN_TWO_MONTHS_AND_LOW_OR_HIGH_TEMPERATURE.symptom.id)
+//                    newReds.add(TriageSymptom.YOUNGER_THAN_TWO_MONTHS_AND_LOW_OR_HIGH_TEMPERATURE.id)
             }
         }
-        return newReds.toSet() // Make it immutable
+        return newReds.toSet()
     }
 }
 
@@ -140,7 +140,7 @@ private fun Set<String>.resetComputedElements(): MutableSet<String> {
     return this.minus(
         TriageSymptom.entries
             .filter { it.isComputed }
-            .map { it.symptom.id }
+            .map { it.id }
             .toSet()
     ).toMutableSet()
 }

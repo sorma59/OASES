@@ -35,6 +35,7 @@ import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.unimib.oases.domain.model.symptom.TriageSymptom
 import com.unimib.oases.ui.components.input.LabeledCheckbox
 import com.unimib.oases.ui.components.util.FadeOverlay
 import com.unimib.oases.ui.components.util.ShowMoreArrow
@@ -57,7 +58,7 @@ fun RedCodeScreen(
     var pregnancyRowScrollTargetY by remember { mutableFloatStateOf(0f) }
 
     val handlePregnancyChangeAndScroll = { newPregnancyState: Boolean ->
-        onEvent(TriageEvent.FieldToggled("pregnancy"))
+        onEvent(TriageEvent.FieldToggled(TriageSymptom.PREGNANCY.id))
         if (newPregnancyState) { // Only scroll if it's being expanded
             coroutineScope.launch {
                 scrollState.animateScrollTo(
@@ -147,7 +148,9 @@ fun RedCodeScreen(
                                         modifier = if (it.symptom.parent != null) Modifier.padding(start = 16.dp) else Modifier
                                     )
 
-                                    if (it.symptom.isParent) {
+                                    if (it.symptom.id == TriageSymptom.PREGNANCY.id
+                                        && it.symptom.isParent
+                                    ) {
                                         ShowMoreArrow(
                                             expanded = state.selectedReds.contains(id),
                                             onClick = {

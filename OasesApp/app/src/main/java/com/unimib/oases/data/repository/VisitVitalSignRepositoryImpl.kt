@@ -47,4 +47,22 @@ class VisitVitalSignRepositoryImpl @Inject constructor(
             }
     }
 
+    override fun getVisitLatestVitalSigns(visitId: String): Flow<Resource<List<VisitVitalSign>>> = flow {
+        roomDataSource.getLatestVisitVitalSigns(visitId)
+            .onStart {
+                emit(Resource.Loading())
+            }
+            .catch { exception ->
+                Log.e(
+                    "VisitVitalSignRepository",
+                    "Error getting visit latest vital signs for visitId $visitId: ${exception.message}",
+                    exception
+                )
+                emit(Resource.Error(exception.message ?: "An error occurred"))
+            }
+            .collect { entities ->
+                val domainModels = entities.map { it.toDomain() }
+                emit(Resource.Success(domainModels))
+            }
+    }
 }

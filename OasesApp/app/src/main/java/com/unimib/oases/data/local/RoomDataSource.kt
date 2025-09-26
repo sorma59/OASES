@@ -23,7 +23,6 @@ import com.unimib.oases.data.local.model.User
 import com.unimib.oases.data.local.model.VisitEntity
 import com.unimib.oases.data.local.model.VisitVitalSignEntity
 import com.unimib.oases.data.local.model.VitalSignEntity
-import com.unimib.oases.domain.model.Room
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -194,6 +193,10 @@ class RoomDataSource @Inject constructor(
 
     fun getVisitVitalSigns(visitId: String): Flow<List<VisitVitalSignEntity>> {
         return visitVitalSignDao.getVisitVitalSigns(visitId)
+    }
+
+    fun getLatestVisitVitalSigns(visitId: String): Flow<List<VisitVitalSignEntity>> {
+        return visitVitalSignDao.getVisitLatestVitalSigns(visitId)
     }
 
     // -------------------Vital Signs--------------------

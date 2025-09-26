@@ -73,9 +73,9 @@ data object DyspneaRiskOfHIVTests: Condition {
     override val label = "This is a patient at risk of HIV. Order also an HIV test"
     override val predicate = { symptoms: Set<Symptom> ->
         !symptoms.contains(Symptom.HivPositive)
-        && symptoms.contains(Symptom.DyspneaInTheLastThirtyPlusDays)
-        || symptoms.contains(Symptom.DyspneaInTheLastFifteenToThirtyDays)
-        || symptoms.contains(Symptom.DyspneaCoughWithBlood)
+        && (symptoms.contains(Symptom.DyspneaInTheLastThirtyPlusDays)
+            || symptoms.contains(Symptom.DyspneaInTheLastFifteenToThirtyDays)
+            || symptoms.contains(Symptom.DyspneaCoughWithBlood))
     }
     override val suggestedTests = listOf(
         HIVTest()

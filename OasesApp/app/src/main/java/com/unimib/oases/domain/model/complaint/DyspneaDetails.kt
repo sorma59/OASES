@@ -80,7 +80,7 @@ data object DyspneaOtherHighRiskSymptoms: OtherHighRiskSymptomsQuestion() {
         Symptom.HistoryOfRenalOrLiverDisease,
         Symptom.SickleCellDisease,
         Symptom.ProlongedImmobilizationOrBedridden,
-        Symptom.Pregnancy,
+        Symptom.CurrentPregnancy,
         Symptom.Unvaccinated,
         Symptom.SmokingOrExposedToSmoke
     )

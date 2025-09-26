@@ -1,6 +1,5 @@
 package com.unimib.oases.ui.screen.medical_visit
 
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,11 +15,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.unimib.oases.domain.model.complaint.ComplaintId
 import com.unimib.oases.ui.components.util.CenteredTextInBox
 import com.unimib.oases.ui.components.util.TitleText
@@ -31,9 +33,12 @@ import com.unimib.oases.ui.screen.root.AppViewModel
 
 @Composable
 fun MedicalVisitScreen(
-    patientId: String,
     appViewModel: AppViewModel,
 ) {
+
+    val viewModel: MedicalVisitViewModel = hiltViewModel()
+
+    val state by viewModel.state.collectAsState()
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -46,11 +51,11 @@ fun MedicalVisitScreen(
 
         TitleText("View or edit PMH")
 
-        PastMedicalHistoryBox(patientId, appViewModel)
+        PastMedicalHistoryBox(state.patientId, appViewModel)
 
         HorizontalDivider()
 
-        MainComplaintsGrid(patientId, appViewModel)
+        MainComplaintsGrid(state.patientId, appViewModel)
     }
 }
 

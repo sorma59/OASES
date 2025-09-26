@@ -15,6 +15,7 @@ import com.unimib.oases.domain.usecase.AnswerImmediateTreatmentQuestionUseCase
 import com.unimib.oases.domain.usecase.GenerateSuggestedSupportiveTherapiesUseCase
 import com.unimib.oases.domain.usecase.GenerateSuggestedTestsUseCase
 import com.unimib.oases.domain.usecase.SelectSymptomUseCase
+import com.unimib.oases.domain.usecase.TranslateLatestVitalSignsToSymptomsUseCase
 import com.unimib.oases.domain.usecase.TranslateTriageSymptomIdsToSymptomsUseCase
 import com.unimib.oases.domain.usecase.VisitUseCase
 import com.unimib.oases.util.Resource
@@ -39,6 +40,7 @@ class MainComplaintViewModel @Inject constructor(
     private val generateSuggestedTestsUseCase: GenerateSuggestedTestsUseCase,
     private val generateSuggestedSupportiveTherapiesUseCase: GenerateSuggestedSupportiveTherapiesUseCase,
     private val translateTriageSymptomIdsToSymptomsUseCase: TranslateTriageSymptomIdsToSymptomsUseCase,
+    private val translateLatestVitalSignsToSymptomsUseCase: TranslateLatestVitalSignsToSymptomsUseCase,
     private val selectSymptomUseCase: SelectSymptomUseCase,
     private val visitUseCase: VisitUseCase,
     savedStateHandle: SavedStateHandle,
@@ -64,14 +66,13 @@ class MainComplaintViewModel @Inject constructor(
     )
     val state: StateFlow<MainComplaintState> = _state.asStateFlow()
 
-    val additionalTestsText: StateFlow<String> =
-        _state
-            .map { it.additionalTestsText }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000),
-                initialValue = ""
-            )
+    val additionalTestsText: StateFlow<String> = _state
+        .map { it.additionalTestsText }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = ""
+        )
 
     init {
         initialize()
@@ -83,6 +84,7 @@ class MainComplaintViewModel @Inject constructor(
             updateLoading(true)
             getPatientData()
             getTriageData()
+            getVitalSignsData()
             getComplaint()
             handleComplaint()
             updateLoading(false)
@@ -211,7 +213,7 @@ class MainComplaintViewModel @Inject constructor(
                             val ids = it.redSymptomIds + it.yellowSymptomIds
                             _state.update {
                                 it.copy(
-                                    symptoms = translateTriageSymptomIdsToSymptomsUseCase(ids)
+                                    symptoms = it.symptoms + translateTriageSymptomIdsToSymptomsUseCase(ids)
                                 )
                             }
                         }
@@ -223,6 +225,20 @@ class MainComplaintViewModel @Inject constructor(
 
                     else -> Unit
                 }
+            }
+        } catch (e: Exception) {
+            _state.update { it.copy(error = e.message) }
+        } finally {
+            _state.update { it.copy(isLoading = false) }
+        }
+    }
+
+    private suspend fun getVitalSignsData(){
+        try {
+            _state.update {
+                it.copy(
+                    symptoms = _state.value.symptoms + translateLatestVitalSignsToSymptomsUseCase(_state.value.patientId)
+                )
             }
         } catch (e: Exception) {
             _state.update { it.copy(error = e.message) }
