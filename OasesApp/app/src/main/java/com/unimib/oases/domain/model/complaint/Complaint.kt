@@ -1,11 +1,13 @@
 package com.unimib.oases.domain.model.complaint
 
+import com.unimib.oases.domain.model.complaint.binarytree.Tree
 import com.unimib.oases.domain.model.symptom.Symptom
 import com.unimib.oases.util.StringFormatHelper.SnakeCaseString
 import com.unimib.oases.util.StringFormatHelper.snakeCase
 
 sealed interface Complaint {
     val complaintId: ComplaintId
+    val immediateTreatmentTrees: List<Tree>
     val details: ComplaintDetails
     val tests: ComplaintTests
     val supportiveTherapies: ComplaintSupportiveTherapies
@@ -15,7 +17,8 @@ sealed interface Complaint {
 
 enum class ComplaintId(val value: SnakeCaseString) {
 
-    DIARRHEA(snakeCase("diarrhea"));
+    DIARRHEA(snakeCase("diarrhea")),
+    DYSPNEA(snakeCase("dyspnea"));
 
     val id: String
         get() = value.string

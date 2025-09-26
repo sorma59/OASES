@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -26,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.unimib.oases.domain.model.complaint.MultipleChoiceComplaintQuestion
@@ -71,12 +73,14 @@ fun MainComplaintScreen(){
         viewModel.onEvent(MainComplaintEvent.GenerateTestsPressed)
     }
 
-    val shouldShowGenerateTestsButton = remember {
+    val shouldShowGenerateTestsButton by remember {
         derivedStateOf {
-            state.detailsQuestions.isNotEmpty() &&
-            state.detailsQuestionsToShow == state.detailsQuestions.size
+            state.detailsQuestions.isNotEmpty()
+            && state.detailsQuestionsToShow == state.detailsQuestions.size
         }
     }
+
+    val onSubmit = { viewModel.onEvent(MainComplaintEvent.SubmitPressed) }
 
     LaunchedEffect(state.toastMessage){
         state.toastMessage?.let {
@@ -119,11 +123,10 @@ fun MainComplaintScreen(){
 
             GenerateTestsButton(
                 onGenerateTestsPressed,
-                shouldShowGenerateTestsButton.value
+                shouldShowGenerateTestsButton
             )
 
             state.complaint?.let {
-
 
                 Tests(
                     state,
@@ -136,8 +139,33 @@ fun MainComplaintScreen(){
                 SupportiveTherapies(state)
             }
 
+            SubmitButton(
+                onSubmit,
+                state.shouldShowSubmitButton
+            )
+
             Spacer(Modifier.height(256.dp))
         }
+}
+
+@Composable
+private fun SubmitButton(
+    onClick: () -> Unit,
+    visible: Boolean
+) {
+    if (visible) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.fillMaxWidth()
+        ){
+            Button(
+                onClick = onClick,
+                modifier = Modifier.size(256.dp, 64.dp)
+            ) {
+                TitleText("Submit")
+            }
+        }
+    }
 }
 
 @Composable
@@ -169,12 +197,13 @@ private fun GenerateTestsButton(
 ) {
     if (visible){
         Box(
-            Modifier.fillMaxWidth()
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.fillMaxWidth()
         ) {
             Button(
                 onClick = onClick
             ) {
-                Text("Suggest tests and supportive therapies")
+                Text("Suggest tests and supportive therapies", fontWeight = FontWeight.Bold)
             }
         }
     }
@@ -269,24 +298,41 @@ private fun ImmediateTreatmentQuestions(
     viewModel: MainComplaintViewModel,
     readOnly: Boolean = false
 ) {
-    Column{
-        for ((node, answer) in state.immediateTreatmentQuestions) {
+    state.complaint?.let {
 
-            YesOrNoQuestion(
-                question = node.value,
-                onAnswer = {
-                    viewModel.onEvent(MainComplaintEvent.NodeAnswered(it, node))
-                },
-                enabled = !readOnly,
-                answer = answer
-            )
-        }
+        val algorithms = state.immediateTreatmentAlgorithms.take(
+            state.immediateTreatmentAlgorithmsToShow
+        )
 
-        Spacer(Modifier.height(8.dp))
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        )  {
+            for ((index, algorithm) in algorithms.withIndex()) {
+                Column{
+                    for ((node, answer) in state.immediateTreatmentQuestions.elementAt(index)) {
 
-        state.immediateTreatment?.let {
-            TitleText("Immediate Treatment")
-            Text(it.text)
+                        YesOrNoQuestion(
+                            question = node.value,
+                            onAnswer = {
+                                viewModel.onEvent(MainComplaintEvent.NodeAnswered(it, node, algorithm))
+                            },
+                            enabled = !readOnly,
+                            answer = answer
+                        )
+                    }
+
+                    Spacer(Modifier.height(8.dp))
+
+                    if (state.immediateTreatments.isNotEmpty()){
+                        state.immediateTreatments.elementAt(index)?.let {
+                            TitleText("Immediate Treatment")
+                            Text(it.text)
+                            Spacer(Modifier.height(16.dp))
+                            HorizontalDivider(thickness = 0.8.dp)
+                        }
+                    }
+                }
+            }
         }
     }
 }

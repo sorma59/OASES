@@ -81,11 +81,28 @@ private fun MainComplaintsGrid(
         TitleText("Choose a main complaint")
 
         FlowRow(
-            Modifier.padding(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             DiarrheaBox(patientId, appViewModel)
+
+            DyspneaBox(patientId, appViewModel)
         }
     }
+}
+
+@Composable
+private fun DyspneaBox(
+    patientId: String,
+    appViewModel: AppViewModel
+) {
+    MedicalVisitBoxButton(
+        label = "Dyspnea",
+        destination = MainComplaintScreen.route +
+            "/patientId=${patientId}" +
+            "/complaintId=${ComplaintId.DYSPNEA.id}",
+        appViewModel
+    )
 }
 
 @Composable

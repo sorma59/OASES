@@ -760,15 +760,15 @@ class RegistrationScreenViewModel @Inject constructor(
 
     fun onBack() {
         val currentIndex = _state.value.currentStep
-        if (state.value.currentTab == Tab.CONTINUE_TO_TRIAGE && !mustSkipContinueToTriagePage() ||
+        if (state.value.currentTab == Tab.CONTINUE_TO_TRIAGE ||
             currentIndex == 0) {
             viewModelScope.launch(ioDispatcher + errorHandler){
                 navigationEventsChannel.send(NavigationEvent.NavigateBack)
             }
             return
         }
-        val previousIndex = calculatePreviousStep(currentIndex)
-        _state.update { it.copy(currentStep = previousIndex) }
+        val previousStep = calculatePreviousStep(currentIndex)
+        _state.update { it.copy(currentStep = previousStep) }
     }
 
     private fun calculateNextStep(currentIndex: Int): Int {

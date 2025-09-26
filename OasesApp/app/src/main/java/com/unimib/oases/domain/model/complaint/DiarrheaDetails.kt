@@ -2,7 +2,7 @@ package com.unimib.oases.domain.model.complaint
 
 import com.unimib.oases.domain.model.symptom.Symptom
 
-class DiarrheaDetails: ComplaintDetails {
+object DiarrheaDetails: ComplaintDetails {
 
     override val questions = listOf(
         DiarrheaDurationQuestion,

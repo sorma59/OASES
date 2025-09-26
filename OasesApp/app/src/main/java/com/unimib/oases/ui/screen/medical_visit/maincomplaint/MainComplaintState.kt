@@ -10,9 +10,11 @@ import com.unimib.oases.domain.model.complaint.Test
 import com.unimib.oases.domain.model.complaint.binarytree.Branch
 import com.unimib.oases.domain.model.complaint.binarytree.LeafNode
 import com.unimib.oases.domain.model.complaint.binarytree.ManualNode
+import com.unimib.oases.domain.model.complaint.binarytree.Tree
 import com.unimib.oases.domain.model.symptom.Symptom
 
-fun List<ImmediateTreatmentQuestionState>.rebranch(node: ManualNode, answer: Boolean): List<ImmediateTreatmentQuestionState> {
+fun List<ImmediateTreatmentQuestionState>.rebranch(node: ManualNode, answer: Boolean)
+: List<ImmediateTreatmentQuestionState> {
     var list = this.toMutableList()
     while(list.last().node != node){
         list.removeAt(list.lastIndex)
@@ -29,22 +31,25 @@ fun List<ImmediateTreatmentQuestionState>.rebranch(node: ManualNode, answer: Boo
  * with the leaf node of the complaint. It assumes that the `leaf` node is not null.
  *
  * @return A [Branch] representing the current path of questions and the final leaf node.
- * @throws Exception if the `leaf` node is null.
+ * @throws IllegalStateException if the `leaf` node is null.
  */
-fun MainComplaintState.toBranch(): Branch{
-    if (this.leaf == null) throw Exception("Leaf node is null")
-    return Branch(
-        nodes = this.immediateTreatmentQuestions.map { it.node } + listOf(this.leaf)
-    )
-}
+//fun MainComplaintState.toBranch(): Branch{
+//    check(this.leaf != null) {("Leaf node is null")}
+//    return Branch(
+//        nodes = this.immediateTreatmentQuestions.map { it.node } + listOf(this.leaf)
+//    )
+//}
 
 data class MainComplaintState(
     val patientId: String,
     val complaintId: String,
     val patient: Patient? = null,
     val complaint: Complaint? = null,
-    val immediateTreatmentQuestions: List<ImmediateTreatmentQuestionState> = emptyList(),
-    val leaf: LeafNode? = null,
+
+    val immediateTreatmentAlgorithmsToShow: Int = 0,
+    val immediateTreatmentAlgorithms: List<Tree> = emptyList(),
+    val immediateTreatmentQuestions: List<List<ImmediateTreatmentQuestionState>> = emptyList(),
+    val leaves: List<LeafNode?> = emptyList(),
 
     val detailsQuestions: List<ComplaintQuestion> = emptyList(),
     val detailsQuestionsToShow: Int = 0,
@@ -59,12 +64,14 @@ data class MainComplaintState(
 
     val supportiveTherapies: List<SupportiveTherapy>? = null,
 
+    val shouldShowSubmitButton: Boolean = false,
+
     val isLoading: Boolean = false,
     val toastMessage: String? = null,
     val error: String? = null
 ){
-    val immediateTreatment : ImmediateTreatment?
-        get() = leaf?.value
+    val immediateTreatments : List<ImmediateTreatment?>
+        get() = leaves.map { it?.value }
 }
 
 data class ImmediateTreatmentQuestionState(

@@ -4,7 +4,7 @@ import com.unimib.oases.domain.model.symptom.Fever
 import com.unimib.oases.domain.model.symptom.Pain
 import com.unimib.oases.domain.model.symptom.Symptom
 
-class DiarrheaSupportiveTherapies: ComplaintSupportiveTherapies {
+object DiarrheaSupportiveTherapies: ComplaintSupportiveTherapies {
     override val therapies = listOf(
         DiarrheaWithFeverOrPain,
         DiarrheaWithConvulsions,

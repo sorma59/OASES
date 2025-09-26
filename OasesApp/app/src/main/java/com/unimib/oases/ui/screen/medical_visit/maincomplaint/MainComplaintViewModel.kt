@@ -7,6 +7,7 @@ import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.model.complaint.ComplaintId
 import com.unimib.oases.domain.model.complaint.ComplaintQuestion
 import com.unimib.oases.domain.model.complaint.Diarrhea
+import com.unimib.oases.domain.model.complaint.Dyspnea
 import com.unimib.oases.domain.model.complaint.binarytree.ManualNode
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.domain.repository.TriageEvaluationRepository
@@ -103,6 +104,14 @@ class MainComplaintViewModel @Inject constructor(
                     }
                 }
 
+                ComplaintId.DYSPNEA.id -> {
+                    _state.update{
+                        it.copy(
+                            complaint = Dyspnea
+                        )
+                    }
+                }
+
                 else -> {
                     updateError("Complaint data not found")
                 }
@@ -115,17 +124,27 @@ class MainComplaintViewModel @Inject constructor(
     }
 
     private fun handleComplaint() {
+        setAlgorithms()
+        showFirstAlgorithm()
+        showFirstQuestion(_state.value.complaint!!.immediateTreatmentTrees.first().root)
+    }
 
-        when (_state.value.complaintId) {
-            ComplaintId.DIARRHEA.id -> {
-                showFirstQuestion((_state.value.complaint!! as Diarrhea).tree.root)
-            }
-
-            else -> {
-                updateError("Complaint data not found")
-            }
+    private fun setAlgorithms() {
+        _state.update {
+            val algorithms = it.complaint!!.immediateTreatmentTrees
+            it.copy(
+                immediateTreatmentAlgorithms = algorithms,
+                leaves = List(algorithms.size){ null }
+            )
         }
+    }
 
+    private fun showFirstAlgorithm() {
+        _state.update {
+            it.copy(
+                immediateTreatmentAlgorithmsToShow = 1
+            )
+        }
     }
 
     private fun updateError(error: String?) {
@@ -148,7 +167,9 @@ class MainComplaintViewModel @Inject constructor(
         _state.update {
             it.copy(
                 immediateTreatmentQuestions = listOf(
-                    ImmediateTreatmentQuestionState(firstNode)
+                    listOf(
+                        ImmediateTreatmentQuestionState(firstNode)
+                    )
                 )
             )
         }
@@ -214,7 +235,7 @@ class MainComplaintViewModel @Inject constructor(
         when(event){
             is MainComplaintEvent.NodeAnswered -> {
                 _state.update {
-                    answerImmediateTreatmentQuestionUseCase(event.answer, event.node, it)
+                    answerImmediateTreatmentQuestionUseCase(event.answer, event.node, event.tree, it)
                 }
             }
 
@@ -259,7 +280,16 @@ class MainComplaintViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         conditions = generateSuggestedTestsUseCase(it.complaint!!, it.symptoms),
-                        supportiveTherapies = generateSuggestedSupportiveTherapiesUseCase(it.complaint, it.symptoms)
+                        supportiveTherapies = generateSuggestedSupportiveTherapiesUseCase(it.complaint, it.symptoms),
+                        shouldShowSubmitButton = true
+                    )
+                }
+            }
+
+            MainComplaintEvent.SubmitPressed -> {
+                _state.update {
+                    it.copy(
+                        toastMessage = "Complaint submitted"
                     )
                 }
             }

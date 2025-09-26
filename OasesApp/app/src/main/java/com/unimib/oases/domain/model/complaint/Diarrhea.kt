@@ -6,11 +6,11 @@ class Diarrhea(ageInYears: Int): Complaint {
 
     override val complaintId = ComplaintId.DIARRHEA
 
-    val tree = DiarrheaTree(ageInYears)
+    override val immediateTreatmentTrees = listOf(DiarrheaTree(ageInYears))
 
-    override val details = DiarrheaDetails()
+    override val details = DiarrheaDetails
 
-    override val tests = DiarrheaTests()
+    override val tests = DiarrheaTests
 
-    override val supportiveTherapies = DiarrheaSupportiveTherapies()
+    override val supportiveTherapies = DiarrheaSupportiveTherapies
 }

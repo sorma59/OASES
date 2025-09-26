@@ -67,6 +67,12 @@ fun Set<Symptom>.select(symptom: Symptom): Set<Symptom> {
     return mutableSet.toSet()
 }
 
+fun <T> List<T>.replaceAt(index: Int, element: T): List<T>{
+    val list = this.toMutableList()
+    list[index] = element
+    return list
+}
+
 /**
 * This function makes the receiver react to the keyboard being shown or hidden.
 * It calculates the bottom inset of the keyboard and applies it to the receiver.

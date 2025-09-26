@@ -30,23 +30,24 @@ class DiarrheaTree(val ageInYears: Int): Tree {
     val shockOrSevereDehydrationWithoutMalnutritionAndFiveYearsOldOrOlderImmediateTreatment =
         ImmediateTreatment(
             """
-            This is a high-risk patient with shock/severe dehydration. Rapidly perform the following actions:
-            - set 2 large bore IV lines
-            - infuse IV fluids (Ringer's lactate or Normal Saline 0.9%) 20 ml/kg boluses according to response (repeat up to 3 times)
-            - assess response to fluid resuscitation by monitoring BP, HR, RR, capillary refill, mental status and urinary output
-            - after initial stabilization with fluid boluses, continue IV infusion with Ringer’s lactate (or Normal Saline 0.9%) 50 ml/kg in the first 4 hours (up to a maximum of 3 L)
-            - as soon as patient can drink, also give ORS 5 ml/kg/hour. In addition to ORS, other fluids such as soup, fruit juice and safe clean water may be given
-            - continued nutrition is important and food should be continued during treatment for dehydration
-            - consider hospitalizing the patient to continue treatment
+            This is a high-risk patient with shock/severe dehydration. 
+            Rapidly perform the following actions:
+                - set 2 large bore IV lines
+                - infuse IV fluids (Ringer's lactate or Normal Saline 0.9%) 20 ml/kg boluses according to response (repeat up to 3 times)
+                - assess response to fluid resuscitation by monitoring BP, HR, RR, capillary refill, mental status and urinary output
+                - after initial stabilization with fluid boluses, continue IV infusion with Ringer’s lactate (or Normal Saline 0.9%) 50 ml/kg in the first 4 hours (up to a maximum of 3 L)
+                - as soon as patient can drink, also give ORS 5 ml/kg/hour. In addition to ORS, other fluids such as soup, fruit juice and safe clean water may be given
+                - continued nutrition is important and food should be continued during treatment for dehydration
+                - consider hospitalizing the patient to continue treatment
 
             NB: If IV fluids are not available within 30 minutes, start rehydration by nasogastric tube (or by mouth) with ORS at 20 ml/kg/hr for 6 h (total: 120 ml/kg divided in 6 hours)This is a high-risk patient with shock/severe dehydration. Rapidly perform the following actions:
-            - set 2 large bore IV lines
-            - infuse IV fluids (Ringer's lactate or Normal Saline 0.9%) 20 ml/kg boluses according to response (repeat up to 3 times)
-            - assess response to fluid resuscitation by monitoring BP, HR, RR, capillary refill, mental status and urinary output
-            - after initial stabilization with fluid boluses, continue IV infusion with Ringer’s lactate (or Normal Saline 0.9%) 50 ml/kg in the first 4 hours (up to a maximum of 3 L)
-            - as soon as patient can drink, also give ORS 5 ml/kg/hour. In addition to ORS, other fluids such as soup, fruit juice and safe clean water may be given
-            - continued nutrition is important and food should be continued during treatment for dehydration
-            - consider hospitalizing the patient to continue treatment
+                - set 2 large bore IV lines
+                - infuse IV fluids (Ringer's lactate or Normal Saline 0.9%) 20 ml/kg boluses according to response (repeat up to 3 times)
+                - assess response to fluid resuscitation by monitoring BP, HR, RR, capillary refill, mental status and urinary output
+                - after initial stabilization with fluid boluses, continue IV infusion with Ringer’s lactate (or Normal Saline 0.9%) 50 ml/kg in the first 4 hours (up to a maximum of 3 L)
+                - as soon as patient can drink, also give ORS 5 ml/kg/hour. In addition to ORS, other fluids such as soup, fruit juice and safe clean water may be given
+                - continued nutrition is important and food should be continued during treatment for dehydration
+                - consider hospitalizing the patient to continue treatment
 
             NB: If IV fluids are not available within 30 minutes, start rehydration by nasogastric tube (or by mouth) with ORS at 20 ml/kg/hr for 6 h (total: 120 ml/kg divided in 6 hours)
         """.trimIndent()
@@ -56,15 +57,15 @@ class DiarrheaTree(val ageInYears: Int): Tree {
         ImmediateTreatment(
             """
             This is a high-risk patient with shock/severe dehydration. Rapidly perform the following actions:
-            - set 2 large bore IV lines
-            - infuse IV fluids (Ringer's lactate or Normal Saline 0.9%) 20 ml/kg boluses according to response (repeat up to 3 times)
-            - assess response to fluid resuscitation by monitoring BP, HR, RR, capillary refill, mental status and urinary output
-            - after initial stabilization with fluid boluses, continue IV infusion with Ringer’s lactate (or Normal Saline 0.9%) according to the following scheme:
-            If < 12 months: 30 ml/Kg in 1 hour, then 70 ml/kg in 5 hours
-            If > 12 months: 30 ml/Kg in 30 min, then 70 ml/kg in 2.5 hour
-            - as soon as patient can drink, also give ORS 5 ml/kg/hour. In addition to ORS, other fluids such as soup, fruit juice and safe clean water may be given
-            - continued nutrition is important and food should be continued during treatment for dehydration
-            - consider hospitalizing the patient to continue treatment. Otherwise, observe the child for at least 6 h after rehydration to be sure that the mother can maintain hydration by giving the child ORS solution by mouth.
+                - set 2 large bore IV lines
+                - infuse IV fluids (Ringer's lactate or Normal Saline 0.9%) 20 ml/kg boluses according to response (repeat up to 3 times)
+                - assess response to fluid resuscitation by monitoring BP, HR, RR, capillary refill, mental status and urinary output
+                - after initial stabilization with fluid boluses, continue IV infusion with Ringer’s lactate (or Normal Saline 0.9%) according to the following scheme:
+                   If < 12 months: 30 ml/Kg in 1 hour, then 70 ml/kg in 5 hours
+                   If > 12 months: 30 ml/Kg in 30 min, then 70 ml/kg in 2.5 hour
+                - as soon as patient can drink, also give ORS 5 ml/kg/hour. In addition to ORS, other fluids such as soup, fruit juice and safe clean water may be given
+                - continued nutrition is important and food should be continued during treatment for dehydration
+                - consider hospitalizing the patient to continue treatment. Otherwise, observe the child for at least 6 h after rehydration to be sure that the mother can maintain hydration by giving the child ORS solution by mouth.
 
             NB: If IV fluids are not available within 30 minutes, start rehydration by nasogastric tube (or by mouth) with ORS at 20 ml/kg/hr for 6 h (total: 120 ml/kg divided in 6 hours)
         """.trimIndent()
@@ -72,19 +73,20 @@ class DiarrheaTree(val ageInYears: Int): Tree {
 
     val moderateDehydrationAndMalnutritionImmediateTreatment = ImmediateTreatment(
         """
-            This is a high-risk patient with moderate dehydration and malnutrition. Rapidly perform the following actions:
-            - give oral ReSoMal 5 ml/kg every 30 min for the first 2 h.
-            - then continue oral ReSoMal 5–10 ml/kg per/hr for the next 4–10 h on alternate hours
-            - initiate re-feeding with starter F-75
-            - hospitalize high-risk malnourished children
+            This is a high-risk patient with moderate dehydration and malnutrition.
+            Rapidly perform the following actions:
+                - give oral ReSoMal 5 ml/kg every 30 min for the first 2 h.
+                - then continue oral ReSoMal 5–10 ml/kg per/hr for the next 4–10 h on alternate hours
+                - initiate re-feeding with starter F-75
+                - hospitalize high-risk malnourished children
         """.trimIndent()
     )
 
     val moderateDehydrationWithoutMalnutritionAndFiveYearsOldOrOlderImmediateTreatment = ImmediateTreatment(
         """
             This is a patient with moderate dehydration. Perform the following actions:
-            - give ORS 50 ml/kg in the first 4 hours. Initially, adults can take up to 750 ml ORS/hour (3 L in 4 hours)
-            - observe for at least 4hr, then if the patient improves and tolerates ORS, discharge with ORS
+                - give ORS 50 ml/kg in the first 4 hours. Initially, adults can take up to 750 ml ORS/hour (3 L in 4 hours)
+                - observe for at least 4hr, then if the patient improves and tolerates ORS, discharge with ORS
         """.trimIndent()
     )
 
@@ -92,9 +94,9 @@ class DiarrheaTree(val ageInYears: Int): Tree {
         ImmediateTreatment(
             """
             This is a patient with moderate dehydration. Perform the following actions:
-            - give ORS 75 ml/kg in the first 4 hours. Give frequent small sips from a cup. If the child vomits, wait 10 minutes, then continue more slowly
-            - for infants < 6 months who are not breastfed, also give 100-200 ml of clean water during the first 4 hours
-            - observe for at least 4 hr, then if the patient improves and tolerates ORS, discharge with ORS
+                - give ORS 75 ml/kg in the first 4 hours. Give frequent small sips from a cup. If the child vomits, wait 10 minutes, then continue more slowly
+                - for infants < 6 months who are not breastfed, also give 100-200 ml of clean water during the first 4 hours
+                - observe for at least 4 hr, then if the patient improves and tolerates ORS, discharge with ORS
         """.trimIndent()
         )
 
@@ -103,31 +105,31 @@ class DiarrheaTree(val ageInYears: Int): Tree {
     // Nodes
 
       // Leaves
-    val shockOrSevereDehydrationAndMalnutritionNode = LeafNode(
+    val shockOrSevereDehydrationAndMalnutritionLeaf = LeafNode(
           shockOrSevereDehydrationAndMalnutritionImmediateTreatment
       )
 
-    val shockOrSevereDehydrationWithoutMalnutritionAndFiveYearsOldOrOlderNode = LeafNode(
+    val shockOrSevereDehydrationWithoutMalnutritionAndFiveYearsOldOrOlderLeaf = LeafNode(
         shockOrSevereDehydrationWithoutMalnutritionAndFiveYearsOldOrOlderImmediateTreatment
     )
 
-    val shockOrSevereDehydrationWithoutMalnutritionAndYoungerThanFiveYearsOldNode = LeafNode(
+    val shockOrSevereDehydrationWithoutMalnutritionAndYoungerThanFiveYearsOldLeaf = LeafNode(
         shockOrSevereDehydrationWithoutMalnutritionAndYoungerThanFiveYearsOldImmediateTreatment
     )
 
-    val moderateDehydrationAndMalnutritionNode = LeafNode(
+    val moderateDehydrationAndMalnutritionLeaf = LeafNode(
         moderateDehydrationAndMalnutritionImmediateTreatment
     )
 
-    val moderateDehydrationWithoutMalnutritionAndFiveYearsOldOrOlderNode = LeafNode(
+    val moderateDehydrationWithoutMalnutritionAndFiveYearsOldOrOlderLeaf = LeafNode(
         moderateDehydrationWithoutMalnutritionAndFiveYearsOldOrOlderImmediateTreatment
     )
 
-    val moderateDehydrationWithoutMalnutritionAndYoungerThanFiveYearsOldNode = LeafNode(
+    val moderateDehydrationWithoutMalnutritionAndYoungerThanFiveYearsOldLeaf = LeafNode(
         moderateDehydrationWithoutMalnutritionAndYoungerThanFiveYearsOldImmediateTreatment
     )
 
-    val noShockNorSevereDehydrationAndNoMalnutritionNode = LeafNode(
+    val noShockNorSevereDehydrationAndNoMalnutritionLeaf = LeafNode(
         noShockNorSevereDehydrationAndNoMalnutritionTherapy
     )
 
@@ -135,8 +137,8 @@ class DiarrheaTree(val ageInYears: Int): Tree {
 
     val moderateDehydrationWithoutMalnutritionNode = AutoNode(
         children = Children(
-            left = moderateDehydrationWithoutMalnutritionAndFiveYearsOldOrOlderNode,
-            right = moderateDehydrationWithoutMalnutritionAndYoungerThanFiveYearsOldNode
+            left = moderateDehydrationWithoutMalnutritionAndFiveYearsOldOrOlderLeaf,
+            right = moderateDehydrationWithoutMalnutritionAndYoungerThanFiveYearsOldLeaf
         ),
         predicate = {
             ageInYears >= 5
@@ -145,8 +147,8 @@ class DiarrheaTree(val ageInYears: Int): Tree {
 
     val shockOrSevereDehydrationWithoutMalnutritionNode = AutoNode(
         children = Children(
-            left = shockOrSevereDehydrationWithoutMalnutritionAndFiveYearsOldOrOlderNode,
-            right = shockOrSevereDehydrationWithoutMalnutritionAndYoungerThanFiveYearsOldNode
+            left = shockOrSevereDehydrationWithoutMalnutritionAndFiveYearsOldOrOlderLeaf,
+            right = shockOrSevereDehydrationWithoutMalnutritionAndYoungerThanFiveYearsOldLeaf
         ),
         predicate = {
             ageInYears >= 5
@@ -156,7 +158,7 @@ class DiarrheaTree(val ageInYears: Int): Tree {
     val moderateDehydrationNode = ManualNode(
         value = malnutritionQuestion,
         children = Children(
-            left = moderateDehydrationAndMalnutritionNode,
+            left = moderateDehydrationAndMalnutritionLeaf,
             right = moderateDehydrationWithoutMalnutritionNode
         )
     )
@@ -164,7 +166,7 @@ class DiarrheaTree(val ageInYears: Int): Tree {
     val shockOrSevereDehydrationNode = ManualNode(
         value = malnutritionQuestion,
         children = Children(
-            left = shockOrSevereDehydrationAndMalnutritionNode,
+            left = shockOrSevereDehydrationAndMalnutritionLeaf,
             right = shockOrSevereDehydrationWithoutMalnutritionNode
         )
     )
@@ -173,7 +175,7 @@ class DiarrheaTree(val ageInYears: Int): Tree {
         value = moderateDehydrationQuestion,
         children = Children(
             left = moderateDehydrationNode,
-            right = noShockNorSevereDehydrationAndNoMalnutritionNode
+            right = noShockNorSevereDehydrationAndNoMalnutritionLeaf
         )
     )
 

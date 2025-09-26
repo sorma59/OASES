@@ -1,17 +1,17 @@
 package com.unimib.oases.domain.model.complaint
 
-import com.unimib.oases.domain.model.complaint.Test.BloodSmearForMalariaParasites
-import com.unimib.oases.domain.model.complaint.Test.CompleteBloodCount
+import com.unimib.oases.domain.model.complaint.Test.BloodSmearForMalariaParasitesTest
+import com.unimib.oases.domain.model.complaint.Test.CompleteBloodCountTest
 import com.unimib.oases.domain.model.complaint.Test.MalariaRapidDiagnosticTest
-import com.unimib.oases.domain.model.complaint.Test.RapidBloodSugar
+import com.unimib.oases.domain.model.complaint.Test.RapidBloodSugarTest
 import com.unimib.oases.domain.model.symptom.Symptom
 
-class DiarrheaTests: ComplaintTests {
+object DiarrheaTests: ComplaintTests {
     override val conditions = listOf(
         DiarrheaBasicTests,
         DiarrheaRiskOfBacterialOrParasiticInfectionsTests,
         DiarrheaRiskOfToxicMegacolonOrIntestinalOcclusionOrPerforation,
-        DiarrheaRiskOfHIV
+        DiarrheaRiskOfHIVTests
     )
 }
 
@@ -19,16 +19,16 @@ data object DiarrheaBasicTests: Condition {
     override val label: String = "Consider ordering the following diagnostic tests"
     override val predicate = { symptoms: Set<Symptom> -> true }
     override val suggestedTests: List<Test> = listOf(
-        RapidBloodSugar(
+        RapidBloodSugarTest(
             label = "Rapid blood sugar (RBS) in patients with severe illness, inability to breastfeed, malnutrition, altered mental status, convulsions"
         ),
-        CompleteBloodCount(
+        CompleteBloodCountTest(
             label = "Complete blood count (CBC) in patients with severe illness, suspected sepsis, signs of anemia, suspected HUS (easy bruising)"
         ),
         MalariaRapidDiagnosticTest(
             label = "Malaria rapid diagnostic test (MRDT) in patients with severe illness, fever, pallor"
         ),
-        BloodSmearForMalariaParasites(
+        BloodSmearForMalariaParasitesTest(
             label = "Blood smear for malaria parasites (B/S) in patients with severe illness, fever, pallor"
         )
     )
@@ -37,11 +37,11 @@ data object DiarrheaBasicTests: Condition {
 data object DiarrheaRiskOfBacterialOrParasiticInfectionsTests: Condition {
     override val label = "This is a patient at risk of bacterial/parasitic infections. Order also the following diagnostic tests"
     override val predicate = { symptoms: Set<Symptom> ->
-        symptoms.contains(Symptom.HivPositive) ||
-                symptoms.contains(Symptom.DiarrheaInTheLastOneToSevenDays) ||
-                symptoms.contains(Symptom.DiarrheaInTheLastThirtyPlusDays) ||
-                symptoms.contains(Symptom.DiarrheaBloodyStools) ||
-                symptoms.contains(Symptom.DiarrheaOilyOrGreasyOrFoulSmellingStools)
+        symptoms.contains(Symptom.HivPositive)
+        || symptoms.contains(Symptom.DiarrheaInTheLastFifteenToThirtyDays)
+        || symptoms.contains(Symptom.DiarrheaInTheLastThirtyPlusDays)
+        || symptoms.contains(Symptom.DiarrheaBloodyStools)
+        || symptoms.contains(Symptom.DiarrheaOilyOrGreasyOrFoulSmellingStools)
     }
     override val suggestedTests = listOf(
         Test.StoolMicroscopy()
@@ -58,13 +58,13 @@ data object DiarrheaRiskOfToxicMegacolonOrIntestinalOcclusionOrPerforation: Cond
     )
 }
 
-data object DiarrheaRiskOfHIV: Condition {
-    override val label = "This is a patient at risk of HIV due to chronic diarrhea. Order also an HIV test"
+data object DiarrheaRiskOfHIVTests: Condition {
+    override val label = "This is a patient at risk of HIVTest due to chronic diarrhea. Order also an HIVTest test"
     override val predicate = { symptoms: Set<Symptom> ->
-        !symptoms.contains(Symptom.HivPositive) &&
-                symptoms.contains(Symptom.DiarrheaInTheLastThirtyPlusDays)
+        !symptoms.contains(Symptom.HivPositive)
+        && symptoms.contains(Symptom.DiarrheaInTheLastThirtyPlusDays)
     }
     override val suggestedTests = listOf(
-        Test.HIV()
+        Test.HIVTest()
     )
 }
