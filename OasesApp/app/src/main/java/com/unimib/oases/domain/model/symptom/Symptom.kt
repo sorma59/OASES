@@ -2,13 +2,16 @@ package com.unimib.oases.domain.model.symptom
 
 import com.unimib.oases.domain.model.symptom.SymptomId.AbdominalDistensionAndTendernessWithAlteredBowelSoundsId
 import com.unimib.oases.domain.model.symptom.SymptomId.AbdominalPainId
+import com.unimib.oases.domain.model.symptom.SymptomId.AbsenceOfStatusEpilepticusId
 import com.unimib.oases.domain.model.symptom.SymptomId.AcuteLimbDeformityOrOpenFractureId
 import com.unimib.oases.domain.model.symptom.SymptomId.AcuteTesticularOrScrotalPainOrPriapismId
 import com.unimib.oases.domain.model.symptom.SymptomId.AgeOverEightyYearsId
 import com.unimib.oases.domain.model.symptom.SymptomId.AggressiveBehaviorId
 import com.unimib.oases.domain.model.symptom.SymptomId.AirwaySwellingOrMassOfMouthOrThroatOrNeckId
+import com.unimib.oases.domain.model.symptom.SymptomId.AlertLevelOfConsciousnessId
 import com.unimib.oases.domain.model.symptom.SymptomId.AnimalBiteOrNeedlestickPunctureId
 import com.unimib.oases.domain.model.symptom.SymptomId.AsthmaCOPDHistoryId
+import com.unimib.oases.domain.model.symptom.SymptomId.BulgingFontanelleId
 import com.unimib.oases.domain.model.symptom.SymptomId.CardiacMurmurAtChestAuscultationId
 import com.unimib.oases.domain.model.symptom.SymptomId.ChestPainId
 import com.unimib.oases.domain.model.symptom.SymptomId.CholeraOutbreakId
@@ -16,6 +19,7 @@ import com.unimib.oases.domain.model.symptom.SymptomId.CloseContactWithKnownTube
 import com.unimib.oases.domain.model.symptom.SymptomId.ConvulsionsId
 import com.unimib.oases.domain.model.symptom.SymptomId.CracklesAtChestAuscultationId
 import com.unimib.oases.domain.model.symptom.SymptomId.DecreasedBreathSoundsAtChestAuscultationId
+import com.unimib.oases.domain.model.symptom.SymptomId.DiabetesId
 import com.unimib.oases.domain.model.symptom.SymptomId.DiarrheaBloodyStoolsId
 import com.unimib.oases.domain.model.symptom.SymptomId.DiarrheaEpisodesOnceOrTwiceADayId
 import com.unimib.oases.domain.model.symptom.SymptomId.DiarrheaEpisodesSixOrMoreTimesADayId
@@ -39,8 +43,12 @@ import com.unimib.oases.domain.model.symptom.SymptomId.DyspneaProgressiveCourseI
 import com.unimib.oases.domain.model.symptom.SymptomId.DyspneaRecurrentCourseId
 import com.unimib.oases.domain.model.symptom.SymptomId.EasyBruisingId
 import com.unimib.oases.domain.model.symptom.SymptomId.EdemaOfBothFeetId
+import com.unimib.oases.domain.model.symptom.SymptomId.EpilepsyOrHistoryOfRecurrentUnprovokedSeizuresId
 import com.unimib.oases.domain.model.symptom.SymptomId.FeverAboveThirtyEightDegrees
 import com.unimib.oases.domain.model.symptom.SymptomId.FocalNeurologicDeficitOrFocalVisualDeficitId
+import com.unimib.oases.domain.model.symptom.SymptomId.FocalNeurologicalDeficitId
+import com.unimib.oases.domain.model.symptom.SymptomId.HeadInjuryId
+import com.unimib.oases.domain.model.symptom.SymptomId.HeadacheOrCervicalPainId
 import com.unimib.oases.domain.model.symptom.SymptomId.HeadacheWithStiffNeckId
 import com.unimib.oases.domain.model.symptom.SymptomId.HeavyBleedingId
 import com.unimib.oases.domain.model.symptom.SymptomId.HighHrId
@@ -56,6 +64,8 @@ import com.unimib.oases.domain.model.symptom.SymptomId.HypoglycemiaId
 import com.unimib.oases.domain.model.symptom.SymptomId.HypotensionId
 import com.unimib.oases.domain.model.symptom.SymptomId.InabilityToBreastfeedOrDrinkId
 import com.unimib.oases.domain.model.symptom.SymptomId.IrregularPulseOrIrregularHeartSoundsId
+import com.unimib.oases.domain.model.symptom.SymptomId.IrritabilityOrConfusionId
+import com.unimib.oases.domain.model.symptom.SymptomId.JaundiceId
 import com.unimib.oases.domain.model.symptom.SymptomId.LethargyId
 import com.unimib.oases.domain.model.symptom.SymptomId.LethargyOrConfusionOrAgitationId
 import com.unimib.oases.domain.model.symptom.SymptomId.LethargyOrRestlessOrIrritableOrConfusedId
@@ -73,8 +83,10 @@ import com.unimib.oases.domain.model.symptom.SymptomId.NonHighRiskPregnancyRelat
 import com.unimib.oases.domain.model.symptom.SymptomId.NonHighRiskTraumaId
 import com.unimib.oases.domain.model.symptom.SymptomId.NonMajorBurnsId
 import com.unimib.oases.domain.model.symptom.SymptomId.OngoingSevereVomitingOrOngoingSevereDiarrheaId
+import com.unimib.oases.domain.model.symptom.SymptomId.OpisthotonusId
 import com.unimib.oases.domain.model.symptom.SymptomId.OrthopneaOrParoxysmalNocturnalDyspneaId
 import com.unimib.oases.domain.model.symptom.SymptomId.PeripheralEdemaOrJugularVenousDistensionId
+import com.unimib.oases.domain.model.symptom.SymptomId.PetechialRashOrPurpuraId
 import com.unimib.oases.domain.model.symptom.SymptomId.PoisoningIntoxicationId
 import com.unimib.oases.domain.model.symptom.SymptomId.PregnancyId
 import com.unimib.oases.domain.model.symptom.SymptomId.PregnancyWithActiveLaborId
@@ -92,7 +104,16 @@ import com.unimib.oases.domain.model.symptom.SymptomId.RecentChestTraumaId
 import com.unimib.oases.domain.model.symptom.SymptomId.RecentChokingOrForeignBodyInhalationId
 import com.unimib.oases.domain.model.symptom.SymptomId.RecentFaintingId
 import com.unimib.oases.domain.model.symptom.SymptomId.RespiratoryDistressId
+import com.unimib.oases.domain.model.symptom.SymptomId.ResponsiveToPainLevelOfConsciousnessId
+import com.unimib.oases.domain.model.symptom.SymptomId.ResponsiveToVoiceLevelOfConsciousnessId
 import com.unimib.oases.domain.model.symptom.SymptomId.RunnyNoseOrSneezingOrSoreThroatId
+import com.unimib.oases.domain.model.symptom.SymptomId.SeizuresOrComaAbsenceOfSeizuresId
+import com.unimib.oases.domain.model.symptom.SymptomId.SeizuresOrComaFocalSeizuresId
+import com.unimib.oases.domain.model.symptom.SymptomId.SeizuresOrComaGeneralizedMotorSeizuresId
+import com.unimib.oases.domain.model.symptom.SymptomId.SeizuresOrComaInTheLastEightToFourteenDaysId
+import com.unimib.oases.domain.model.symptom.SymptomId.SeizuresOrComaInTheLastFifteenToThirtyDaysId
+import com.unimib.oases.domain.model.symptom.SymptomId.SeizuresOrComaInTheLastOneToSevenDaysId
+import com.unimib.oases.domain.model.symptom.SymptomId.SeizuresOrComaInTheLastThirtyPlusDaysId
 import com.unimib.oases.domain.model.symptom.SymptomId.SevereDehydrationId
 import com.unimib.oases.domain.model.symptom.SymptomId.SevereMalnutritionId
 import com.unimib.oases.domain.model.symptom.SymptomId.SeverePainId
@@ -102,11 +123,17 @@ import com.unimib.oases.domain.model.symptom.SymptomId.ShockId
 import com.unimib.oases.domain.model.symptom.SymptomId.SickleCellDiseaseId
 import com.unimib.oases.domain.model.symptom.SymptomId.SmokingOrExposedToSmokeId
 import com.unimib.oases.domain.model.symptom.SymptomId.SnakeBiteId
+import com.unimib.oases.domain.model.symptom.SymptomId.StatusEpilepticusId
+import com.unimib.oases.domain.model.symptom.SymptomId.StiffNeckId
+import com.unimib.oases.domain.model.symptom.SymptomId.SuspectOfAlcoholUseOrWithdrawalId
+import com.unimib.oases.domain.model.symptom.SymptomId.SuspectOfDrugOrToxinIngestionId
 import com.unimib.oases.domain.model.symptom.SymptomId.SwellingOrPainOrWarmthOrRednessOfOneLegId
 import com.unimib.oases.domain.model.symptom.SymptomId.ThreatenedLimbId
 import com.unimib.oases.domain.model.symptom.SymptomId.UnableToFeedOrDrinkId
 import com.unimib.oases.domain.model.symptom.SymptomId.UnableToPassUrineId
 import com.unimib.oases.domain.model.symptom.SymptomId.UnconsciousnessId
+import com.unimib.oases.domain.model.symptom.SymptomId.UnequalPupilsId
+import com.unimib.oases.domain.model.symptom.SymptomId.UnresponsiveLevelOfConsciousnessId
 import com.unimib.oases.domain.model.symptom.SymptomId.UnvaccinatedId
 import com.unimib.oases.domain.model.symptom.SymptomId.VomitingId
 import com.unimib.oases.domain.model.symptom.SymptomId.WeightLossId
@@ -120,8 +147,6 @@ import com.unimib.oases.util.StringFormatHelper.snakeCase
 sealed interface Symptom {
     val symptomId: SymptomId
     val label: String
-    val group: SymptomGroup?
-        get() = null
 
     val id: String
         get() = symptomId.value.string
@@ -202,7 +227,7 @@ sealed interface Symptom {
         override val symptomId = PregnancyWithSevereAbdominalPainId
         override val label = "Severe abdominal pain"
     }
-    data object PregnancyWithSeizures: Symptom , Pregnancy{
+    data object PregnancyWithSeizures: Symptom , Pregnancy, Seizures{
         override val symptomId = PregnancyWithSeizuresId
         override val label = "Seizures"
     }
@@ -372,133 +397,179 @@ sealed interface Symptom {
 
     //---------------------------------------------------
 
-    data object DiarrheaInTheLastOneToSevenDays: Symptom {
+    data object DiarrheaInTheLastOneToSevenDays: Symptom, DiarrheaDuration {
         override val symptomId = DiarrheaInTheLastOneToSevenDaysId
         override val label = "1-7 days"
-        override val group = SymptomGroup.DiarrheaDuration
     }
 
-    data object DiarrheaInTheLastEightToFourteenDays: Symptom {
+    data object DiarrheaInTheLastEightToFourteenDays: Symptom, DiarrheaDuration {
         override val symptomId = DiarrheaInTheLastEightToFourteenDaysId
         override val label = "8-14 days"
-        override val group = SymptomGroup.DiarrheaDuration
     }
 
-    data object DiarrheaInTheLastFifteenToThirtyDays: Symptom {
+    data object DiarrheaInTheLastFifteenToThirtyDays: Symptom, DiarrheaDuration{
         override val symptomId = DiarrheaInTheLastFifteenToThirtyDaysId
         override val label = "15-30 days"
-        override val group = SymptomGroup.DiarrheaDuration
     }
 
-    data object DiarrheaInTheLastThirtyPlusDays: Symptom {
+    data object DiarrheaInTheLastThirtyPlusDays: Symptom, DiarrheaDuration {
         override val symptomId = DiarrheaInTheLastThirtyPlusDaysId
         override val label = "30+ days"
-        override val group = SymptomGroup.DiarrheaDuration
     }
 
 
-    data object DiarrheaEpisodesOnceOrTwiceADay: Symptom {
+    data object DiarrheaEpisodesOnceOrTwiceADay: Symptom, DiarrheaFrequency {
         override val symptomId = DiarrheaEpisodesOnceOrTwiceADayId
         override val label = "1-2 episodes/day"
-        override val group = SymptomGroup.DiarrheaFrequency
     }
 
-    data object DiarrheaEpisodesThreeToFiveTimesADay: Symptom {
+    data object DiarrheaEpisodesThreeToFiveTimesADay: Symptom, DiarrheaFrequency {
         override val symptomId = DiarrheaEpisodesThreeToFiveTimesADayId
         override val label = "3-5 episodes/day"
-        override val group = SymptomGroup.DiarrheaFrequency
     }
 
-    data object DiarrheaEpisodesSixOrMoreTimesADay: Symptom {
+    data object DiarrheaEpisodesSixOrMoreTimesADay: Symptom, DiarrheaFrequency {
         override val symptomId = DiarrheaEpisodesSixOrMoreTimesADayId
         override val label = "6+ episodes/day"
-        override val group = SymptomGroup.DiarrheaFrequency
     }
 
-    data object DiarrheaWateryStools: Symptom {
+    data object DiarrheaWateryStools: Symptom, DiarrheaAspect {
         override val symptomId = DiarrheaWateryStoolsId
         override val label = "watery"
-        override val group = SymptomGroup.DiarrheaAspect
     }
 
-    data object DiarrheaBloodyStools: Symptom {
+    data object DiarrheaBloodyStools: Symptom, DiarrheaAspect {
         override val symptomId = DiarrheaBloodyStoolsId
         override val label = "with blood"
-        override val group = SymptomGroup.DiarrheaAspect
     }
 
-    data object DiarrheaOilyOrGreasyOrFoulSmellingStools: Symptom {
+    data object DiarrheaOilyOrGreasyOrFoulSmellingStools: Symptom, DiarrheaAspect {
         override val symptomId = DiarrheaOilyOrGreasyOrFoulSmellingStoolsId
         override val label = "oily/greasy/foul-smelling"
-        override val group = SymptomGroup.DiarrheaAspect
     }
 
     // Dyspnea
 
-    data object DyspneaInTheLastOneToSevenDays: Symptom {
+    data object DyspneaInTheLastOneToSevenDays: Symptom, DyspneaDuration {
         override val symptomId = DyspneaInTheLastOneToSevenDaysId
         override val label = "1-7 days"
-        override val group = SymptomGroup.DyspneaDuration
     }
 
-    data object DyspneaInTheLastEightToFourteenDays: Symptom {
+    data object DyspneaInTheLastEightToFourteenDays: Symptom, DyspneaDuration {
         override val symptomId = DyspneaInTheLastEightToFourteenDaysId
         override val label = "8-14 days"
-        override val group = SymptomGroup.DyspneaDuration
     }
 
-    data object DyspneaInTheLastFifteenToThirtyDays: Symptom {
+    data object DyspneaInTheLastFifteenToThirtyDays: Symptom, DyspneaDuration {
         override val symptomId = DyspneaInTheLastFifteenToThirtyDaysId
         override val label = "15-30 days"
-        override val group = SymptomGroup.DyspneaDuration
     }
 
-    data object DyspneaInTheLastThirtyPlusDays: Symptom {
+    data object DyspneaInTheLastThirtyPlusDays: Symptom, DyspneaDuration {
         override val symptomId = DyspneaInTheLastThirtyPlusDaysId
         override val label = "30+ days"
-        override val group = SymptomGroup.DyspneaDuration
     }
 
-    data object DyspneaAcuteCourse: Symptom {
+    data object DyspneaAcuteCourse: Symptom, DyspneaCourse {
         override val symptomId = DyspneaAcuteCourseId
         override val label = "Acute (new onset)"
-        override val group = SymptomGroup.DyspneaCourse
     }
 
-    data object DyspneaProgressiveCourse: Symptom {
+    data object DyspneaProgressiveCourse: Symptom, DyspneaCourse {
         override val symptomId = DyspneaProgressiveCourseId
         override val label = "Progressive (worsening over days/weeks)"
-        override val group = SymptomGroup.DyspneaCourse
     }
 
-    data object DyspneaRecurrentCourse: Symptom {
+    data object DyspneaRecurrentCourse: Symptom, DyspneaCourse {
         override val symptomId = DyspneaRecurrentCourseId
         override val label = "Recurrent (previous similar episodes with symptom-free gaps)"
-        override val group = SymptomGroup.DyspneaCourse
     }
 
-    data object DyspneaDryCough: Symptom {
+    data object DyspneaDryCough: Symptom, DyspneaCoughAspect {
         override val symptomId = DyspneaDryCoughId
         override val label = "dry"
-        override val group = SymptomGroup.DyspneaCoughAspect
     }
 
-    data object DyspneaCoughWithMucous: Symptom {
+    data object DyspneaCoughWithMucous: Symptom, DyspneaCoughAspect {
         override val symptomId = DyspneaCoughWithMucousId
         override val label = "with mucous"
-        override val group = SymptomGroup.DyspneaCoughAspect
     }
 
-    data object DyspneaCoughWithBlood: Symptom {
+    data object DyspneaCoughWithBlood: Symptom, DyspneaCoughAspect {
         override val symptomId = DyspneaCoughWithBloodId
         override val label = "with blood"
-        override val group = SymptomGroup.DyspneaCoughAspect
     }
 
-    data object DyspneaParoxysmalCoughWithWhoopsOrCentralCyanosisOrVomiting: Symptom {
+    data object DyspneaParoxysmalCoughWithWhoopsOrCentralCyanosisOrVomiting: Symptom, DyspneaCoughAspect {
         override val symptomId = DyspneaParoxysmalCoughWithWhoopsOrCentralCyanosisOrVomitingId
         override val label = "paroxysms with whoops/central cyanosis/vomiting"
-        override val group = SymptomGroup.DyspneaCoughAspect
+    }
+
+    // Seizures-Coma
+
+    data object AlertLevelOfConsciousness: Symptom, SeizuresOrComaConsciousness {
+        override val symptomId = AlertLevelOfConsciousnessId
+        override val label = "A (Alert)"
+    }
+
+    data object ResponsiveToVoiceLevelOfConsciousness: Symptom, SeizuresOrComaConsciousness {
+        override val symptomId = ResponsiveToVoiceLevelOfConsciousnessId
+        override val label = "V (Responsive to Voice)"
+    }
+
+    data object ResponsiveToPainLevelOfConsciousness: Symptom, SeizuresOrComaConsciousness {
+        override val symptomId = ResponsiveToPainLevelOfConsciousnessId
+        override val label = "P (Responsive to Pain)"
+    }
+
+    data object UnresponsiveLevelOfConsciousness: Symptom, SeizuresOrComaConsciousness {
+        override val symptomId = UnresponsiveLevelOfConsciousnessId
+        override val label = "U (Unresponsive)"
+    }
+
+    data object SeizuresOrComaInTheLastOneToSevenDays: Symptom, SeizuresOrComaDuration {
+        override val symptomId = SeizuresOrComaInTheLastOneToSevenDaysId
+        override val label = "1-7 days"
+    }
+
+    data object SeizuresOrComaInTheLastEightToFourteenDays: Symptom, SeizuresOrComaDuration {
+        override val symptomId = SeizuresOrComaInTheLastEightToFourteenDaysId
+        override val label = "8-14 days"
+    }
+
+    data object SeizuresOrComaInTheLastFifteenToThirtyDays: Symptom, SeizuresOrComaDuration {
+        override val symptomId = SeizuresOrComaInTheLastFifteenToThirtyDaysId
+        override val label = "15-30 days"
+    }
+
+    data object SeizuresOrComaInTheLastThirtyPlusDays: Symptom, SeizuresOrComaDuration {
+        override val symptomId = SeizuresOrComaInTheLastThirtyPlusDaysId
+        override val label = "30+ days"
+    }
+
+    data object StatusEpilepticus: Symptom, AbsenceOrPresenceOfStatusEpilepticus {
+        override val symptomId = StatusEpilepticusId
+        override val label = "Status epilepticus"
+    }
+
+    data object AbsenceOfStatusEpilepticus: Symptom, AbsenceOrPresenceOfStatusEpilepticus {
+        override val symptomId = AbsenceOfStatusEpilepticusId
+        override val label = "Absence of status epilepticus"
+    }
+
+    data object SeizuresOrComaFocalSeizures: Symptom, Seizures, SeizuresType {
+        override val symptomId = SeizuresOrComaFocalSeizuresId
+        override val label = "focal"
+    }
+
+    data object SeizuresOrComaGeneralizedMotorSeizures: Symptom, Seizures, SeizuresType {
+        override val symptomId = SeizuresOrComaGeneralizedMotorSeizuresId
+        override val label = "generalized motor (e.g. tonic-clonic)"
+    }
+
+    data object SeizuresOrComaAbsenceOfSeizures: Symptom, SeizuresType {
+        override val symptomId = SeizuresOrComaAbsenceOfSeizuresId
+        override val label = "absence"
     }
     //--------------------------------------------
 
@@ -606,6 +677,53 @@ sealed interface Symptom {
         override val symptomId = SwellingOrPainOrWarmthOrRednessOfOneLegId
         override val label = "Swelling, pain, warmth, redness of one leg"
     }
+
+    // Seizures-Coma
+
+    data object IrritabilityOrConfusion: Symptom {
+        override val symptomId = IrritabilityOrConfusionId
+        override val label = "Irritability or confusion"
+    }
+
+    data object HeadacheOrCervicalPain: Symptom {
+        override val symptomId = HeadacheOrCervicalPainId
+        override val label = "Headache or cervical pain"
+    }
+
+    data object StiffNeck: Symptom {
+        override val symptomId = StiffNeckId
+        override val label = "Stiff neck"
+    }
+
+    data object BulgingFontanelle: Symptom {
+        override val symptomId = BulgingFontanelleId
+        override val label = "Bulging fontanelle"
+    }
+
+    data object FocalNeurologicalDeficit: Symptom {
+        override val symptomId = FocalNeurologicalDeficitId
+        override val label = "Focal neurological deficit"
+    }
+
+    data object UnequalPupils: Symptom {
+        override val symptomId = UnequalPupilsId
+        override val label = "Unequal pupils"
+    }
+
+    data object Opisthotonus: Symptom {
+        override val symptomId = OpisthotonusId
+        override val label = "Opisthotonus (rigid posture)"
+    }
+
+    data object PetechialRashOrPurpura: Symptom {
+        override val symptomId = PetechialRashOrPurpuraId
+        override val label = "Petechial rash or purpura"
+    }
+
+    data object Jaundice: Symptom {
+        override val symptomId = JaundiceId
+        override val label = "Jaundice"
+    }
     // --------High-risk------------
 
     data object HivPositive: Symptom {
@@ -668,6 +786,32 @@ sealed interface Symptom {
     data object SmokingOrExposedToSmoke: Symptom {
         override val symptomId = SmokingOrExposedToSmokeId
         override val label = "Smoking / exposure to smoke"
+    }
+
+    // Seizures-Coma
+    data object EpilepsyOrHistoryOfRecurrentUnprovokedSeizures: Symptom {
+        override val symptomId = EpilepsyOrHistoryOfRecurrentUnprovokedSeizuresId
+        override val label = "Known epilepsy or history of recurrent unprovoked seizures"
+    }
+
+    data object HeadInjury: Symptom {
+        override val symptomId = HeadInjuryId
+        override val label = "Head injury"
+    }
+
+    data object SuspectOfDrugOrToxinIngestion: Symptom {
+        override val symptomId = SuspectOfDrugOrToxinIngestionId
+        override val label = "Suspect of drug/toxin ingestion"
+    }
+
+    data object SuspectOfAlcoholUseOrWithdrawal: Symptom {
+        override val symptomId = SuspectOfAlcoholUseOrWithdrawalId
+        override val label = "Suspect of alcohol use/withdrawal"
+    }
+
+    data object Diabetes: Symptom {
+        override val symptomId = DiabetesId
+        override val label = "Diabetes"
     }
 
     companion object {
@@ -762,6 +906,21 @@ sealed interface Symptom {
                 put(DyspneaCoughWithBlood.id, DyspneaCoughWithBlood)
                 put(DyspneaParoxysmalCoughWithWhoopsOrCentralCyanosisOrVomiting.id, DyspneaParoxysmalCoughWithWhoopsOrCentralCyanosisOrVomiting)
 
+                put(AlertLevelOfConsciousness.id, AlertLevelOfConsciousness)
+                put(ResponsiveToVoiceLevelOfConsciousness.id, ResponsiveToVoiceLevelOfConsciousness)
+                put(ResponsiveToPainLevelOfConsciousness.id, ResponsiveToPainLevelOfConsciousness)
+                put(UnresponsiveLevelOfConsciousness.id, UnresponsiveLevelOfConsciousness)
+                put(SeizuresOrComaInTheLastOneToSevenDays.id, SeizuresOrComaInTheLastOneToSevenDays)
+                put(SeizuresOrComaInTheLastEightToFourteenDays.id, SeizuresOrComaInTheLastEightToFourteenDays)
+                put(SeizuresOrComaInTheLastFifteenToThirtyDays.id, SeizuresOrComaInTheLastFifteenToThirtyDays)
+                put(SeizuresOrComaInTheLastThirtyPlusDays.id, SeizuresOrComaInTheLastThirtyPlusDays)
+                put(StatusEpilepticus.id, StatusEpilepticus)
+                put(AbsenceOfStatusEpilepticus.id, AbsenceOfStatusEpilepticus)
+                put(SeizuresOrComaFocalSeizures.id, SeizuresOrComaFocalSeizures)
+                put(SeizuresOrComaGeneralizedMotorSeizures.id, SeizuresOrComaGeneralizedMotorSeizures)
+                put(SeizuresOrComaAbsenceOfSeizures.id, SeizuresOrComaAbsenceOfSeizures)
+
+                put(NightSweats.id, NightSweats)
                 put(ChestPain.id, ChestPain)
                 put(OrthopneaOrParoxysmalNocturnalDyspnea.id, OrthopneaOrParoxysmalNocturnalDyspnea)
                 put(RunnyNoseOrSneezingOrSoreThroat.id, RunnyNoseOrSneezingOrSoreThroat)
@@ -805,6 +964,18 @@ sealed interface Symptom {
 sealed interface Pain
 sealed interface Fever
 sealed interface Pregnancy
+sealed interface Seizures
+
+sealed interface DiarrheaDuration
+sealed interface DiarrheaFrequency
+sealed interface DiarrheaAspect
+sealed interface DyspneaDuration
+sealed interface DyspneaCourse
+sealed interface DyspneaCoughAspect
+sealed interface AbsenceOrPresenceOfStatusEpilepticus
+sealed interface SeizuresOrComaConsciousness
+sealed interface SeizuresOrComaDuration
+sealed interface SeizuresType
 
 /**
  * Sealed interface representing the unique identifier for a symptom.
@@ -910,6 +1081,23 @@ sealed class SymptomId (
     object DyspneaCoughWithBloodId: SymptomId(snakeCase("dyspnea_cough_with_blood"))
     object DyspneaParoxysmalCoughWithWhoopsOrCentralCyanosisOrVomitingId: SymptomId(snakeCase("dyspnea_paroxysmal_cough_with_whoops_or_central_cyanosis_or_vomiting"))
 
+    // Seizures-Coma
+    object AlertLevelOfConsciousnessId: SymptomId(snakeCase("alert_level_of_consciousness"))
+    object ResponsiveToVoiceLevelOfConsciousnessId: SymptomId(snakeCase("responsive_to_voice_level_of_consciousness"))
+    object ResponsiveToPainLevelOfConsciousnessId: SymptomId(snakeCase("responsive_to_pain_level_of_consciousness"))
+    object UnresponsiveLevelOfConsciousnessId: SymptomId(snakeCase("unresponsive_level_of_consciousness"))
+
+    object SeizuresOrComaInTheLastOneToSevenDaysId: SymptomId(snakeCase("seizures_or_coma_in_the_last_one_to_seven_days"))
+    object SeizuresOrComaInTheLastEightToFourteenDaysId: SymptomId(snakeCase("seizures_or_coma_in_the_last_eight_to_fourteen_days"))
+    object SeizuresOrComaInTheLastFifteenToThirtyDaysId: SymptomId(snakeCase("seizures_or_coma_in_the_last_fifteen_to_thirty_days"))
+    object SeizuresOrComaInTheLastThirtyPlusDaysId: SymptomId(snakeCase("seizures_or_coma_in_the_last_thirty_plus_days"))
+
+    object StatusEpilepticusId: SymptomId(snakeCase("status_epilepticus"))
+    object AbsenceOfStatusEpilepticusId: SymptomId(snakeCase("absence_of_status_epilepticus"))
+
+    object SeizuresOrComaFocalSeizuresId: SymptomId(snakeCase("seizures_or_coma_focal_seizures"))
+    object SeizuresOrComaGeneralizedMotorSeizuresId: SymptomId(snakeCase("seizures_or_coma_generalized_motor_seizures"))
+    object SeizuresOrComaAbsenceOfSeizuresId: SymptomId(snakeCase("seizures_or_coma_absence_of_seizures"))
     //--------------------------------------------------------------
 
     object VomitingId: SymptomId(snakeCase("vomiting"))
@@ -935,6 +1123,16 @@ sealed class SymptomId (
     object PeripheralEdemaOrJugularVenousDistensionId: SymptomId(snakeCase("peripheral_edema_or_jugular_venous_distension"))
     object SwellingOrPainOrWarmthOrRednessOfOneLegId: SymptomId(snakeCase("swelling_or_pain_or_warmth_or_redness_of_one_leg"))
 
+    object IrritabilityOrConfusionId: SymptomId(snakeCase("irritability_or_confusion"))
+    object HeadacheOrCervicalPainId: SymptomId(snakeCase("headache_or_cervical_pain"))
+    object StiffNeckId: SymptomId(snakeCase("stiff_neck"))
+    object BulgingFontanelleId: SymptomId(snakeCase("bulging_fontanelle"))
+    object FocalNeurologicalDeficitId: SymptomId(snakeCase("focal_neurological_deficit"))
+    object UnequalPupilsId: SymptomId(snakeCase("unequal_pupils"))
+    object OpisthotonusId: SymptomId(snakeCase("opisthotonus"))
+    object PetechialRashOrPurpuraId: SymptomId(snakeCase("petechial_rash_or_purpura"))
+    object JaundiceId: SymptomId(snakeCase("jaundice"))
+
     object HivPositiveId: SymptomId(snakeCase("hiv_positive"))
     object CholeraOutbreakId: SymptomId(snakeCase("cholera_outbreak"))
 
@@ -948,17 +1146,12 @@ sealed class SymptomId (
     object ProlongedImmobilizationOrBedriddenId: SymptomId(snakeCase("prolonged_immobilization_or_bedridden"))
     object UnvaccinatedId: SymptomId(snakeCase("unvaccinated"))
     object SmokingOrExposedToSmokeId: SymptomId(snakeCase("smoking_or_exposed_to_smoke"))
+
+    object EpilepsyOrHistoryOfRecurrentUnprovokedSeizuresId: SymptomId(snakeCase("epilepsy_or_history_of_recurrent_unprovoked_seizures"))
+    object HeadInjuryId: SymptomId(snakeCase("head_injury"))
+    object SuspectOfDrugOrToxinIngestionId: SymptomId(snakeCase("suspect_of_drug_or_toxin_ingestion"))
+    object SuspectOfAlcoholUseOrWithdrawalId: SymptomId(snakeCase("suspect_of_alcohol_use_or_withdrawal"))
+    object DiabetesId: SymptomId(snakeCase("diabetes"))
 }
-
-enum class SymptomGroup{
-    DiarrheaDuration,
-    DiarrheaFrequency,
-    DiarrheaAspect,
-
-    DyspneaDuration,
-    DyspneaCourse,
-    DyspneaCoughAspect
-}
-
 
 

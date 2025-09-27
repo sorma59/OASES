@@ -15,7 +15,7 @@ object DyspneaDetails: ComplaintDetails {
 data object DyspneaDurationQuestion: SingleChoiceComplaintQuestion{
     override val question = "How long did the patient experience cough/difficulty breathing for?"
     override val isRequired = true
-    override val options = listOf(
+    override val options: List<Symptom> = listOf(
         Symptom.DyspneaInTheLastOneToSevenDays,
         Symptom.DyspneaInTheLastEightToFourteenDays,
         Symptom.DyspneaInTheLastFifteenToThirtyDays,
@@ -26,7 +26,7 @@ data object DyspneaDurationQuestion: SingleChoiceComplaintQuestion{
 data object DyspneaCourseQuestion: SingleChoiceComplaintQuestion{
     override val question = "How was the course of the cough/dyspnea?"
     override val isRequired = true
-    override val options = listOf(
+    override val options: List<Symptom> = listOf(
         Symptom.DyspneaAcuteCourse,
         Symptom.DyspneaProgressiveCourse,
         Symptom.DyspneaRecurrentCourse
@@ -36,7 +36,7 @@ data object DyspneaCourseQuestion: SingleChoiceComplaintQuestion{
 data object DyspneaCoughAspectQuestion: SingleChoiceComplaintQuestion{
     override val question = "How does the cough look like?"
     override val isRequired = true
-    override val options = listOf(
+    override val options: List<Symptom> = listOf(
         Symptom.DyspneaDryCough,
         Symptom.DyspneaCoughWithMucous,
         Symptom.DyspneaCoughWithBlood,
@@ -44,7 +44,7 @@ data object DyspneaCoughAspectQuestion: SingleChoiceComplaintQuestion{
     )
 }
 
-data object DyspneaOtherSymptoms: OtherSymptomsQuestion() {
+data object DyspneaOtherSymptoms: OtherSymptomsQuestion {
     override val isRequired = false
     override val options = listOf(
         Symptom.FeverAbove38Degrees,
@@ -68,7 +68,7 @@ data object DyspneaOtherSymptoms: OtherSymptomsQuestion() {
     )
 }
 
-data object DyspneaOtherHighRiskSymptoms: OtherHighRiskSymptomsQuestion() {
+data object DyspneaOtherHighRiskSymptoms: OtherHighRiskSymptomsQuestion {
     override val isRequired = false
     override val options = listOf(
         Symptom.RecentChokingOrForeignBodyInhalation,

@@ -92,8 +92,24 @@ private fun MainComplaintsGrid(
             DiarrheaBox(patientId, appViewModel)
 
             DyspneaBox(patientId, appViewModel)
+
+            SeizuresOrComaBox(patientId, appViewModel)
         }
     }
+}
+
+@Composable
+fun SeizuresOrComaBox(
+    patientId: String,
+    appViewModel: AppViewModel
+) {
+    MedicalVisitBoxButton(
+        label = "Seizures / Coma",
+        destination = MainComplaintScreen.route +
+                "/patientId=${patientId}" +
+                "/complaintId=${ComplaintId.SEIZURES_OR_COMA.id}",
+        appViewModel
+    )
 }
 
 @Composable

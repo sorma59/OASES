@@ -30,9 +30,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.unimib.oases.domain.model.complaint.ComplaintQuestionWithImmediateTreatment
 import com.unimib.oases.domain.model.complaint.MultipleChoiceComplaintQuestion
 import com.unimib.oases.domain.model.complaint.SingleChoiceComplaintQuestion
 import com.unimib.oases.domain.model.complaint.Test
+import com.unimib.oases.domain.model.complaint.getLabels
 import com.unimib.oases.domain.model.symptom.Symptom
 import com.unimib.oases.ui.components.input.LabeledCheckbox
 import com.unimib.oases.ui.components.input.LabeledRadioButton
@@ -265,7 +267,9 @@ private fun DetailsQuestions(
     onEvent: (MainComplaintEvent) -> Unit
 ) {
 
-    Column {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
         for (question in state.detailsQuestions.take(state.detailsQuestionsToShow)) {
             when(question){
                 is MultipleChoiceComplaintQuestion -> {
@@ -288,6 +292,11 @@ private fun DetailsQuestions(
                     )
                 }
             }
+            if (question is ComplaintQuestionWithImmediateTreatment)
+                if (question.shouldShowTreatment(state.symptoms)) {
+                    TitleText("Immediate Treatment")
+                    Text(question.treatment.text)
+                }
         }
     }
 }
@@ -385,12 +394,15 @@ private fun SingleChoiceQuestion(
     isSelected: (Symptom) -> Boolean,
     onSelected: (Symptom) -> Unit,
 ){
+
+    val labels = question.getLabels()
+
     Column{
         TitleText(question.question)
 
-        for (option in question.options) {
+        for ((index, option) in question.options.withIndex()) {
             LabeledRadioButton(
-                label = option.label,
+                label = labels[index],
                 selected = isSelected(option),
                 onClick = { onSelected(option) }
             )

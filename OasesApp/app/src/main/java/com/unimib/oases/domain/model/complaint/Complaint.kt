@@ -5,6 +5,18 @@ import com.unimib.oases.domain.model.symptom.Symptom
 import com.unimib.oases.util.StringFormatHelper.SnakeCaseString
 import com.unimib.oases.util.StringFormatHelper.snakeCase
 
+fun ComplaintQuestion.getLabels(): List<String> {
+    return if (this is BooleanComplaintQuestion)
+        this.options.map {
+            if (it == this.trueSymptom)
+                this.trueLabel
+            else
+                this.falseLabel
+        }
+    else
+        this.options.map { it.label }
+}
+
 sealed interface Complaint {
     val complaintId: ComplaintId
     val immediateTreatmentTrees: List<Tree>
@@ -18,7 +30,8 @@ sealed interface Complaint {
 enum class ComplaintId(val value: SnakeCaseString) {
 
     DIARRHEA(snakeCase("diarrhea")),
-    DYSPNEA(snakeCase("dyspnea"));
+    DYSPNEA(snakeCase("dyspnea")),
+    SEIZURES_OR_COMA(snakeCase("seizures_or_coma"));
 
     val id: String
         get() = value.string
@@ -43,9 +56,14 @@ sealed interface Question {
     val options: List<Any>
 }
 
+sealed interface ComplaintQuestionWithImmediateTreatment {
+    val treatment: ImmediateTreatment
+    val shouldShowTreatment: (Set<Symptom>) -> Boolean
+}
+
 sealed class QuestionType {
-    object SingleChoice : QuestionType()
-    object MultipleChoice : QuestionType()
+    object SingleChoice: QuestionType()
+    object MultipleChoice: QuestionType()
 }
 
 sealed interface ComplaintQuestion: Question{
@@ -64,12 +82,23 @@ sealed interface MultipleChoiceComplaintQuestion: ComplaintQuestion{
         get() = QuestionType.MultipleChoice
 }
 
-sealed class OtherSymptomsQuestion(): MultipleChoiceComplaintQuestion{
-    override val question = "Which other symptoms does the patient have?"
-    override val options: List<Symptom> = emptyList()
+sealed interface BooleanComplaintQuestion: SingleChoiceComplaintQuestion{
+    val trueSymptom: Symptom
+    val falseSymptom: Symptom
+    val trueLabel: String
+        get() = "Yes"
+    val falseLabel: String
+        get() = "No"
 }
 
-sealed class OtherHighRiskSymptomsQuestion(): MultipleChoiceComplaintQuestion{
-    override val question = "Which other high-risk features are present?"
-    override val options: List<Symptom> = emptyList()
+sealed interface OtherSymptomsQuestion: MultipleChoiceComplaintQuestion{
+    override val question: String
+        get() = "Which other symptoms does the patient have?"
+    override val options: List<Symptom>
+}
+
+sealed interface OtherHighRiskSymptomsQuestion: MultipleChoiceComplaintQuestion{
+    override val question: String
+        get() = "Which other high-risk features are present?"
+    override val options: List<Symptom>
 }

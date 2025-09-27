@@ -16,7 +16,7 @@ object DiarrheaDetails: ComplaintDetails {
 data object DiarrheaDurationQuestion: SingleChoiceComplaintQuestion{
     override val question = "How long did the patient experience diarrhea for?"
     override val isRequired = true
-    override val options = listOf(
+    override val options: List<Symptom> = listOf(
         Symptom.DiarrheaInTheLastOneToSevenDays,
         Symptom.DiarrheaInTheLastEightToFourteenDays,
         Symptom.DiarrheaInTheLastFifteenToThirtyDays,
@@ -27,7 +27,7 @@ data object DiarrheaDurationQuestion: SingleChoiceComplaintQuestion{
 data object DiarrheaFrequencyQuestion: SingleChoiceComplaintQuestion{
     override val question = "How many episodes of diarrhea does the patient have?"
     override val isRequired = true
-    override val options = listOf(
+    override val options: List<Symptom> = listOf(
         Symptom.DiarrheaEpisodesOnceOrTwiceADay,
         Symptom.DiarrheaEpisodesThreeToFiveTimesADay,
         Symptom.DiarrheaEpisodesSixOrMoreTimesADay
@@ -37,14 +37,14 @@ data object DiarrheaFrequencyQuestion: SingleChoiceComplaintQuestion{
 data object DiarrheaAspectQuestion: SingleChoiceComplaintQuestion{
     override val question = "How do the stools look like?"
     override val isRequired = true
-    override val options = listOf(
+    override val options: List<Symptom> = listOf(
         Symptom.DiarrheaWateryStools,
         Symptom.DiarrheaBloodyStools,
         Symptom.DiarrheaOilyOrGreasyOrFoulSmellingStools
     )
 }
 
-data object DiarrheaOtherSymptoms: OtherSymptomsQuestion() {
+data object DiarrheaOtherSymptoms: OtherSymptomsQuestion {
     override val isRequired = false
     override val options = listOf(
         Symptom.Vomiting,
@@ -60,7 +60,7 @@ data object DiarrheaOtherSymptoms: OtherSymptomsQuestion() {
     )
 }
 
-data object DiarrheaOtherHighRiskSymptoms: OtherHighRiskSymptomsQuestion() {
+data object DiarrheaOtherHighRiskSymptoms: OtherHighRiskSymptomsQuestion {
     override val isRequired = false
     override val options = listOf(
         Symptom.HivPositive,

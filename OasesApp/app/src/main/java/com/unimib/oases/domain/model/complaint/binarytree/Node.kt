@@ -7,11 +7,24 @@ fun ManualNode.next(boolean: Boolean): ShowableNode {
     var node = if (boolean) children.left else children.right
     while (true){
         when (node) {
-            is AutoNode -> node = if (node.predicate()) node.children.left else node.children.right
+            is AutoNode -> {
+                val evaluation = node.predicate()
+                evaluation?.let {
+                    node = if (it) node.children.left else node.children.right
+                } ?: return node.toManualNode() // This is a "SemiAutoNode", must be converted to ManualNode
+            }
             is ShowableNode -> return node
         }
     }
 }
+
+fun AutoNode.toManualNode(): ManualNode {
+    return ManualNode(
+        value = this.value!!,
+        children = this.children
+    )
+}
+
 sealed interface Node {
     val value: Any?
     val children: Children? // Full tree: 0 or 2 children
@@ -33,7 +46,9 @@ sealed interface InternalNode: Node {
 data class AutoNode(
     override val value: String? = null,
     override val children: Children,
-    val predicate: () -> Boolean
+    val predicate: () -> Boolean?
+// An AutoNode can return null: it cannot tell whether the predicate is satisfied or not
+// They have a non-null question (value) in case they need to become a ManualNode (that is, when predicate returns null)
 ): InternalNode
 
 // Internal node that needs the user input

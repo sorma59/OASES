@@ -39,26 +39,22 @@ fun <T> Set<T>.toggle(element: T): Set<T> {
 }
 
 /**
- * Selects a symptom from a set of symptoms.
+ * Selects a symptom from a set of symptoms and removes a specified set of symptoms.
  *
- * This function is used to ensure that only one symptom from each group is selected.
- * If a symptom from a group is already selected, it will be replaced by the new symptom.
- * If no symptom from the group is selected, the new symptom will be added.
+ * This function first removes all symptoms specified in the `toRemove` set from the original set.
+ * Then, it adds the specified `symptom` to the resulting set.
  *
- * @param symptom The symptom to select.
- * @return A new set of symptoms with the selected symptom.
- * @throws IllegalArgumentException if the symptom is not part of a symptom group.
+ * @param symptom The symptom to select and add to the set.
+ * @param toRemove A set of symptoms to remove from the original set.
+ * @return A new set of symptoms with the specified `symptom` added and the `toRemove` symptoms removed.
  */
-fun Set<Symptom>.select(symptom: Symptom): Set<Symptom> {
-
-    if (symptom.group == null)
-        throw IllegalArgumentException("Symptom must be part of a symptom group")
+fun Set<Symptom>.selectAndRemove(symptom: Symptom, toRemove: Set<Symptom>): Set<Symptom> {
 
     // Create a mutable copy of the original set to modify
     val mutableSet = this.toMutableSet()
 
     // Remove all symptoms that belong to the same group as the symptom
-    mutableSet.removeAll { it.group == symptom.group }
+    mutableSet.removeAll(toRemove)
 
     // Add the symptom
     mutableSet.add(symptom)

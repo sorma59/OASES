@@ -8,16 +8,19 @@ import com.unimib.oases.domain.model.complaint.ComplaintId
 import com.unimib.oases.domain.model.complaint.ComplaintQuestion
 import com.unimib.oases.domain.model.complaint.Diarrhea
 import com.unimib.oases.domain.model.complaint.Dyspnea
+import com.unimib.oases.domain.model.complaint.SeizuresOrComa
 import com.unimib.oases.domain.model.complaint.binarytree.ManualNode
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.domain.repository.TriageEvaluationRepository
 import com.unimib.oases.domain.usecase.AnswerImmediateTreatmentQuestionUseCase
 import com.unimib.oases.domain.usecase.GenerateSuggestedSupportiveTherapiesUseCase
 import com.unimib.oases.domain.usecase.GenerateSuggestedTestsUseCase
+import com.unimib.oases.domain.usecase.GetPatientCategoryUseCase
 import com.unimib.oases.domain.usecase.SelectSymptomUseCase
 import com.unimib.oases.domain.usecase.TranslateLatestVitalSignsToSymptomsUseCase
 import com.unimib.oases.domain.usecase.TranslateTriageSymptomIdsToSymptomsUseCase
 import com.unimib.oases.domain.usecase.VisitUseCase
+import com.unimib.oases.ui.screen.nurse_assessment.patient_registration.Sex.Companion.fromDisplayName
 import com.unimib.oases.util.Resource
 import com.unimib.oases.util.toggle
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -39,6 +42,7 @@ class MainComplaintViewModel @Inject constructor(
     private val answerImmediateTreatmentQuestionUseCase: AnswerImmediateTreatmentQuestionUseCase,
     private val generateSuggestedTestsUseCase: GenerateSuggestedTestsUseCase,
     private val generateSuggestedSupportiveTherapiesUseCase: GenerateSuggestedSupportiveTherapiesUseCase,
+    private val getPatientCategoryUseCase: GetPatientCategoryUseCase,
     private val translateTriageSymptomIdsToSymptomsUseCase: TranslateTriageSymptomIdsToSymptomsUseCase,
     private val translateLatestVitalSignsToSymptomsUseCase: TranslateLatestVitalSignsToSymptomsUseCase,
     private val selectSymptomUseCase: SelectSymptomUseCase,
@@ -96,6 +100,8 @@ class MainComplaintViewModel @Inject constructor(
         val patient = _state.value.patient
         patient?.let {
             val age = it.ageInMonths / 12
+            val sex = fromDisplayName(it.sex)
+            val patientCategory = getPatientCategoryUseCase(it.ageInMonths)
 
             when (_state.value.complaintId) {
                 ComplaintId.DIARRHEA.id -> {
@@ -110,6 +116,14 @@ class MainComplaintViewModel @Inject constructor(
                     _state.update{
                         it.copy(
                             complaint = Dyspnea
+                        )
+                    }
+                }
+
+                ComplaintId.SEIZURES_OR_COMA.id -> {
+                    _state.update{
+                        it.copy(
+                            complaint = SeizuresOrComa(sex, patientCategory)
                         )
                     }
                 }
@@ -258,7 +272,7 @@ class MainComplaintViewModel @Inject constructor(
             is MainComplaintEvent.SymptomSelected -> {
                 _state.update {
                     it.copy(
-                        symptoms = selectSymptomUseCase(event.symptom, it.symptoms),
+                        symptoms = selectSymptomUseCase(event.symptom, it.symptoms, event.question),
                         detailsQuestionsToShow = calculateNumberOfDetailsQuestionsToShow(event.question)
                     )
                 }
