@@ -10,9 +10,11 @@ import com.unimib.oases.domain.model.complaint.TestId.ElectrocardiogramId
 import com.unimib.oases.domain.model.complaint.TestId.ElectrolytesTestsId
 import com.unimib.oases.domain.model.complaint.TestId.HIVId
 import com.unimib.oases.domain.model.complaint.TestId.LiverFunctionTestsId
+import com.unimib.oases.domain.model.complaint.TestId.LumbarPunctureAndCSFExaminationId
 import com.unimib.oases.domain.model.complaint.TestId.MalariaRapidDiagnosticTestId
 import com.unimib.oases.domain.model.complaint.TestId.RapidBloodSugarId
 import com.unimib.oases.domain.model.complaint.TestId.RenalFunctionTestsId
+import com.unimib.oases.domain.model.complaint.TestId.SkullXRayId
 import com.unimib.oases.domain.model.complaint.TestId.StoolMicroscopyId
 import com.unimib.oases.domain.model.complaint.TestId.TuberculosisGeneXpertId
 import com.unimib.oases.domain.model.complaint.TestId.UrinalysisId
@@ -148,6 +150,22 @@ sealed interface Test{
         override val name: String = "Liver function tests",
         override val label: String = name
     ): Test
+
+    // Seizures-Coma
+
+    data class LumbarPunctureAndCSFExamination(
+        override val testId: TestId = LumbarPunctureAndCSFExaminationId,
+        override val acronym: String? = null,
+        override val name: String = "Lumbar puncture and CSF examination",
+        override val label: String = name
+    ): Test
+
+    data class SkullXRay(
+        override val testId: TestId = SkullXRayId,
+        override val acronym: String? = null,
+        override val name: String = "Skull X-ray",
+        override val label: String = name
+    ): Test
 }
 
 sealed class TestId (
@@ -170,4 +188,6 @@ sealed class TestId (
     object ElectrolytesTestsId: TestId(snakeCase("electrolytes_tests"))
     object UrinalysisId: TestId(snakeCase("urinalysis"))
     object LiverFunctionTestsId: TestId(snakeCase("liver_function_tests"))
+    object LumbarPunctureAndCSFExaminationId: TestId(snakeCase("lumbar_puncture_and_csf_examination"))
+    object SkullXRayId: TestId(snakeCase("skull_x_ray"))
 }

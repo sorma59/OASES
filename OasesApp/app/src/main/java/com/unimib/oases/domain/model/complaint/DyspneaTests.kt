@@ -24,7 +24,7 @@ object DyspneaTests: ComplaintTests {
         DyspneaRiskOfTuberculosisTests,
         DyspneaRiskOfHIVTests,
         DyspneaRiskOfAcuteHeartDiseaseTests,
-        DyspneaRiskOfFluidOverLoadDueToHeartOrRenalOrLiverFailureTests
+        DyspneaRiskOfFluidOverloadDueToHeartOrRenalOrLiverFailureTests
     )
 }
 
@@ -75,7 +75,8 @@ data object DyspneaRiskOfHIVTests: Condition {
         !symptoms.contains(Symptom.HivPositive)
         && (symptoms.contains(Symptom.DyspneaInTheLastThirtyPlusDays)
             || symptoms.contains(Symptom.DyspneaInTheLastFifteenToThirtyDays)
-            || symptoms.contains(Symptom.DyspneaCoughWithBlood))
+            || symptoms.contains(Symptom.DyspneaCoughWithBlood)
+        )
     }
     override val suggestedTests = listOf(
         HIVTest()
@@ -107,8 +108,8 @@ data object DyspneaRiskOfAcuteHeartDiseaseTests: Condition {
     )
 }
 
-data object DyspneaRiskOfFluidOverLoadDueToHeartOrRenalOrLiverFailureTests: Condition {
-    override val label = "This is a patient at risk of fluid overload due to heart failure or liver/renal failure"
+data object DyspneaRiskOfFluidOverloadDueToHeartOrRenalOrLiverFailureTests: Condition {
+    override val label = "This is a patient at risk of fluid overload due to heart failure or liver/renal failure. Consider ordering the following diagnostic tests"
     override val predicate = { symptoms: Set<Symptom> ->
         symptoms.contains(Symptom.HistoryOfHeartDisease)
         || symptoms.contains(Symptom.HistoryOfRenalOrLiverDisease)

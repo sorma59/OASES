@@ -13,8 +13,6 @@ class SeizuresOrComa(
         SeizuresTree(sex, patientCategory)
     )
     override val details = SeizuresOrComaDetails
-    override val tests: ComplaintTests
-        get() = TODO("Not yet implemented")
-    override val supportiveTherapies: ComplaintSupportiveTherapies
-        get() = TODO("Not yet implemented")
+    override val tests = SeizuresOrComaTests
+    override val supportiveTherapies = SeizuresOrComaSupportiveTherapies
 }
