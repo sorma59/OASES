@@ -31,17 +31,21 @@ object SeizuresOrComaTests: ComplaintTests {
 data object SeizuresOrComaBasicTests: Condition {
     override val label: String = "Consider ordering the following diagnostic tests"
     override val predicate = { symptoms: Set<Symptom> -> true }
-    override val suggestedTests: List<Test> = listOf(
-        RapidBloodSugarTest(
+    override val suggestedTests = listOf(
+        LabelledTest(
+            test = RapidBloodSugarTest,
             label = "Rapid blood sugar (RBS) in all patients"
         ),
-        CompleteBloodCountTest(
+        LabelledTest(
+            test = CompleteBloodCountTest,
             label = "Complete blood count (CBC) in patients with severe illness, fever, signs of anemia, HIV"
         ),
-        MalariaRapidDiagnosticTest(
+        LabelledTest(
+            test = MalariaRapidDiagnosticTest,
             label = "Malaria rapid diagnostic test (MRDT) in patients with severe illness, fever, pallor"
         ),
-        BloodSmearForMalariaParasitesTest(
+        LabelledTest(
+            test = BloodSmearForMalariaParasitesTest,
             label = "Blood smear for malaria parasites (B/S) in patients with severe illness, fever, pallor"
         )
     )
@@ -65,7 +69,8 @@ data object SeizuresOrComaRiskOfCNSInfectionTests: Condition {
         )
     }
     override val suggestedTests = listOf(
-        LumbarPunctureAndCSFExamination(
+        LabelledTest(
+            test = LumbarPunctureAndCSFExamination,
             label = "Lumbar puncture and CSF examination"
         )
     )
@@ -80,10 +85,12 @@ data object SeizuresOrComaRiskOfTuberculosisTests: Condition {
         || symptoms.contains(Symptom.CloseContactWithKnownTuberculosisPatient)
     }
     override val suggestedTests = listOf(
-        TuberculosisGeneXpert(
+        LabelledTest(
+            test = TuberculosisGeneXpert,
             label = "TB GeneXpert on CSF / sputum / gastric aspirate"
         ),
-        AcidFastBacilliMicroscopy(
+        LabelledTest(
+            test = AcidFastBacilliMicroscopy,
             label = "Microscopy for acid-fast bacilli on CSF / sputum / gastric aspirate"
         )
     )
@@ -98,7 +105,9 @@ data object SeizuresOrComaRiskOfHIVTests: Condition {
         )
     }
     override val suggestedTests = listOf(
-        HIVTest()
+        LabelledTest(
+            HIVTest
+        )
     )
 }
 
@@ -108,7 +117,9 @@ data object SeizuresOrComaPatientWithHeadInjuryTests: Condition {
         symptoms.contains(Symptom.HeadInjury)
     }
     override val suggestedTests = listOf(
-        SkullXRay()
+        LabelledTest(
+            test = SkullXRay
+        )
     )
 }
 
@@ -121,14 +132,19 @@ data object SeizuresOrComaRiskOfRenalOrLiverFailureOrElectrolytesDisorderTests: 
         || symptoms.contains(Symptom.Jaundice)
     }
     override val suggestedTests = listOf(
-        RenalFunctionTests(
+        LabelledTest(
+            test = RenalFunctionTests,
             label = "Renal function tests (creatinine, urea)"
         ),
-        ElectrolytesTests(
+        LabelledTest(
+            test = ElectrolytesTests,
             label = "Electrolytes (Na, K)"
         ),
-        Urinalysis(),
-        LiverFunctionTests(
+        LabelledTest(
+            test = Urinalysis
+        ),
+        LabelledTest(
+            test = LiverFunctionTests,
             label = "Liver function tests (ast, alt, bilirubin)"
         )
     )

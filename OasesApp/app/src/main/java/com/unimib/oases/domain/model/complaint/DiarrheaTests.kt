@@ -1,9 +1,12 @@
 package com.unimib.oases.domain.model.complaint
 
+import com.unimib.oases.domain.model.complaint.Test.AbdominalXRay
 import com.unimib.oases.domain.model.complaint.Test.BloodSmearForMalariaParasitesTest
 import com.unimib.oases.domain.model.complaint.Test.CompleteBloodCountTest
+import com.unimib.oases.domain.model.complaint.Test.HIVTest
 import com.unimib.oases.domain.model.complaint.Test.MalariaRapidDiagnosticTest
 import com.unimib.oases.domain.model.complaint.Test.RapidBloodSugarTest
+import com.unimib.oases.domain.model.complaint.Test.StoolMicroscopy
 import com.unimib.oases.domain.model.symptom.Symptom
 
 object DiarrheaTests: ComplaintTests {
@@ -18,17 +21,21 @@ object DiarrheaTests: ComplaintTests {
 data object DiarrheaBasicTests: Condition {
     override val label: String = "Consider ordering the following diagnostic tests"
     override val predicate = { symptoms: Set<Symptom> -> true }
-    override val suggestedTests: List<Test> = listOf(
-        RapidBloodSugarTest(
+    override val suggestedTests = listOf(
+        LabelledTest(
+            test = RapidBloodSugarTest,
             label = "Rapid blood sugar (RBS) in patients with severe illness, inability to breastfeed, malnutrition, altered mental status, convulsions"
         ),
-        CompleteBloodCountTest(
+        LabelledTest(
+            test = CompleteBloodCountTest,
             label = "Complete blood count (CBC) in patients with severe illness, suspected sepsis, signs of anemia, suspected HUS (easy bruising)"
         ),
-        MalariaRapidDiagnosticTest(
+        LabelledTest(
+            test = MalariaRapidDiagnosticTest,
             label = "Malaria rapid diagnostic test (MRDT) in patients with severe illness, fever, pallor"
         ),
-        BloodSmearForMalariaParasitesTest(
+        LabelledTest(
+            test = BloodSmearForMalariaParasitesTest,
             label = "Blood smear for malaria parasites (B/S) in patients with severe illness, fever, pallor"
         )
     )
@@ -44,7 +51,7 @@ data object DiarrheaRiskOfBacterialOrParasiticInfectionsTests: Condition {
         || symptoms.contains(Symptom.DiarrheaOilyOrGreasyOrFoulSmellingStools)
     }
     override val suggestedTests = listOf(
-        Test.StoolMicroscopy()
+        LabelledTest(StoolMicroscopy)
     )
 }
 
@@ -54,7 +61,7 @@ data object DiarrheaRiskOfToxicMegacolonOrIntestinalOcclusionOrPerforation: Cond
         symptoms.contains(Symptom.AbdominalDistensionAndTendernessWithAlteredBowelSounds)
     }
     override val suggestedTests = listOf(
-        Test.AbdominalXRay()
+        LabelledTest(AbdominalXRay)
     )
 }
 
@@ -65,6 +72,6 @@ data object DiarrheaRiskOfHIVTests: Condition {
         && symptoms.contains(Symptom.DiarrheaInTheLastThirtyPlusDays)
     }
     override val suggestedTests = listOf(
-        Test.HIVTest()
+        LabelledTest(HIVTest)
     )
 }

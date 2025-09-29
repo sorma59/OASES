@@ -1,7 +1,7 @@
 package com.unimib.oases.ui.screen.medical_visit.maincomplaint
 
 import com.unimib.oases.domain.model.complaint.ComplaintQuestion
-import com.unimib.oases.domain.model.complaint.Test
+import com.unimib.oases.domain.model.complaint.LabelledTest
 import com.unimib.oases.domain.model.complaint.binarytree.ManualNode
 import com.unimib.oases.domain.model.complaint.binarytree.Tree
 import com.unimib.oases.domain.model.symptom.Symptom
@@ -12,7 +12,7 @@ sealed class MainComplaintEvent {
 
     data class SymptomSelected(val symptom: Symptom, val question: ComplaintQuestion): MainComplaintEvent()
 
-    data class TestSelected(val test: Test): MainComplaintEvent()
+    data class TestSelected(val test: LabelledTest): MainComplaintEvent()
 
     data object RetryButtonClicked: MainComplaintEvent()
 

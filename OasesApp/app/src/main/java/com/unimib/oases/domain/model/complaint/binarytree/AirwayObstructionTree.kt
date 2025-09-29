@@ -21,7 +21,7 @@ data object AirwayObstructionTree: Tree {
         """.trimIndent()
     )
 
-    val noAirwayObstructionImmediateTreatment = null
+    val noAirwayObstructionImmediateTreatment = ImmediateTreatment("The patient does not require immediate treatment for airway obstruction")
 
     // Leaves
 

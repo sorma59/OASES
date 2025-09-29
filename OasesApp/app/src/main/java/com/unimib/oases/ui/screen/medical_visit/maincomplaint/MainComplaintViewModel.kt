@@ -3,6 +3,7 @@ package com.unimib.oases.ui.screen.medical_visit.maincomplaint
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.unimib.oases.data.mapper.serializer.ComplaintSummarySerializer
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.model.complaint.ComplaintId
 import com.unimib.oases.domain.model.complaint.ComplaintQuestion
@@ -317,11 +318,9 @@ class MainComplaintViewModel @Inject constructor(
             }
 
             MainComplaintEvent.SubmitPressed -> {
-                _state.update {
-                    it.copy(
-                        toastMessage = "Complaint submitted"
-                    )
-                }
+                ComplaintSummarySerializer.test(
+                    state.value.toComplaintSummary()
+                )
             }
         }
     }

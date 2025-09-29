@@ -50,7 +50,7 @@ class SeizuresTree(
         """.trimIndent()
     )
 
-    val noActiveTonicClonicSeizuresImmediateTreatment = null
+    val noActiveTonicClonicSeizuresImmediateTreatment = ImmediateTreatment("No immediate treatment needed")
 
     // Nodes
 

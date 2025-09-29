@@ -20,6 +20,7 @@ import com.unimib.oases.domain.model.complaint.TestId.TuberculosisGeneXpertId
 import com.unimib.oases.domain.model.complaint.TestId.UrinalysisId
 import com.unimib.oases.domain.model.complaint.TestId.VenousUltrasoundOfLowerLimbsId
 import com.unimib.oases.util.StringFormatHelper.SnakeCaseString
+import kotlinx.serialization.Serializable
 
 private fun snakeCase(string: String) = SnakeCaseString.of(string)
 
@@ -27,146 +28,157 @@ sealed interface Test{
     val testId: TestId
     val acronym: String?
     val name: String
-    val label: String
 
     val id: String
         get() = testId.value.string
 
-    data class RapidBloodSugarTest(
-        override val testId: TestId = RapidBloodSugarId,
-        override val acronym: String = "RBS",
-        override val name: String = "Rapid blood sugar",
-        override val label: String = name
-    ): Test
+    data object RapidBloodSugarTest: Test {
+        override val testId: TestId = RapidBloodSugarId
+        override val acronym: String = "RBS"
+        override val name: String = "Rapid blood sugar"
+    }
 
-    data class CompleteBloodCountTest(
-        override val testId: TestId = CompleteBloodCountId,
-        override val acronym: String = "CBC",
-        override val name: String = "Complete blood count",
-        override val label: String = name
-    ): Test
+    data object CompleteBloodCountTest: Test {
+        override val testId: TestId = CompleteBloodCountId
+        override val acronym: String = "CBC"
+        override val name: String = "Complete blood count"
+    }
 
-    data class MalariaRapidDiagnosticTest(
-        override val testId: TestId = MalariaRapidDiagnosticTestId,
-        override val acronym: String = "MRDT",
-        override val name: String = "Malaria rapid diagnostic test",
-        override val label: String = name
-    ): Test
+    data object MalariaRapidDiagnosticTest: Test {
+        override val testId: TestId = MalariaRapidDiagnosticTestId
+        override val acronym: String = "MRDT"
+        override val name: String = "Malaria rapid diagnostic test"
+    }
 
-    data class BloodSmearForMalariaParasitesTest(
-        override val testId: TestId = BloodSmearForMalariaParasitesId,
-        override val acronym: String = "B/S",
-        override val name: String = "Blood smear for malaria parasites",
-        override val label: String = name
-    ): Test
+    data object BloodSmearForMalariaParasitesTest: Test {
+        override val testId: TestId = BloodSmearForMalariaParasitesId
+        override val acronym: String = "B/S"
+        override val name: String = "Blood smear for malaria parasites"
+    }
 
-    data class ChestXRay(
-        override val testId: TestId = ChestXRayId,
-        override val acronym: String? = null,
-        override val name: String = "Chest X-ray",
-        override val label: String = name
-    ): Test
+    data object ChestXRay: Test {
+        override val testId: TestId = ChestXRayId
+        override val acronym: String? = null
+        override val name: String = "Chest X-ray"
+    }
 
-    data class StoolMicroscopy(
-        override val testId: TestId = StoolMicroscopyId,
-        override val acronym: String = "STM",
-        override val name: String = "Stool microscopy",
-        override val label: String = name
-    ): Test
+    data object StoolMicroscopy: Test {
+        override val testId: TestId = StoolMicroscopyId
+        override val acronym: String = "STM"
+        override val name: String = "Stool microscopy"
+    }
 
-    data class AbdominalXRay(
-        override val testId: TestId = AbdominalXRayId,
-        override val acronym: String = "AXR",
-        override val name: String = "Abdominal X-ray",
-        override val label: String = name
-    ): Test
+    data object AbdominalXRay: Test {
+        override val testId: TestId = AbdominalXRayId
+        override val acronym: String = "AXR"
+        override val name: String = "Abdominal X-ray"
+    }
 
-    data class HIVTest(
-        override val testId: TestId = HIVId,
-        override val acronym: String = "HIV",
-        override val name: String = "HIV test",
-        override val label: String = name
-    ): Test
+    data object HIVTest: Test {
+        override val testId: TestId = HIVId
+        override val acronym: String = "HIV"
+        override val name: String = "HIV test"
+    }
 
-    data class TuberculosisGeneXpert(
-        override val testId: TestId = TuberculosisGeneXpertId,
-        override val acronym: String = "TB",
-        override val name: String = "Tuberculosis GeneXpert",
-        override val label: String = name
-    ): Test
+    data object TuberculosisGeneXpert: Test {
+        override val testId: TestId = TuberculosisGeneXpertId
+        override val acronym: String = "TB"
+        override val name: String = "Tuberculosis GeneXpert"
+    }
 
-    data class AcidFastBacilliMicroscopy(
-        override val testId: TestId = AcidFastBacilliMicroscopyId,
-        override val acronym: String = "AFB",
-        override val name: String = "Acid-fast bacilli microscopy",
-        override val label: String = name
-    ): Test
+    data object AcidFastBacilliMicroscopy: Test {
+        override val testId: TestId = AcidFastBacilliMicroscopyId
+        override val acronym: String = "AFB"
+        override val name: String = "Acid-fast bacilli microscopy"
+    }
 
-    data class Electrocardiogram(
-        override val testId: TestId = ElectrocardiogramId,
-        override val acronym: String = "ECG",
-        override val name: String = "Electrocardiogram",
-        override val label: String = name
-    ): Test
+    data object Electrocardiogram: Test {
+        override val testId: TestId = ElectrocardiogramId
+        override val acronym: String = "ECG"
+        override val name: String = "Electrocardiogram"
+    }
 
-    data class Echocardiography(
-        override val testId: TestId = EchocardiographyId,
-        override val acronym: String = "ECHO",
-        override val name: String = "Echocardiography",
-        override val label: String = name
-    ): Test
+    data object Echocardiography: Test {
+        override val testId: TestId = EchocardiographyId
+        override val acronym: String = "ECHO"
+        override val name: String = "Echocardiography"
+    }
 
-    data class VenousUltrasoundOfLowerLimbs(
-        override val testId: TestId = VenousUltrasoundOfLowerLimbsId,
-        override val acronym: String = "CUS",
-        override val name: String = "Venous ultrasound of lower limbs",
-        override val label: String = name
-    ): Test
+    data object VenousUltrasoundOfLowerLimbs: Test {
+        override val testId: TestId = VenousUltrasoundOfLowerLimbsId
+        override val acronym: String = "CUS"
+        override val name: String = "Venous ultrasound of lower limbs"
+    }
 
-    data class RenalFunctionTests(
-        override val testId: TestId = RenalFunctionTestsId,
-        override val acronym: String = "RFT",
-        override val name: String = "Renal function tests",
-        override val label: String = name
-    ): Test
+    data object RenalFunctionTests: Test {
+        override val testId: TestId = RenalFunctionTestsId
+        override val acronym: String = "RFT"
+        override val name: String = "Renal function tests"
+    }
 
-    data class ElectrolytesTests(
-        override val testId: TestId = ElectrolytesTestsId,
-        override val acronym: String? = null,
-        override val name: String = "Electrolytes tests",
-        override val label: String = name
-    ): Test
+    data object ElectrolytesTests: Test {
+        override val testId: TestId = ElectrolytesTestsId
+        override val acronym: String? = null
+        override val name: String = "Electrolytes tests"
+    }
 
-    data class Urinalysis(
-        override val testId: TestId = UrinalysisId,
-        override val acronym: String = "UA",
-        override val name: String = "Urinalysis",
-        override val label: String = name
-    ): Test
+    data object Urinalysis: Test {
+        override val testId: TestId = UrinalysisId
+        override val acronym: String = "UA"
+        override val name: String = "Urinalysis"
+    }
 
-    data class LiverFunctionTests(
-        override val testId: TestId = LiverFunctionTestsId,
-        override val acronym: String = "LFT",
-        override val name: String = "Liver function tests",
-        override val label: String = name
-    ): Test
+    data object LiverFunctionTests: Test {
+        override val testId: TestId = LiverFunctionTestsId
+        override val acronym: String = "LFT"
+        override val name: String = "Liver function tests"
+    }
 
     // Seizures-Coma
 
-    data class LumbarPunctureAndCSFExamination(
-        override val testId: TestId = LumbarPunctureAndCSFExaminationId,
-        override val acronym: String? = null,
-        override val name: String = "Lumbar puncture and CSF examination",
-        override val label: String = name
-    ): Test
+    data object LumbarPunctureAndCSFExamination: Test {
+        override val testId: TestId = LumbarPunctureAndCSFExaminationId
+        override val acronym: String? = null
+        override val name: String = "Lumbar puncture and CSF examination"
+    }
 
-    data class SkullXRay(
-        override val testId: TestId = SkullXRayId,
-        override val acronym: String? = null,
-        override val name: String = "Skull X-ray",
-        override val label: String = name
-    ): Test
+    data object SkullXRay: Test {
+        override val testId: TestId = SkullXRayId
+        override val acronym: String? = null
+        override val name: String = "Skull X-ray"
+    }
+
+    companion object {
+        val tests: Map<String, Test> by lazy {
+            buildMap {
+                put(RapidBloodSugarTest.id, RapidBloodSugarTest)
+                put(CompleteBloodCountTest.id, CompleteBloodCountTest)
+                put(MalariaRapidDiagnosticTest.id, MalariaRapidDiagnosticTest)
+                put(BloodSmearForMalariaParasitesTest.id, BloodSmearForMalariaParasitesTest)
+                put(ChestXRay.id, ChestXRay)
+                put(StoolMicroscopy.id, StoolMicroscopy)
+                put(AbdominalXRay.id, AbdominalXRay)
+                put(HIVTest.id, HIVTest)
+                put(TuberculosisGeneXpert.id, TuberculosisGeneXpert)
+                put(AcidFastBacilliMicroscopy.id, AcidFastBacilliMicroscopy)
+                put(Electrocardiogram.id, Electrocardiogram)
+                put(Echocardiography.id, Echocardiography)
+                put(VenousUltrasoundOfLowerLimbs.id, VenousUltrasoundOfLowerLimbs)
+                put(RenalFunctionTests.id, RenalFunctionTests)
+                put(ElectrolytesTests.id, ElectrolytesTests)
+                put(Urinalysis.id, Urinalysis)
+                put(LiverFunctionTests.id, LiverFunctionTests)
+                put(LumbarPunctureAndCSFExamination.id, LumbarPunctureAndCSFExamination)
+                put(SkullXRay.id, SkullXRay)
+            }
+        }
+    }
 }
+@Serializable
+data class LabelledTest(
+    val test: Test,
+    val label: String = test.name
+)
 
 sealed class TestId (
     val value: SnakeCaseString

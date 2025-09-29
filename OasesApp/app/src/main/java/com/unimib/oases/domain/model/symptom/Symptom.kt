@@ -910,12 +910,15 @@ sealed interface Symptom {
                 put(ResponsiveToVoiceLevelOfConsciousness.id, ResponsiveToVoiceLevelOfConsciousness)
                 put(ResponsiveToPainLevelOfConsciousness.id, ResponsiveToPainLevelOfConsciousness)
                 put(UnresponsiveLevelOfConsciousness.id, UnresponsiveLevelOfConsciousness)
+
                 put(SeizuresOrComaInTheLastOneToSevenDays.id, SeizuresOrComaInTheLastOneToSevenDays)
                 put(SeizuresOrComaInTheLastEightToFourteenDays.id, SeizuresOrComaInTheLastEightToFourteenDays)
                 put(SeizuresOrComaInTheLastFifteenToThirtyDays.id, SeizuresOrComaInTheLastFifteenToThirtyDays)
                 put(SeizuresOrComaInTheLastThirtyPlusDays.id, SeizuresOrComaInTheLastThirtyPlusDays)
+
                 put(StatusEpilepticus.id, StatusEpilepticus)
                 put(AbsenceOfStatusEpilepticus.id, AbsenceOfStatusEpilepticus)
+
                 put(SeizuresOrComaFocalSeizures.id, SeizuresOrComaFocalSeizures)
                 put(SeizuresOrComaGeneralizedMotorSeizures.id, SeizuresOrComaGeneralizedMotorSeizures)
                 put(SeizuresOrComaAbsenceOfSeizures.id, SeizuresOrComaAbsenceOfSeizures)
@@ -932,6 +935,22 @@ sealed interface Symptom {
                 put(IrregularPulseOrIrregularHeartSounds.id, IrregularPulseOrIrregularHeartSounds)
                 put(PeripheralEdemaOrJugularVenousDistension.id, PeripheralEdemaOrJugularVenousDistension)
                 put(SwellingOrPainOrWarmthOrRednessOfOneLeg.id, SwellingOrPainOrWarmthOrRednessOfOneLeg)
+
+                put(IrritabilityOrConfusion.id, IrritabilityOrConfusion)
+                put(HeadacheOrCervicalPain.id, HeadacheOrCervicalPain)
+                put(StiffNeck.id, StiffNeck)
+                put(BulgingFontanelle.id, BulgingFontanelle)
+                put(FocalNeurologicalDeficit.id, FocalNeurologicalDeficit)
+                put(UnequalPupils.id, UnequalPupils)
+                put(Opisthotonus.id, Opisthotonus)
+                put(PetechialRashOrPurpura.id, PetechialRashOrPurpura)
+                put(Jaundice.id, Jaundice)
+                put(EpilepsyOrHistoryOfRecurrentUnprovokedSeizures.id, EpilepsyOrHistoryOfRecurrentUnprovokedSeizures)
+                put(HeadInjury.id, HeadInjury)
+                put(SuspectOfDrugOrToxinIngestion.id, SuspectOfDrugOrToxinIngestion)
+                put(SuspectOfAlcoholUseOrWithdrawal.id, SuspectOfAlcoholUseOrWithdrawal)
+                put(Diabetes.id, Diabetes)
+
 
                 put(Vomiting.id, Vomiting)
                 put(AbdominalPain.id, AbdominalPain)

@@ -31,20 +31,25 @@ object DyspneaTests: ComplaintTests {
 data object DyspneaBasicTests: Condition {
     override val label: String = "Consider ordering the following diagnostic tests"
     override val predicate = { symptoms: Set<Symptom> -> true }
-    override val suggestedTests: List<Test> = listOf(
-        RapidBloodSugarTest(
+    override val suggestedTests = listOf(
+        LabelledTest(
+            test = RapidBloodSugarTest,
             label = "Rapid blood sugar (RBS) in patients with severe illness, altered mental status, convulsions, inability to eat/breastfeed, malnutrition"
         ),
-        CompleteBloodCountTest(
+        LabelledTest(
+            test = CompleteBloodCountTest,
             label = "Complete blood count (CBC) in patients with severe illness, respiratory distress, fever, signs of anemia, HIVTest"
         ),
-        MalariaRapidDiagnosticTest(
+        LabelledTest(
+            test = MalariaRapidDiagnosticTest,
             label = "Malaria rapid diagnostic test (MRDT) in patients with severe illness, fever, pallor"
         ),
-        BloodSmearForMalariaParasitesTest(
+        LabelledTest(
+            test = BloodSmearForMalariaParasitesTest,
             label = "Blood smear for malaria parasites (B/S) in patients with severe illness, fever, pallor"
         ),
-        ChestXRay(
+        LabelledTest(
+            test = ChestXRay,
             label = "Chest x-ray in patients with severe illness, respiratory distress, fever, chronic cough or other symptoms suggestive of TB, HIVTest, traumatic chest injury"
         )
     )
@@ -60,10 +65,12 @@ data object DyspneaRiskOfTuberculosisTests: Condition {
         || symptoms.contains(Symptom.CloseContactWithKnownTuberculosisPatient)
     }
     override val suggestedTests = listOf(
-        TuberculosisGeneXpert(
+        LabelledTest(
+            test = TuberculosisGeneXpert,
             label = "TB GeneXpert on sputum / gastric aspirate / appropriate sample"
         ),
-        AcidFastBacilliMicroscopy(
+        LabelledTest(
+            test = AcidFastBacilliMicroscopy,
             label = "Microscopy for acid-fast bacilli on sputum / gastric aspirate / appropriate sample"
         )
     )
@@ -79,7 +86,9 @@ data object DyspneaRiskOfHIVTests: Condition {
         )
     }
     override val suggestedTests = listOf(
-        HIVTest()
+        LabelledTest(
+            test = HIVTest,
+        )
     )
 }
 
@@ -98,11 +107,15 @@ data object DyspneaRiskOfAcuteHeartDiseaseTests: Condition {
         || symptoms.contains(Symptom.PeripheralEdemaOrJugularVenousDistension)
     }
     override val suggestedTests = listOf(
-        Electrocardiogram(
+        LabelledTest(
+            test = Electrocardiogram,
             label = "ECG"
         ),
-        Echocardiography(),
-        VenousUltrasoundOfLowerLimbs(
+        LabelledTest(
+            test = Echocardiography
+        ),
+        LabelledTest(
+            test = VenousUltrasoundOfLowerLimbs,
             label = "Venous ultrasound of lower limbs with suspect of pulmonary embolism"
         )
     )
@@ -117,14 +130,19 @@ data object DyspneaRiskOfFluidOverloadDueToHeartOrRenalOrLiverFailureTests: Cond
         || symptoms.contains(Symptom.OrthopneaOrParoxysmalNocturnalDyspnea)
     }
     override val suggestedTests = listOf(
-        RenalFunctionTests(
+        LabelledTest(
+            test = RenalFunctionTests,
             label = "Renal function tests (creatinine, urea)"
         ),
-        ElectrolytesTests(
+        LabelledTest(
+            test = ElectrolytesTests,
             label = "Electrolytes (Na, K)"
         ),
-        Urinalysis(),
-        LiverFunctionTests(
+        LabelledTest(
+            test = Urinalysis
+        ),
+        LabelledTest(
+            test = LiverFunctionTests,
             label = "Liver function tests (ast, alt, bilirubin)"
         )
     )

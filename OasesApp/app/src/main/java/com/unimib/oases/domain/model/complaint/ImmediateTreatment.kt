@@ -1,5 +1,7 @@
 package com.unimib.oases.domain.model.complaint
 
-data class ImmediateTreatment (
-    val text: String
-)
+import kotlinx.serialization.Serializable
+
+@JvmInline
+@Serializable
+value class ImmediateTreatment (val text: String)

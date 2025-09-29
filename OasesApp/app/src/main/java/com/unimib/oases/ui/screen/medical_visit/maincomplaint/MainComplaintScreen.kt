@@ -31,9 +31,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.unimib.oases.domain.model.complaint.ComplaintQuestionWithImmediateTreatment
+import com.unimib.oases.domain.model.complaint.LabelledTest
 import com.unimib.oases.domain.model.complaint.MultipleChoiceComplaintQuestion
 import com.unimib.oases.domain.model.complaint.SingleChoiceComplaintQuestion
-import com.unimib.oases.domain.model.complaint.Test
 import com.unimib.oases.domain.model.complaint.getLabels
 import com.unimib.oases.domain.model.symptom.Symptom
 import com.unimib.oases.ui.components.input.LabeledCheckbox
@@ -63,13 +63,13 @@ fun MainComplaintScreen(){
         )
     }
 
-    val onCheckedChange: (Test) -> Unit = {
+    val onCheckedChange: (LabelledTest) -> Unit = {
         viewModel.onEvent(
             MainComplaintEvent.TestSelected(it)
         )
     }
 
-    val isChecked: (Test) -> Boolean = { state.requestedTests.contains(it) }
+    val isChecked: (LabelledTest) -> Boolean = { state.requestedTests.contains(it) }
 
     val onGenerateTestsPressed: () -> Unit = {
         viewModel.onEvent(MainComplaintEvent.GenerateTestsPressed)
@@ -178,9 +178,9 @@ private fun SupportiveTherapies(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ){
         state.supportiveTherapies?.let {
-            TitleText("Supportive therapies", fontSize = 18)
 
             if (it.isNotEmpty()){
+                TitleText("Supportive therapies", fontSize = 18)
                 HorizontalDivider(thickness = 0.8.dp)
                 for (supportiveTherapy in it) {
                     Text(supportiveTherapy.text)
@@ -214,8 +214,8 @@ private fun GenerateTestsButton(
 @Composable
 private fun Tests(
     state: MainComplaintState,
-    isChecked: (Test) -> Boolean,
-    onCheckedChange: (Test) -> Unit,
+    isChecked: (LabelledTest) -> Boolean,
+    onCheckedChange: (LabelledTest) -> Unit,
     additionalTestsText: String,
     onAdditionalTestsChanged: (String) -> Unit
 ) {
@@ -228,11 +228,11 @@ private fun Tests(
                 Column{
                     TitleText(condition.label, fontSize = 18)
                     Column(verticalArrangement =  Arrangement.spacedBy(8.dp)){
-                        for (test in condition.suggestedTests) {
+                        for (labelledTest in condition.suggestedTests) {
                             LabeledCheckbox(
-                                label = test.label,
-                                checked = isChecked(test),
-                                onCheckedChange = { onCheckedChange(test) }
+                                label = labelledTest.label,
+                                checked = isChecked(labelledTest),
+                                onCheckedChange = { onCheckedChange(labelledTest) }
                             )
                         }
                     }

@@ -100,7 +100,7 @@ class DiarrheaTree(val ageInYears: Int): Tree {
         """.trimIndent()
         )
 
-    val noShockNorSevereDehydrationAndNoMalnutritionTherapy = null
+    val noShockNorSevereDehydrationAndNoMalnutritionTherapy = ImmediateTreatment("No immediate treatment needed")
 
     // Nodes
 
