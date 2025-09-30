@@ -1,14 +1,23 @@
+import java.util.Properties
+
 plugins {
     id ("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
     id("org.jetbrains.kotlin.plugin.serialization")
 
-    id("com.google.devtools.ksp") version "2.1.20-2.0.0"
+    id("com.google.devtools.ksp") version "2.2.20-2.0.3"
     id("kotlin-parcelize")
     id("com.google.dagger.hilt.android")
-    alias(libs.plugins.google.gms.google.services)
+//    alias(libs.plugins.google.gms.google.services)
 }
+
+val localProperties = rootProject.file("gradle.local.properties")
+    .takeIf { it.exists() }
+    ?.reader()
+    ?.use {
+        Properties().apply { load(it) }
+    } ?: Properties()
 
 android {
     namespace = "com.unimib.oases"
@@ -24,13 +33,25 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file(localProperties["KEYSTORE_FILE"] ?: "")
+            storePassword = localProperties["KEYSTORE_PASSWORD"] as String?
+            keyAlias = localProperties["KEY_ALIAS"] as String?
+            keyPassword = localProperties["KEY_PASSWORD"] as String?
+        }
+    }
+
     buildTypes {
-        release {
+        debug {
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
             isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+        }
+        release {
+            signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
     compileOptions {
@@ -58,11 +79,11 @@ dependencies {
     implementation(libs.play.services.maps)
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.androidx.ui.text.google.fonts)
-    implementation(libs.firebase.auth)
+//    implementation(libs.firebase.auth)
     implementation(libs.androidx.animation.core.android)
-    implementation(libs.firebase.storage.ktx)
-    implementation(libs.firebase.database.ktx)
-    implementation(libs.firebase.firestore)
+//    implementation(libs.firebase.storage.ktx)
+//    implementation(libs.firebase.database.ktx)
+//    implementation(libs.firebase.firestore)
     implementation(libs.androidx.material3.window.size.class1.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

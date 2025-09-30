@@ -4,14 +4,11 @@ import android.util.Log
 import com.unimib.oases.data.local.RoomDataSource
 import com.unimib.oases.data.mapper.toDomain
 import com.unimib.oases.data.mapper.toEntity
-import com.unimib.oases.data.remote.FirebaseFirestoreSource
-import com.unimib.oases.data.util.FirestoreManager
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.util.Resource
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,28 +21,27 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class PatientRepositoryImpl @Inject constructor(
     private val roomDataSource: RoomDataSource,
-    private val firestoreApi: FirebaseFirestoreSource,
-    private val firestoreManager: FirestoreManager,
+//    private val firestoreApi: FirebaseFirestoreSource,
+//    private val firestoreManager: FirestoreManager,
     @IoDispatcher private val dispatcher: CoroutineDispatcher
 ) : PatientRepository {
 
 
-    init {
-        CoroutineScope(dispatcher).launch {
-            firestoreManager.onlineStatus.collect { isOnline ->
-                if (isOnline) {
-                    doOnlineTasks()
-                } else {
-                    doOfflineTasks()
-                }
-            }
-        }
-    }
+//    init {
+//        CoroutineScope(dispatcher).launch {
+//            firestoreManager.onlineStatus.collect { isOnline ->
+//                if (isOnline) {
+//                    doOnlineTasks()
+//                } else {
+//                    doOfflineTasks()
+//                }
+//            }
+//        }
+//    }
 
 
 
@@ -61,12 +57,12 @@ class PatientRepositoryImpl @Inject constructor(
             Log.d("PatientRepositoryImpl", "Adding patient: $patient")
             roomDataSource.insertPatient(patient.toEntity())
 
-            if(firestoreManager.isOnline()){
-                Log.e("PatientRepositoryImpl", "Adding patient to firestore: $patient")
-                //firestoreManager.addPatient(patient.toEntity())
-            } else {
-                Log.e("PatientRepositoryImpl", "Adding patient to queue: $patient")
-            }
+//            if(firestoreManager.isOnline()){
+//                Log.e("PatientRepositoryImpl", "Adding patient to firestore: $patient")
+//                //firestoreManager.addPatient(patient.toEntity())
+//            } else {
+//                Log.e("PatientRepositoryImpl", "Adding patient to queue: $patient")
+//            }
 
             Resource.Success(Unit)
         } catch (e: Exception) {
