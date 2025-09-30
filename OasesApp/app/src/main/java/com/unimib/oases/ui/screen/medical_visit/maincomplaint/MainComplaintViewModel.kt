@@ -3,7 +3,6 @@ package com.unimib.oases.ui.screen.medical_visit.maincomplaint
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.unimib.oases.data.mapper.serializer.ComplaintSummarySerializer
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.model.complaint.ComplaintId
 import com.unimib.oases.domain.model.complaint.ComplaintQuestion
@@ -18,6 +17,7 @@ import com.unimib.oases.domain.usecase.GenerateSuggestedSupportiveTherapiesUseCa
 import com.unimib.oases.domain.usecase.GenerateSuggestedTestsUseCase
 import com.unimib.oases.domain.usecase.GetPatientCategoryUseCase
 import com.unimib.oases.domain.usecase.SelectSymptomUseCase
+import com.unimib.oases.domain.usecase.SubmitMedicalVisitPartOneUseCase
 import com.unimib.oases.domain.usecase.TranslateLatestVitalSignsToSymptomsUseCase
 import com.unimib.oases.domain.usecase.TranslateTriageSymptomIdsToSymptomsUseCase
 import com.unimib.oases.domain.usecase.VisitUseCase
@@ -41,6 +41,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainComplaintViewModel @Inject constructor(
     private val answerImmediateTreatmentQuestionUseCase: AnswerImmediateTreatmentQuestionUseCase,
+    private val submitMedicalVisitPartOneUseCase: SubmitMedicalVisitPartOneUseCase,
     private val generateSuggestedTestsUseCase: GenerateSuggestedTestsUseCase,
     private val generateSuggestedSupportiveTherapiesUseCase: GenerateSuggestedSupportiveTherapiesUseCase,
     private val getPatientCategoryUseCase: GetPatientCategoryUseCase,
@@ -83,15 +84,17 @@ class MainComplaintViewModel @Inject constructor(
         initialize()
     }
 
-    private fun initialize(){
+    private fun initialize(shouldRebuildTree: Boolean = true){
         viewModelScope.launch(dispatcher + errorHandler){
             updateError(null)
             updateLoading(true)
             getPatientData()
             getTriageData()
             getVitalSignsData()
-            getComplaint()
-            handleComplaint()
+            if (shouldRebuildTree){
+                getComplaint()
+                handleComplaint()
+            }
             updateLoading(false)
         }
     }
@@ -214,7 +217,7 @@ class MainComplaintViewModel @Inject constructor(
         }
     }
 
-    private fun getTriageData(){
+    private suspend fun getTriageData(){
         try {
 
             val visit = visitUseCase.getCurrentVisit(_state.value.patientId)
@@ -304,7 +307,7 @@ class MainComplaintViewModel @Inject constructor(
             }
 
             MainComplaintEvent.RetryButtonClicked -> {
-                initialize()
+                initialize(false)
             }
 
             MainComplaintEvent.GenerateTestsPressed -> {
@@ -318,9 +321,27 @@ class MainComplaintViewModel @Inject constructor(
             }
 
             MainComplaintEvent.SubmitPressed -> {
-                ComplaintSummarySerializer.test(
-                    state.value.toComplaintSummary()
-                )
+                viewModelScope.launch(dispatcher + errorHandler){
+                    val result = submitMedicalVisitPartOneUseCase(state.value)
+                    when(result){
+                        is Resource.Error -> {
+                            _state.update {
+                                it.copy(
+                                    error = result.message
+                                )
+                            }
+                        }
+                        is Resource.Success -> {
+                            _state.update {
+                                it.copy(
+                                    toastMessage = "Medical visit submitted successfully"
+                                )
+                            }
+                        }
+
+                        else -> Unit
+                    }
+                }
             }
         }
     }

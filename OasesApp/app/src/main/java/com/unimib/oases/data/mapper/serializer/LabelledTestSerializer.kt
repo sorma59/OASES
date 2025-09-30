@@ -1,14 +1,13 @@
 package com.unimib.oases.data.mapper.serializer
 
 import com.unimib.oases.domain.model.complaint.LabelledTest
-import com.unimib.oases.domain.model.complaint.Test
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
 object LabelledTestSerializer {
 
     fun serialize(labelledTest: LabelledTest): ByteArray {
-        val testIdBytes = labelledTest.test.id.toByteArray()
+        val testIdBytes = labelledTest.testId.toByteArray()
         val labelBytes = labelledTest.label.toByteArray()
 
         val buffer = ByteBuffer
@@ -33,9 +32,7 @@ object LabelledTestSerializer {
         val testId = buffer.readString()
         val label = buffer.readString()
 
-        val test = Test.tests[testId]
-
-        return LabelledTest(test ?: throw IllegalArgumentException("Unknown test ID: $testId"), label)
+        return LabelledTest(testId, label)
     }
 
 }

@@ -8,9 +8,11 @@ import com.unimib.oases.data.bluetooth.BluetoothEnvelopeType
 import com.unimib.oases.data.bluetooth.transfer.PatientFullData
 import com.unimib.oases.data.mapper.serializer.PatientFullDataSerializer
 import com.unimib.oases.data.mapper.serializer.PatientSerializer.serialize
+import com.unimib.oases.domain.model.ComplaintSummary
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.domain.model.PatientDisease
 import com.unimib.oases.domain.model.VisitVitalSign
+import com.unimib.oases.domain.repository.ComplaintSummaryRepository
 import com.unimib.oases.domain.repository.MalnutritionScreeningRepository
 import com.unimib.oases.domain.repository.PatientDiseaseRepository
 import com.unimib.oases.domain.repository.TriageEvaluationRepository
@@ -31,7 +33,8 @@ class SendPatientViaBluetoothUseCase @Inject constructor(
     private val patientDiseaseRepository: PatientDiseaseRepository,
     private val visitVitalSignRepository: VisitVitalSignRepository,
     private val triageEvaluationRepository: TriageEvaluationRepository,
-    private val malnutritionScreeningRepository: MalnutritionScreeningRepository
+    private val malnutritionScreeningRepository: MalnutritionScreeningRepository,
+    private val complaintSummaryRepository: ComplaintSummaryRepository
 ) {
     suspend operator fun invoke(patient: Patient, device: BluetoothDevice): Resource<Unit> {
         return try {
@@ -90,9 +93,27 @@ class SendPatientViaBluetoothUseCase @Inject constructor(
                                     }
                                 }
 
+                                val complaintsSummariesDeferred = async(Dispatchers.IO) {
+                                    try {
+                                        val resource =
+                                            complaintSummaryRepository.getVisitComplaintsSummaries(
+                                                currentVisit.id
+                                            )
+                                                .first { it is Resource.Success || it is Resource.Error } // Wait for Success or Error
+                                        resource.data ?: emptyList<ComplaintSummary>()
+                                    } catch (e: NoSuchElementException) {
+                                        Log.e("SendPatient", "Complaints flow completed without Success/Error for visit ${currentVisit.id}", e)
+                                        emptyList<ComplaintSummary>()
+                                    } catch (e: Exception) {
+                                        Log.e("SendPatient", "Error collecting complaints for visit ${currentVisit.id}", e)
+                                        emptyList<ComplaintSummary>()
+                                    }
+                                }
+
                                 // Wait for both tasks to complete
                                 val diseases: List<PatientDisease> = diseasesDeferred.await()
                                 val vitalSigns: List<VisitVitalSign> = vitalSignsDeferred.await()
+                                val complaintsSummaries: List<ComplaintSummary> = complaintsSummariesDeferred.await()
 
                                 val patientWithTriageData = PatientFullData(
                                     patientDetails = patient,
@@ -100,7 +121,8 @@ class SendPatientViaBluetoothUseCase @Inject constructor(
                                     patientDiseases = diseases,
                                     vitalSigns = vitalSigns,
                                     triageEvaluation = triageEvaluation,
-                                    malnutritionScreening = malnutritionScreening
+                                    malnutritionScreening = malnutritionScreening,
+                                    complaintsSummaries = complaintsSummaries
                                 )
 
                                 // Serialize the patient data

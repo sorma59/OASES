@@ -42,10 +42,13 @@ import com.unimib.oases.ui.components.util.TitleText
 import com.unimib.oases.ui.components.util.button.RetryButton
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 import com.unimib.oases.ui.screen.medical_visit.maincomplaint.MainComplaintEvent.SymptomSelected
+import com.unimib.oases.ui.screen.root.AppViewModel
 import com.unimib.oases.ui.util.ToastUtils
 
 @Composable
-fun MainComplaintScreen(){
+fun MainComplaintScreen(
+    appViewModel: AppViewModel
+){
 
     val viewModel: MainComplaintViewModel = hiltViewModel()
 
@@ -317,30 +320,31 @@ private fun ImmediateTreatmentQuestions(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         )  {
             for ((index, algorithm) in algorithms.withIndex()) {
-                Column{
-                    for ((node, answer) in state.immediateTreatmentQuestions.elementAt(index)) {
+                if (index <= state.immediateTreatmentQuestions.size) // Somewhat defensive
+                    Column{
+                        for ((node, answer) in state.immediateTreatmentQuestions.elementAt(index)) {
 
-                        YesOrNoQuestion(
-                            question = node.value,
-                            onAnswer = {
-                                viewModel.onEvent(MainComplaintEvent.NodeAnswered(it, node, algorithm))
-                            },
-                            enabled = !readOnly,
-                            answer = answer
-                        )
-                    }
+                            YesOrNoQuestion(
+                                question = node.value,
+                                onAnswer = {
+                                    viewModel.onEvent(MainComplaintEvent.NodeAnswered(it, node, algorithm))
+                                },
+                                enabled = !readOnly,
+                                answer = answer
+                            )
+                        }
 
-                    Spacer(Modifier.height(8.dp))
+                        Spacer(Modifier.height(8.dp))
 
-                    if (state.immediateTreatments.isNotEmpty()){
-                        state.immediateTreatments.elementAt(index)?.let {
-                            TitleText("Immediate Treatment")
-                            Text(it.text)
-                            Spacer(Modifier.height(16.dp))
-                            HorizontalDivider(thickness = 0.8.dp)
+                        if (state.immediateTreatments.isNotEmpty()){
+                            state.immediateTreatments.elementAt(index)?.let {
+                                TitleText("Immediate Treatment")
+                                Text(it.text)
+                                Spacer(Modifier.height(16.dp))
+                                HorizontalDivider(thickness = 0.8.dp)
+                            }
                         }
                     }
-                }
             }
         }
     }

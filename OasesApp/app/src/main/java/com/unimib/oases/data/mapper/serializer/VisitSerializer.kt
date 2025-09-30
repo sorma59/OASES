@@ -15,15 +15,13 @@ object VisitSerializer {
         val triageCodeBytes = visit.triageCode.name.toByteArray(Charsets.UTF_8)
         val dateBytes = visit.date.toString().toByteArray(Charsets.UTF_8)
         val descriptionBytes = visit.description.toByteArray(Charsets.UTF_8)
-        val complaintsListBytes = visit.complaints.map { ComplaintSummarySerializer.serialize(it) }
 
         val buffer = ByteBuffer.allocate(
             4 + idBytes.size +
             4 + patientIdBytes.size +
             4 + triageCodeBytes.size +
             4 + dateBytes.size +
-            4 + descriptionBytes.size +
-            4 + complaintsListBytes.sumOf { it.size }
+            4 + descriptionBytes.size
         )
 
         buffer.putInt(idBytes.size)
@@ -41,12 +39,6 @@ object VisitSerializer {
         buffer.putInt(descriptionBytes.size)
         buffer.put(descriptionBytes)
 
-        buffer.putInt(complaintsListBytes.sumOf { it.size })
-        complaintsListBytes.forEach {
-            buffer.putInt(it.size)
-            buffer.put(it)
-        }
-
         return buffer.array()
     }
 
@@ -58,19 +50,13 @@ object VisitSerializer {
         val triageCode = buffer.readString()
         val date = buffer.readString()
         val description = buffer.readString()
-        val complaints = List(buffer.int) {
-            val size = buffer.int
-            val itemBytes = ByteArray(size).also { buffer.get(it) }
-            ComplaintSummarySerializer.deserialize(itemBytes)
-        }.toSet()
 
         return Visit(
             id = id,
             patientId = patientId,
             triageCode = fromTriageCodeName(triageCode),
             date = LocalDate.parse(date),
-            description = description,
-            complaints = complaints
+            description = description
         )
     }
 

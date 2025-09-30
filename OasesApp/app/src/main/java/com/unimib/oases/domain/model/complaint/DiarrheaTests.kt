@@ -23,19 +23,19 @@ data object DiarrheaBasicTests: Condition {
     override val predicate = { symptoms: Set<Symptom> -> true }
     override val suggestedTests = listOf(
         LabelledTest(
-            test = RapidBloodSugarTest,
+            testId = RapidBloodSugarTest.id,
             label = "Rapid blood sugar (RBS) in patients with severe illness, inability to breastfeed, malnutrition, altered mental status, convulsions"
         ),
         LabelledTest(
-            test = CompleteBloodCountTest,
+            testId = CompleteBloodCountTest.id,
             label = "Complete blood count (CBC) in patients with severe illness, suspected sepsis, signs of anemia, suspected HUS (easy bruising)"
         ),
         LabelledTest(
-            test = MalariaRapidDiagnosticTest,
+            testId = MalariaRapidDiagnosticTest.id,
             label = "Malaria rapid diagnostic test (MRDT) in patients with severe illness, fever, pallor"
         ),
         LabelledTest(
-            test = BloodSmearForMalariaParasitesTest,
+            testId = BloodSmearForMalariaParasitesTest.id,
             label = "Blood smear for malaria parasites (B/S) in patients with severe illness, fever, pallor"
         )
     )
@@ -51,7 +51,7 @@ data object DiarrheaRiskOfBacterialOrParasiticInfectionsTests: Condition {
         || symptoms.contains(Symptom.DiarrheaOilyOrGreasyOrFoulSmellingStools)
     }
     override val suggestedTests = listOf(
-        LabelledTest(StoolMicroscopy)
+        LabelledTest(StoolMicroscopy.id)
     )
 }
 
@@ -61,7 +61,7 @@ data object DiarrheaRiskOfToxicMegacolonOrIntestinalOcclusionOrPerforation: Cond
         symptoms.contains(Symptom.AbdominalDistensionAndTendernessWithAlteredBowelSounds)
     }
     override val suggestedTests = listOf(
-        LabelledTest(AbdominalXRay)
+        LabelledTest(AbdominalXRay.id)
     )
 }
 
@@ -72,6 +72,6 @@ data object DiarrheaRiskOfHIVTests: Condition {
         && symptoms.contains(Symptom.DiarrheaInTheLastThirtyPlusDays)
     }
     override val suggestedTests = listOf(
-        LabelledTest(HIVTest)
+        LabelledTest(HIVTest.id)
     )
 }

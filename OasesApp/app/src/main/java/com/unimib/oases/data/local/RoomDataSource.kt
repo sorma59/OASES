@@ -1,5 +1,6 @@
 package com.unimib.oases.data.local
 
+import com.unimib.oases.data.local.dao.ComplaintSummaryDao
 import com.unimib.oases.data.local.dao.DiseaseDao
 import com.unimib.oases.data.local.dao.MalnutritionScreeningDao
 import com.unimib.oases.data.local.dao.PatientDao
@@ -12,6 +13,7 @@ import com.unimib.oases.data.local.dao.VisitVitalSignDao
 import com.unimib.oases.data.local.dao.VitalSignsDao
 import com.unimib.oases.data.local.db.AuthDatabase
 import com.unimib.oases.data.local.db.OasesDatabase
+import com.unimib.oases.data.local.model.ComplaintSummaryEntity
 import com.unimib.oases.data.local.model.DiseaseEntity
 import com.unimib.oases.data.local.model.MalnutritionScreeningEntity
 import com.unimib.oases.data.local.model.PatientDiseaseEntity
@@ -40,6 +42,7 @@ class RoomDataSource @Inject constructor(
     private val visitVitalSignDao: VisitVitalSignDao get() = appDatabase.visitVitalSignDao()
     private val vitalSignDao: VitalSignsDao get() = appDatabase.vitalSignDao()
     private val roomsDao: RoomsDao get() = appDatabase.roomsDao()
+    private val complaintSummaryDao: ComplaintSummaryDao get() = appDatabase.complaintSummaryDao()
 
     // -------------------Patients-------------------
     suspend fun insertPatient(patient: PatientEntity) {
@@ -181,7 +184,7 @@ class RoomDataSource @Inject constructor(
         return visitDao.getVisits(patientId)
     }
 
-    fun getCurrentVisit(patientId: String): VisitEntity? {
+    fun getCurrentVisit(patientId: String): Flow<VisitEntity?> {
         return visitDao.getCurrentVisit(patientId)
     }
 
@@ -215,5 +218,22 @@ class RoomDataSource @Inject constructor(
 
     suspend fun deleteVitalSign(vitalSign: VitalSignEntity) {
         vitalSignDao.delete(vitalSign)
+    }
+
+    // Complaint summaries --------------------------
+    suspend fun insertComplaintSummary(complaintSummary: ComplaintSummaryEntity) {
+        complaintSummaryDao.insert(complaintSummary)
+    }
+
+    suspend fun deleteComplaintSummary(complaintSummary: ComplaintSummaryEntity) {
+        complaintSummaryDao.delete(complaintSummary)
+    }
+
+    fun getVisitComplaintsSummaries(visitId: String): Flow<List<ComplaintSummaryEntity>> {
+        return complaintSummaryDao.getVisitComplaintsSummaries(visitId)
+    }
+
+    fun getComplaintSummary(visitId: String, complaintId: String): Flow<ComplaintSummaryEntity?> {
+        return complaintSummaryDao.getComplaintSummary(visitId, complaintId)
     }
 }

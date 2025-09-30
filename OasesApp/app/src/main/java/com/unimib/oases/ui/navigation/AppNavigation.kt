@@ -200,7 +200,7 @@ fun AppNavigation(
                 }
             )
         ){
-            MainComplaintScreen()
+            MainComplaintScreen(appViewModel)
         }
     }
 }

@@ -18,6 +18,7 @@ object PatientFullDataSerializer {
         val malnutritionScreeningBytes = patientFullData.malnutritionScreening?.let {
             MalnutritionScreeningSerializer.serialize(it)
         }
+        val complaintSummariesListBytes = patientFullData.complaintsSummaries.map{ComplaintSummarySerializer.serialize(it)}
 
         val totalSize =
             4 + patientByteArray.size +
@@ -25,7 +26,8 @@ object PatientFullDataSerializer {
             4 + visitByteArray.size +
             4 + vitalSignBytesList.sumOf { 4 + it.size } +
             4 + triageByteArray.size +
-            1 + (malnutritionScreeningBytes?.let { 4 + it.size } ?: 0)
+            1 + (malnutritionScreeningBytes?.let { 4 + it.size } ?: 0) +
+            4 + complaintSummariesListBytes.sumOf { 4 + it.size }
 
         val buffer = ByteBuffer.allocate(totalSize).order(ByteOrder.BIG_ENDIAN)
 
@@ -57,6 +59,12 @@ object PatientFullDataSerializer {
             buffer.put(malnutritionScreeningBytes)
         } else {
             buffer.put(0) // absence flag
+        }
+
+        buffer.putInt(complaintSummariesListBytes.size)
+        complaintSummariesListBytes.forEach {
+            buffer.putInt(it.size)
+            buffer.put(it)
         }
 
         return buffer.array()
@@ -104,13 +112,22 @@ object PatientFullDataSerializer {
         } else
             null
 
+        // Complaint summaries
+        val complaintSummariesCount = buffer.int
+        val complaintSummaries = List(complaintSummariesCount) {
+            val size = buffer.int
+            val itemBytes = ByteArray(size).also { buffer.get(it) }
+            ComplaintSummarySerializer.deserialize(itemBytes)
+        }
+
         return PatientFullData(
             patientDetails = patient,
             patientDiseases = diseases,
             vitalSigns = vitals,
             visit = visit,
             triageEvaluation = triageEvaluation,
-            malnutritionScreening = malnutritionScreening
+            malnutritionScreening = malnutritionScreening,
+            complaintsSummaries = complaintSummaries
         )
     }
 }

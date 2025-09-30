@@ -30,7 +30,7 @@ sealed interface Test{
     val name: String
 
     val id: String
-        get() = testId.value.string
+        get() = this@Test.testId.value.string
 
     data object RapidBloodSugarTest: Test {
         override val testId: TestId = RapidBloodSugarId
@@ -174,10 +174,11 @@ sealed interface Test{
         }
     }
 }
+
 @Serializable
 data class LabelledTest(
-    val test: Test,
-    val label: String = test.name
+    val testId: String,
+    val label: String = Test.tests[testId]?.name ?: "Unknown test"
 )
 
 sealed class TestId (

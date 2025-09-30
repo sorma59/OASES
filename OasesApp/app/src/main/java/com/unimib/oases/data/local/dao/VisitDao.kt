@@ -20,7 +20,7 @@ interface VisitDao {
     @Query("SELECT * FROM " + TableNames.VISIT + " WHERE patient_id = :patientId")
     fun getVisits(patientId: String): Flow<List<VisitEntity>>
 
-    @Query("SELECT * FROM " + TableNames.VISIT + " WHERE patient_id = :patientId AND `date` = :today LIMIT 1")
-    fun getCurrentVisit(patientId: String, today: String = LocalDate.now().toString()): VisitEntity?
+    @Query("SELECT * FROM " + TableNames.VISIT + " WHERE patient_id = :patientId AND date = :today LIMIT 1")
+    fun getCurrentVisit(patientId: String, today: String = LocalDate.now().toString()): Flow<VisitEntity?>
 
 }

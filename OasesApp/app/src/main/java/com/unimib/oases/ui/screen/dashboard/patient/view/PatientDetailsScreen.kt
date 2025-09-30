@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.unimib.oases.domain.model.Patient
-import com.unimib.oases.ui.components.util.button.BottomButtons
 import com.unimib.oases.ui.components.util.button.RetryButton
 import com.unimib.oases.ui.screen.root.AppViewModel
 import com.unimib.oases.util.StringFormatHelper.getAgeWithSuffix
@@ -67,12 +66,12 @@ fun PatientDetailsScreen(
                     PatientDetails(it)
                 }
 
-                BottomButtons(
-                    onCancel = { viewModel.onEvent(PatientDetailsEvent.OnBack) },
-                    onConfirm = { viewModel.onEvent(PatientDetailsEvent.OnNext) },
-                    cancelButtonText = "Back",
-                    confirmButtonText = "Next",
-                )
+//                BottomButtons(
+//                    onCancel = { viewModel.onEvent(PatientDetailsEvent.OnBack) },
+//                    onConfirm = { viewModel.onEvent(PatientDetailsEvent.OnNext) },
+//                    cancelButtonText = "Back",
+//                    confirmButtonText = "Next",
+//                )
             }
         }
             ?: Box(Modifier.fillMaxSize()) {

@@ -8,6 +8,7 @@ import com.unimib.oases.domain.model.Visit
 import com.unimib.oases.domain.repository.VisitRepository
 import com.unimib.oases.util.Resource
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
@@ -48,14 +49,13 @@ class VisitRepositoryImpl @Inject constructor(
 
     }
 
-    override fun getCurrentVisit(patientId: String): Visit? {
+    override suspend fun getCurrentVisit(patientId: String): Visit? {
         return try {
-            val visit = roomDataSource.getCurrentVisit(patientId)
-            visit?.toDomain()
+            val entity = roomDataSource.getCurrentVisit(patientId).first()
+            entity?.toDomain()
         } catch (e: Exception) {
             Log.e("VisitRepository", "Error getting visits: ${e.message}")
             null
         }
     }
-
 }

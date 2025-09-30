@@ -12,7 +12,7 @@ class VisitUseCase @Inject constructor(
         return visitRepository.addVisit(visit)
     }
 
-    fun getCurrentVisit(patientId: String): Visit? {
+    suspend fun getCurrentVisit(patientId: String): Visit? {
         return visitRepository.getCurrentVisit(patientId)
     }
 }

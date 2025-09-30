@@ -126,7 +126,7 @@ class RegistrationScreenViewModel @Inject constructor(
         }
     }
 
-    fun getCurrentVisit(patientId: String) = visitUseCase.getCurrentVisit(patientId)
+    suspend fun getCurrentVisit(patientId: String) = visitUseCase.getCurrentVisit(patientId)
 
     // --------------Demographics-----------------------
 

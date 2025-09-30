@@ -1,10 +1,6 @@
 package com.unimib.oases.domain.model
 
 import com.unimib.oases.data.mapper.serializer.LocalDateSerializer
-import com.unimib.oases.domain.model.complaint.ImmediateTreatment
-import com.unimib.oases.domain.model.complaint.LabelledTest
-import com.unimib.oases.domain.model.complaint.SupportiveTherapyText
-import com.unimib.oases.domain.model.symptom.Symptom
 import kotlinx.serialization.Serializable
 import java.time.LocalDate
 import java.util.UUID
@@ -16,8 +12,7 @@ data class Visit(
     val triageCode: TriageCode = TriageCode.GREEN,
     @Serializable(with = LocalDateSerializer::class)
     val date: LocalDate = LocalDate.now(),
-    val description: String = "",
-    val complaints: Set<ComplaintSummary> = emptySet()
+    val description: String = ""
 ){
     val status: VisitStatus
         get() = if (date.isBefore(LocalDate.now())) VisitStatus.CLOSED else VisitStatus.OPEN
@@ -38,12 +33,3 @@ enum class VisitStatus{
     OPEN,
     CLOSED
 }
-@Serializable
-data class ComplaintSummary(
-    val complaintId: String,
-    val symptoms: Set<Symptom>,
-    val tests: Set<LabelledTest>,
-    val immediateTreatments: Set<ImmediateTreatment>,
-    val supportiveTherapies: Set<SupportiveTherapyText>,
-    val additionalTests: String
-)

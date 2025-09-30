@@ -4,6 +4,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.unimib.oases.data.local.Converters
+import com.unimib.oases.data.local.dao.ComplaintSummaryDao
 import com.unimib.oases.data.local.dao.DiseaseDao
 import com.unimib.oases.data.local.dao.MalnutritionScreeningDao
 import com.unimib.oases.data.local.dao.PatientDao
@@ -13,6 +14,7 @@ import com.unimib.oases.data.local.dao.TriageEvaluationDao
 import com.unimib.oases.data.local.dao.VisitDao
 import com.unimib.oases.data.local.dao.VisitVitalSignDao
 import com.unimib.oases.data.local.dao.VitalSignsDao
+import com.unimib.oases.data.local.model.ComplaintSummaryEntity
 import com.unimib.oases.data.local.model.DiseaseEntity
 import com.unimib.oases.data.local.model.MalnutritionScreeningEntity
 import com.unimib.oases.data.local.model.PatientDiseaseEntity
@@ -34,6 +36,7 @@ import com.unimib.oases.data.local.model.VitalSignEntity
         VisitVitalSignEntity::class,
         VitalSignEntity::class,
         RoomEntity::class,
+        ComplaintSummaryEntity::class
     ],
     version = 1
 )
@@ -49,4 +52,5 @@ abstract class OasesDatabase : RoomDatabase() {
     abstract fun visitVitalSignDao(): VisitVitalSignDao
     abstract fun vitalSignDao(): VitalSignsDao
     abstract fun roomsDao(): RoomsDao
+    abstract fun complaintSummaryDao(): ComplaintSummaryDao
 }

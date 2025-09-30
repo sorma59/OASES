@@ -7,13 +7,17 @@ fun main() {
     val stmt = conn.createStatement()
 
     /*
-        * const val DISEASE = "diseases"
+        const val DISEASE = "diseases"
         const val PATIENT_DISEASE = "patients_diseases"
         const val PATIENT = "patients"
         const val USER = "users"
         const val VISIT = "visits"
         const val VISIT_VITAL_SIGN = "visits_vital_signs"
         const val VITAL_SIGN = "vital_signs"
+        const val TRIAGE_EVALUATION = "triage_evaluations"
+        const val MALNUTRITION_SCREENING = "malnutrition_screenings"
+        const val ROOMS = "rooms"
+        const val COMPLAINT_SUMMARY = "complaints_summaries"
 
         enum class SexSpecificity(val displayName: String) {
             MALE("Male"),
@@ -145,6 +149,23 @@ fun main() {
             bmi DOUBLE NOT NULL,
             
             PRIMARY KEY(visit_id),
+            FOREIGN KEY(visit_id) REFERENCES visits(id) ON UPDATE NO ACTION ON DELETE CASCADE
+        )  
+    """.trimIndent())
+
+    stmt.execute("DROP TABLE IF EXISTS complaints_summaries")
+    stmt.execute("""
+        CREATE TABLE complaints_summaries (
+            visit_id TEXT NOT NULL,
+            complaint_id TEXT NOT NULL,
+            algorithms_questions_and_answers TEXT NOT NULL,
+            symptoms TEXT NOT NULL,
+            labelled_tests TEXT NOT NULL,
+            immediate_treatments TEXT NOT NULL,
+            supportive_therapies TEXT NOT NULL,
+            additional_tests TEXT NOT NULL,
+            
+            PRIMARY KEY(visit_id, complaint_id),
             FOREIGN KEY(visit_id) REFERENCES visits(id) ON UPDATE NO ACTION ON DELETE CASCADE
         )  
     """.trimIndent())

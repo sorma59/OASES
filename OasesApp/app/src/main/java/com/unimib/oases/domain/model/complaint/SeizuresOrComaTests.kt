@@ -33,19 +33,19 @@ data object SeizuresOrComaBasicTests: Condition {
     override val predicate = { symptoms: Set<Symptom> -> true }
     override val suggestedTests = listOf(
         LabelledTest(
-            test = RapidBloodSugarTest,
+            testId = RapidBloodSugarTest.id,
             label = "Rapid blood sugar (RBS) in all patients"
         ),
         LabelledTest(
-            test = CompleteBloodCountTest,
+            testId = CompleteBloodCountTest.id,
             label = "Complete blood count (CBC) in patients with severe illness, fever, signs of anemia, HIV"
         ),
         LabelledTest(
-            test = MalariaRapidDiagnosticTest,
+            testId = MalariaRapidDiagnosticTest.id,
             label = "Malaria rapid diagnostic test (MRDT) in patients with severe illness, fever, pallor"
         ),
         LabelledTest(
-            test = BloodSmearForMalariaParasitesTest,
+            testId = BloodSmearForMalariaParasitesTest.id,
             label = "Blood smear for malaria parasites (B/S) in patients with severe illness, fever, pallor"
         )
     )
@@ -70,7 +70,7 @@ data object SeizuresOrComaRiskOfCNSInfectionTests: Condition {
     }
     override val suggestedTests = listOf(
         LabelledTest(
-            test = LumbarPunctureAndCSFExamination,
+            testId = LumbarPunctureAndCSFExamination.id,
             label = "Lumbar puncture and CSF examination"
         )
     )
@@ -86,11 +86,11 @@ data object SeizuresOrComaRiskOfTuberculosisTests: Condition {
     }
     override val suggestedTests = listOf(
         LabelledTest(
-            test = TuberculosisGeneXpert,
+            testId = TuberculosisGeneXpert.id,
             label = "TB GeneXpert on CSF / sputum / gastric aspirate"
         ),
         LabelledTest(
-            test = AcidFastBacilliMicroscopy,
+            testId = AcidFastBacilliMicroscopy.id,
             label = "Microscopy for acid-fast bacilli on CSF / sputum / gastric aspirate"
         )
     )
@@ -106,7 +106,7 @@ data object SeizuresOrComaRiskOfHIVTests: Condition {
     }
     override val suggestedTests = listOf(
         LabelledTest(
-            HIVTest
+            HIVTest.id
         )
     )
 }
@@ -118,7 +118,7 @@ data object SeizuresOrComaPatientWithHeadInjuryTests: Condition {
     }
     override val suggestedTests = listOf(
         LabelledTest(
-            test = SkullXRay
+            testId = SkullXRay.id
         )
     )
 }
@@ -133,18 +133,18 @@ data object SeizuresOrComaRiskOfRenalOrLiverFailureOrElectrolytesDisorderTests: 
     }
     override val suggestedTests = listOf(
         LabelledTest(
-            test = RenalFunctionTests,
+            testId = RenalFunctionTests.id,
             label = "Renal function tests (creatinine, urea)"
         ),
         LabelledTest(
-            test = ElectrolytesTests,
+            testId = ElectrolytesTests.id,
             label = "Electrolytes (Na, K)"
         ),
         LabelledTest(
-            test = Urinalysis
+            testId = Urinalysis.id
         ),
         LabelledTest(
-            test = LiverFunctionTests,
+            testId = LiverFunctionTests.id,
             label = "Liver function tests (ast, alt, bilirubin)"
         )
     )

@@ -1,6 +1,5 @@
 package com.unimib.oases.ui.screen.medical_visit.maincomplaint
 
-import com.unimib.oases.domain.model.ComplaintSummary
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.domain.model.complaint.Complaint
 import com.unimib.oases.domain.model.complaint.ComplaintQuestion
@@ -23,19 +22,6 @@ fun List<ImmediateTreatmentQuestionState>.rebranch(node: ManualNode, answer: Boo
     list.removeAt(list.lastIndex)
     list.add(ImmediateTreatmentQuestionState(node, answer))
     return list.toList()
-}
-
-fun MainComplaintState.toComplaintSummary(): ComplaintSummary{
-    check(this.immediateTreatments.all { it != null })
-    check(this.supportiveTherapies != null)
-    return ComplaintSummary(
-        complaintId = this.complaintId,
-        symptoms = this.symptoms,
-        tests = this.requestedTests,
-        immediateTreatments = this.immediateTreatments.toSet() as Set<ImmediateTreatment>,
-        supportiveTherapies = this.supportiveTherapies.map { it.therapy }.toSet(),
-        additionalTests = this.additionalTestsText
-    )
 }
 
 data class MainComplaintState(

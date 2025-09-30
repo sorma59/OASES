@@ -1,5 +1,6 @@
 package com.unimib.oases.domain.usecase
 
+import android.util.Log
 import com.unimib.oases.domain.model.symptom.Symptom
 import javax.inject.Inject
 
@@ -32,6 +33,8 @@ class TranslateLatestVitalSignsToSymptomsUseCase @Inject constructor(
                     }
                 }
             }
+        } ?: run {
+            Log.e("GetCurrentVisitUseCase", "Visit not found")
         }
 
         return symptoms.toSet()

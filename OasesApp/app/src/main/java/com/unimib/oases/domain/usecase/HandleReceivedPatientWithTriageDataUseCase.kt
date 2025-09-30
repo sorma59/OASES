@@ -2,6 +2,7 @@ package com.unimib.oases.domain.usecase
 
 import android.util.Log
 import com.unimib.oases.data.bluetooth.transfer.PatientFullData
+import com.unimib.oases.domain.repository.ComplaintSummaryRepository
 import com.unimib.oases.domain.repository.MalnutritionScreeningRepository
 import com.unimib.oases.domain.repository.PatientDiseaseRepository
 import com.unimib.oases.domain.repository.PatientRepository
@@ -19,7 +20,8 @@ class HandleReceivedPatientWithTriageDataUseCase @Inject constructor(
     private val patientDiseaseRepository: PatientDiseaseRepository,
     private val visitVitalSignRepository: VisitVitalSignRepository,
     private val triageEvaluationRepository: TriageEvaluationRepository,
-    private val malnutritionScreeningRepository: MalnutritionScreeningRepository
+    private val malnutritionScreeningRepository: MalnutritionScreeningRepository,
+    private val complaintSummaryRepository: ComplaintSummaryRepository
 ) {
     suspend operator fun invoke(patientWithTriageData: PatientFullData) = withContext(Dispatchers.IO) {
         try {
@@ -50,6 +52,13 @@ class HandleReceivedPatientWithTriageDataUseCase @Inject constructor(
             if (patientWithTriageData.malnutritionScreening != null)
                 if (malnutritionScreeningRepository.insertMalnutritionScreening(patientWithTriageData.malnutritionScreening) is Resource.Error)
                     throw Exception("Failed to insert malnutrition screening ${patientWithTriageData.malnutritionScreening}")
+
+            // Add the complaint summaries to the db
+            patientWithTriageData.complaintsSummaries.forEach {
+                if (complaintSummaryRepository.addComplaintSummary(it) is Resource.Error)
+                    throw Exception("Failed to insert complaint summary $it")
+            }
+
 
         } catch (e: Exception) {
             Log.e("PatientWithTriageDataInsertUseCase", "Failed to insert patient full data", e)
