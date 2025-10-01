@@ -12,13 +12,6 @@ plugins {
 //    alias(libs.plugins.google.gms.google.services)
 }
 
-val localProperties = rootProject.file("gradle.local.properties")
-    .takeIf { it.exists() }
-    ?.reader()
-    ?.use {
-        Properties().apply { load(it) }
-    } ?: Properties()
-
 android {
     namespace = "com.unimib.oases"
     compileSdk = 35
@@ -33,12 +26,20 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    val keyFile = "gradle.local.properties"
+
     signingConfigs {
-        create("release") {
-            storeFile = file(localProperties["KEYSTORE_FILE"] ?: "")
-            storePassword = localProperties["KEYSTORE_PASSWORD"] as String?
-            keyAlias = localProperties["KEY_ALIAS"] as String?
-            keyPassword = localProperties["KEY_PASSWORD"] as String?
+        val localPropertiesFile = rootProject.file(keyFile)
+        if (localPropertiesFile.exists()) {
+            val localProperties = Properties().apply {
+                localPropertiesFile.reader().use { load(it) }
+            }
+            create("release") {
+                storeFile = file(localProperties["KEYSTORE_FILE"] ?: "")
+                storePassword = localProperties["KEYSTORE_PASSWORD"] as String?
+                keyAlias = localProperties["KEY_ALIAS"] as String?
+                keyPassword = localProperties["KEY_PASSWORD"] as String?
+            }
         }
     }
 
@@ -49,7 +50,12 @@ android {
             isMinifyEnabled = false
         }
         release {
-            signingConfig = signingConfigs.getByName("release")
+            val signing = signingConfigs.findByName("release")
+            if (signing != null) {
+                signingConfig = signing
+            } else {
+                throw GradleException("Missing $keyFile: cannot build a signed release APK")
+            }
             isMinifyEnabled = false
             isShrinkResources = false
         }
