@@ -49,15 +49,13 @@ android {
             versionNameSuffix = "-debug"
             isMinifyEnabled = false
         }
-        release {
-            val signing = signingConfigs.findByName("release")
-            if (signing != null) {
+        val signing = signingConfigs.findByName("release")
+        if (signing != null){
+            release {
                 signingConfig = signing
-            } else {
-                throw GradleException("Missing $keyFile: cannot build a signed release APK")
+                isMinifyEnabled = false
+                isShrinkResources = false
             }
-            isMinifyEnabled = false
-            isShrinkResources = false
         }
     }
     compileOptions {
