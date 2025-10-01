@@ -70,7 +70,6 @@ fun Array<Tab>.next(currentIndex: Int) = if (currentIndex != this.lastIndex) thi
 
 fun Array<Tab>.previous(currentIndex: Int) = if (currentIndex != 0) this[(currentIndex - 1)] else null
 
-
 @HiltViewModel
 class RegistrationScreenViewModel @Inject constructor(
     private val patientUseCase: PatientUseCase,
