@@ -1,9 +1,7 @@
 package com.unimib.oases.domain.model
 
-import kotlinx.serialization.Serializable
 import java.util.UUID
 
-@Serializable
 data class MalnutritionScreening(
 
     val visitId: String = UUID.randomUUID().toString(),
