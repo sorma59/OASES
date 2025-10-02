@@ -5,7 +5,6 @@ import com.unimib.oases.data.local.model.PatientStatus
 import com.unimib.oases.domain.model.Patient
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 object PatientSerializer {
@@ -118,10 +117,10 @@ object PatientSerializer {
         val district = buffer.readString()
         val nextOfKin = buffer.readString()
         val contact = buffer.readString()
-        val status = buffer.readString()
         val room = buffer.readString()
         val arrivalTime = buffer.readString()
         val code = buffer.readString()
+        val status = buffer.readString()
 
         val imageLength = buffer.int
         val image = if (imageLength > 0) {
