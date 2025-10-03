@@ -1,0 +1,28 @@
+package com.unimib.oases.domain.usecase
+
+import com.unimib.oases.domain.model.ComplaintSummary
+import com.unimib.oases.domain.repository.ComplaintSummaryRepository
+import com.unimib.oases.util.Resource
+import kotlinx.coroutines.flow.first
+import javax.inject.Inject
+
+class GetCurrentVisitMainComplaintUseCase @Inject constructor(
+    private val getCurrentVisitUseCase: GetCurrentVisitUseCase,
+    private val complaintSummaryRepository: ComplaintSummaryRepository
+) {
+
+    suspend operator fun invoke(patientId: String): Resource<List<ComplaintSummary>> {
+        val visitId = getCurrentVisitUseCase(patientId)?.id
+        visitId?.let{
+            return try {
+                val complaints = complaintSummaryRepository.getVisitComplaintsSummaries(visitId).first {
+                    it is Resource.Success || it is Resource.Error
+                }
+                complaints
+            } catch (e: Exception) {
+                Resource.Error(e.message ?: "Unknown error")
+            }
+        }
+        return Resource.Error("No current visit")
+    }
+}

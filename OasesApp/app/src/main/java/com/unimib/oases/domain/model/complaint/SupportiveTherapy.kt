@@ -11,5 +11,7 @@ sealed class SupportiveTherapy(
 }
 
 @JvmInline
-value class SupportiveTherapyText(val text: String)
+value class SupportiveTherapyText(val text: String) {
+    override fun toString(): String = text
+}
 

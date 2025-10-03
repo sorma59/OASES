@@ -23,7 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PatientDashboardViewModel @Inject constructor(
     private val patientRepository: PatientRepository,
-    configurePatientDashboardButtonsUseCase: ConfigPatientDashboardButtonsUseCase,
+    private val configurePatientDashboardButtonsUseCase: ConfigPatientDashboardButtonsUseCase,
     savedStateHandle: SavedStateHandle,
     @IoDispatcher private val dispatcher: CoroutineDispatcher
 ): ViewModel(){
@@ -31,7 +31,7 @@ class PatientDashboardViewModel @Inject constructor(
     private val _state = MutableStateFlow(
         PatientDashboardState(
             patientId = savedStateHandle["patientId"]!!,
-            buttons = configurePatientDashboardButtonsUseCase()
+            buttons = emptyList(),
         )
     )
     val state: StateFlow<PatientDashboardState> = _state.asStateFlow()
@@ -43,7 +43,19 @@ class PatientDashboardViewModel @Inject constructor(
     val uiEvents = uiEventsChannel.receiveAsFlow()
 
     init {
+        refresh()
+    }
+
+    private fun refresh() {
         getPatientData()
+        getButtons()
+    }
+
+    private fun getButtons() {
+        viewModelScope.launch {
+            val buttons = configurePatientDashboardButtonsUseCase(_state.value.patientId)
+            _state.value = _state.value.copy(buttons = buttons)
+        }
     }
 
     private fun getPatientData() {
@@ -118,6 +130,10 @@ class PatientDashboardViewModel @Inject constructor(
                 viewModelScope.launch(dispatcher){
                     navigationEventsChannel.send(NavigationEvent.NavigateBack)
                 }
+            }
+
+            PatientDashboardEvent.Refresh -> {
+                refresh()
             }
         }
 

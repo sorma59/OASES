@@ -3,6 +3,7 @@ package com.unimib.oases.ui.screen.medical_visit.maincomplaint
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.unimib.oases.data.local.model.PatientStatus
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.model.complaint.ComplaintId
 import com.unimib.oases.domain.model.complaint.ComplaintQuestion
@@ -21,18 +22,21 @@ import com.unimib.oases.domain.usecase.SubmitMedicalVisitPartOneUseCase
 import com.unimib.oases.domain.usecase.TranslateLatestVitalSignsToSymptomsUseCase
 import com.unimib.oases.domain.usecase.TranslateTriageSymptomIdsToSymptomsUseCase
 import com.unimib.oases.domain.usecase.VisitUseCase
+import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.screen.nurse_assessment.patient_registration.Sex.Companion.fromDisplayName
 import com.unimib.oases.util.Resource
 import com.unimib.oases.util.toggle
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -71,6 +75,9 @@ class MainComplaintViewModel @Inject constructor(
         )
     )
     val state: StateFlow<MainComplaintState> = _state.asStateFlow()
+
+    private val navigationEventsChannel = Channel<NavigationEvent>()
+    val navigationEvents = navigationEventsChannel.receiveAsFlow()
 
     val additionalTestsText: StateFlow<String> = _state
         .map { it.additionalTestsText }
@@ -337,6 +344,10 @@ class MainComplaintViewModel @Inject constructor(
                                     toastMessage = "Medical visit submitted successfully"
                                 )
                             }
+                            patientRepository.addPatient(_state.value.patient!!.copy(
+                                status = PatientStatus.WAITING_FOR_TEST_RESULTS.displayValue
+                            ))
+                            navigationEventsChannel.send(NavigationEvent.NavigateBack)
                         }
 
                         else -> Unit

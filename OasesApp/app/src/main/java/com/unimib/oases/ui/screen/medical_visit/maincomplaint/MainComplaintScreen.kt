@@ -87,6 +87,12 @@ fun MainComplaintScreen(
 
     val onSubmit = { viewModel.onEvent(MainComplaintEvent.SubmitPressed) }
 
+    LaunchedEffect(Unit) {
+        viewModel.navigationEvents.collect {
+            appViewModel.onNavEvent(it)
+        }
+    }
+
     LaunchedEffect(state.toastMessage){
         state.toastMessage?.let {
             ToastUtils.showToast(context, it)

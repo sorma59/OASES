@@ -106,6 +106,7 @@ class PatientRepositoryImpl @Inject constructor(
             .catch { e -> emit(Resource.Error(e.message ?: "Unknown error")) }
 
 
+
     override fun doOnlineTasks(){
         println("Doing Online tasks")
     }

@@ -64,10 +64,9 @@ private fun PastMedicalHistoryBox(
     patientId: String,
     appViewModel: AppViewModel
 ){
-    MedicalVisitBoxButton(
+    BoxButton(
         label = "Past Medical History",
-        destination = Screen.PastMedicalHistoryScreen.route +
-            "/patientId=$patientId",
+        destination = Screen.PastMedicalHistoryScreen.route + "/patientId=$patientId",
         appViewModel
     )
 }
@@ -89,63 +88,31 @@ private fun MainComplaintsGrid(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            DiarrheaBox(patientId, appViewModel)
-
-            DyspneaBox(patientId, appViewModel)
-
-            SeizuresOrComaBox(patientId, appViewModel)
+            for (complaint in ComplaintId.entries)
+                MainComplaintBoxButton(complaint, patientId, appViewModel)
         }
     }
 }
 
 @Composable
-fun SeizuresOrComaBox(
+private fun MainComplaintBoxButton(
+    complaintId: ComplaintId,
     patientId: String,
     appViewModel: AppViewModel
-) {
-    MedicalVisitBoxButton(
-        label = "Seizures / Coma",
-        destination = MainComplaintScreen.route +
-                "/patientId=${patientId}" +
-                "/complaintId=${ComplaintId.SEIZURES_OR_COMA.id}",
+){
+    BoxButton(
+        complaintId.label,
+        MainComplaintScreen.route + "/patientId=$patientId/complaintId=${complaintId.id}",
         appViewModel
     )
 }
 
 @Composable
-private fun DyspneaBox(
-    patientId: String,
-    appViewModel: AppViewModel
-) {
-    MedicalVisitBoxButton(
-        label = "Dyspnea",
-        destination = MainComplaintScreen.route +
-            "/patientId=${patientId}" +
-            "/complaintId=${ComplaintId.DYSPNEA.id}",
-        appViewModel
-    )
-}
-
-@Composable
-private fun DiarrheaBox(
-    patientId: String,
-    appViewModel: AppViewModel
-) {
-    MedicalVisitBoxButton(
-        label = "Diarrhea",
-        destination = MainComplaintScreen.route +
-            "/patientId=${patientId}" +
-            "/complaintId=${ComplaintId.DIARRHEA.id}",
-        appViewModel
-    )
-}
-
-@Composable
-private fun MedicalVisitBoxButton(
+private fun BoxButton(
     label: String,
     destination: String,
     appViewModel: AppViewModel
-){
+) {
     Box(
         modifier = Modifier
             .size(128.dp)

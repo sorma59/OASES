@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.MedicalServices
 import androidx.compose.material.icons.outlined.Person
@@ -22,10 +24,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.unimib.oases.domain.model.ComplaintSummary
 import com.unimib.oases.domain.model.Patient
+import com.unimib.oases.domain.model.complaint.ComplaintId
+import com.unimib.oases.ui.components.util.TitleText
 import com.unimib.oases.ui.components.util.button.RetryButton
 import com.unimib.oases.ui.screen.root.AppViewModel
 import com.unimib.oases.util.StringFormatHelper.getAgeWithSuffix
@@ -39,40 +45,28 @@ fun PatientDetailsScreen(
 
     val state by viewModel.state.collectAsState()
 
+    val scrollState = rememberScrollState()
+
     LaunchedEffect(Unit) {
         viewModel.navigationEvents.collect {
             appViewModel.onNavEvent(it)
         }
     }
 
-    Column(Modifier.fillMaxSize()){
+    Column(
+        verticalArrangement = Arrangement.spacedBy(32.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .verticalScroll(scrollState),
+    ){
 
         state.patient?.let {
-            Column(
-                verticalArrangement = Arrangement.Bottom,
-                modifier = Modifier.padding(horizontal = 16.dp)
-            ) {
-
-                Spacer(Modifier.height(24.dp))
-
-                Box(
-                    modifier = Modifier.weight(1f)
-                ) {
-//                        EditButton(
-//                            onClick = { viewModel.onEvent(PatientDetailsEvent.OnEdit) },
-//                            contentDescription = "Edit patient details"
-//                        ) // Top Right
-
-                    PatientDetails(it)
-                }
-
-//                BottomButtons(
-//                    onCancel = { viewModel.onEvent(PatientDetailsEvent.OnBack) },
-//                    onConfirm = { viewModel.onEvent(PatientDetailsEvent.OnNext) },
-//                    cancelButtonText = "Back",
-//                    confirmButtonText = "Next",
-//                )
-            }
+            PatientDetails(it)
+//          EditButton(
+//              onClick = { viewModel.onEvent(PatientDetailsEvent.OnEdit) },
+//              contentDescription = "Edit patient details"
+//          ) // Top Right
         }
             ?: Box(Modifier.fillMaxSize()) {
                 RetryButton(
@@ -80,17 +74,130 @@ fun PatientDetailsScreen(
                     onClick = { viewModel.onEvent(PatientDetailsEvent.OnRetry) },
                 )
             }
+
+        MainComplaintsDetails(state)
+    }
+}
+
+@Composable
+fun MainComplaintsDetails(state: PatientDetailsState) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ){
+        for (complaint in state.mainComplaintsSummaries) {
+            MainComplaintSummary(complaint)
+            HorizontalDivider()
+        }
+    }
+}
+
+@Composable
+fun MainComplaintSummary(complaint: ComplaintSummary) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ){
+        val title = ComplaintId.complaints[complaint.complaintId]!!.label
+        TitleText(title)
+
+        TitleText("Answers", fontSize = 16)
+
+        for (algorithmQuestionsAndAnswer in complaint.algorithmsQuestionsAndAnswers) {
+            for (questionAndAnswer in algorithmQuestionsAndAnswer){
+                Text(
+                    text = questionAndAnswer.question,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = questionAndAnswer.answer,
+                    fontSize = 14.sp
+                )
+            }
+        }
+
+        HorizontalDivider()
+
+        TitleText("Suggested immediate treatments", fontSize = 16)
+
+        for (immediateTreatment in complaint.immediateTreatments) {
+            Text(
+                text = immediateTreatment.text,
+                fontSize = 14.sp
+            )
+        }
+
+
+        HorizontalDivider()
+
+        TitleText("Symptoms", fontSize = 16)
+
+        if (complaint.symptoms.isNotEmpty()){
+            for (symptom in complaint.symptoms) {
+                Text(
+                    text = symptom.label,
+                    fontSize = 14.sp
+                )
+            }
+        } else {
+            Text(
+                text = "None",
+                fontSize = 14.sp
+            )
+        }
+
+        HorizontalDivider()
+
+        TitleText("Selected tests", fontSize = 16)
+
+        if (complaint.tests.isNotEmpty() || complaint.additionalTests.isNotBlank()){
+            for (test in complaint.tests) {
+                Text(
+                    text = test.label,
+                    fontSize = 14.sp
+                )
+            }
+        } else {
+            Text(
+                text = "None",
+                fontSize = 14.sp
+            )
+        }
+
+
+        if (complaint.additionalTests.isNotBlank()){
+            TitleText("Additional tests", fontSize = 16)
+
+            Text(
+                text = complaint.additionalTests,
+                fontSize = 14.sp
+            )
+        }
+
+
+        HorizontalDivider()
+
+        TitleText("Suggested supportive therapies", fontSize = 16)
+
+        if (complaint.supportiveTherapies.isNotEmpty()){
+            for (supportiveTherapy in complaint.supportiveTherapies) {
+                Text(
+                    text = supportiveTherapy.text,
+                    fontSize = 14.sp
+                )
+            }
+        } else {
+            Text(
+                text = "None",
+                fontSize = 14.sp
+            )
+        }
+
     }
 }
 
 @Composable
 private fun PatientDetails(patient: Patient) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-
-    ) {
+    Column {
         Row(
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.spacedBy(12.dp)

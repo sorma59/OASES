@@ -27,11 +27,19 @@ sealed interface Complaint {
     val therapies get() = supportiveTherapies.therapies
 }
 
-enum class ComplaintId(val value: SnakeCaseString) {
+enum class ComplaintId(val value: SnakeCaseString, val label: String) {
 
-    DIARRHEA(snakeCase("diarrhea")),
-    DYSPNEA(snakeCase("dyspnea")),
-    SEIZURES_OR_COMA(snakeCase("seizures_or_coma"));
+    DIARRHEA(snakeCase("diarrhea"), "Diarrhea"),
+    DYSPNEA(snakeCase("dyspnea"), "Dyspnea"),
+    SEIZURES_OR_COMA(snakeCase("seizures_or_coma"), "Seizures or coma");
+
+    companion object {
+        val complaints = mapOf(
+            DIARRHEA.id to DIARRHEA,
+            DYSPNEA.id to DYSPNEA,
+            SEIZURES_OR_COMA.id to SEIZURES_OR_COMA
+        )
+    }
 
     val id: String
         get() = value.string

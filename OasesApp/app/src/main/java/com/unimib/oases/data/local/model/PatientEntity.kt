@@ -5,7 +5,6 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.unimib.oases.data.local.TableNames
 import com.unimib.oases.ui.screen.nurse_assessment.patient_registration.Sex
-import java.time.LocalDateTime
 
 @Entity(tableName = TableNames.PATIENT)
 data class PatientEntity (
@@ -34,5 +33,6 @@ enum class PatientStatus(val displayValue: String) {
     WAITING_FOR_TRIAGE("Waiting for triage"),
     WAITING_FOR_VISIT("Waiting for visit"),
     WAITING_FOR_TEST_RESULTS("Waiting for test results"),
+    HOSPITALIZED("Hospitalized"),
     DISMISSED("Dismissed")
 }

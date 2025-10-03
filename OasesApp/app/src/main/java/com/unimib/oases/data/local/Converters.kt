@@ -3,7 +3,9 @@ package com.unimib.oases.data.local
 import android.util.Base64
 import androidx.room.TypeConverter
 import com.unimib.oases.domain.model.QuestionAndAnswer
+import com.unimib.oases.domain.model.complaint.ImmediateTreatment
 import com.unimib.oases.domain.model.complaint.LabelledTest
+import com.unimib.oases.domain.model.complaint.SupportiveTherapyText
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -49,5 +51,23 @@ object Converters {
         return if (value.isEmpty()) emptyList() else Json.decodeFromString(value)
     }
 
+    @TypeConverter
+    fun fromImmediateTreatmentListToString(list: List<ImmediateTreatment>): String {
+        return list.joinToString(separator = "_")
+    }
 
+    @TypeConverter
+    fun fromStringToImmediateTreatmentList(string: String): List<ImmediateTreatment> {
+        return if (string.isBlank()) emptyList() else string.split("_").map{ ImmediateTreatment(it) }
+    }
+
+    @TypeConverter
+    fun fromSupportiveTherapyTextListToString(list: List<SupportiveTherapyText>): String {
+        return list.joinToString(separator = "_")
+    }
+
+    @TypeConverter
+    fun fromStringToSupportiveTherapyTextList(string: String): List<SupportiveTherapyText> {
+        return if (string.isBlank()) emptyList() else string.split("_").map{ SupportiveTherapyText("G$it") }
+    }
 }

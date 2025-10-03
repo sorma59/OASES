@@ -50,23 +50,30 @@ import com.unimib.oases.ui.util.ToastUtils
 @Composable
 fun PatientDashboardScreen(
     appViewModel: AppViewModel,
-    patientDashboardViewModel: PatientDashboardViewModel = hiltViewModel()
+    viewModel: PatientDashboardViewModel = hiltViewModel()
 ) {
 
-    val state by patientDashboardViewModel.state.collectAsState()
+    val state by viewModel.state.collectAsState()
 
     var showAlertDialog by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        patientDashboardViewModel.navigationEvents.collect {
+        viewModel.navigationEvents.collect {
             appViewModel.onNavEvent(it)
         }
     }
 
+    LaunchedEffect(context) {
+        // Refresh button and patient info every time the screen appears
+        viewModel.onEvent(
+            PatientDashboardEvent.Refresh
+        )
+    }
+
     LaunchedEffect(Unit) {
-        patientDashboardViewModel.uiEvents.collect {
+        viewModel.uiEvents.collect {
             showAlertDialog = when(it){
                 PatientDashboardViewModel.UiEvent.ShowDialog -> {
                     true
@@ -99,7 +106,7 @@ fun PatientDashboardScreen(
 
             PatientItem(
                 patient = state.patient,
-                onClick = { patientDashboardViewModel.onEvent(PatientDashboardEvent.PatientItemClicked) },
+                onClick = { viewModel.onEvent(PatientDashboardEvent.PatientItemClicked) },
                 errorText = "Could not load patient info, tap to retry \n${state.error}",
                 isLoading = state.isLoading
             )
@@ -121,7 +128,7 @@ fun PatientDashboardScreen(
 
                         IconButton(
                             onClick = {
-                                patientDashboardViewModel.onEvent(
+                                viewModel.onEvent(
                                     PatientDashboardEvent.ActionButtonClicked(
                                         button
                                     )
@@ -157,7 +164,7 @@ fun PatientDashboardScreen(
             confirmButton = {
                 DeleteButton(
                     onDelete = {
-                        patientDashboardViewModel.onEvent(
+                        viewModel.onEvent(
                             PatientDashboardEvent.PatientDeletionConfirmed
                         )
                     }

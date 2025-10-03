@@ -5,7 +5,9 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import com.unimib.oases.data.local.TableNames
 import com.unimib.oases.domain.model.QuestionAndAnswer
+import com.unimib.oases.domain.model.complaint.ImmediateTreatment
 import com.unimib.oases.domain.model.complaint.LabelledTest
+import com.unimib.oases.domain.model.complaint.SupportiveTherapyText
 
 @Entity(
     tableName = TableNames.COMPLAINT_SUMMARY,
@@ -26,7 +28,7 @@ data class ComplaintSummaryEntity(
     val algorithmsQuestionsAndAnswers: List<List<QuestionAndAnswer>>,
     val symptoms: List<String>,
     @ColumnInfo(name = "labelled_tests") val labelledTests: List<LabelledTest>,
-    @ColumnInfo(name = "immediate_treatments") val immediateTreatments: List<String>,
-    @ColumnInfo(name = "supportive_therapies") val supportiveTherapies: List<String>,
+    @ColumnInfo(name = "immediate_treatments") val immediateTreatments: List<ImmediateTreatment>,
+    @ColumnInfo(name = "supportive_therapies") val supportiveTherapies: List<SupportiveTherapyText>,
     @ColumnInfo(name = "additional_tests") val additionalTests: String
 )
