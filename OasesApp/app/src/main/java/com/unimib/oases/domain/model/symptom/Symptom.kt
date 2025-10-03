@@ -878,6 +878,8 @@ sealed interface Symptom {
                 put(HighHr.id, HighHr)
                 put(LowSbp.id, LowSbp)
                 put(HighSbp.id, HighSbp)
+                put(Hypotension.id, Hypotension)
+                put(HypertensiveEmergency.id, HypertensiveEmergency)
 
                 put(DiarrheaInTheLastOneToSevenDays.id, DiarrheaInTheLastOneToSevenDays)
                 put(DiarrheaInTheLastEightToFourteenDays.id, DiarrheaInTheLastEightToFourteenDays)

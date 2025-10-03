@@ -22,7 +22,7 @@ fun ComplaintSummaryEntity.toDomain(): ComplaintSummary {
         visitId = visitId,
         complaintId = complaintId,
         algorithmsQuestionsAndAnswers = algorithmsQuestionsAndAnswers,
-        symptoms = symptoms.map { Symptom.symptoms[it] ?: error("Symptom not found") }.toSet(),
+        symptoms = symptoms.map { Symptom.symptoms[it] ?: error("Symptom not found $it") }.toSet(),
         tests = labelledTests.toSet(),
         immediateTreatments = immediateTreatments.toSet(),
         supportiveTherapies = supportiveTherapies.toSet(),

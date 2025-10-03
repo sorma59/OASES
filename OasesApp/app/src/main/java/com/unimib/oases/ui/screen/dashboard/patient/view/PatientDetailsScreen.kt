@@ -53,7 +53,13 @@ fun PatientDetailsScreen(
         }
     }
 
-    Column(
+    state.error?.let {
+        RetryButton(
+            error = it,
+            onClick = { viewModel.onEvent(PatientDetailsEvent.OnRetry) },
+        )
+    }
+        ?: Column(
         verticalArrangement = Arrangement.spacedBy(32.dp),
         modifier = Modifier
             .fillMaxSize()
