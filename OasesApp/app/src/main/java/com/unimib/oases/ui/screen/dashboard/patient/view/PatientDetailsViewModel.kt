@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.domain.usecase.GetCurrentVisitMainComplaintUseCase
+import com.unimib.oases.domain.usecase.GetCurrentVisitUseCase
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,6 +25,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PatientDetailsViewModel @Inject constructor(
     private val patientRepository: PatientRepository,
+    private val getCurrentVisitUseCase: GetCurrentVisitUseCase,
     private val getCurrentVisitMainComplaintUseCase: GetCurrentVisitMainComplaintUseCase,
     savedStateHandle: SavedStateHandle,
     @IoDispatcher private val dispatcher: CoroutineDispatcher
@@ -33,7 +35,7 @@ class PatientDetailsViewModel @Inject constructor(
         e.printStackTrace()
         _state.update{
             _state.value.copy(
-                error = e.message
+                currentVisitRelatedError = e.message
             )
         }
     }
@@ -51,62 +53,76 @@ class PatientDetailsViewModel @Inject constructor(
     }
 
     private fun getPatientData() {
-        _state.update { it.copy(isLoading = true, error = null) }
-        getPatientDemographics()
-        getCurrentVisitComplaintsSummaries()
+        _state.update { it.copy(isLoading = true, currentVisitRelatedError = null, demographicsError = null) }
+        viewModelScope.launch(dispatcher + errorHandler) {
+            getPatientDemographics()
+            getCurrentVisit()
+            getComplaintsSummaries()
+        }
         _state.update { it.copy(isLoading = false) }
     }
 
-    private fun getCurrentVisitComplaintsSummaries() {
-        viewModelScope.launch(dispatcher + errorHandler) {
-            try {
-                val resource = getCurrentVisitMainComplaintUseCase(_state.value.patientId)
-                when (resource) {
-                    is Resource.Success -> {
-                        _state.update { it.copy(mainComplaintsSummaries = resource.data!!) }
-                    }
-
-                    is Resource.Error -> {
-                        _state.update { it.copy(error = resource.message) }
-                    }
-
-                    else -> Unit
+    private suspend fun getComplaintsSummaries() {
+        try {
+            val resource = getCurrentVisitMainComplaintUseCase(
+                _state.value.patientId,
+                _state.value.currentVisit
+            )
+            when (resource) {
+                is Resource.Success -> {
+                    _state.update { it.copy(mainComplaintsSummaries = resource.data!!) }
                 }
-            } catch (e: Exception) {
-                _state.update { it.copy(error = e.message) }
+
+                is Resource.Error -> {
+                    _state.update { it.copy(currentVisitRelatedError = resource.message) }
+                }
+
+                else -> Unit
             }
+        } catch (e: Exception) {
+            _state.update { it.copy(currentVisitRelatedError = e.message) }
+        }
+
+    }
+
+    private suspend fun getPatientDemographics() {
+        try {
+            val resource = patientRepository.getPatientById(_state.value.patientId).first {
+                it is Resource.Success || it is Resource.Error
+            }
+
+            when (resource) {
+                is Resource.Success -> {
+                    _state.update { it.copy(patient = resource.data) }
+                }
+
+                is Resource.Error -> {
+                    _state.update { it.copy(currentVisitRelatedError = resource.message) }
+                }
+
+                else -> Unit
+            }
+        } catch (e: Exception) {
+            _state.update { it.copy(currentVisitRelatedError = e.message) }
         }
     }
 
-    private fun getPatientDemographics() {
-        viewModelScope.launch(dispatcher + errorHandler) {
-            try {
-                val resource = patientRepository.getPatientById(_state.value.patientId).first {
-                    it is Resource.Success || it is Resource.Error
-                }
-
-                when (resource) {
-                    is Resource.Success -> {
-                        _state.update { it.copy(patient = resource.data) }
-                    }
-
-                    is Resource.Error -> {
-                        _state.update { it.copy(error = resource.message) }
-                    }
-
-                    else -> Unit
-                }
-            } catch (e: Exception) {
-                _state.update { it.copy(error = e.message) }
+    private suspend fun getCurrentVisit() {
+        val resource = getCurrentVisitUseCase(_state.value.patientId)
+        if (resource is Resource.Error)
+            _state.update { it.copy(currentVisitRelatedError = resource.message) }
+        else
+            _state.update {
+                it.copy(currentVisit = resource.data)
             }
-        }
     }
 
     fun onEvent(event: PatientDetailsEvent){
 
         viewModelScope.launch(dispatcher + errorHandler){
             when (event) {
-                PatientDetailsEvent.OnRetry -> getPatientData()
+                PatientDetailsEvent.OnRetryPatientDetails -> getPatientDemographics()
+                PatientDetailsEvent.OnRetryCurrentVisitRelated -> getComplaintsSummaries()
             }
         }
 

@@ -31,6 +31,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.unimib.oases.domain.model.ComplaintSummary
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.domain.model.complaint.ComplaintId
+import com.unimib.oases.ui.components.util.CenteredText
 import com.unimib.oases.ui.components.util.TitleText
 import com.unimib.oases.ui.components.util.button.RetryButton
 import com.unimib.oases.ui.screen.root.AppViewModel
@@ -53,13 +54,7 @@ fun PatientDetailsScreen(
         }
     }
 
-    state.error?.let {
-        RetryButton(
-            error = it,
-            onClick = { viewModel.onEvent(PatientDetailsEvent.OnRetry) },
-        )
-    }
-        ?: Column(
+    Column(
         verticalArrangement = Arrangement.spacedBy(32.dp),
         modifier = Modifier
             .fillMaxSize()
@@ -77,24 +72,39 @@ fun PatientDetailsScreen(
             ?: Box(Modifier.fillMaxSize()) {
                 RetryButton(
                     error = "Failed to load patient data",
-                    onClick = { viewModel.onEvent(PatientDetailsEvent.OnRetry) },
+                    onClick = { viewModel.onEvent(PatientDetailsEvent.OnRetryPatientDetails) },
                 )
             }
 
-        MainComplaintsDetails(state)
+        MainComplaintsDetails(state, viewModel)
     }
 }
 
 @Composable
-fun MainComplaintsDetails(state: PatientDetailsState) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ){
-        for (complaint in state.mainComplaintsSummaries) {
-            MainComplaintSummary(complaint)
-            HorizontalDivider()
+fun MainComplaintsDetails(
+    state: PatientDetailsState,
+    viewModel: PatientDetailsViewModel
+) {
+    state.currentVisit?.let {
+        state.currentVisitRelatedError?.let {
+            RetryButton(
+                error = it,
+                onClick = { viewModel.onEvent(PatientDetailsEvent.OnRetryCurrentVisitRelated) },
+            )
+        } ?: Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ){
+            TitleText("Main complaints summaries", fontSize = 22)
+            if (state.mainComplaintsSummaries.isEmpty())
+                CenteredText("No main complaints summaries")
+            else {
+                for (complaint in state.mainComplaintsSummaries) {
+                    MainComplaintSummary(complaint)
+                    HorizontalDivider()
+                }
+            }
         }
-    }
+    } ?: CenteredText("No current visit")
 }
 
 @Composable
@@ -102,8 +112,12 @@ fun MainComplaintSummary(complaint: ComplaintSummary) {
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ){
+        Spacer(Modifier.height(8.dp))
+
         val title = ComplaintId.complaints[complaint.complaintId]!!.label
-        TitleText(title)
+        TitleText(title, fontSize = 20)
+
+        Spacer(Modifier.height(8.dp))
 
         TitleText("Answers", fontSize = 16)
 
