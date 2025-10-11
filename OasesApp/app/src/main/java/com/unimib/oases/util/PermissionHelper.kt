@@ -21,7 +21,7 @@ object PermissionHelper {
      * Returns the required Bluetooth permissions based on API level.
      * Uses BLUETOOTH and BLUETOOTH_ADMIN for API < 31.
      */
-    fun getRequiredPermissions(): Array<String> {
+    fun getBluetoothPermissions(): Array<String> {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             arrayOf(
                 Manifest.permission.BLUETOOTH_SCAN,
@@ -38,9 +38,31 @@ object PermissionHelper {
     /**
      * Checks if all required Bluetooth permissions are granted.
      */
-    fun hasPermissions(): Boolean {
-        return getRequiredPermissions().all {
+    fun hasBluetoothPermissions(): Boolean {
+        return getBluetoothPermissions().all {
             ContextCompat.checkSelfPermission(appContext, it) == PackageManager.PERMISSION_GRANTED
         }
+    }
+
+    // ----------------------------
+    // Notification permission (Android 13+)
+    // ----------------------------
+    fun needsNotificationPermission(): Boolean {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+    }
+
+    fun hasNotificationPermission(): Boolean {
+        return if (needsNotificationPermission()) {
+            ContextCompat.checkSelfPermission(
+                appContext,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+        } else true // Below API 33, permission not needed
+    }
+
+    fun getNotificationPermission(): Array<String> {
+        return if (needsNotificationPermission()) {
+            arrayOf(Manifest.permission.POST_NOTIFICATIONS)
+        } else emptyArray()
     }
 }

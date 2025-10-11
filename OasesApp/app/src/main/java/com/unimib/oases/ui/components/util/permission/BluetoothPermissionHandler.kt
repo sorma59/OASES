@@ -1,4 +1,4 @@
-package com.unimib.oases.ui.components.util
+package com.unimib.oases.ui.components.util.permission
 
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -14,11 +14,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -30,7 +28,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.unimib.oases.R
 import com.unimib.oases.data.bluetooth.BluetoothCustomManager
+import com.unimib.oases.ui.components.util.CenteredText
 import com.unimib.oases.util.PermissionHelper
 
 @Composable
@@ -41,7 +41,7 @@ fun BluetoothPermissionHandler(
     var showRationale by remember { mutableStateOf(false) }
     var showSettingsDialog by remember { mutableStateOf(false) }
 
-    val permissions = PermissionHelper.getRequiredPermissions()
+    val bluetoothPermissions = PermissionHelper.getBluetoothPermissions()
 
     val permissionLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { results ->
@@ -54,7 +54,7 @@ fun BluetoothPermissionHandler(
 
     // Check and request permissions
     LaunchedEffect(Unit) {
-        val deniedPermissions = permissions.filter {
+        val deniedPermissions = bluetoothPermissions.filter {
             ContextCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED
         }
         if (deniedPermissions.isEmpty()) {
@@ -72,11 +72,11 @@ fun BluetoothPermissionHandler(
     }
 
     if (showRationale) {
-        PermissionRationaleDialog(
+        BluetoothPermissionRationaleDialog(
             onDismiss = { showRationale = false },
             onConfirm = {
                 showRationale = false
-                permissionLauncher.launch(permissions)
+                permissionLauncher.launch(bluetoothPermissions)
             }
         )
     }
@@ -93,32 +93,15 @@ fun BluetoothPermissionHandler(
 }
 
 @Composable
-fun PermissionRationaleDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Bluetooth Permission Needed") },
-        text = { Text("This app needs Bluetooth permissions to find and connect to devices. Please grant them to continue.") },
-        confirmButton = {
-            TextButton(onClick = onConfirm) { Text("OK") }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
-        }
-    )
-}
-
-@Composable
-fun GoToSettingsDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Permission Required") },
-        text = { Text("You have denied Bluetooth permissions permanently. Please go to Settings to enable them manually.") },
-        confirmButton = {
-            TextButton(onClick = onConfirm) { Text("Go to Settings") }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
-        }
+fun BluetoothPermissionRationaleDialog(
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    PermissionRationaleDialog(
+        title = "Bluetooth Permission Needed",
+        text = "${R.string.app_name} needs Bluetooth permissions to find and connect to devices. Please grant them to continue.",
+        onDismiss = onDismiss,
+        onConfirm = onConfirm
     )
 }
 
@@ -132,7 +115,7 @@ fun NoPermissionMessage(
     var showRationale by remember { mutableStateOf(false) }
     var showSettingsDialog by remember { mutableStateOf(false) }
 
-    val permissions = PermissionHelper.getRequiredPermissions()
+    val permissions = PermissionHelper.getBluetoothPermissions()
 
     val permissionLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { results ->
@@ -182,7 +165,7 @@ fun NoPermissionMessage(
     }
 
     if (showRationale) {
-        PermissionRationaleDialog(
+        BluetoothPermissionRationaleDialog(
             onDismiss = { showRationale = false },
             onConfirm = {
                 showRationale = false

@@ -1,10 +1,7 @@
 package com.unimib.oases.data.bluetooth
 
-import com.unimib.oases.data.bluetooth.transfer.PatientFullData
-import com.unimib.oases.domain.model.Patient
+import com.unimib.oases.domain.model.PatientFullData
 
 interface PatientHandler {
-    suspend fun onPatientReceived(patient: Patient)
-
-    suspend fun onPatientWithTriageDataReceived(patientWithTriageData: PatientFullData)
+    suspend fun onPatientReceived(patientFullData: PatientFullData)
 }

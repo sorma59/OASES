@@ -16,12 +16,12 @@ import com.unimib.oases.domain.repository.TriageEvaluationRepository
 import com.unimib.oases.domain.usecase.AnswerImmediateTreatmentQuestionUseCase
 import com.unimib.oases.domain.usecase.GenerateSuggestedSupportiveTherapiesUseCase
 import com.unimib.oases.domain.usecase.GenerateSuggestedTestsUseCase
+import com.unimib.oases.domain.usecase.GetCurrentVisitUseCase
 import com.unimib.oases.domain.usecase.GetPatientCategoryUseCase
 import com.unimib.oases.domain.usecase.SelectSymptomUseCase
 import com.unimib.oases.domain.usecase.SubmitMedicalVisitPartOneUseCase
 import com.unimib.oases.domain.usecase.TranslateLatestVitalSignsToSymptomsUseCase
 import com.unimib.oases.domain.usecase.TranslateTriageSymptomIdsToSymptomsUseCase
-import com.unimib.oases.domain.usecase.VisitUseCase
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.screen.nurse_assessment.patient_registration.Sex.Companion.fromDisplayName
 import com.unimib.oases.util.Resource
@@ -49,10 +49,10 @@ class MainComplaintViewModel @Inject constructor(
     private val generateSuggestedTestsUseCase: GenerateSuggestedTestsUseCase,
     private val generateSuggestedSupportiveTherapiesUseCase: GenerateSuggestedSupportiveTherapiesUseCase,
     private val getPatientCategoryUseCase: GetPatientCategoryUseCase,
+    private val getCurrentVisitUseCase: GetCurrentVisitUseCase,
     private val translateTriageSymptomIdsToSymptomsUseCase: TranslateTriageSymptomIdsToSymptomsUseCase,
     private val translateLatestVitalSignsToSymptomsUseCase: TranslateLatestVitalSignsToSymptomsUseCase,
     private val selectSymptomUseCase: SelectSymptomUseCase,
-    private val visitUseCase: VisitUseCase,
     savedStateHandle: SavedStateHandle,
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
     private val patientRepository: PatientRepository,
@@ -227,7 +227,11 @@ class MainComplaintViewModel @Inject constructor(
     private suspend fun getTriageData(){
         try {
 
-            val visit = visitUseCase.getCurrentVisit(_state.value.patientId)
+            val visitResource = getCurrentVisitUseCase(_state.value.patientId)
+
+            if (visitResource is Resource.Error)
+                throw Exception(visitResource.message)
+            val visit = (visitResource as Resource.Success).data
 
             visit?.let {
                 val resource = triageEvaluationRepository.getTriageEvaluation(visit.id)

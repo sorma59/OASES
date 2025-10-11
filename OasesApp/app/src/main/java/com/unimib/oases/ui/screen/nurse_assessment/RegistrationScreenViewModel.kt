@@ -16,6 +16,7 @@ import com.unimib.oases.domain.repository.TriageEvaluationRepository
 import com.unimib.oases.domain.usecase.ComputeSymptomsUseCase
 import com.unimib.oases.domain.usecase.ConfigTriageUseCase
 import com.unimib.oases.domain.usecase.EvaluateTriageCodeUseCase
+import com.unimib.oases.domain.usecase.GetCurrentVisitUseCase
 import com.unimib.oases.domain.usecase.GetPatientCategoryUseCase
 import com.unimib.oases.domain.usecase.GetVitalSignPrecisionUseCase
 import com.unimib.oases.domain.usecase.InsertPatientLocallyUseCase
@@ -81,6 +82,7 @@ class RegistrationScreenViewModel @Inject constructor(
     private val configTriageUseCase: ConfigTriageUseCase,
     private val evaluateTriageCodeUseCase: EvaluateTriageCodeUseCase,
     private val getPatientCategoryUseCase: GetPatientCategoryUseCase,
+    private val getCurrentVisitUseCase: GetCurrentVisitUseCase,
     private val insertPatientLocallyUseCase: InsertPatientLocallyUseCase,
     private val vitalSignsUseCases: VitalSignUseCase,
     private val roomUseCase: RoomUseCase,
@@ -125,7 +127,13 @@ class RegistrationScreenViewModel @Inject constructor(
         }
     }
 
-    suspend fun getCurrentVisit(patientId: String) = visitUseCase.getCurrentVisit(patientId)
+    suspend fun getCurrentVisit(patientId: String): Visit? {
+        val visitResource = getCurrentVisitUseCase(patientId)
+
+        if (visitResource is Resource.Error)
+            throw Exception(visitResource.message)
+        return (visitResource as Resource.Success).data
+    }
 
     // --------------Demographics-----------------------
 

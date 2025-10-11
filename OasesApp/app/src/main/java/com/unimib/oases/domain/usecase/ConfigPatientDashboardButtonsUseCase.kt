@@ -1,6 +1,7 @@
 package com.unimib.oases.domain.usecase
 
 import com.unimib.oases.ui.screen.dashboard.patient.PatientDashboardButton
+import com.unimib.oases.util.Resource
 import javax.inject.Inject
 
 class ConfigPatientDashboardButtonsUseCase @Inject constructor(
@@ -11,7 +12,8 @@ class ConfigPatientDashboardButtonsUseCase @Inject constructor(
         val buttons = PatientDashboardButton.entries.filter {
             it.roles.contains(getCurrentRoleUseCase())
         }
-        return if (getCurrentVisitUseCase(patientId) == null)
+        val currentVisit = getCurrentVisitUseCase(patientId)
+        return if (currentVisit is Resource.Error || currentVisit.data == null)
             buttons.minus(PatientDashboardButton.START_VISIT)
         else
             buttons

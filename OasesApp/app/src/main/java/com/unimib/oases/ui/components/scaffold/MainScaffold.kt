@@ -1,9 +1,12 @@
 package com.unimib.oases.ui.components.scaffold
 
+import android.content.Context
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -17,13 +20,16 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.unimib.oases.data.bluetooth.BluetoothCustomManager
-import com.unimib.oases.ui.components.util.BluetoothPermissionHandler
-import com.unimib.oases.ui.components.util.NoPermissionMessage
+import com.unimib.oases.ui.components.util.permission.BluetoothPermissionHandler
+import com.unimib.oases.ui.components.util.permission.NoPermissionMessage
+import com.unimib.oases.ui.components.util.permission.NotificationPermissionHandler
 import com.unimib.oases.ui.navigation.AppNavigation
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Screen.Companion.screenOf
 import com.unimib.oases.ui.screen.login.AuthViewModel
 import com.unimib.oases.ui.screen.root.AppViewModel
+import com.unimib.oases.ui.util.SnackbarController
+import com.unimib.oases.ui.util.ToastUtils
 import kotlinx.coroutines.launch
 
 @Composable
@@ -36,6 +42,8 @@ fun MainScaffold(
     val navController = rememberNavController()
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
+
+    val snackbarHostState = remember { SnackbarHostState() }
 
     val backStackEntry = navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry.value?.destination?.route
@@ -66,9 +74,20 @@ fun MainScaffold(
         }
     )
 
+
+
     if (!hasPermissions)
         NoPermissionMessage(context, bluetoothManager)
     else {
+
+        NotificationPermissionHandler(
+            context = context,
+        )
+
+        LaunchedEffect(Unit) {
+            SnackbarController.setHostState(snackbarHostState)
+        }
+
         OasesDrawer(
             drawerState = drawerState,
             authViewModel = authViewModel,
@@ -81,7 +100,8 @@ fun MainScaffold(
                         screen = screen
                     )
 
-                }
+                },
+                snackbarHost = { SnackbarHost(snackbarHostState) }
             ) { padding ->
 
                 AppNavigation(
@@ -116,13 +136,26 @@ fun MainScaffold(
                 }
             }
         }
-//        launch {
-//            appViewModel.uiEvents.collect { event ->
-//                when (event) {
-//                    is UiEvent.ShowToast -> ToastUtils.showToast(navController.context, event.message)
-//                    is UiEvent.ShowDialog -> showDialog(event.message)
-//                }
-//            }
-//        }
+        launch {
+            appViewModel.uiEvents.collect { event ->
+                when (event) {
+                    is UiEvent.ShowToast -> ToastUtils.showToast(navController.context, event.message)
+                    is UiEvent.ShowSnackbar -> SnackbarController.showMessage(
+                        event.message,
+                        event.actionLabel,
+                        event.onAction
+                    )
+                }
+            }
+        }
     }
+}
+
+sealed class UiEvent {
+    data class ShowToast(val message: String, val context: Context): UiEvent()
+    data class ShowSnackbar(
+        val message: String,
+        val actionLabel: String? = null,
+        val onAction: (() -> Unit)? = null
+    ): UiEvent()
 }

@@ -23,7 +23,6 @@ import com.unimib.oases.data.bluetooth.BluetoothEnvelope
 import com.unimib.oases.data.bluetooth.BluetoothEnvelopeType
 import com.unimib.oases.data.bluetooth.PatientHandler
 import com.unimib.oases.data.mapper.serializer.PatientFullDataSerializer
-import com.unimib.oases.data.mapper.serializer.PatientSerializer
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -229,14 +228,9 @@ class BluetoothServerService () : Service() {
 
                 when (envelope.type) {
                     BluetoothEnvelopeType.PATIENT.name -> {
-                        val patient = PatientSerializer.deserialize(envelope.payload)
-                        Log.d("BluetoothServer", "Received patient: $patient")
-                        patientHandler.onPatientReceived(patient)
-                    }
-                    BluetoothEnvelopeType.PATIENT_WITH_TRIAGE_DATA.name -> {
-                        val patientWithTriageData = PatientFullDataSerializer.deserialize(envelope.payload)
-                        Log.d("BluetoothServer", "Received patient with triage data: $patientWithTriageData")
-                        patientHandler.onPatientWithTriageDataReceived(patientWithTriageData)
+                        val patientFullData = PatientFullDataSerializer.deserialize(envelope.payload)
+                        Log.d("BluetoothServer", "Received patient with triage data: $patientFullData")
+                        patientHandler.onPatientReceived(patientFullData)
                     }
                     BluetoothEnvelopeType.COMMAND.name -> {
                         when (val command = envelope.payload.toString(Charsets.UTF_8)) {

@@ -49,13 +49,13 @@ class VisitRepositoryImpl @Inject constructor(
 
     }
 
-    override suspend fun getCurrentVisit(patientId: String): Visit? {
+    override suspend fun getCurrentVisit(patientId: String): Resource<Visit?> {
         return try {
             val entity = roomDataSource.getCurrentVisit(patientId).first()
-            entity?.toDomain()
+            Resource.Success(entity?.toDomain())
         } catch (e: Exception) {
             Log.e("VisitRepository", "Error getting visits: ${e.message}")
-            null
+            Resource.Error(e.message ?: "An error occurred")
         }
     }
 }

@@ -101,7 +101,7 @@ class SendPatientViaBluetoothViewModel @Inject constructor(
     private fun sendPatient(patient: Patient, device: BluetoothDevice) {
         viewModelScope.launch {
             updatePatientSendingState { it.copy(isLoading = true) }
-            val resource = sendPatientViaBluetoothUseCase(patient, device)
+            val resource = sendPatientViaBluetoothUseCase(patient.id, device)
             when(resource){
                 is Resource.Success -> {
                     updatePatientSendingState { it.copy(result = "Patient sent successfully, tap another device to send ${patient.name} again") }

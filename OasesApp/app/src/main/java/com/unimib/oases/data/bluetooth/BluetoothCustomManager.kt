@@ -3,6 +3,7 @@ package com.unimib.oases.data.bluetooth
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
+import android.app.NotificationManager
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
@@ -16,26 +17,27 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
+import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.unimib.oases.OasesApp
 import com.unimib.oases.R
-import com.unimib.oases.data.bluetooth.transfer.PatientFullData
-import com.unimib.oases.domain.model.Patient
+import com.unimib.oases.domain.model.BluetoothEvent
+import com.unimib.oases.domain.model.BluetoothPatientHandlingResult
+import com.unimib.oases.domain.model.PatientFullData
 import com.unimib.oases.domain.usecase.HandleReceivedPatientUseCase
-import com.unimib.oases.domain.usecase.HandleReceivedPatientWithTriageDataUseCase
 import com.unimib.oases.service.BluetoothServerService
 import com.unimib.oases.ui.util.ToastUtils
+import com.unimib.oases.util.AppForegroundObserver
 import com.unimib.oases.util.PermissionHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -48,8 +50,8 @@ import javax.inject.Singleton
 
 @Singleton
 class BluetoothCustomManager @Inject constructor(
-    private val handleReceivedPatientWithTriageDataUseCase: HandleReceivedPatientWithTriageDataUseCase,
     private val handleReceivedPatientUseCase: HandleReceivedPatientUseCase,
+    private val appForegroundObserver: AppForegroundObserver
 ): PatientHandler{
 
     private val appContext = OasesApp.getAppContext()
@@ -57,12 +59,8 @@ class BluetoothCustomManager @Inject constructor(
         appContext.getSystemService(BluetoothManager::class.java)?.adapter
     }
 
-    private val _receivedPatients = MutableSharedFlow<Patient>(
-        replay = 0,
-        extraBufferCapacity = 1,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST
-    )
-    val receivedPatients: SharedFlow<Patient> = _receivedPatients
+    private val _events = MutableSharedFlow<BluetoothEvent>()
+    val events = _events.asSharedFlow()
 
     // ------------Discovery------------------
     private val _isDiscovering = MutableStateFlow(false)
@@ -196,7 +194,7 @@ class BluetoothCustomManager @Inject constructor(
     }
 
     fun updatePermissions() {
-        _hasPermissions.value = PermissionHelper.hasPermissions()
+        _hasPermissions.value = PermissionHelper.hasBluetoothPermissions()
     }
 
     @SuppressLint("MissingPermission")
@@ -282,7 +280,7 @@ class BluetoothCustomManager @Inject constructor(
             onNotSupported()
         } else {
 
-            if (PermissionHelper.hasPermissions()){
+            if (PermissionHelper.hasBluetoothPermissions()){
                 launchIntentIfNotEnabled(
                     onEnabled = onEnabled,
                     onDenied = onDenied
@@ -374,7 +372,7 @@ class BluetoothCustomManager @Inject constructor(
     }
 
     suspend fun connectToServer(device: BluetoothDevice): BluetoothSocket? {
-        if (!PermissionHelper.hasPermissions()) {
+        if (!PermissionHelper.hasBluetoothPermissions()) {
             Log.e("BluetoothClient", "Missing Bluetooth permissions")
             return null
         }
@@ -505,7 +503,7 @@ class BluetoothCustomManager @Inject constructor(
     @SuppressLint("MissingPermission")
     fun getThisDeviceName(): String? {
         if (isBluetoothSupported())
-            if (PermissionHelper.hasPermissions())
+            if (PermissionHelper.hasBluetoothPermissions())
                 return bluetoothAdapter?.name
         return null
     }
@@ -538,12 +536,59 @@ class BluetoothCustomManager @Inject constructor(
         return bluetoothAdapter != null
     }
 
-    override suspend fun onPatientReceived(patient: Patient) {
-        _receivedPatients.tryEmit(patient)
-        handleReceivedPatientUseCase(patient)
+    override suspend fun onPatientReceived(patientFullData: PatientFullData) {
+        val patientId = patientFullData.patientDetails.id
+        val patientName = patientFullData.patientDetails.name
+        val result = handleReceivedPatientUseCase(patientFullData)
+        if (appForegroundObserver.isForeground.value) {
+            // App is in foreground → emit event for ViewModel to show snackbar
+            when (result) {
+                is BluetoothPatientHandlingResult.Error -> {
+                    _events.emit(BluetoothEvent.ErrorWhileReceivingPatient(result.message))
+                }
+                is BluetoothPatientHandlingResult.PatientReceived -> {
+                    _events.emit(BluetoothEvent.PatientReceived(patientFullData))
+                }
+            }
+        } else {
+            // App is in background → show system notification
+            if (PermissionHelper.hasNotificationPermission()){
+                when (result) {
+                    is BluetoothPatientHandlingResult.Error -> {
+                        showUnsuccessfulNotification(patientId, patientName)
+                    }
+
+                    is BluetoothPatientHandlingResult.PatientReceived -> {
+                        showSuccessfulNotification(patientId, patientName)
+                    }
+                }
+            }
+        }
     }
 
-    override suspend fun onPatientWithTriageDataReceived(patientWithTriageData: PatientFullData) {
-        handleReceivedPatientWithTriageDataUseCase(patientWithTriageData)
+    private fun showSuccessfulNotification(patientId: String, patientName: String) {
+        val manager = appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        val notification = NotificationCompat.Builder(appContext, "bluetooth_channel")
+            .setSmallIcon(R.drawable.ic_launcher_round)
+            .setContentTitle("New patient received: $patientName")
+            .setContentText("$patientName and its data were successfully saved on this device")
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .build()
+
+        manager.notify(patientId.hashCode(), notification)
+    }
+
+    private fun showUnsuccessfulNotification(patientId: String, patientName: String) {
+        val manager = appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        val notification = NotificationCompat.Builder(appContext, "bluetooth_channel")
+            .setSmallIcon(R.drawable.ic_launcher_round)
+            .setContentTitle("Error while receiving patient $patientName")
+            .setContentText("An error happened during the receiving of a patient, have it sent to this device again")
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .build()
+
+        manager.notify(patientId.hashCode(), notification)
     }
 }

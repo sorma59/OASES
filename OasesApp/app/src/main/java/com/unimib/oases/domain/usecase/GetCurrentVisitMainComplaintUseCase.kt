@@ -12,10 +12,13 @@ class GetCurrentVisitMainComplaintUseCase @Inject constructor(
 ) {
 
     suspend operator fun invoke(patientId: String): Resource<List<ComplaintSummary>> {
-        val visitId = getCurrentVisitUseCase(patientId)?.id
-        visitId?.let{
+        val visitResource = getCurrentVisitUseCase(patientId)
+        if (visitResource is Resource.Error)
+            return Resource.Error(visitResource.message ?: "Error during the retrieval of the patient's current visit")
+        val visit = visitResource.data
+        visit?.let{
             return try {
-                val complaints = complaintSummaryRepository.getVisitComplaintsSummaries(visitId).first {
+                val complaints = complaintSummaryRepository.getVisitComplaintsSummaries(visit.id).first {
                     it is Resource.Success || it is Resource.Error
                 }
                 complaints

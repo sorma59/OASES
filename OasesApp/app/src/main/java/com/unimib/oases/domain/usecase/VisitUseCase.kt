@@ -11,8 +11,4 @@ class VisitUseCase @Inject constructor(
     suspend fun addVisit(visit: Visit): Resource<Unit> {
         return visitRepository.addVisit(visit)
     }
-
-    suspend fun getCurrentVisit(patientId: String): Visit? {
-        return visitRepository.getCurrentVisit(patientId)
-    }
 }

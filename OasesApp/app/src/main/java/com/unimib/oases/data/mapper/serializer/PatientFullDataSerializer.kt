@@ -1,10 +1,28 @@
 package com.unimib.oases.data.mapper.serializer
 
-import com.unimib.oases.data.bluetooth.transfer.PatientFullData
 import com.unimib.oases.data.mapper.serializer.PatientDiseaseSerializer.serialize
 import com.unimib.oases.data.mapper.serializer.VisitVitalSignSerializer.serialize
+import com.unimib.oases.domain.model.PatientFullData
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+
+fun ByteBuffer.putNullable(nullableByteArray: ByteArray?){
+    nullableByteArray?.let {
+        this.put(1) // Presence flag
+        this.putInt(nullableByteArray.size)
+        this.put(nullableByteArray)
+    } ?: this.put(0) // Absence flag
+}
+
+fun <T> ByteBuffer.readNullable(deserializer: (ByteArray) -> T): T? {
+    val presenceFlag = this.get().toInt()
+    return if (presenceFlag == 1) {
+        val size = this.int
+        val itemBytes = ByteArray(size).also { this.get(it) }
+        deserializer(itemBytes)
+    } else
+        null
+}
 
 object PatientFullDataSerializer {
 
@@ -13,8 +31,12 @@ object PatientFullDataSerializer {
         val patientByteArray = PatientSerializer.serialize(patientFullData.patientDetails)
         val diseaseBytesList = patientFullData.patientDiseases.map { serialize(it) }
         val vitalSignBytesList = patientFullData.vitalSigns.map { serialize(it) }
-        val visitByteArray = VisitSerializer.serialize(patientFullData.visit)
-        val triageByteArray = TriageEvaluationSerializer.serialize(patientFullData.triageEvaluation)
+        val visitByteArray = patientFullData.visit?.let {
+            VisitSerializer.serialize(it)
+        }
+        val triageByteArray = patientFullData.triageEvaluation?.let {
+            TriageEvaluationSerializer.serialize(it)
+        }
         val malnutritionScreeningBytes = patientFullData.malnutritionScreening?.let {
             MalnutritionScreeningSerializer.serialize(it)
         }
@@ -23,9 +45,9 @@ object PatientFullDataSerializer {
         val totalSize =
             4 + patientByteArray.size +
             4 + diseaseBytesList.sumOf { 4 + it.size } +
-            4 + visitByteArray.size +
+            1 + (visitByteArray?.let {4 + it.size} ?: 0) +
             4 + vitalSignBytesList.sumOf { 4 + it.size } +
-            4 + triageByteArray.size +
+            1 + (triageByteArray?.let { 4 + it.size} ?: 0) +
             1 + (malnutritionScreeningBytes?.let { 4 + it.size } ?: 0) +
             4 + complaintSummariesListBytes.sumOf { 4 + it.size }
 
@@ -40,8 +62,7 @@ object PatientFullDataSerializer {
             buffer.put(it)
         }
 
-        buffer.putInt(visitByteArray.size)
-        buffer.put(visitByteArray)
+        buffer.putNullable(visitByteArray)
 
         buffer.putInt(vitalSignBytesList.size)
         vitalSignBytesList.forEach {
@@ -49,17 +70,9 @@ object PatientFullDataSerializer {
             buffer.put(it)
         }
 
-        buffer.putInt(triageByteArray.size)
-        buffer.put(triageByteArray)
+        buffer.putNullable(triageByteArray)
 
-        // MalnutritionScreening (nullable)
-        if (malnutritionScreeningBytes != null) {
-            buffer.put(1) // presence flag
-            buffer.putInt(malnutritionScreeningBytes.size)
-            buffer.put(malnutritionScreeningBytes)
-        } else {
-            buffer.put(0) // absence flag
-        }
+        buffer.putNullable(malnutritionScreeningBytes)
 
         buffer.putInt(complaintSummariesListBytes.size)
         complaintSummariesListBytes.forEach {
@@ -87,9 +100,7 @@ object PatientFullDataSerializer {
         }
 
         // Visit
-        val visitSize = buffer.int
-        val visitBytes = ByteArray(visitSize).also { buffer.get(it) }
-        val visit = VisitSerializer.deserialize(visitBytes)
+        val visit = buffer.readNullable(VisitSerializer::deserialize)
 
         // Vitals
         val vitalCount = buffer.int
@@ -100,17 +111,10 @@ object PatientFullDataSerializer {
         }
 
         // Triage Evaluation
-        val triageSize = buffer.int
-        val triageBytes = ByteArray(triageSize).also { buffer.get(it) }
-        val triageEvaluation = TriageEvaluationSerializer.deserialize(triageBytes)
+        val triageEvaluation = buffer.readNullable(TriageEvaluationSerializer::deserialize)
 
         // Malnutrition Screening (nullable)
-        val malnutritionScreening = if (buffer.get().toInt() == 1){
-            val malnutritionScreeningSize = buffer.int
-            val malnutritionScreeningBytes = ByteArray(malnutritionScreeningSize).also { buffer.get(it) }
-            MalnutritionScreeningSerializer.deserialize(malnutritionScreeningBytes)
-        } else
-            null
+        val malnutritionScreening = buffer.readNullable(MalnutritionScreeningSerializer::deserialize)
 
         // Complaint summaries
         val complaintSummariesCount = buffer.int
