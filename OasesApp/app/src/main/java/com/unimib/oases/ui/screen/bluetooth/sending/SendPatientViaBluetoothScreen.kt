@@ -32,7 +32,6 @@ import com.unimib.oases.ui.components.util.button.BottomButtons
 import com.unimib.oases.ui.navigation.Screen
 import com.unimib.oases.ui.util.ToastUtils
 
-
 @Composable
 fun SendPatientViaBluetoothScreen(
     navController: NavController
@@ -41,9 +40,9 @@ fun SendPatientViaBluetoothScreen(
     var showResultDialog by remember { mutableStateOf(false) }
     var resultMessageToShow by remember { mutableStateOf(null as String?) }
 
-    val sendPatientViaBluetoothViewModel: SendPatientViaBluetoothViewModel = hiltViewModel()
+    val viewModel: SendPatientViaBluetoothViewModel = hiltViewModel()
 
-    val state by sendPatientViaBluetoothViewModel.state.collectAsState()
+    val state by viewModel.state.collectAsState()
 
     val context = LocalContext.current
 
@@ -55,18 +54,19 @@ fun SendPatientViaBluetoothScreen(
     }
 
     LaunchedEffect(state.toastMessage) {
-
         state.toastMessage?.let{
             ToastUtils.showToast(context, it)
-            sendPatientViaBluetoothViewModel.onEvent(SendPatientViaBluetoothEvent.OnToastShown)
+            viewModel.onEvent(SendPatientViaBluetoothEvent.OnToastShown)
         }
-
     }
 
     LaunchedEffect(state.patientSendingState.isLoading) {
         if (state.patientSendingState.isLoading)
             showResultDialog = true
-        resultMessageToShow = state.patientSendingState.result
+        state.patientSendingState.result?.let {
+            resultMessageToShow = it
+        }
+        viewModel.onEvent(SendPatientViaBluetoothEvent.SendResultShown)
     }
 
     Column(
@@ -95,7 +95,7 @@ fun SendPatientViaBluetoothScreen(
                         patient = state.patient,
                         modifier = Modifier.padding(horizontal = 16.dp),
                         onClick = {
-                            sendPatientViaBluetoothViewModel.onEvent(SendPatientViaBluetoothEvent.PatientItemClicked)
+                            viewModel.onEvent(SendPatientViaBluetoothEvent.PatientItemClicked)
                         },
                         errorText = "Couldn't load patient data, tap to retry \n${state.patientRetrievalState.error}",
                         isLoading = state.patientRetrievalState.isLoading
@@ -119,7 +119,7 @@ fun SendPatientViaBluetoothScreen(
                                 devices = state.pairedDevices,
                                 devicesType = "Paired Devices",
                                 onClick = { device ->
-                                    sendPatientViaBluetoothViewModel.onEvent(
+                                    viewModel.onEvent(
                                         SendPatientViaBluetoothEvent.SendPatient(device)
                                     )
                                 },
