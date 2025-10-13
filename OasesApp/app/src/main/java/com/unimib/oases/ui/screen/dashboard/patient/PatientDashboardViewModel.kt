@@ -1,5 +1,6 @@
 package com.unimib.oases.ui.screen.dashboard.patient
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,6 +11,8 @@ import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,6 +30,21 @@ class PatientDashboardViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     @IoDispatcher private val dispatcher: CoroutineDispatcher
 ): ViewModel(){
+
+    private val errorHandler = CoroutineExceptionHandler { _, e ->
+        // Log the error
+        Log.e("ViewModelError", "Coroutine exception", e)
+
+        // Safely update on Main (Must when doing UI work other than updating state)
+        viewModelScope.launch(Dispatchers.Main) {
+            _state.update {
+                it.copy(
+                    error = e.message ?: "An unexpected error occurred",
+                    isLoading = false
+                )
+            }
+        }
+    }
 
     private val _state = MutableStateFlow(
         PatientDashboardState(
@@ -47,41 +65,36 @@ class PatientDashboardViewModel @Inject constructor(
     }
 
     private fun refresh() {
-        getPatientData()
-        getButtons()
-    }
-
-    private fun getButtons() {
-        viewModelScope.launch {
-            val buttons = configurePatientDashboardButtonsUseCase(_state.value.patientId)
-            _state.value = _state.value.copy(buttons = buttons)
+        viewModelScope.launch(dispatcher + errorHandler) {
+            _state.update { it.copy(isLoading = true, error = null) }
+            getPatientData()
+            getButtons()
+            _state.update { it.copy(isLoading = false) }
         }
     }
 
-    private fun getPatientData() {
+    private suspend fun getButtons() {
+        val buttons = configurePatientDashboardButtonsUseCase(_state.value.patientId)
+        _state.update {
+            it.copy(buttons = buttons)
+        }
 
-        viewModelScope.launch(dispatcher) {
-            try {
-                _state.update { it.copy(isLoading = true, error = null) }
+    }
 
-                val resource = patientRepository.getPatientById(_state.value.patientId).first {
-                    it is Resource.Success || it is Resource.Error
-                }
+    private suspend fun getPatientData() {
 
-                when (resource) {
-                    is Resource.Success -> {
-                        _state.update { it.copy(patient = resource.data) }
-                    }
-                    is Resource.Error -> {
-                        _state.update { it.copy(error = resource.message) }
-                    }
-                    else -> Unit
-                }
-            } catch (e: Exception) {
-                _state.update { it.copy(error = e.message) }
-            } finally {
-                _state.update { it.copy(isLoading = false) }
+        val resource = patientRepository.getPatientById(_state.value.patientId).first {
+            it is Resource.Success || it is Resource.Error
+        }
+
+        when (resource) {
+            is Resource.Success -> {
+                _state.update { it.copy(patient = resource.data) }
             }
+            is Resource.Error -> {
+                _state.update { it.copy(error = resource.message) }
+            }
+            else -> Unit
         }
     }
 
@@ -107,8 +120,11 @@ class PatientDashboardViewModel @Inject constructor(
                 }
             }
             PatientDashboardEvent.PatientItemClicked -> {
-                if (_state.value.patient == null)
-                    getPatientData()
+                if (_state.value.patient == null) {
+                    viewModelScope.launch(dispatcher + errorHandler){
+                        getPatientData()
+                    }
+                }
             }
 
             PatientDashboardEvent.PatientDeletionConfirmed -> {

@@ -29,7 +29,7 @@ class SendPatientViaBluetoothUseCase @Inject constructor(
                     try {
                         val connectionSuccess = bluetoothManager.connectToServer(device)
 
-                        if (connectionSuccess != null){
+                        if (connectionSuccess != null){ // Connection was successful
 
                             val patientFullDataResource = retrievePatientFullDataUseCase(patientId)
 
@@ -37,82 +37,6 @@ class SendPatientViaBluetoothUseCase @Inject constructor(
                                 throw Exception(patientFullDataResource.message)
 
                             val patientFullData = (patientFullDataResource as Resource.Success).data!!
-
-                            // Connection was successful
-
-                            /*
-                                        val currentVisit = getCurrentVisitUseCase(patient.id)
-
-                                        if (currentVisit != null){
-
-                                            val triageEvaluation = triageEvaluationRepository.getTriageEvaluation(currentVisit.id).data!!
-
-                                            val result = malnutritionScreeningRepository.getMalnutritionScreening(currentVisit.id)
-                                            val malnutritionScreening = if (result is Resource.Success) result.data else null
-
-                                            // Get the patient's current visit's vital signs
-                                            val vitalSignsDeferred = async(Dispatchers.IO) {
-                                                try {
-                                                    val resource = visitVitalSignRepository.getVisitVitalSigns(currentVisit.id)
-                                                        .first { it is Resource.Success || it is Resource.Error } // Wait for Success or Error
-                                                    resource.data ?: emptyList<VisitVitalSign>()
-                                                } catch (e: NoSuchElementException) {
-                                                    // This catch block is important if the flow could complete
-                                                    // without ever emitting Success or Error (highly unlikely with current setup).
-                                                    Log.e("SendPatient", "Vital signs flow completed without Success/Error for visit ${currentVisit.id}", e)
-                                                    emptyList<VisitVitalSign>()
-                                                } catch (e: Exception) {
-                                                    Log.e("SendPatient", "Error collecting vital signs for visit ${currentVisit.id}", e)
-                                                    emptyList<VisitVitalSign>()
-                                                }
-                                            }
-
-                                            val diseasesDeferred = async(Dispatchers.IO) {
-                                                try {
-                                                    val resource = patientDiseaseRepository.getPatientDiseases(patient.id)
-                                                        .first { it is Resource.Success || it is Resource.Error } // Wait for Success or Error
-                                                    resource.data ?: emptyList<PatientDisease>()
-                                                } catch (e: NoSuchElementException) {
-                                                    Log.e("SendPatient", "Diseases flow completed without Success/Error for patient ${patient.id}", e)
-                                                    emptyList<PatientDisease>()
-                                                } catch (e: Exception) {
-                                                    Log.e("SendPatient", "Error collecting diseases for patient ${patient.id}", e)
-                                                    emptyList<PatientDisease>()
-                                                }
-                                            }
-
-                                            val complaintsSummariesDeferred = async(Dispatchers.IO) {
-                                                try {
-                                                    val resource =
-                                                        complaintSummaryRepository.getVisitComplaintsSummaries(
-                                                            currentVisit.id
-                                                        )
-                                                            .first { it is Resource.Success || it is Resource.Error } // Wait for Success or Error
-                                                    resource.data ?: emptyList<ComplaintSummary>()
-                                                } catch (e: NoSuchElementException) {
-                                                    Log.e("SendPatient", "Complaints flow completed without Success/Error for visit ${currentVisit.id}", e)
-                                                    emptyList<ComplaintSummary>()
-                                                } catch (e: Exception) {
-                                                    Log.e("SendPatient", "Error collecting complaints for visit ${currentVisit.id}", e)
-                                                    emptyList<ComplaintSummary>()
-                                                }
-                                            }
-
-                                            // Wait for both tasks to complete
-                                            val diseases: List<PatientDisease> = diseasesDeferred.await()
-                                            val vitalSigns: List<VisitVitalSign> = vitalSignsDeferred.await()
-                                            val complaintsSummaries: List<ComplaintSummary> = complaintsSummariesDeferred.await()
-
-                                            val patientWithTriageData = PatientFullData(
-                                                patientDetails = patient,
-                                                visit = currentVisit,
-                                                patientDiseases = diseases,
-                                                vitalSigns = vitalSigns,
-                                                triageEvaluation = triageEvaluation,
-                                                malnutritionScreening = malnutritionScreening,
-                                                complaintsSummaries = complaintsSummaries
-                                            )
-            */
 
                             // Serialize the patient data
                             val bytes = PatientFullDataSerializer.serialize(patientFullData)

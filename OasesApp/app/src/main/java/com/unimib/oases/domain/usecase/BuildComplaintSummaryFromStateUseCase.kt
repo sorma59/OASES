@@ -2,7 +2,7 @@ package com.unimib.oases.domain.usecase
 
 import com.unimib.oases.domain.model.ComplaintSummary
 import com.unimib.oases.ui.screen.medical_visit.maincomplaint.MainComplaintState
-import com.unimib.oases.util.Resource
+import com.unimib.oases.util.firstNullableSuccess
 import javax.inject.Inject
 
 class BuildComplaintSummaryFromStateUseCase @Inject constructor(
@@ -16,13 +16,7 @@ class BuildComplaintSummaryFromStateUseCase @Inject constructor(
         }
         check(state.supportiveTherapies != null)
 
-        val visitResource = getCurrentVisitUseCase(state.patientId)
-
-        check(visitResource is Resource.Success){
-            "Error during during retrieval of the patient's current visit"
-        }
-
-        val visit = visitResource.data
+        val visit = getCurrentVisitUseCase(state.patientId).firstNullableSuccess()
 
         check(visit != null){
             "This patient does not have an open visit"

@@ -5,6 +5,7 @@ import androidx.room.Query
 import androidx.room.Upsert
 import com.unimib.oases.data.local.TableNames
 import com.unimib.oases.data.local.model.TriageEvaluationEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TriageEvaluationDao {
@@ -12,5 +13,5 @@ interface TriageEvaluationDao {
     suspend fun insert(triageEvaluation: TriageEvaluationEntity)
 
     @Query("SELECT * FROM " + TableNames.TRIAGE_EVALUATION + " WHERE visit_id = :visitId")
-    fun getTriageEvaluation(visitId: String): TriageEvaluationEntity
+    fun getTriageEvaluation(visitId: String): Flow<TriageEvaluationEntity>
 }

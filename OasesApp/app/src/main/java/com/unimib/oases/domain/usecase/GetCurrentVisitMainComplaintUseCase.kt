@@ -4,6 +4,7 @@ import com.unimib.oases.domain.model.ComplaintSummary
 import com.unimib.oases.domain.model.Visit
 import com.unimib.oases.domain.repository.ComplaintSummaryRepository
 import com.unimib.oases.util.Resource
+import com.unimib.oases.util.firstNullableSuccess
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
@@ -23,21 +24,18 @@ class GetCurrentVisitMainComplaintUseCase @Inject constructor(
                 Resource.Error(e.message ?: "Unknown error")
             }
         } ?: run { // Otherwise, get it from db
-            val visitResource = getCurrentVisitUseCase(patientId)
-            if (visitResource is Resource.Error)
-                return Resource.Error(visitResource.message ?: "Error during the retrieval of the patient's current visit")
-            val visit = visitResource.data
-            visit?.let{
-                return try {
-                    val complaints = complaintSummaryRepository.getVisitComplaintsSummaries(visit.id).first {
-                        it is Resource.Success || it is Resource.Error
-                    }
+            return try {
+                val visitFromDb = getCurrentVisitUseCase(patientId).firstNullableSuccess()
+                visitFromDb?.let {
+                    val complaints =
+                        complaintSummaryRepository.getVisitComplaintsSummaries(visitFromDb.id).first {
+                            it is Resource.Success || it is Resource.Error
+                        }
                     complaints
-                } catch (e: Exception) {
-                    Resource.Error(e.message ?: "Unknown error")
-                }
+                } ?: Resource.Error("No current visit")
+            } catch (e: Exception) {
+                Resource.Error(e.message ?: "Unknown error")
             }
-            return Resource.Error("No current visit")
         }
     }
 }

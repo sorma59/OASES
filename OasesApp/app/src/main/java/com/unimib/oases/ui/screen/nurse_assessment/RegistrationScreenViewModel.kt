@@ -50,6 +50,8 @@ import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.toVisitVitalSigns
 import com.unimib.oases.util.DateTimeFormatter
 import com.unimib.oases.util.Resource
 import com.unimib.oases.util.debounce
+import com.unimib.oases.util.firstNullableSuccess
+import com.unimib.oases.util.firstSuccess
 import com.unimib.oases.util.toggle
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -116,6 +118,18 @@ class RegistrationScreenViewModel @Inject constructor(
         }
     }
 
+    private val triageErrorHandler = CoroutineExceptionHandler { _, e ->
+        e.printStackTrace()
+        _state.update{
+            _state.value.copy(
+                triageState = _state.value.triageState.copy(
+                    error = e.message,
+                    loaded = false
+                )
+            )
+        }
+    }
+
     fun onEvent(event: RegistrationEvent) {
         when (event) {
 
@@ -127,13 +141,7 @@ class RegistrationScreenViewModel @Inject constructor(
         }
     }
 
-    suspend fun getCurrentVisit(patientId: String): Visit? {
-        val visitResource = getCurrentVisitUseCase(patientId)
-
-        if (visitResource is Resource.Error)
-            throw Exception(visitResource.message)
-        return (visitResource as Resource.Success).data
-    }
+    suspend fun getCurrentVisit(patientId: String) = getCurrentVisitUseCase(patientId).firstNullableSuccess()
 
     // --------------Demographics-----------------------
 
@@ -279,11 +287,15 @@ class RegistrationScreenViewModel @Inject constructor(
 
     private suspend fun refreshVitalSigns(){
         updateVitalSignsState { it.copy(error = null, isLoading = true) }
-        loadVitalSigns()
-        val currentVisit = getCurrentVisit(patientId = state.value.patientInfoState.patient.id)
-        if (currentVisit != null) {
-            if (_state.value.vitalSignsState.error == null)
-                loadVisitVitalSigns(currentVisit.id)
+        try {
+            loadVitalSigns()
+            val currentVisit = getCurrentVisit(patientId = state.value.patientInfoState.patient.id)
+            if (currentVisit != null) {
+                if (_state.value.vitalSignsState.error == null)
+                    loadVisitVitalSigns(currentVisit.id)
+            }
+        } catch (e: Exception) {
+            updateVitalSignsState { it.copy(error = e.message) }
         }
     }
 
@@ -464,29 +476,21 @@ class RegistrationScreenViewModel @Inject constructor(
     }
 
     fun refreshTriage(visitId: String) {
-        updateTriageState { it.copy(error = null, isLoading = true) }
-
-        applicationScope.launch(ioDispatcher + errorHandler) {
+        viewModelScope.launch(ioDispatcher + triageErrorHandler) {
+            updateTriageState { it.copy(error = null, isLoading = true) }
             loadPatientSymptoms(visitId)
+            updateTriageState { it.copy(isLoading = false) }
         }
     }
 
-    private fun loadPatientSymptoms(visitId: String){
-        val triageEvaluationResource = triageEvaluationRepository.getTriageEvaluation(visitId)
-        if (triageEvaluationResource is Resource.Success)
-            updateTriageState {
-                it.copy(
-                    selectedReds = triageEvaluationResource.data!!.redSymptomIds.toSet(),
-                    selectedYellows = triageEvaluationResource.data!!.yellowSymptomIds.toSet(),
-                )
-            }
-        else
-            updateTriageState {
-                it.copy(
-                    error = triageEvaluationResource.message,
-                    loaded = false
-                )
-            }
+    private suspend fun loadPatientSymptoms(visitId: String){
+        val triageEvaluation = triageEvaluationRepository.getTriageEvaluation(visitId).firstSuccess()
+        updateTriageState {
+            it.copy(
+                selectedReds = triageEvaluation.redSymptomIds.toSet(),
+                selectedYellows = triageEvaluation.yellowSymptomIds.toSet(),
+            )
+        }
     }
 
     // --------------Visit History------------------
@@ -570,8 +574,10 @@ class RegistrationScreenViewModel @Inject constructor(
         }
     }
 
-    private fun loadMalnutritionScreening(visitId: String) {
-        val malnutritionScreeningResource = malnutritionScreeningRepository.getMalnutritionScreening(visitId)
+    private suspend fun loadMalnutritionScreening(visitId: String) {
+        val malnutritionScreeningResource = malnutritionScreeningRepository.getMalnutritionScreening(visitId).first {
+            it is Resource.Success || it is Resource.Error
+        }
         if (malnutritionScreeningResource is Resource.Success){
             malnutritionScreeningResource.data?.let{
                 updateMalnutritionScreeningState {

@@ -13,6 +13,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 fun <T> Flow<T>.debounce(timeoutMillis: Long): Flow<T> = channelFlow {
@@ -83,4 +84,49 @@ fun Modifier.reactToKeyboardAppearance(): Modifier {
         .calculateBottomPadding()
 
     return this.padding(bottom = bottomInset)
+}
+
+/**
+ * Collects the first emitted [Resource] from this Flow that is either [Resource.Success] or [Resource.Error].
+ *
+ * If the first emitted Resource is [Resource.Error], this function throws an [Exception] with the
+ * error message. Otherwise, it returns the non-null data from [Resource.Success].
+ *
+ * Usage example:
+ * ```
+ * val patient: Patient = patientRepository.getPatientById(patientId).firstSuccess()
+ * ```
+ *
+ * This function is intended for Room or repository Flows that emit [Resource] wrappers for results.
+ *
+ * @throws Exception if the first emitted Resource is [Resource.Error]
+ * @return T the data contained in the first [Resource.Success] emission
+ */
+suspend fun <T> Flow<Resource<T>>.firstSuccess(): T {
+    val result = first { it is Resource.Success || it is Resource.Error }
+    if (result is Resource.Error) throw Exception(result.message)
+    return (result as Resource.Success).data!!
+}
+
+
+/**
+ * Collects the first emitted [Resource] from this Flow that is either [Resource.Success] or [Resource.Error].
+ *
+ * If the first emitted Resource is [Resource.Error], this function throws an [Exception] with the
+ * error message. Otherwise, it returns the nullable data from [Resource.Success].
+ *
+ * Usage example:
+ * ```
+ * val patient: Patient = patientRepository.getPatientById(patientId).firstSuccess()
+ * ```
+ *
+ * This function is intended for Room or repository Flows that emit [Resource] wrappers for results.
+ *
+ * @throws Exception if the first emitted Resource is [Resource.Error]
+ * @return T? the data contained in the first [Resource.Success] emission
+ */
+suspend fun <T> Flow<Resource<T>>.firstNullableSuccess(): T? {
+    val result = first { it is Resource.Success || it is Resource.Error }
+    if (result is Resource.Error) throw Exception(result.message)
+    return (result as Resource.Success).data
 }

@@ -9,6 +9,7 @@ import com.unimib.oases.domain.usecase.GetCurrentVisitMainComplaintUseCase
 import com.unimib.oases.domain.usecase.GetCurrentVisitUseCase
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.util.Resource
+import com.unimib.oases.util.firstNullableSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -108,13 +109,12 @@ class PatientDetailsViewModel @Inject constructor(
     }
 
     private suspend fun getCurrentVisit() {
-        val resource = getCurrentVisitUseCase(_state.value.patientId)
-        if (resource is Resource.Error)
-            _state.update { it.copy(currentVisitRelatedError = resource.message) }
-        else
-            _state.update {
-                it.copy(currentVisit = resource.data)
-            }
+        try {
+            val visit = getCurrentVisitUseCase(_state.value.patientId).firstNullableSuccess()
+            _state.update { it.copy(currentVisit = visit) }
+        } catch (e: Exception) {
+            _state.update { it.copy(currentVisitRelatedError = e.message) }
+        }
     }
 
     fun onEvent(event: PatientDetailsEvent){

@@ -40,6 +40,8 @@ import com.unimib.oases.data.local.model.Role
 import com.unimib.oases.ui.components.patients.PatientItem
 import com.unimib.oases.ui.components.util.button.DeleteButton
 import com.unimib.oases.ui.components.util.button.DismissButton
+import com.unimib.oases.ui.components.util.button.RetryButton
+import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 import com.unimib.oases.ui.navigation.Screen.MedicalVisit
 import com.unimib.oases.ui.navigation.Screen.PatientRegistration
 import com.unimib.oases.ui.navigation.Screen.SendPatient
@@ -92,59 +94,68 @@ fun PatientDashboardScreen(
         }
     }
 
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ){
-
+    state.error?.let {
+        RetryButton(
+            it,
+            onClick = { viewModel.onEvent(PatientDashboardEvent.Refresh) }
+        )
+    } ?: if (state.isLoading)
+        CustomCircularProgressIndicator()
+    else {
         Column(
-            modifier = Modifier
-                .padding(32.dp)
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.End,
-            verticalArrangement = Arrangement.spacedBy(64.dp)
+            modifier = Modifier.fillMaxSize()
         ) {
 
-            PatientItem(
-                patient = state.patient,
-                onClick = { viewModel.onEvent(PatientDashboardEvent.PatientItemClicked) },
-                errorText = "Could not load patient info, tap to retry \n${state.error}",
-                isLoading = state.isLoading
-            )
-
             Column(
-                verticalArrangement = Arrangement.spacedBy(30.dp),
-                horizontalAlignment = Alignment.End
+                modifier = Modifier
+                    .padding(32.dp)
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.spacedBy(64.dp)
             ) {
-                for (button in state.buttons) {
 
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                PatientItem(
+                    patient = state.patient,
+                    onClick = { viewModel.onEvent(PatientDashboardEvent.PatientItemClicked) },
+                    errorText = "Could not load patient info, tap to retry",
+                    isLoading = state.isLoading
+                )
 
-                        Text(
-                            text = button.text,
-                            fontSize = 30.sp
-                        )
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(30.dp),
+                    horizontalAlignment = Alignment.End
+                ) {
+                    for (button in state.buttons) {
 
-                        Spacer(Modifier.width(4.dp))
+                        Row(verticalAlignment = Alignment.CenterVertically) {
 
-                        IconButton(
-                            onClick = {
-                                viewModel.onEvent(
-                                    PatientDashboardEvent.ActionButtonClicked(
-                                        button
-                                    )
-                                )
-                            },
-                            colors = IconButtonDefaults.iconButtonColors(
-                                containerColor = button.buttonColor(),
-                                contentColor = button.buttonTintColor()
-                            ),
-                            modifier = Modifier.size(Dp(ButtonDefaults.IconSize.value * 4f))
-                        ) {
-                            Icon(
-                                imageVector = button.icon,
-                                contentDescription = button.contentDescription,
-                                modifier = Modifier.size(Dp(ButtonDefaults.IconSize.value * 2f))
+                            Text(
+                                text = button.text,
+                                fontSize = 30.sp
                             )
+
+                            Spacer(Modifier.width(4.dp))
+
+                            IconButton(
+                                onClick = {
+                                    viewModel.onEvent(
+                                        PatientDashboardEvent.ActionButtonClicked(
+                                            button
+                                        )
+                                    )
+                                },
+                                colors = IconButtonDefaults.iconButtonColors(
+                                    containerColor = button.buttonColor(),
+                                    contentColor = button.buttonTintColor()
+                                ),
+                                modifier = Modifier.size(Dp(ButtonDefaults.IconSize.value * 4f))
+                            ) {
+                                Icon(
+                                    imageVector = button.icon,
+                                    contentDescription = button.contentDescription,
+                                    modifier = Modifier.size(Dp(ButtonDefaults.IconSize.value * 2f))
+                                )
+                            }
                         }
                     }
                 }

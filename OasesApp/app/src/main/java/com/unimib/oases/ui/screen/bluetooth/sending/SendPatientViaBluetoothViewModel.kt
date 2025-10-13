@@ -30,7 +30,7 @@ class SendPatientViaBluetoothViewModel @Inject constructor(
 ) : ViewModel(){
 
     private val _state = MutableStateFlow(
-        SendPatientViaBluetoothState(receivedId = savedStateHandle["patientId"]!!)
+        SendPatientViaBluetoothState(patientId = savedStateHandle["patientId"]!!)
     )
     val state: StateFlow<SendPatientViaBluetoothState> = _state.asStateFlow()
 
@@ -55,7 +55,7 @@ class SendPatientViaBluetoothViewModel @Inject constructor(
 
                 updatePatientRetrievalState { it.copy(isLoading = true, error = null) }
 
-                val resource = patientRepository.getPatientById(_state.value.receivedId).first {
+                val resource = patientRepository.getPatientById(_state.value.patientId).first {
                     it is Resource.Success || it is Resource.Error
                 }
 

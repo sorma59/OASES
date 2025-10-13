@@ -40,6 +40,7 @@ import com.unimib.oases.ui.components.input.LabeledCheckbox
 import com.unimib.oases.ui.components.util.FadeOverlay
 import com.unimib.oases.ui.components.util.ShowMoreArrow
 import com.unimib.oases.ui.components.util.button.RetryButton
+import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 import com.unimib.oases.ui.util.ToastUtils
 import kotlinx.coroutines.launch
 
@@ -107,13 +108,13 @@ fun RedCodeScreen(
             )
         }
 
-        if (state.error != null){
+        state.error?.let {
             RetryButton(
                 error = state.error,
                 onClick = { onEvent(TriageEvent.Retry) }
             )
-        }
-
+        } ?: if (state.isLoading)
+            CustomCircularProgressIndicator()
         else {
             Box {
                 Column(
@@ -145,7 +146,9 @@ fun RedCodeScreen(
                                             else
                                                 onEvent(TriageEvent.FieldToggled(id))
                                         },
-                                        modifier = if (it.symptom.parent != null) Modifier.padding(start = 16.dp) else Modifier
+                                        modifier = if (it.symptom.parent != null) Modifier.padding(
+                                            start = 16.dp
+                                        ) else Modifier
                                     )
 
                                     if (it.symptom.id == TriageSymptom.PREGNANCY.id

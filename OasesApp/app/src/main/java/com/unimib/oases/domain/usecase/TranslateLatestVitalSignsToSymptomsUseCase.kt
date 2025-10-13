@@ -2,7 +2,7 @@ package com.unimib.oases.domain.usecase
 
 import android.util.Log
 import com.unimib.oases.domain.model.symptom.Symptom
-import com.unimib.oases.util.Resource
+import com.unimib.oases.util.firstNullableSuccess
 import javax.inject.Inject
 
 class TranslateLatestVitalSignsToSymptomsUseCase @Inject constructor(
@@ -12,10 +12,7 @@ class TranslateLatestVitalSignsToSymptomsUseCase @Inject constructor(
 
     suspend operator fun invoke(patientId: String): Set<Symptom> {
         val symptoms = mutableSetOf<Symptom>()
-        val visitResource = getCurrentVisitUseCase(patientId)
-        if (visitResource is Resource.Error)
-            throw Exception(visitResource.message)
-        val visit = visitResource.data
+        val visit = getCurrentVisitUseCase(patientId).firstNullableSuccess()
         visit?.let {
             val vitalSigns = getLatestVitalSignsUseCase(visit.id)
             for (vitalSign in vitalSigns) {

@@ -25,6 +25,7 @@ import com.unimib.oases.domain.usecase.TranslateTriageSymptomIdsToSymptomsUseCas
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.screen.nurse_assessment.patient_registration.Sex.Companion.fromDisplayName
 import com.unimib.oases.util.Resource
+import com.unimib.oases.util.firstNullableSuccess
 import com.unimib.oases.util.toggle
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -227,14 +228,12 @@ class MainComplaintViewModel @Inject constructor(
     private suspend fun getTriageData(){
         try {
 
-            val visitResource = getCurrentVisitUseCase(_state.value.patientId)
-
-            if (visitResource is Resource.Error)
-                throw Exception(visitResource.message)
-            val visit = (visitResource as Resource.Success).data
+            val visit = getCurrentVisitUseCase(_state.value.patientId).firstNullableSuccess()
 
             visit?.let {
-                val resource = triageEvaluationRepository.getTriageEvaluation(visit.id)
+                val resource = triageEvaluationRepository.getTriageEvaluation(visit.id).first {
+                    it is Resource.Success || it is Resource.Error
+                }
 
                 when (resource) {
                     is Resource.Success -> {

@@ -157,7 +157,7 @@ class RoomDataSource @Inject constructor(
         malnutritionScreeningDao.insert(malnutritionScreening)
     }
 
-    fun getMalnutritionScreening(visitId: String): MalnutritionScreeningEntity? {
+    fun getMalnutritionScreening(visitId: String): Flow<MalnutritionScreeningEntity?> {
         return malnutritionScreeningDao.getMalnutritionScreening(visitId)
     }
 
@@ -166,7 +166,7 @@ class RoomDataSource @Inject constructor(
         triageEvaluationDao.insert(triageEvaluation)
     }
 
-    fun getTriageEvaluation(visitId: String): TriageEvaluationEntity {
+    fun getTriageEvaluation(visitId: String): Flow<TriageEvaluationEntity> {
         return triageEvaluationDao.getTriageEvaluation(visitId)
     }
 

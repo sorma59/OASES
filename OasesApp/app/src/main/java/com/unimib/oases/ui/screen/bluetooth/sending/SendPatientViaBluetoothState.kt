@@ -4,7 +4,7 @@ import android.bluetooth.BluetoothDevice
 import com.unimib.oases.domain.model.Patient
 
 data class SendPatientViaBluetoothState(
-    val receivedId: String,
+    val patientId: String,
     val patient: Patient? = null,
     val pairedDevices: List<BluetoothDevice> = emptyList(),
 

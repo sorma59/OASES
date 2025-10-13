@@ -5,6 +5,7 @@ import androidx.room.Query
 import androidx.room.Upsert
 import com.unimib.oases.data.local.TableNames
 import com.unimib.oases.data.local.model.MalnutritionScreeningEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface MalnutritionScreeningDao {
@@ -12,5 +13,5 @@ interface MalnutritionScreeningDao {
     suspend fun insert(malnutritionScreening: MalnutritionScreeningEntity)
 
     @Query("SELECT * FROM " + TableNames.MALNUTRITION_SCREENING + " WHERE visit_id = :visitId LIMIT 1")
-    fun getMalnutritionScreening(visitId: String): MalnutritionScreeningEntity?
+    fun getMalnutritionScreening(visitId: String): Flow<MalnutritionScreeningEntity?>
 }
