@@ -31,4 +31,12 @@ sealed class Resource<T>(var data: T? = null, val message: String? = null) {
      * Represents a resource operation that is currently loading.
      */
     class Loading<T>(message: String? = null) : Resource<T>(message = message)
+
+//    /**
+//     * Represents a resource that could not be found.
+//     * This is a specific type of error.
+//     *
+//     * @param message An error message indicating that the resource was not found.
+//     */
+//    class NotFound<T>(message: String? = "Resource not found"): Resource<T>(message = message)
 }

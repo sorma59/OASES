@@ -38,30 +38,35 @@ class VisitRepositoryImpl @Inject constructor(
     }
 
     override fun getVisits(patientId: String): Flow<Resource<List<Visit>>> = flow {
-        try {
-            emit(Resource.Loading())
-            roomDataSource.getVisits(patientId).collect {
-                emit(Resource.Success(it.map { entity -> entity.toDomain() }))
-            }
-        } catch (e: Exception) {
-            Log.e("VisitRepository", "Error getting visits: ${e.message}")
-            emit(Resource.Error(e.message ?: "An error occurred"))
-        }
-
+//        if (Random.nextBoolean())
+//            emit(Resource.Error("Mock error"))
+//        else
+            roomDataSource.getVisits(patientId)
+                .onStart { emit(Resource.Loading()) }
+                .catch {
+                    Log.e("VisitRepository", "Error getting visits: ${it.message}")
+                    emit(Resource.Error(it.message ?: "An error occurred"))
+                }
+                .collect {
+                    emit(Resource.Success(it.map { entity -> entity.toDomain() }))
+                }
     }
 
     override fun getCurrentVisit(patientId: String): Flow<Resource<Visit?>> = flow {
-        roomDataSource.getCurrentVisit(patientId)
-            .onStart {
-                emit(Resource.Loading())
-            }
-            .catch {
-                Log.e("VisitRepository", "Error getting current visit: ${it.message}")
-                emit(Resource.Error(it.message ?: "An error occurred"))
-            }
-            .collect { entity ->
-                val domainModel = entity?.toDomain()
-                emit(Resource.Success(domainModel))
-            }
+//        if (Random.nextBoolean())
+//            emit(Resource.Error("Mock error"))
+//        else
+            roomDataSource.getCurrentVisit(patientId)
+                .onStart {
+                    emit(Resource.Loading())
+                }
+                .catch {
+                    Log.e("VisitRepository", "Error getting current visit: ${it.message}")
+                    emit(Resource.Error(it.message ?: "An error occurred"))
+                }
+                .collect { entity ->
+                    val domainModel = entity?.toDomain()
+                    emit(Resource.Success(domainModel))
+                }
     }
 }

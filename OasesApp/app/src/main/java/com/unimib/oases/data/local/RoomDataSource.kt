@@ -166,7 +166,7 @@ class RoomDataSource @Inject constructor(
         triageEvaluationDao.insert(triageEvaluation)
     }
 
-    fun getTriageEvaluation(visitId: String): Flow<TriageEvaluationEntity> {
+    fun getTriageEvaluation(visitId: String): Flow<TriageEvaluationEntity?> {
         return triageEvaluationDao.getTriageEvaluation(visitId)
     }
 

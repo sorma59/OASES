@@ -11,8 +11,10 @@ import com.unimib.oases.util.Resource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -48,14 +50,24 @@ class VitalSignRepositoryImpl @Inject constructor(
     }
 
     override fun getAllVitalSigns(): Flow<Resource<List<VitalSign>>> = flow {
-        emit(Resource.Loading())
-        roomDataSource.getAllVitalSigns().collect {
-            precisionMap.clear()
-            precisionMap.putAll(
-                it.associate { it.name to it.precision}
-            )
-            emit(Resource.Success(it.map { entity -> entity.toDomain() }))
-        }
+//        if (Random.nextBoolean())
+//            emit(Resource.Error("Mock error"))
+//        else
+        roomDataSource.getAllVitalSigns()
+            .onStart {
+                emit(Resource.Loading())
+            }
+            .catch {
+                Log.e("VitalSignRepository", "Error getting all vital signs: ${it.message}")
+                emit(Resource.Error(it.message ?: "Unknown error"))
+            }
+            .collect {
+                precisionMap.clear()
+                precisionMap.putAll(
+                    it.associate { it.name to it.precision}
+                )
+                emit(Resource.Success(it.map { entity -> entity.toDomain() }))
+            }
     }
 
     override fun getPrecisionFor(name: String): NumericPrecision? {

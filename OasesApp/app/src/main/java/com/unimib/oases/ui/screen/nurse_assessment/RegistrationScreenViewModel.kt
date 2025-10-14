@@ -11,6 +11,7 @@ import com.unimib.oases.domain.model.NumericPrecision
 import com.unimib.oases.domain.model.Room
 import com.unimib.oases.domain.model.Visit
 import com.unimib.oases.domain.model.symptom.triageSymptoms
+import com.unimib.oases.domain.model.toState
 import com.unimib.oases.domain.repository.MalnutritionScreeningRepository
 import com.unimib.oases.domain.repository.TriageEvaluationRepository
 import com.unimib.oases.domain.usecase.ComputeSymptomsUseCase
@@ -62,7 +63,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -96,7 +96,9 @@ class RegistrationScreenViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ): ViewModel() {
 
-    private val _state = MutableStateFlow(RegistrationState())
+    private val _state = MutableStateFlow(RegistrationState(
+        patientId = savedStateHandle["patientId"]!!
+    ))
     val state: StateFlow<RegistrationState> = _state.asStateFlow()
 
     val tabs = state.value.tabs
@@ -107,9 +109,8 @@ class RegistrationScreenViewModel @Inject constructor(
     private val validationEventsChannel = Channel<ValidationEvent>()
     val validationEvents = validationEventsChannel.receiveAsFlow()
 
-    private val retrievedPatientId: String? = savedStateHandle["patientId"]
-
     private var errorHandler = CoroutineExceptionHandler { _, e ->
+        Log.e("Prova", "errorHandler")
         e.printStackTrace()
         _state.update{
             _state.value.copy(
@@ -118,17 +119,84 @@ class RegistrationScreenViewModel @Inject constructor(
         }
     }
 
-    private val triageErrorHandler = CoroutineExceptionHandler { _, e ->
+    private val patientErrorHandler = CoroutineExceptionHandler { _, e ->
+        Log.e("Prova", "patientErrorHandler")
         e.printStackTrace()
-        _state.update{
-            _state.value.copy(
-                triageState = _state.value.triageState.copy(
-                    error = e.message,
-                    loaded = false
-                )
+        updatePatientInfoState {
+            it.copy(
+                error = e.message,
+                isLoading = false
             )
         }
     }
+
+    private val visitErrorHandler = CoroutineExceptionHandler { _, e ->
+        Log.e("Prova", "visitErrorHandler")
+        e.printStackTrace()
+        updateVisitHistoryState {
+            it.copy(
+                error = e.message,
+                isLoading = false
+            )
+        }
+    }
+
+    private val vitalSignsErrorHandler = CoroutineExceptionHandler { _, e ->
+        Log.e("Prova", "vitalSignsErrorHandler")
+        e.printStackTrace()
+        updateVitalSignsState {
+            it.copy(
+                error = e.message,
+                isLoading = false
+            )
+        }
+    }
+
+    private val roomsErrorHandler = CoroutineExceptionHandler { _, e ->
+        Log.e("Prova", "roomsErrorHandler")
+        e.printStackTrace()
+        updateRoomState {
+            it.copy(
+                error = e.message,
+                isLoading = false
+            )
+        }
+    }
+
+    private val triageErrorHandler = CoroutineExceptionHandler { _, e ->
+        e.printStackTrace()
+        updateTriageState {
+            it.copy(
+                error = e.message,
+                loaded = false
+            )
+        }
+    }
+
+    private val malnutritionErrorHandler = CoroutineExceptionHandler { _, e ->
+        Log.e("Prova", "malnutritionErrorHandler")
+        e.printStackTrace()
+        updateMalnutritionScreeningState {
+            it.copy(
+                error = e.message,
+                isLoading = false
+            )
+        }
+    }
+
+    val mainContext = ioDispatcher + errorHandler
+
+    val patientCoroutineContext = ioDispatcher + patientErrorHandler
+
+    val visitContext = ioDispatcher + visitErrorHandler
+
+    val roomsContext = ioDispatcher + roomsErrorHandler
+
+    val triageContext = ioDispatcher + triageErrorHandler
+
+    val vitalSignsContext = ioDispatcher + vitalSignsErrorHandler
+
+    val malnutritionContext = ioDispatcher + malnutritionErrorHandler
 
     fun onEvent(event: RegistrationEvent) {
         when (event) {
@@ -146,59 +214,29 @@ class RegistrationScreenViewModel @Inject constructor(
     // --------------Demographics-----------------------
 
     init {
-        viewModelScope.launch(ioDispatcher + errorHandler) {
-            refreshPatientInfo()
-            refreshVitalSigns()
-            refreshRooms()
-        }
+        refreshPatientInfo()
+        refreshVitalSigns()
+        refreshRooms()
     }
 
-    private suspend fun refreshPatientInfo() {
-        retrievedPatientId?.let { id ->
-
-            try {
-                updatePatientInfoState {
-                    it.copy(
-                        isLoading = true,
-                        error = null
-                    )
-                }
-
-                val resource = patientUseCase.getPatient(id).first {
-                    it is Resource.Success || it is Resource.Error
-                }
-
-                when (resource) {
-
-                    is Resource.Success -> {
-                        updatePatientInfoState {
-                            it.copy(
-                                patient = resource.data!!,
-                                isNew = false,
-                                isLoading = false,
-                                error = null
-                            )
-                        }
-                    }
-
-                    is Resource.Error -> {
-                        updatePatientInfoState {
-                            it.copy(
-                                error = resource.message,
-                                isLoading = false
-                            )
-                        }
-                    }
-
-                    else -> {} // Unreachable
-                }
-            } catch (e: Exception) {
-                updatePatientInfoState {
-                    it.copy(
-                        error = e.message,
-                        isLoading = false
-                    )
-                }
+    private fun refreshPatientInfo() {
+        viewModelScope.launch(patientCoroutineContext) {
+            updatePatientInfoState {
+                it.copy(
+                    isLoading = true,
+                    error = null
+                )
+            }
+            val patient = patientUseCase
+                .getPatient(_state.value.patientId)
+                .firstSuccess()
+            updatePatientInfoState {
+                it.copy(
+                    patient = patient,
+                    isNew = false,
+                    isLoading = false,
+                    error = null
+                )
             }
         }
     }
@@ -212,12 +250,12 @@ class RegistrationScreenViewModel @Inject constructor(
     fun handlePatientInfoEffect(effect: PatientInfoEffect) {
         when (effect) {
             PatientInfoEffect.SavePatientData -> {
-                applicationScope.launch(ioDispatcher + errorHandler) {
+                applicationScope.launch(mainContext) {
                     savePatientData()
                 }
             }
             PatientInfoEffect.SendValidationResult -> {
-                viewModelScope.launch(ioDispatcher + errorHandler) {
+                viewModelScope.launch(mainContext) {
                     validationEventsChannel.send(ValidationEvent.ValidationSuccess)
                 }
             }
@@ -234,7 +272,7 @@ class RegistrationScreenViewModel @Inject constructor(
                 }
             }
             PatientInfoEffect.Retry -> {
-                viewModelScope.launch(ioDispatcher + errorHandler) { refreshPatientInfo() }
+                refreshPatientInfo()
             }
         }
     }
@@ -266,7 +304,7 @@ class RegistrationScreenViewModel @Inject constructor(
     fun onVitalSignsEvent(event: VitalSignsEvent) {
         when (event) {
             is VitalSignsEvent.Retry -> {
-                viewModelScope.launch(ioDispatcher + errorHandler) { refreshVitalSigns() }
+                refreshVitalSigns()
             }
 
             is VitalSignsEvent.ValueChanged -> {
@@ -285,157 +323,82 @@ class RegistrationScreenViewModel @Inject constructor(
         }
     }
 
-    private suspend fun refreshVitalSigns(){
-        updateVitalSignsState { it.copy(error = null, isLoading = true) }
-        try {
+    private fun refreshVitalSigns(){
+        viewModelScope.launch(vitalSignsContext) {
+            updateVitalSignsState { it.copy(error = null, isLoading = true) }
             loadVitalSigns()
-            val currentVisit = getCurrentVisit(patientId = state.value.patientInfoState.patient.id)
-            if (currentVisit != null) {
+            getCurrentVisit(_state.value.patientId)?.let {
                 if (_state.value.vitalSignsState.error == null)
-                    loadVisitVitalSigns(currentVisit.id)
+                    loadVisitVitalSigns(it.id)
             }
-        } catch (e: Exception) {
-            updateVitalSignsState { it.copy(error = e.message) }
+            updateVitalSignsState { it.copy(isLoading = false) }
         }
     }
 
     private suspend fun loadVitalSigns() {
-
-        updateVitalSignsState { it.copy(isLoading = true) }
-
-        try {
-            // Collect only the first emission from the Flow
-            val vitalSignsResource = vitalSignsUseCases.getVitalSigns().first {
-                it is Resource.Success || it is Resource.Error
-            }
-
-            if (vitalSignsResource is Resource.Success) {
-
-                val vitalSignsData = vitalSignsResource.data
-
-                if (vitalSignsData != null) {
-                    val newStates = vitalSignsData.map { vitalSign -> // More efficient mapping
-                        PatientVitalSignState(vitalSign.name, vitalSign.acronym, vitalSign.unit)
-                    }
-                    updateVitalSignsState {
-                        it.copy(
-                            vitalSigns = newStates, // Set the list, don't append if it's initial load
-                            error = null // Clear previous error
-                        )
-                    }
-                } else {
-                    // Handle case where Resource.Success has null data, if possible
-                    updateVitalSignsState { it.copy(error = "Successful fetch but no data.") }
-                }
-            } else if (vitalSignsResource is Resource.Error) {
-                updateVitalSignsState { it.copy(error = vitalSignsResource.message) }
-            }
-        } catch (e: Exception) {
-            // This can catch NoSuchElementException if the Flow completes
-            // or any other exception from the Flow upstream or the first() operator itself.
-            updateVitalSignsState { it.copy(error = e.message ?: "An unexpected error occurred") }
-        } finally {
-            updateVitalSignsState { it.copy(isLoading = false) } // Ensure isLoading is false in all cases
+        val vitalSigns = vitalSignsUseCases.getVitalSigns().firstSuccess()
+        val newStates = vitalSigns.map { vitalSign -> // More efficient mapping
+            PatientVitalSignState(vitalSign.name, vitalSign.acronym, vitalSign.unit)
         }
-
+        updateVitalSignsState {
+            it.copy(
+                vitalSigns = newStates, // Set the list, don't append if it's initial load
+            )
+        }
     }
 
     // Rooms
 
-    private suspend fun refreshRooms(){
-        updateRoomState { it.copy(error = null, isLoading = true) }
-        loadRooms()
+    private fun refreshRooms(){
+        viewModelScope.launch(roomsContext) {
+            updateRoomState { it.copy(error = null, isLoading = true) }
+            loadRooms()
+            updateRoomState { it.copy(isLoading = false) }
+        }
     }
 
     private suspend fun loadRooms(){
-        updateRoomState { it.copy(isLoading = true) }
-
-        try {
-            // Collect only the first emission from the Flow
-            val roomsResource = roomUseCase.getRooms().first {
-                it is Resource.Success || it is Resource.Error
-            }
-
-            if (roomsResource is Resource.Success) {
-
-                val roomsData = roomsResource.data
-
-                if (roomsData != null) {
-//                    val newStates = roomsData.map { room -> // More efficient mapping
-//                        PatientVitalSignState(vitalSign.name, vitalSign.acronym, vitalSign.unit)
-//                    }
-                    updateRoomState {
-                        it.copy(
-                            rooms = roomsData, // Set the list, don't append if it's initial load
-                            currentRoom = Room(state.value.patientInfoState.patient.room),
-                            currentTriageCode = state.value.triageState.triageCode.name,
-                            error = null // Clear previous error
-                        )
-                    }
-
-                } else {
-                    // Handle case where Resource.Success has null data, if possible
-                    updateRoomState { it.copy(error = "Successful fetch but no data.") }
-                }
-            } else if (roomsResource is Resource.Error) {
-                updateRoomState { it.copy(error = roomsResource.message) }
-            }
-        } catch (e: Exception) {
-            // This can catch NoSuchElementException if the Flow completes
-            // or any other exception from the Flow upstream or the first() operator itself.
-            updateRoomState { it.copy(error = e.message ?: "An unexpected error occurred") }
-        } finally {
-            updateRoomState { it.copy(isLoading = false) } // Ensure isLoading is false in all cases
+        val rooms = roomUseCase.getRooms().firstSuccess()
+        updateRoomState {
+            it.copy(
+                rooms = rooms, // Set the list, don't append if it's initial load
+                currentRoom = Room(state.value.patientInfoState.patient.room),
+                currentTriageCode = state.value.triageState.triageCode.name,
+            )
         }
     }
 
     private suspend fun loadVisitVitalSigns(visitId: String) {
 
-        updateVitalSignsState { it.copy(isLoading = true) }
+        val vitalSigns = visitVitalSignsUseCases
+            .getVisitVitalSigns(visitId)
+            .firstSuccess()
+        val visitVitalSignsDbMap = vitalSigns.associateBy { it.vitalSignName }
 
-        try {
-            val visitVitalSigns = visitVitalSignsUseCases.getVisitVitalSigns(visitId).first {
-                it is Resource.Success || it is Resource.Error
-            }
+        updateVitalSignsState { currentState ->
+            val updatedVitalSignsList =
+                currentState.vitalSigns.map { uiState ->
 
-            if (visitVitalSigns is Resource.Success) {
+                    val visitSpecificVitalSignData = visitVitalSignsDbMap[uiState.name]
 
-                val visitVitalSignsFromDb = visitVitalSigns.data!!
-                val visitVitalSignsDbMap = visitVitalSignsFromDb.associateBy { it.vitalSignName }
+                    if (visitSpecificVitalSignData != null) {
+                        val precision = getPrecisionFor(uiState.name)
 
-                updateVitalSignsState { currentState ->
-                    val updatedVitalSignsList =
-                        currentState.vitalSigns.map { uiState ->
-
-                            val visitSpecificVitalSignData = visitVitalSignsDbMap[uiState.name]
-
-                            if (visitSpecificVitalSignData != null) {
-                                val precision = getPrecisionFor(uiState.name)
-
-                                val value = when (precision) {
-                                    NumericPrecision.INTEGER -> visitSpecificVitalSignData.value.toInt().toString()
-                                    NumericPrecision.FLOAT -> visitSpecificVitalSignData.value.toString()
-                                    null -> throw IllegalStateException("Precision for ${uiState.name} not found")
-                                }
-
-                                uiState.copy(
-                                    value = value
-                                )
-                            } else {
-                                uiState
-                            }
+                        check(precision != null) {
+                            "Precision for ${uiState.name} not found"
                         }
-                    currentState.copy(vitalSigns = updatedVitalSignsList, isLoading = false)
+
+                        val value = when (precision) {
+                            NumericPrecision.INTEGER -> visitSpecificVitalSignData.value.toInt().toString()
+                            NumericPrecision.FLOAT -> visitSpecificVitalSignData.value.toString()
+                        }
+
+                        uiState.copy(value = value)
+                    } else {
+                        uiState
+                    }
                 }
-            } else if (visitVitalSigns is Resource.Error) {
-                updateVitalSignsState { it.copy(error = visitVitalSigns.message) }
-            }
-        } catch (e: Exception) {
-            // This can catch NoSuchElementException if the Flow completes
-            // or any other exception from the Flow upstream or the first() operator itself.
-            updateVitalSignsState { it.copy(error = e.message ?: "An unexpected error occurred") }
-        } finally {
-            updateVitalSignsState { it.copy(isLoading = false) }
+            currentState.copy(vitalSigns = updatedVitalSignsList)
         }
     }
 
@@ -449,7 +412,7 @@ class RegistrationScreenViewModel @Inject constructor(
                 updateRoomState { it.copy(currentRoom = event.room) }
             }
             RoomEvent.Retry -> {
-                viewModelScope.launch(ioDispatcher + errorHandler) { refreshRooms() }
+                refreshRooms()
             }
             RoomEvent.ConfirmSelection -> onNext()
             RoomEvent.RoomDeselected -> {updateRoomState { it.copy(currentRoom = null) }}
@@ -476,14 +439,14 @@ class RegistrationScreenViewModel @Inject constructor(
     }
 
     fun refreshTriage(visitId: String) {
-        viewModelScope.launch(ioDispatcher + triageErrorHandler) {
+        viewModelScope.launch(triageContext) {
             updateTriageState { it.copy(error = null, isLoading = true) }
-            loadPatientSymptoms(visitId)
+            loadTriageEvaluation(visitId)
             updateTriageState { it.copy(isLoading = false) }
         }
     }
 
-    private suspend fun loadPatientSymptoms(visitId: String){
+    private suspend fun loadTriageEvaluation(visitId: String){
         val triageEvaluation = triageEvaluationRepository.getTriageEvaluation(visitId).firstSuccess()
         updateTriageState {
             it.copy(
@@ -505,8 +468,7 @@ class RegistrationScreenViewModel @Inject constructor(
 
     fun refreshVisitHistory(patientId: String) {
         updateVisitHistoryState { it.copy(error = null, isLoading = true) }
-
-        applicationScope.launch(ioDispatcher + errorHandler) {
+        viewModelScope.launch(visitContext) {
             loadVisits(patientId)
         }
     }
@@ -569,33 +531,20 @@ class RegistrationScreenViewModel @Inject constructor(
 
     fun refreshMalnutritionScreening(visitId: String) {
         updateMalnutritionScreeningState { it.copy(error = null, isLoading = true) }
-        viewModelScope.launch(ioDispatcher + errorHandler) {
+        viewModelScope.launch(malnutritionContext) {
             loadMalnutritionScreening(visitId)
+            updateMalnutritionScreeningState {
+                it.copy(isLoading = false)
+            }
         }
     }
 
     private suspend fun loadMalnutritionScreening(visitId: String) {
-        val malnutritionScreeningResource = malnutritionScreeningRepository.getMalnutritionScreening(visitId).first {
-            it is Resource.Success || it is Resource.Error
-        }
-        if (malnutritionScreeningResource is Resource.Success){
-            malnutritionScreeningResource.data?.let{
-                updateMalnutritionScreeningState {
-                    it.copy(
-                        weight = malnutritionScreeningResource.data!!.weight.toString(),
-                        height = malnutritionScreeningResource.data!!.height.toString(),
-                        muacState = it.muacState.copy(
-                            value = malnutritionScreeningResource.data!!.muac.value.toString()
-                        )
-                    )
-                }
-            }
-        } else{
-            updateMalnutritionScreeningState {
-                it.copy(
-                    error = malnutritionScreeningResource.message,
-                )
-            }
+        val malnutritionScreening = malnutritionScreeningRepository
+            .getMalnutritionScreening(visitId)
+            .firstNullableSuccess()
+        updateMalnutritionScreeningState {
+            malnutritionScreening.toState()
         }
     }
 
@@ -604,7 +553,7 @@ class RegistrationScreenViewModel @Inject constructor(
         val ageInMonths = _state.value.patientInfoState.patient.ageInMonths
         val id = _state.value.patientInfoState.patient.id
 
-        applicationScope.launch(ioDispatcher + errorHandler) {
+        applicationScope.launch(mainContext) {
             val currentVisit = getCurrentVisit(id)
             _state.update {
                 _state.value.copy(
@@ -660,7 +609,7 @@ class RegistrationScreenViewModel @Inject constructor(
     }
 
     private fun handleFinalSubmission(){
-        applicationScope.launch(ioDispatcher + errorHandler) {
+        applicationScope.launch(mainContext) {
             val patient = _state.value.patientInfoState.patient
             val currentVisit = _state.value.currentVisit
             val triageCode =
@@ -752,7 +701,6 @@ class RegistrationScreenViewModel @Inject constructor(
         _state.update { it.copy(vitalSignsState = update(it.vitalSignsState)) }
     }
 
-
     private fun updateRoomState(update: (RoomState) -> RoomState){
         _state.update { it.copy(roomState = update(it.roomState)) }
     }
@@ -761,6 +709,10 @@ class RegistrationScreenViewModel @Inject constructor(
 
     fun onNext() {
         executeSideEffect()
+        goToNextStep()
+    }
+
+    private fun goToNextStep() {
         val currentIndex = _state.value.currentStep
         if (currentIndex != _state.value.tabs.lastIndex) {
             val nextIndex = calculateNextStep(currentIndex)
@@ -772,7 +724,7 @@ class RegistrationScreenViewModel @Inject constructor(
         val currentIndex = _state.value.currentStep
         if (state.value.currentTab == Tab.CONTINUE_TO_TRIAGE ||
             currentIndex == 0) {
-            viewModelScope.launch(ioDispatcher + errorHandler){
+            viewModelScope.launch(mainContext){
                 navigationEventsChannel.send(NavigationEvent.NavigateBack)
             }
             return
@@ -808,10 +760,9 @@ class RegistrationScreenViewModel @Inject constructor(
             Tab.VITAL_SIGNS -> {
                 onEvent(RegistrationEvent.VitalSignsSubmitted)
             }
-
             Tab.SUBMIT_ALL -> {
                 onEvent(RegistrationEvent.Submit)
-                viewModelScope.launch(ioDispatcher + errorHandler) {
+                viewModelScope.launch(mainContext) {
                     navigationEventsChannel.send(NavigationEvent.NavigateBack)
                 }
             }

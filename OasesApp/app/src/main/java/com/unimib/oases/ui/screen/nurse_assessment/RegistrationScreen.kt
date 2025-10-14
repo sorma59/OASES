@@ -89,15 +89,17 @@ fun RegistrationScreen(
         }
     }
 
-    val onConfirm =
-        if (currentTab == Tab.DEMOGRAPHICS &&
-            (state.patientInfoState.isEdited ||
-            state.patientInfoState.isNew))
-        {
-            { registrationScreenViewModel.onPatientInfoEvent(PatientInfoEvent.NextButtonPressed) }
+    val onConfirm by remember(currentTab, state.patientInfoState.isEdited, state.patientInfoState.isNew) {
+        derivedStateOf {
+            if (currentTab == Tab.DEMOGRAPHICS &&
+                (state.patientInfoState.isEdited ||
+                        state.patientInfoState.isNew)
+            ) {
+                { registrationScreenViewModel.onPatientInfoEvent(PatientInfoEvent.NextButtonPressed) }
+            } else
+                registrationScreenViewModel::onNext
         }
-        else
-            registrationScreenViewModel::onNext
+    }
 
     LaunchedEffect(Unit) {
         registrationScreenViewModel.navigationEvents.collect {
@@ -119,7 +121,6 @@ fun RegistrationScreen(
             }
         }
     }
-
 
     Column(modifier = Modifier.fillMaxSize()) {
 

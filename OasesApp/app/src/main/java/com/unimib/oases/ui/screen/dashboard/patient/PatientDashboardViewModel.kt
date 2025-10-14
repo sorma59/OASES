@@ -78,7 +78,6 @@ class PatientDashboardViewModel @Inject constructor(
         _state.update {
             it.copy(buttons = buttons)
         }
-
     }
 
     private suspend fun getPatientData() {

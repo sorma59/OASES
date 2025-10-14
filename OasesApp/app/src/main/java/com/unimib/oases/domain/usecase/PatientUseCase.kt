@@ -17,7 +17,7 @@ class PatientUseCase @Inject constructor(
         return patientRepository.getPatients()
     }
 
-    suspend fun getPatient(patientId: String): Flow<Resource<Patient>> {
+    fun getPatient(patientId: String): Flow<Resource<Patient>> {
         return patientRepository.getPatientById(patientId)
     }
 

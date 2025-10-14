@@ -14,8 +14,7 @@ class RoomUseCase @Inject constructor(
     }
 
     fun getRooms(): Flow<Resource<List<Room>>> {
-        val result = repo.getAllRooms()
-        return result
+        return repo.getAllRooms()
     }
 
     fun deleteRoom(room: Room){

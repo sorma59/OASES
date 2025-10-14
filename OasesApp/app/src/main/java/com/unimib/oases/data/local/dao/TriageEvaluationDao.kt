@@ -13,5 +13,5 @@ interface TriageEvaluationDao {
     suspend fun insert(triageEvaluation: TriageEvaluationEntity)
 
     @Query("SELECT * FROM " + TableNames.TRIAGE_EVALUATION + " WHERE visit_id = :visitId")
-    fun getTriageEvaluation(visitId: String): Flow<TriageEvaluationEntity>
+    fun getTriageEvaluation(visitId: String): Flow<TriageEvaluationEntity?>
 }

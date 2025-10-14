@@ -58,18 +58,22 @@ fun RedCodeScreen(
 
     var pregnancyRowScrollTargetY by remember { mutableFloatStateOf(0f) }
 
+    suspend fun animate() {
+        scrollState.animateScrollTo(
+            value = pregnancyRowScrollTargetY.toInt(),
+            animationSpec = tween(
+                durationMillis = 500,
+                delayMillis = 100,
+                easing = LinearOutSlowInEasing
+            )
+        )
+    }
+
     val handlePregnancyChangeAndScroll = { newPregnancyState: Boolean ->
         onEvent(TriageEvent.FieldToggled(TriageSymptom.PREGNANCY.id))
         if (newPregnancyState) { // Only scroll if it's being expanded
             coroutineScope.launch {
-                scrollState.animateScrollTo(
-                    value = pregnancyRowScrollTargetY.toInt(),
-                    animationSpec = tween(
-                        durationMillis = 500,
-                        delayMillis = 100,
-                        easing = LinearOutSlowInEasing
-                    )
-                )
+                animate()
             }
         }
     }

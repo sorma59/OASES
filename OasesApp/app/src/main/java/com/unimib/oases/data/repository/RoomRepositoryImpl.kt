@@ -10,8 +10,10 @@ import com.unimib.oases.util.Resource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -43,11 +45,21 @@ class RoomRepositoryImpl @Inject constructor(
     }
 
     override fun getAllRooms(): Flow<Resource<List<Room>>> = flow {
-        emit(Resource.Loading())
-        roomDataSource.getAllRooms().collect {
-            emit(Resource.Success(it.map { entity -> entity.toDomain() }))
-        }
+//        if (Random.nextBoolean())
+//            emit(Resource.Error("Mock error"))
+//        else
+            roomDataSource.getAllRooms()
+                .onStart { emit(Resource.Loading()) }
+                .catch {
+                    emit(Resource.Error(it.message ?: "Unknown error"))
+                }
+                .collect {
+                    emit(
+                        Resource.Success(
+                            it.map { entity -> entity.toDomain() }
+                        )
+                    )
+                }
     }
-
 
 }

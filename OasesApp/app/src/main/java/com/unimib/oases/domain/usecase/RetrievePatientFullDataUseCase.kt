@@ -14,7 +14,6 @@ import com.unimib.oases.util.firstSuccess
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -38,7 +37,9 @@ class RetrievePatientFullDataUseCase @Inject constructor(
 
                     // Patient details
                     val patientDeferred = async {
-                        patientRepository.getPatientById(patientId).firstSuccess()
+                        patientRepository
+                            .getPatientById(patientId)
+                            .firstSuccess()
                     }
 
 //                    Log.d("Prova: patient", (System.currentTimeMillis() - patientTime).toString())
@@ -56,13 +57,9 @@ class RetrievePatientFullDataUseCase @Inject constructor(
 
                     // Patient's PMH
                     val patientDiseasesDeferred = async {
-                        val patientDiseasesResource =
-                            patientDiseaseRepository.getPatientDiseases(patientId).first {
-                                it is Resource.Success || it is Resource.Error
-                            }
-                        if (patientDiseasesResource is Resource.Error)
-                            throw Exception(patientDiseasesResource.message)
-                        (patientDiseasesResource as Resource.Success).data!!
+                        patientDiseaseRepository
+                            .getPatientDiseases(patientId)
+                            .firstSuccess()
                     }
 
 //                    Log.d("Prova: diseases", (System.currentTimeMillis() - diseases).toString())
@@ -80,13 +77,9 @@ class RetrievePatientFullDataUseCase @Inject constructor(
 
                     // Current visit's vital signs
                     val vitalSignsDeferred = async {
-                        val vitalSignsResource =
-                            visitVitalSignRepository.getVisitVitalSigns(visit.id).first {
-                                it is Resource.Success || it is Resource.Error
-                            }
-                        if (vitalSignsResource is Resource.Error)
-                            throw Exception(vitalSignsResource.message)
-                        (vitalSignsResource as Resource.Success).data!!
+                        visitVitalSignRepository
+                            .getVisitVitalSigns(visit.id)
+                            .firstSuccess()
                     }
 
 //                    Log.d("Prova: vitals", (System.currentTimeMillis() - preVitals).toString())
@@ -95,13 +88,9 @@ class RetrievePatientFullDataUseCase @Inject constructor(
 
                     // Current visit's triage evaluation
                     val triageEvaluationDeferred = async {
-                        val triageEvaluationResource =
-                            triageEvaluationRepository.getTriageEvaluation(visit.id).first {
-                                it is Resource.Success || it is Resource.Error
-                            }
-                        if (triageEvaluationResource is Resource.Error)
-                            throw Exception(triageEvaluationResource.message)
-                        (triageEvaluationResource as Resource.Success).data!!
+                        triageEvaluationRepository
+                            .getTriageEvaluation(visit.id)
+                            .firstSuccess()
                     }
 
 //                    Log.d("Prova: triage", (System.currentTimeMillis() - triage).toString())
@@ -110,14 +99,9 @@ class RetrievePatientFullDataUseCase @Inject constructor(
 
                     // Current visit's malnutrition screening
                     val malnutritionScreeningDeferred = async {
-                        val malnutritionScreeningResource =
-                            malnutritionScreeningRepository.getMalnutritionScreening(visit.id)
-                                .first {
-                                    it is Resource.Success || it is Resource.Error
-                                }
-                        if (malnutritionScreeningResource is Resource.Error)
-                            throw Exception(malnutritionScreeningResource.message)
-                        (malnutritionScreeningResource as Resource.Success).data
+                        malnutritionScreeningRepository
+                            .getMalnutritionScreening(visit.id)
+                            .firstNullableSuccess()
                     }
 
 //                    Log.d(
@@ -129,13 +113,9 @@ class RetrievePatientFullDataUseCase @Inject constructor(
 
                     // Current visit's complaints summaries
                     val complaintsSummariesDeferred = async {
-                        val complaintsSummariesResource =
-                            complaintSummaryRepository.getVisitComplaintsSummaries(visit.id).first {
-                                it is Resource.Success || it is Resource.Error
-                            }
-                        if (complaintsSummariesResource is Resource.Error)
-                            throw Exception(complaintsSummariesResource.message)
-                        (complaintsSummariesResource as Resource.Success).data!!
+                        complaintSummaryRepository
+                            .getVisitComplaintsSummaries(visit.id)
+                            .firstSuccess()
                     }
 
 //                    Log.d("Prova: summaries", (System.currentTimeMillis() - summaries).toString())

@@ -24,21 +24,27 @@ class TriageEvaluationRepositoryImpl @Inject constructor(private val roomDataSou
     }
 
     override fun getTriageEvaluation(visitId: String): Flow<Resource<TriageEvaluation>> = flow {
-        roomDataSource.getTriageEvaluation(visitId)
-            .onStart {
-                emit(Resource.Loading())
-            }
-            .catch { exception ->
-                Log.e(
-                    "TriageEvaluationRepository",
-                    "Error getting triage evaluation for visitId $visitId: ${exception.message}",
-                    exception
-                )
-                emit(Resource.Error(exception.message ?: "An error occurred"))
-            }
-            .collect { entity ->
-                val domainModel = entity.toDomain()
-                emit(Resource.Success(domainModel))
-            }
+
+//        if (Random.nextBoolean())
+//            emit(Resource.Error("Mock error"))
+//        else
+            roomDataSource.getTriageEvaluation(visitId)
+                .onStart {
+                    emit(Resource.Loading())
+                }
+                .catch { exception ->
+                    Log.e(
+                        "TriageEvaluationRepository",
+                        "Error getting triage evaluation for visitId $visitId: ${exception.message}",
+                        exception
+                    )
+                    emit(Resource.Error(exception.message ?: "An error occurred"))
+                }
+                .collect { entity ->
+                    val resource = entity?.let {
+                        Resource.Success(it.toDomain())
+                    } ?: Resource.Error("No triage evaluation found for visitId $visitId")
+                    emit(resource)
+                }
     }
 }

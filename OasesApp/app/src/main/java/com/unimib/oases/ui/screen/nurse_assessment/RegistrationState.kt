@@ -9,6 +9,7 @@ import com.unimib.oases.ui.screen.nurse_assessment.visit_history.VisitHistorySta
 import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.VitalSignsState
 
 data class RegistrationState (
+    val patientId: String,
     val patientInfoState: PatientInfoState = PatientInfoState(),
     val vitalSignsState: VitalSignsState = VitalSignsState(),
     val visitHistoryState: VisitHistoryState = VisitHistoryState(),
