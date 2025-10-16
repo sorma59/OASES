@@ -3,8 +3,6 @@ package com.unimib.oases.ui.screen.homepage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unimib.oases.di.IoDispatcher
-import com.unimib.oases.domain.model.Patient
-import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.domain.usecase.PatientUseCase
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Screen
@@ -15,17 +13,14 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
-    patientRepository: PatientRepository,
     private val useCases: PatientUseCase,
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
 ): ViewModel() {
@@ -80,21 +75,6 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     // ----------------------Patients-------------------------------
-
-    private val receivedPatients: StateFlow<List<Patient>> =
-        patientRepository
-            .receivedPatients
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
-
-    init {
-        viewModelScope.launch {
-            receivedPatients.collect { patients ->
-                _state.update{
-                    _state.value.copy(receivedPatients = patients)
-                }
-            }
-        }
-    }
 
     init {
         getPatients()

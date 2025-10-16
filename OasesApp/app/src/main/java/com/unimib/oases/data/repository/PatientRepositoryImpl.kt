@@ -9,13 +9,9 @@ import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.util.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
@@ -39,11 +35,6 @@ class PatientRepositoryImpl @Inject constructor(
 //        }
 //    }
 
-
-
-    private val _receivedPatients = MutableStateFlow<List<Patient>>(emptyList())
-    override val receivedPatients: StateFlow<List<Patient>> = _receivedPatients.asStateFlow()
-
     private val _newPatientEvents = MutableSharedFlow<Patient>()
     override val newPatientEvents: SharedFlow<Patient> = _newPatientEvents.asSharedFlow()
 
@@ -64,14 +55,6 @@ class PatientRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             Resource.Error(e.message ?: "An error occurred")
         }
-    }
-
-    override suspend fun removePatientFromRecentlyReceived(patient: Patient) {
-        val currentPatients = _receivedPatients.firstOrNull() ?: emptyList()
-
-        val updatedPatients = currentPatients - patient
-
-        _receivedPatients.emit(updatedPatients)
     }
 
     override suspend fun deletePatient(patient: Patient): Resource<Unit> {

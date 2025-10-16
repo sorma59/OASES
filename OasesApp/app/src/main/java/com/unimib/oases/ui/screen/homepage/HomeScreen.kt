@@ -28,7 +28,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.unimib.oases.data.local.model.Role
 import com.unimib.oases.ui.components.patients.PatientList
-import com.unimib.oases.ui.components.patients.RecentlyReceivedPatientList
 import com.unimib.oases.ui.components.search.SearchBar
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 import com.unimib.oases.ui.screen.login.AuthViewModel
@@ -117,7 +116,6 @@ fun HomeScreen(
                             onHistoryItemClick = { searchText = it })
                     }
                 }
-                RecentlyReceivedPatientList(state.receivedPatients)
                 if(state.isLoading){
                     CustomCircularProgressIndicator()
                 }
