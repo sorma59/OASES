@@ -3,7 +3,6 @@ package com.unimib.oases.data.bluetooth
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
-import android.app.NotificationManager
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
@@ -17,7 +16,6 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
-import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.unimib.oases.OasesApp
 import com.unimib.oases.R
@@ -28,6 +26,7 @@ import com.unimib.oases.domain.usecase.HandleReceivedPatientUseCase
 import com.unimib.oases.service.BluetoothServerService
 import com.unimib.oases.ui.util.ToastUtils
 import com.unimib.oases.util.AppForegroundObserver
+import com.unimib.oases.util.OasesNotificationManager
 import com.unimib.oases.util.PermissionHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -51,7 +50,8 @@ import javax.inject.Singleton
 @Singleton
 class BluetoothCustomManager @Inject constructor(
     private val handleReceivedPatientUseCase: HandleReceivedPatientUseCase,
-    private val appForegroundObserver: AppForegroundObserver
+    private val appForegroundObserver: AppForegroundObserver,
+    private val notificationManager: OasesNotificationManager
 ): PatientHandler{
 
     private val appContext = OasesApp.getAppContext()
@@ -61,6 +61,11 @@ class BluetoothCustomManager @Inject constructor(
 
     private val _events = MutableSharedFlow<BluetoothEvent>()
     val events = _events.asSharedFlow()
+
+    // -----------Server---------------------
+    private val bluetoothServerIntent by lazy {
+        Intent(appContext, BluetoothServerService::class.java)
+    }
 
     // ------------Discovery------------------
     private val _isDiscovering = MutableStateFlow(false)
@@ -141,7 +146,6 @@ class BluetoothCustomManager @Inject constructor(
     }
 
     fun deinitialize() {
-        //stopServer()
         emptyPairedDevices()
         emptyDiscoveredDevices()
         updateDiscoveryStatus(false)
@@ -368,7 +372,7 @@ class BluetoothCustomManager @Inject constructor(
     // ---------------Connection------------------------
 
     private fun attemptStartServer() {
-        ContextCompat.startForegroundService(appContext, Intent(appContext, BluetoothServerService()::class.java))
+        ContextCompat.startForegroundService(appContext, bluetoothServerIntent)
     }
 
     suspend fun connectToServer(device: BluetoothDevice): BluetoothSocket? {
@@ -567,28 +571,10 @@ class BluetoothCustomManager @Inject constructor(
     }
 
     private fun showSuccessfulNotification(patientId: String, patientName: String) {
-        val manager = appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-        val notification = NotificationCompat.Builder(appContext, "bluetooth_channel")
-            .setSmallIcon(R.drawable.ic_launcher_round)
-            .setContentTitle("New patient received: $patientName")
-            .setContentText("$patientName and its data were successfully saved on this device")
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .build()
-
-        manager.notify(patientId.hashCode(), notification)
+        notificationManager.showSuccessfulNotification(patientId, patientName)
     }
 
     private fun showUnsuccessfulNotification(patientId: String, patientName: String) {
-        val manager = appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-        val notification = NotificationCompat.Builder(appContext, "bluetooth_channel")
-            .setSmallIcon(R.drawable.ic_launcher_round)
-            .setContentTitle("Error while receiving patient $patientName")
-            .setContentText("An error happened during the receiving of a patient, have it sent to this device again")
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .build()
-
-        manager.notify(patientId.hashCode(), notification)
+        notificationManager.showUnsuccessfulNotification(patientId, patientName)
     }
 }

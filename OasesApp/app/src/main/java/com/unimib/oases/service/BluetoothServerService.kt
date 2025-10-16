@@ -1,9 +1,6 @@
 package com.unimib.oases.service
 
 import android.annotation.SuppressLint
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.app.Service
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
@@ -15,7 +12,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.IBinder
 import android.util.Log
-import androidx.core.app.NotificationCompat
 import com.unimib.oases.OasesApp
 import com.unimib.oases.R
 import com.unimib.oases.data.bluetooth.BluetoothCustomManager
@@ -23,6 +19,7 @@ import com.unimib.oases.data.bluetooth.BluetoothEnvelope
 import com.unimib.oases.data.bluetooth.BluetoothEnvelopeType
 import com.unimib.oases.data.bluetooth.PatientHandler
 import com.unimib.oases.data.mapper.serializer.PatientFullDataSerializer
+import com.unimib.oases.util.OasesNotificationManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -46,9 +43,15 @@ class BluetoothServerService () : Service() {
         appContext.getSystemService(BluetoothManager::class.java)?.adapter
     }
 
-    private var isServerRunning = false
+    private val isServerRunning: Boolean
+        get() = serverSocket != null
+
     @Inject
     lateinit var bluetoothManager: BluetoothCustomManager
+
+    @Inject
+    lateinit var notificationManager: OasesNotificationManager
+
     private lateinit var patientHandler: PatientHandler
 
     private var serviceJob = SupervisorJob()
@@ -79,7 +82,7 @@ class BluetoothServerService () : Service() {
         val state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR)
         when (state) {
             BluetoothAdapter.STATE_OFF -> {
-                stopServer()
+                stopServer(shouldUpdateNotification = true)
             }
             BluetoothAdapter.STATE_ON -> {
                 attemptStartServer()
@@ -92,15 +95,12 @@ class BluetoothServerService () : Service() {
     override fun onCreate() {
         super.onCreate()
         patientHandler = bluetoothManager
-        createNotificationChannel()
 
         val filter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
         registerReceiver(bluetoothReceiver, filter)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        startForeground(1, buildNotification())
-
         attemptStartServer()
 
         return START_STICKY
@@ -120,25 +120,6 @@ class BluetoothServerService () : Service() {
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
-
-    private fun buildNotification(): Notification {
-        return NotificationCompat.Builder(this, "bluetooth_channel")
-            .setContentTitle("Bluetooth Server Running")
-            .setContentText("Listening for incoming connections")
-            .setSmallIcon(android.R.drawable.stat_sys_data_bluetooth)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
-            .build()
-    }
-
-    private fun createNotificationChannel() {
-        val serviceChannel = NotificationChannel(
-            "bluetooth_channel",
-            "Bluetooth Server Channel",
-            NotificationManager.IMPORTANCE_LOW
-        )
-        val manager = getSystemService(NotificationManager::class.java)
-        manager.createNotificationChannel(serviceChannel)
-    }
 
     // ------------------Server-------------------------
 
@@ -168,7 +149,8 @@ class BluetoothServerService () : Service() {
             try {
                 if (isBluetoothEnabled()) {
                     serverSocket = bluetoothAdapter?.listenUsingRfcommWithServiceRecord(appName, appUuid)
-                    isServerRunning = true
+
+                    setServiceNotification()
                     // Server started, waiting for client...
                     val socket = acceptClientConnection()
 
@@ -184,6 +166,12 @@ class BluetoothServerService () : Service() {
                 serverSocket?.close() // Always close server socket after accepting: one connection at a time
             }
         }
+    }
+
+    private fun setServiceNotification() {
+        val notificationWithId =
+            notificationManager.getBluetoothServiceNotification(isServerRunning)
+        startForeground(notificationWithId.id, notificationWithId.notification)
     }
 
     @SuppressLint("MissingPermission")
@@ -257,14 +245,15 @@ class BluetoothServerService () : Service() {
         attemptStartServer()
     }
 
-    fun stopServer() {
+    fun stopServer(shouldUpdateNotification: Boolean = false) {
         try {
             // Close server socket
             closeServerSocket()
             // Close connection socket
             closeConnectionSocket()
-            // Set server running flag to false
-            isServerRunning = false
+            // Update notification
+            if (shouldUpdateNotification)
+                updateServerNotification()
             Log.d("BluetoothServer", "Server stopped")
         } catch (e: IOException) {
             e.printStackTrace()
@@ -289,5 +278,9 @@ class BluetoothServerService () : Service() {
             Log.e("Bluetooth", "Error closing socket: ${e.message}")
             throw e // Rethrow to let the caller know about the error
         }
+    }
+
+    private fun updateServerNotification() {
+        notificationManager.showBluetoothServiceNotification(isServerRunning)
     }
 }
