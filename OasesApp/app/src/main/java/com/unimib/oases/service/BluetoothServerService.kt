@@ -94,6 +94,7 @@ class BluetoothServerService () : Service() {
 
     override fun onCreate() {
         super.onCreate()
+        setServiceNotification()
         patientHandler = bluetoothManager
 
         val filter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
@@ -110,6 +111,7 @@ class BluetoothServerService () : Service() {
         stopServer()
         serviceJob.cancel()
         unregisterReceiver(bluetoothReceiver)
+        stopForeground(0)
         super.onDestroy()
     }
 
@@ -150,7 +152,7 @@ class BluetoothServerService () : Service() {
                 if (isBluetoothEnabled()) {
                     serverSocket = bluetoothAdapter?.listenUsingRfcommWithServiceRecord(appName, appUuid)
 
-                    setServiceNotification()
+                    updateServerNotification()
                     // Server started, waiting for client...
                     val socket = acceptClientConnection()
 

@@ -15,7 +15,7 @@ import com.unimib.oases.R
 class OasesNotificationManager(private val context: Context) {
 
     companion object {
-        const val CHANNEL_ID_GENERAL = "general_channel"
+        const val CHANNEL_ID_MAIN = "main_channel"
         const val CHANNEL_ID_FOREGROUND_SERVICE = "foreground_service_channel"
 
         const val NOTIFICATION_ID_BLUETOOTH_SERVICE = 1001
@@ -37,11 +37,12 @@ class OasesNotificationManager(private val context: Context) {
      */
     private fun createNotificationChannels() {
         val generalChannel = NotificationChannel(
-            CHANNEL_ID_GENERAL,
+            CHANNEL_ID_MAIN,
             "General Notifications",
             NotificationManager.IMPORTANCE_DEFAULT
         ).apply {
             description = "Used for general app alerts like Bluetooth or patient updates."
+            setAllowBubbles(true)
         }
 
         val foregroundChannel = NotificationChannel(
@@ -64,7 +65,7 @@ class OasesNotificationManager(private val context: Context) {
     @SuppressLint("MissingPermission")
     fun showSuccessfulNotification(patientId: String, patientName: String) {
         if (PermissionHelper.hasNotificationPermission()){
-            val notification = NotificationCompat.Builder(context, CHANNEL_ID_GENERAL)
+            val notification = NotificationCompat.Builder(context, CHANNEL_ID_MAIN)
                 .setSmallIcon(R.drawable.ic_launcher_round)
                 .setContentTitle("New patient received: $patientName")
                 .setContentText("$patientName and their data were successfully saved on this device.")
@@ -82,7 +83,7 @@ class OasesNotificationManager(private val context: Context) {
     @SuppressLint("MissingPermission")
     fun showUnsuccessfulNotification(patientId: String, patientName: String) {
         if (PermissionHelper.hasNotificationPermission()){
-            val notification = NotificationCompat.Builder(context, CHANNEL_ID_GENERAL)
+            val notification = NotificationCompat.Builder(context, CHANNEL_ID_MAIN)
                 .setSmallIcon(R.drawable.ic_launcher_round)
                 .setContentTitle("Error while receiving patient $patientName")
                 .setContentText("An error occurred while receiving this patient, have it sent to this device again.")
@@ -117,16 +118,14 @@ class OasesNotificationManager(private val context: Context) {
             "Ready to receive patient data"
         else
             "Turn on Bluetooth to be able to receive patient data again"
-
         return NotificationWithId(
             NOTIFICATION_ID_BLUETOOTH_SERVICE,
             NotificationCompat.Builder(context, CHANNEL_ID_FOREGROUND_SERVICE)
                 .setSmallIcon(android.R.drawable.stat_sys_data_bluetooth)
                 .setContentTitle(title)
                 .setContentText(text)
-                .setOngoing(isRunning) // Cannot be dismissed
                 .setOnlyAlertOnce(true)
-                .setContentIntent(pendingIntent) // Open oases when tapped
+                .setContentIntent(pendingIntent) // Open Oases when tapped
                 .setShowWhen(false) // Do not show time
                 .build()
         )
