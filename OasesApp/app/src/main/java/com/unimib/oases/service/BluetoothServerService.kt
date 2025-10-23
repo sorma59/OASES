@@ -14,10 +14,10 @@ import android.os.IBinder
 import android.util.Log
 import com.unimib.oases.OasesApp
 import com.unimib.oases.R
-import com.unimib.oases.data.bluetooth.BluetoothCustomManager
-import com.unimib.oases.data.bluetooth.BluetoothEnvelope
-import com.unimib.oases.data.bluetooth.BluetoothEnvelopeType
-import com.unimib.oases.data.bluetooth.PatientHandler
+import com.unimib.oases.bluetooth.BluetoothCustomManager
+import com.unimib.oases.bluetooth.BluetoothEnvelope
+import com.unimib.oases.bluetooth.BluetoothEnvelopeType
+import com.unimib.oases.bluetooth.PatientHandler
 import com.unimib.oases.data.mapper.serializer.PatientFullDataSerializer
 import com.unimib.oases.util.OasesNotificationManager
 import dagger.hilt.android.AndroidEntryPoint

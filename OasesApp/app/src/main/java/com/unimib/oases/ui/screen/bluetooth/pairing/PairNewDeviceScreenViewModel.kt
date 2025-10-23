@@ -2,7 +2,7 @@ package com.unimib.oases.ui.screen.bluetooth.pairing
 
 import android.bluetooth.BluetoothDevice
 import androidx.lifecycle.ViewModel
-import com.unimib.oases.data.bluetooth.BluetoothCustomManager
+import com.unimib.oases.bluetooth.BluetoothCustomManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 

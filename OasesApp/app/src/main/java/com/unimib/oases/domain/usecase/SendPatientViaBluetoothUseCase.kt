@@ -1,9 +1,9 @@
 package com.unimib.oases.domain.usecase
 
 import android.bluetooth.BluetoothDevice
-import com.unimib.oases.data.bluetooth.BluetoothCustomManager
-import com.unimib.oases.data.bluetooth.BluetoothEnvelope
-import com.unimib.oases.data.bluetooth.BluetoothEnvelopeType
+import com.unimib.oases.bluetooth.BluetoothCustomManager
+import com.unimib.oases.bluetooth.BluetoothEnvelope
+import com.unimib.oases.bluetooth.BluetoothEnvelopeType
 import com.unimib.oases.data.mapper.serializer.PatientFullDataSerializer
 import com.unimib.oases.util.Resource
 import kotlinx.coroutines.Dispatchers

@@ -4,7 +4,7 @@ import android.bluetooth.BluetoothDevice
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.unimib.oases.data.bluetooth.BluetoothCustomManager
+import com.unimib.oases.bluetooth.BluetoothCustomManager
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.domain.repository.PatientRepository

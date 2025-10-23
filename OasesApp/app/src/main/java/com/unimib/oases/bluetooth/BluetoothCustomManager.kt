@@ -1,4 +1,4 @@
-package com.unimib.oases.data.bluetooth
+package com.unimib.oases.bluetooth
 
 import android.Manifest
 import android.annotation.SuppressLint

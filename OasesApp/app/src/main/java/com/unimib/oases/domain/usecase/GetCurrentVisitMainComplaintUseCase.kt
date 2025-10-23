@@ -5,7 +5,7 @@ import com.unimib.oases.domain.model.Visit
 import com.unimib.oases.domain.repository.ComplaintSummaryRepository
 import com.unimib.oases.util.Resource
 import com.unimib.oases.util.firstNullableSuccess
-import kotlinx.coroutines.flow.first
+import com.unimib.oases.util.firstSuccess
 import javax.inject.Inject
 
 class GetCurrentVisitMainComplaintUseCase @Inject constructor(
@@ -14,24 +14,19 @@ class GetCurrentVisitMainComplaintUseCase @Inject constructor(
 ) {
 
     suspend operator fun invoke(patientId: String, visit: Visit? = null): Resource<List<ComplaintSummary>> {
-        visit?.let { // If visit was passed as parameter, use it
+        if (visit != null) { // If visit was passed as parameter, use it
             return try {
-                val complaints = complaintSummaryRepository.getVisitComplaintsSummaries(visit.id).first {
-                    it is Resource.Success || it is Resource.Error
-                }
-                complaints
+                val complaint = complaintSummaryRepository.getVisitComplaintsSummaries(visit.id).firstSuccess()
+                Resource.Success(complaint)
             } catch (e: Exception) {
                 Resource.Error(e.message ?: "Unknown error")
             }
-        } ?: run { // Otherwise, get it from db
+        } else { // Otherwise, get it from db
             return try {
                 val visitFromDb = getCurrentVisitUseCase(patientId).firstNullableSuccess()
                 visitFromDb?.let {
-                    val complaints =
-                        complaintSummaryRepository.getVisitComplaintsSummaries(visitFromDb.id).first {
-                            it is Resource.Success || it is Resource.Error
-                        }
-                    complaints
+                    val complaint = complaintSummaryRepository.getVisitComplaintsSummaries(it.id).firstSuccess()
+                    Resource.Success(complaint)
                 } ?: Resource.Error("No current visit")
             } catch (e: Exception) {
                 Resource.Error(e.message ?: "Unknown error")

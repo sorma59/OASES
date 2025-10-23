@@ -2,7 +2,7 @@ package com.unimib.oases.ui.screen.root
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.unimib.oases.data.bluetooth.BluetoothCustomManager
+import com.unimib.oases.bluetooth.BluetoothCustomManager
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.model.BluetoothEvent
 import com.unimib.oases.ui.components.scaffold.UiEvent

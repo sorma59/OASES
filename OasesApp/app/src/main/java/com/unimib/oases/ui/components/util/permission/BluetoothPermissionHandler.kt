@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.unimib.oases.R
-import com.unimib.oases.data.bluetooth.BluetoothCustomManager
+import com.unimib.oases.bluetooth.BluetoothCustomManager
 import com.unimib.oases.ui.components.util.CenteredText
 import com.unimib.oases.util.PermissionHelper
 

@@ -19,7 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.unimib.oases.data.bluetooth.BluetoothCustomManager
+import com.unimib.oases.bluetooth.BluetoothCustomManager
 import com.unimib.oases.ui.components.util.permission.BluetoothPermissionHandler
 import com.unimib.oases.ui.components.util.permission.NoPermissionMessage
 import com.unimib.oases.ui.components.util.permission.NotificationPermissionHandler

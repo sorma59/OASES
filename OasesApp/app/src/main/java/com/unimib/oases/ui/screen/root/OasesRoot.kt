@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.unimib.oases.data.bluetooth.BluetoothCustomManager
+import com.unimib.oases.bluetooth.BluetoothCustomManager
 import com.unimib.oases.data.local.model.Role
 import com.unimib.oases.ui.components.scaffold.LoginScaffold
 import com.unimib.oases.ui.components.scaffold.MainScaffold
