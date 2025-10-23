@@ -14,8 +14,8 @@ class VitalSignUseCase @Inject constructor (
         repo.addVitalSign(vitalSign)
     }
 
-    fun deleteVitalSign(vitalSign: VitalSign) {
-        repo.deleteVitalSign(vitalSign.name)
+    suspend fun deleteVitalSign(vitalSign: VitalSign) {
+        repo.deleteVitalSign(vitalSign)
     }
 
     fun getVitalSigns(): Flow<Resource<List<VitalSign>>> {

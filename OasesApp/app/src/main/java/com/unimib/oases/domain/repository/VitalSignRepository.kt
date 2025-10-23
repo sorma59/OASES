@@ -7,8 +7,10 @@ import kotlinx.coroutines.flow.Flow
 
 interface VitalSignRepository {
     suspend fun addVitalSign(vitalSign: VitalSign): Resource<Unit>
+
+    suspend fun deleteVitalSign(vitalSign: VitalSign): Resource<Unit>
+
     fun getAllVitalSigns(): Flow<Resource<List<VitalSign>>>
-    fun deleteVitalSign(vitalSign: String): Resource<Unit>
 
     fun getPrecisionFor(name: String): NumericPrecision?
 }

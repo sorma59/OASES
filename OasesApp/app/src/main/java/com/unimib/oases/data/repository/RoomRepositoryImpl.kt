@@ -7,14 +7,10 @@ import com.unimib.oases.data.mapper.toEntity
 import com.unimib.oases.domain.model.Room
 import com.unimib.oases.domain.repository.RoomRepository
 import com.unimib.oases.util.Resource
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class RoomRepositoryImpl @Inject constructor(
@@ -30,14 +26,9 @@ class RoomRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun deleteRoom(name: String): Resource<Unit> {
+    override suspend fun deleteRoom(room: Room): Resource<Unit> {
         return try {
-            //launch a coroutine to run the suspend function
-            CoroutineScope(Dispatchers.IO).launch {
-                roomDataSource.getRoom(name).firstOrNull()?.let {
-                    roomDataSource.deleteRoom(it)
-                }
-            }
+            roomDataSource.deleteRoom(room.toEntity())
             Resource.Success(Unit)
         } catch (e: Exception) {
             Resource.Error(e.message ?: "Unknown error")

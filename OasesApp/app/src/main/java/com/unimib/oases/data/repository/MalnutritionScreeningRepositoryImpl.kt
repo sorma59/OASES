@@ -27,26 +27,23 @@ class MalnutritionScreeningRepositoryImpl @Inject constructor(
     }
 
     override fun getMalnutritionScreening(visitId: String): Flow<Resource<MalnutritionScreening?>> = flow {
-//        if (Random.nextBoolean())
-//            emit(Resource.Error("Mock error"))
-//        else
-            roomDataSource.getMalnutritionScreening(visitId)
-                .onStart {
-                    emit(Resource.Loading())
-                }
-                .catch { exception ->
-                    Log.e(
-                        "MalnutritionScreeningRepository",
-                        "Error getting malnutrition screening for visitId $visitId: ${exception.message}",
-                        exception
-                    )
-                    emit(Resource.Error(exception.message ?: "An error occurred"))
-                }
-                .collect { entity ->
-                    val domainModel = entity?.toDomain()
-                    emit(Resource.Success(domainModel))
-                    // if entity is null then null is returned in Resource Success
-                    // the reason is a visit can have no screening
-                }
+        roomDataSource.getMalnutritionScreening(visitId)
+            .onStart {
+                emit(Resource.Loading())
+            }
+            .catch { exception ->
+                Log.e(
+                    "MalnutritionScreeningRepository",
+                    "Error getting malnutrition screening for visitId $visitId: ${exception.message}",
+                    exception
+                )
+                emit(Resource.Error(exception.message ?: "An error occurred"))
+            }
+            .collect { entity ->
+                val domainModel = entity?.toDomain()
+                emit(Resource.Success(domainModel))
+                // if entity is null then null is returned in Resource Success
+                // the reason is a visit can have no screening
+            }
     }
 }

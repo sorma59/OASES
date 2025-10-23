@@ -18,7 +18,7 @@ class ValidatePatientInfoFormUseCase @Inject constructor() {
             sexError
         ).any { it != null }
 
-        if(hasError){
+        if (hasError){
             return ValidationResult(
                 successful = false,
                 nameErrorMessage = nameError,

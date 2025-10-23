@@ -24,10 +24,7 @@ class DiseaseUseCase @Inject constructor(
         return result
     }
 
-    fun deleteDisease(disease: Disease){
-       repo.deleteDisease(disease.name)
+    suspend fun deleteDisease(disease: Disease){
+       repo.deleteDisease(disease)
     }
-
-
-
 }

@@ -3,11 +3,7 @@ package com.unimib.oases.ui.screen.dashboard.admin.rooms
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unimib.oases.di.IoDispatcher
-import com.unimib.oases.domain.model.AgeSpecificity
-import com.unimib.oases.domain.model.AgeSpecificity.Companion.fromAgeSpecificityDisplayName
 import com.unimib.oases.domain.model.Room
-import com.unimib.oases.domain.model.SexSpecificity
-import com.unimib.oases.domain.model.SexSpecificity.Companion.fromSexSpecificityDisplayName
 import com.unimib.oases.domain.usecase.RoomUseCase
 import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,7 +24,6 @@ class RoomsManagementViewModel @Inject constructor(
     @IoDispatcher private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
-
     private var getRoomsJob: Job? = null
 
     private val _state = MutableStateFlow(RoomManagementState())
@@ -45,7 +40,6 @@ class RoomsManagementViewModel @Inject constructor(
         }
     }
 
-
     sealed class UiEvent {
         // all events that gonna happen when we need to screen to display something and pass data back to the screen
         data class showSnackbar(val message: String) : UiEvent()
@@ -60,8 +54,8 @@ class RoomsManagementViewModel @Inject constructor(
     fun onEvent(event: RoomsManagementEvent) {
         when (event) {
             is RoomsManagementEvent.Click -> {
-                _state.update{
-                    _state.value.copy(
+                _state.update {
+                    it.copy(
                         room = event.value
                     )
                 }
@@ -76,16 +70,14 @@ class RoomsManagementViewModel @Inject constructor(
             }
 
             is RoomsManagementEvent.EnteredRoomName -> {
-                _state.update{
-                    _state.value.copy(
-                        room = _state.value.room.copy(
+                _state.update {
+                    it.copy(
+                        room = it.room.copy(
                             name = event.value
                         )
                     )
                 }
             }
-
-
 
             RoomsManagementEvent.UndoDelete -> {
                 viewModelScope.launch(dispatcher + errorHandler) {
@@ -95,19 +87,18 @@ class RoomsManagementViewModel @Inject constructor(
                 }
             }
 
-
-
             RoomsManagementEvent.SaveRoom -> {
                 viewModelScope.launch(dispatcher + errorHandler) {
                     try {
-                        _state.update{
-                            _state.value.copy(isLoading = true)
+                        _state.update {
+                            it.copy(isLoading = true)
                         }
 
                         useCases.addRoom(_state.value.room)
 
                         _state.update{
-                            _state.value.copy(isLoading = false,
+                            it.copy(
+                                isLoading = false,
                                 room = Room(
                                     name = "",
                                 )
@@ -117,8 +108,8 @@ class RoomsManagementViewModel @Inject constructor(
                         // in the screen we handle it and we go back to the list
 
                     } catch (e: Exception) {
-                        _state.update{
-                            _state.value.copy(
+                        _state.update {
+                            it.copy(
                                 isLoading = false
                             )
                         }
@@ -143,22 +134,28 @@ class RoomsManagementViewModel @Inject constructor(
             result.collect { resource ->
                 when (resource) {
                     is Resource.Loading -> {
-                        _state.value = _state.value.copy(
-                            isLoading = true
-                        )
+                        _state.update {
+                            it.copy(
+                                isLoading = true
+                            )
+                        }
                     }
 
                     is Resource.Success -> {
-                        _state.value = _state.value.copy(
-                            rooms = resource.data ?: emptyList(),
-                            isLoading = false
-                        )
+                        _state.update {
+                            it.copy(
+                                rooms = resource.data ?: emptyList(),
+                                isLoading = false
+                            )
+                        }
                     }
 
                     is Resource.Error -> {
-                        _state.value = _state.value.copy(
-                            error = resource.message,
-                        )
+                        _state.update {
+                            it.copy(
+                                error = resource.message,
+                            )
+                        }
                     }
                 }
             }

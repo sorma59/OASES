@@ -6,6 +6,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface RoomRepository {
     suspend fun addRoom(room: Room): Resource<Unit>
-    fun deleteRoom(name: String): Resource<Unit>
+    suspend fun deleteRoom(room: Room): Resource<Unit>
     fun getAllRooms(): Flow<Resource<List<Room>>>
 }

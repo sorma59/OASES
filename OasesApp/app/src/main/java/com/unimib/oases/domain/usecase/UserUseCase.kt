@@ -20,8 +20,8 @@ class UserUseCase @Inject constructor(
         return result
     }
 
-    fun deleteUser(user: User){
-        repo.deleteUser(user.username)
+    suspend fun deleteUser(user: User){
+        repo.deleteUser(user)
     }
 
 }

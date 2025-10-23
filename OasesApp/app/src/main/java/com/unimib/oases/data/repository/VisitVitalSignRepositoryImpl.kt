@@ -18,36 +18,31 @@ class VisitVitalSignRepositoryImpl @Inject constructor(
 ): VisitVitalSignRepository
 {
     override suspend fun addVisitVitalSign(visitVitalSign: VisitVitalSign): Resource<Unit> {
-
         return try {
             roomDataSource.insertVisitVitalSigns(visitVitalSign.toEntity())
             Resource.Success(Unit)
         } catch (e: Exception) {
             Resource.Error(e.message ?: "An error occurred")
         }
-
     }
 
     override fun getVisitVitalSigns(visitId: String): Flow<Resource<List<VisitVitalSign>>> = flow {
-//        if (Random.nextBoolean())
-//            emit(Resource.Error("Mock error"))
-//        else
-            roomDataSource.getVisitVitalSigns(visitId)
-                .onStart {
-                    emit(Resource.Loading())
-                }
-                .catch { exception ->
-                    Log.e(
-                        "VisitVitalSignRepository",
-                        "Error getting visit vital signs for visitId $visitId: ${exception.message}",
-                        exception
-                    )
-                    emit(Resource.Error(exception.message ?: "An error occurred"))
-                }
-                .collect { entities ->
-                    val domainModels = entities.map { it.toDomain() }
-                    emit(Resource.Success(domainModels))
-                }
+        roomDataSource.getVisitVitalSigns(visitId)
+            .onStart {
+                emit(Resource.Loading())
+            }
+            .catch { exception ->
+                Log.e(
+                    "VisitVitalSignRepository",
+                    "Error getting visit vital signs for visitId $visitId: ${exception.message}",
+                    exception
+                )
+                emit(Resource.Error(exception.message ?: "An error occurred"))
+            }
+            .collect { entities ->
+                val domainModels = entities.map { it.toDomain() }
+                emit(Resource.Success(domainModels))
+            }
     }
 
     override fun getVisitLatestVitalSigns(visitId: String): Flow<Resource<List<VisitVitalSign>>> = flow {

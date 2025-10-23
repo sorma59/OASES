@@ -13,11 +13,11 @@ class RoomUseCase @Inject constructor(
         repo.addRoom(room)
     }
 
-    fun getRooms(): Flow<Resource<List<Room>>> {
-        return repo.getAllRooms()
+    suspend fun deleteRoom(room: Room){
+        repo.deleteRoom(room)
     }
 
-    fun deleteRoom(room: Room){
-        repo.deleteRoom(room.name)
+    fun getRooms(): Flow<Resource<List<Room>>> {
+        return repo.getAllRooms()
     }
 }

@@ -8,14 +8,10 @@ import com.unimib.oases.domain.model.NumericPrecision
 import com.unimib.oases.domain.model.VitalSign
 import com.unimib.oases.domain.repository.VitalSignRepository
 import com.unimib.oases.util.Resource
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -35,14 +31,9 @@ class VitalSignRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun deleteVitalSign(vitalSign: String): Resource<Unit> {
+    override suspend fun deleteVitalSign(vitalSign: VitalSign): Resource<Unit> {
         return try {
-            //launch a coroutine to run the suspend function
-            CoroutineScope(Dispatchers.IO).launch {
-                roomDataSource.getVitalSign(vitalSign).firstOrNull()?.let {
-                    roomDataSource.deleteVitalSign(it)
-                }
-            }
+            roomDataSource.deleteVitalSign(vitalSign.toEntity())
             Resource.Success(Unit)
         } catch (e: Exception) {
             Resource.Error(e.message ?: "Unknown error")
@@ -50,9 +41,6 @@ class VitalSignRepositoryImpl @Inject constructor(
     }
 
     override fun getAllVitalSigns(): Flow<Resource<List<VitalSign>>> = flow {
-//        if (Random.nextBoolean())
-//            emit(Resource.Error("Mock error"))
-//        else
         roomDataSource.getAllVitalSigns()
             .onStart {
                 emit(Resource.Loading())
@@ -61,12 +49,12 @@ class VitalSignRepositoryImpl @Inject constructor(
                 Log.e("VitalSignRepository", "Error getting all vital signs: ${it.message}")
                 emit(Resource.Error(it.message ?: "Unknown error"))
             }
-            .collect {
+            .collect { vitalSigns ->
                 precisionMap.clear()
                 precisionMap.putAll(
-                    it.associate { it.name to it.precision}
+                    vitalSigns.associate { it.name to it.precision}
                 )
-                emit(Resource.Success(it.map { entity -> entity.toDomain() }))
+                emit(Resource.Success(vitalSigns.map { entity -> entity.toDomain() }))
             }
     }
 

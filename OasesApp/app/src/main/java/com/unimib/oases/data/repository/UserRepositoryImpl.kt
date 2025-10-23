@@ -9,8 +9,10 @@ import com.unimib.oases.util.Resource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -60,14 +62,9 @@ class UserRepositoryImpl @Inject constructor(
 
     }
 
-    override fun deleteUser(username: String): Resource<Unit> {
+    override suspend fun deleteUser(user: User): Resource<Unit> {
         return try {
-            //launch a coroutine to run the suspend function
-            CoroutineScope(Dispatchers.IO).launch {
-                roomDataSource.getUser(username).firstOrNull()?.let {
-                    roomDataSource.deleteUser(it)
-                }
-            }
+            roomDataSource.deleteUser(user)
             Resource.Success(Unit)
         } catch (e: Exception) {
             Resource.Error(e.message ?: "Unknown error")
@@ -75,50 +72,54 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override fun getAllUsers(): Flow<Resource<List<User>>> = flow {
-
-        emit(Resource.Loading())
-        try {
-            roomDataSource.getAllUsers().collect {
+        roomDataSource.getAllUsers()
+            .onStart {
+                emit(Resource.Loading())
+            }
+            .catch {
+                emit(Resource.Error(it.message ?: "Unknown error"))
+            }
+            .collect {
                 emit(Resource.Success(it))
             }
-        } catch (e: Exception) {
-            emit(Resource.Error(e.message ?: "Unknown error"))
-        }
     }
 
     override fun getAllNurses(): Flow<Resource<List<User>>> = flow {
-
-        emit(Resource.Loading())
-        try {
-            roomDataSource.getAllUsersByRole(Role.NURSE).collect {
+        roomDataSource.getAllUsersByRole(Role.NURSE)
+            .onStart {
+                emit(Resource.Loading())
+            }
+            .catch {
+                emit(Resource.Error(it.message ?: "Unknown error"))
+            }
+            .collect {
                 emit(Resource.Success(it))
             }
-        } catch (e: Exception) {
-            emit(Resource.Error(e.message ?: "Unknown error"))
-        }
     }
 
     override fun getAllDoctors(): Flow<Resource<List<User>>> = flow {
-
-        emit(Resource.Loading())
-        try {
-            roomDataSource.getAllUsersByRole(Role.DOCTOR).collect {
+        roomDataSource.getAllUsersByRole(Role.DOCTOR)
+            .onStart {
+                emit(Resource.Loading())
+            }
+            .catch {
+                emit(Resource.Error(it.message ?: "Unknown error"))
+            }
+            .collect {
                 emit(Resource.Success(it))
             }
-        } catch (e: Exception) {
-            emit(Resource.Error(e.message ?: "Unknown error"))
-        }
     }
 
     override fun getUser(username: String): Flow<Resource<User?>> = flow {
-
-        emit(Resource.Loading())
-        try {
-            roomDataSource.getUser(username).collect {
+        roomDataSource.getUser(username)
+            .onStart {
+                emit(Resource.Loading())
+            }
+            .catch {
+                emit(Resource.Error(it.message ?: "Unknown error"))
+            }
+            .collect {
                 emit(Resource.Success(it))
             }
-        } catch (e: Exception) {
-            emit(Resource.Error(e.message ?: "Unknown error"))
-        }
     }
 }

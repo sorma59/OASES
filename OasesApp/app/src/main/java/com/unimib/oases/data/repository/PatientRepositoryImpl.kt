@@ -41,7 +41,6 @@ class PatientRepositoryImpl @Inject constructor(
     override suspend fun addPatient(patient: Patient): Resource<Unit> {
 
         return try {
-            Log.d("PatientRepositoryImpl", "Adding patient: $patient")
             roomDataSource.insertPatient(patient.toEntity())
 
 //            if(firestoreManager.isOnline()){
@@ -76,25 +75,22 @@ class PatientRepositoryImpl @Inject constructor(
     }
 
     override fun getPatientById(patientId: String): Flow<Resource<Patient>> = flow {
-//        if (Random.nextBoolean())
-//            emit(Resource.Error("Mock error"))
-//        else
-            roomDataSource.getPatientById(patientId)
-                .onStart { emit(Resource.Loading()) }
-                .catch { exception ->
-                    Log.e(
-                        "PatientRepository",
-                        "Error getting patient data for patientId $patientId: ${exception.message}",
-                        exception
-                    )
-                    emit(Resource.Error(exception.message ?: "An error occurred"))
-                }
-                .collect { entity ->
-                    val resource = entity?.let {
-                        Resource.Success(it.toDomain())
-                    } ?: Resource.Error("No patient data found for patientId $patientId")
-                    emit(resource)
-                }
+        roomDataSource.getPatientById(patientId)
+            .onStart { emit(Resource.Loading()) }
+            .catch { exception ->
+                Log.e(
+                    "PatientRepository",
+                    "Error getting patient data for patientId $patientId: ${exception.message}",
+                    exception
+                )
+                emit(Resource.Error(exception.message ?: "An error occurred"))
+            }
+            .collect { entity ->
+                val resource = entity?.let {
+                    Resource.Success(it.toDomain())
+                } ?: Resource.Error("No patient data found for patientId $patientId")
+                emit(resource)
+            }
     }
 
 
@@ -108,14 +104,22 @@ class PatientRepositoryImpl @Inject constructor(
     }
 
     override fun getPatients(): Flow<Resource<List<Patient>>> = flow {
-
-        emit(Resource.Loading())
-        roomDataSource.getPatients().collect {
-            emit(Resource.Success(it.asReversed().map { entity -> entity.toDomain() }))
-        }
-    }.catch { e ->
-        Log.e("PatientRepositoryImpl", "Error getting patients: ${e.message}")
-        emit(Resource.Error(e.localizedMessage ?: "Unknown error occurred"))
+        roomDataSource.getPatients()
+            .onStart {
+                emit(Resource.Loading())
+            }
+            .catch {
+                Log.e("PatientRepositoryImpl", "Error getting patients: ${it.message}")
+                emit(Resource.Error(it.localizedMessage ?: "Unknown error occurred"))
+            }
+            .collect { entities ->
+                val patients = entities
+                    .asReversed()
+                    .map { entity ->
+                        entity.toDomain()
+                    }
+                emit(Resource.Success(patients))
+            }
     }
 
 //    override suspend fun updateTriageState(patient: Patient, triageState: String): Resource<Unit> {

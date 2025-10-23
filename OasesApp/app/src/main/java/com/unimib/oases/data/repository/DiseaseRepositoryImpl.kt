@@ -7,12 +7,10 @@ import com.unimib.oases.data.mapper.toEntity
 import com.unimib.oases.domain.model.Disease
 import com.unimib.oases.domain.repository.DiseaseRepository
 import com.unimib.oases.util.Resource
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
 
@@ -21,7 +19,6 @@ class DiseaseRepositoryImpl @Inject constructor(
 ): DiseaseRepository {
 
     override suspend fun addDisease(disease: Disease): Resource<Unit> {
-
         return try {
             roomDataSource.insertDisease(disease.toEntity())
             Resource.Success(Unit)
@@ -31,14 +28,9 @@ class DiseaseRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun deleteDisease(disease: String): Resource<Unit> {
+    override suspend fun deleteDisease(disease: Disease): Resource<Unit> {
         return try {
-            //launch a coroutine to run the suspend function
-            CoroutineScope(Dispatchers.IO).launch {
-                roomDataSource.getDisease(disease).firstOrNull()?.let {
-                    roomDataSource.deleteDisease(it)
-                }
-            }
+            roomDataSource.deleteDisease(disease.toEntity())
             Resource.Success(Unit)
         } catch (e: Exception) {
             Resource.Error(e.message ?: "Unknown error")
@@ -46,16 +38,30 @@ class DiseaseRepositoryImpl @Inject constructor(
     }
 
     override fun getFilteredDiseases(sex: String, age: String): Flow<Resource<List<Disease>>> = flow {
-        emit(Resource.Loading())
-        roomDataSource.getFilteredDiseases(sex, age).collect {
-            emit(Resource.Success(it.map { entity -> entity.toDomain() }))
-        }
+        roomDataSource.getFilteredDiseases(sex, age)
+            .onStart {
+                emit(Resource.Loading())
+            }
+            .catch {
+                emit(Resource.Error(it.message ?: "Unknown error"))
+            }
+            .collect { entities ->
+                val diseases = entities.map { it.toDomain() }
+                emit(Resource.Success(diseases))
+            }
     }
 
     override fun getAllDiseases(): Flow<Resource<List<Disease>>> = flow {
-        emit(Resource.Loading())
-        roomDataSource.getAllDiseases().collect {
-            emit(Resource.Success(it.map { entity -> entity.toDomain() }))
-        }
+        roomDataSource.getAllDiseases()
+            .onStart {
+                emit(Resource.Loading())
+            }
+            .catch {
+                emit(Resource.Error(it.message ?: "Unknown error"))
+            }
+            .collect { entities ->
+                val diseases = entities.map { entity -> entity.toDomain() }
+                emit(Resource.Success(diseases))
+            }
     }
 }
