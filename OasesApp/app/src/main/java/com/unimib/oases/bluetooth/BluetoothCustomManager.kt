@@ -23,7 +23,6 @@ import com.unimib.oases.domain.model.BluetoothEvent
 import com.unimib.oases.domain.model.BluetoothPatientHandlingResult
 import com.unimib.oases.domain.model.PatientFullData
 import com.unimib.oases.domain.usecase.HandleReceivedPatientUseCase
-import com.unimib.oases.service.BluetoothServerService
 import com.unimib.oases.ui.util.ToastUtils
 import com.unimib.oases.util.AppForegroundObserver
 import com.unimib.oases.util.OasesNotificationManager

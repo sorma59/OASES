@@ -56,7 +56,7 @@
         </activity>
 
         <service
-            android:name=".service.BluetoothServerService"
+            android:name=".bluetooth.BluetoothServerService"
             android:exported="false"
             android:foregroundServiceType="connectedDevice"/>
     </application>

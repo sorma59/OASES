@@ -1,4 +1,4 @@
-package com.unimib.oases.service
+package com.unimib.oases.bluetooth
 
 import android.annotation.SuppressLint
 import android.app.Service
@@ -14,10 +14,6 @@ import android.os.IBinder
 import android.util.Log
 import com.unimib.oases.OasesApp
 import com.unimib.oases.R
-import com.unimib.oases.bluetooth.BluetoothCustomManager
-import com.unimib.oases.bluetooth.BluetoothEnvelope
-import com.unimib.oases.bluetooth.BluetoothEnvelopeType
-import com.unimib.oases.bluetooth.PatientHandler
 import com.unimib.oases.data.mapper.serializer.PatientFullDataSerializer
 import com.unimib.oases.util.OasesNotificationManager
 import dagger.hilt.android.AndroidEntryPoint
@@ -38,7 +34,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class BluetoothServerService () : Service() {
 
-    private val appContext = OasesApp.getAppContext()
+    private val appContext = OasesApp.Companion.getAppContext()
     private val bluetoothAdapter: BluetoothAdapter? by lazy {
         appContext.getSystemService(BluetoothManager::class.java)?.adapter
     }
@@ -214,7 +210,7 @@ class BluetoothServerService () : Service() {
 
                 Log.d("BluetoothServer", "Received message: $line")
 
-                val envelope = Json.decodeFromString(BluetoothEnvelope.serializer(), line)
+                val envelope = Json.Default.decodeFromString(BluetoothEnvelope.serializer(), line)
 
                 when (envelope.type) {
                     BluetoothEnvelopeType.PATIENT.name -> {
