@@ -50,6 +50,15 @@ fun HomeScreen(
     var active by remember { mutableStateOf(false) }
     val listState = remember { mutableStateListOf<String>() }
 
+    val onQueryChange = { text: String ->
+        searchText = text
+    }
+
+    val onSearch = {
+        listState.add(searchText)
+        active = false
+    }
+
     val onPatientItemClick = { patientId: String ->
         homeScreenViewModel.onEvent(HomeScreenEvent.PatientItemClicked(patientId))
     }
@@ -105,15 +114,16 @@ fun HomeScreen(
                     ) {
                         SearchBar(
                             query = searchText,
-                            onQueryChange = { searchText = it },
-                            onSearch = {
-                                listState.add(searchText)
-                                active = false
-                            },
+                            onQueryChange = onQueryChange,
+                            onSearch = onSearch,
                             active = active,
                             onActiveChange = { active = it },
                             searchHistory = listState,
-                            onHistoryItemClick = { searchText = it })
+                            onHistoryItemClick = {
+                                onQueryChange(it)
+                                onSearch()
+                            }
+                        )
                     }
                 }
                 if(state.isLoading){
