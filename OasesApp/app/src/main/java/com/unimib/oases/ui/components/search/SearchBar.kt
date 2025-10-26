@@ -1,7 +1,12 @@
 package com.unimib.oases.ui.components.search
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -13,12 +18,11 @@ import androidx.compose.material3.DockedSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
@@ -47,24 +51,31 @@ fun SearchBar(
                 onExpandedChange = onActiveChange,
                 enabled = true,
                 leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Filled.Search,
-                        contentDescription = "Search"
-                    )
+                    Box { // Box used to mimic an icon button without making it clickable
+                        Icon(
+                            imageVector = Icons.Filled.Search,
+                            contentDescription = "Search",
+                            modifier = Modifier.padding(8.dp) // Padding of an IconButton
+                        )
+                    }
                 },
                 trailingIcon = {
                     if (active) {
-                        Icon(
-                            modifier = Modifier.clickable {
+                        IconButton(
+                            onClick = {
                                 if (query.isNotEmpty()) {
                                     onQueryChange("")
                                 } else {
                                     onActiveChange(false)
                                 }
-                            },
-                            imageVector = Icons.Default.Close,
-                            contentDescription = "Close search",
-                        )
+                            }
+                        ){
+                            Icon(
+                                modifier = Modifier.padding(),
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Close search",
+                            )
+                        }
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
@@ -76,35 +87,48 @@ fun SearchBar(
         shape = RoundedCornerShape(10.dp),
         colors = colors1,
         tonalElevation = SearchBarDefaults.TonalElevation,
-        shadowElevation = 5.dp,
-        content = {
-            searchHistory.takeLast(3).forEach { item ->
-                ListItem(
-                    modifier = Modifier.clickable { onHistoryItemClick(item) },
-                    colors = ListItemDefaults.colors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                    ),
-                    headlineContent = { Text(text = item) },
-                    leadingContent = {
-                        Icon(
-                            modifier = Modifier.padding(end = 10.dp),
-                            imageVector = Icons.Default.History,
-                            contentDescription = "History",
-                        )
-                    },
-                    trailingContent = {
-                        IconButton(
-                            onClick = { onQueryChange(item) }
-                        ){
+        shadowElevation = 5.dp
+    ) {
+        searchHistory.asReversed().takeLast(3).forEach { item ->
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(SearchBarDefaults.InputFieldHeight) // Same height as the input field
+                    .clickable { onHistoryItemClick(item) }
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+//                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(start = 8.dp, end = 4.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Box { // Box used to mimic an icon button without making it clickable
                             Icon(
-                                modifier = Modifier.padding(start = 10.dp),
-                                imageVector = Icons.Filled.ArrowUpward,
-                                contentDescription = "Insert history into search",
+                                imageVector = Icons.Default.History,
+                                contentDescription = "History",
+                                modifier = Modifier.padding(8.dp) // Padding of an IconButton
                             )
                         }
+
+                        Text(text = item)
                     }
-                )
+
+                    IconButton(
+                        onClick = { onQueryChange(item) }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowUpward,
+                            contentDescription = "Insert history into search",
+                        )
+                    }
+                }
             }
-        },
-    )
+        }
+    }
 }
