@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Search
@@ -24,7 +23,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.unimib.oases.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,7 +38,6 @@ fun SearchBar(
     searchHistory: List<String>,
     onHistoryItemClick: (String) -> Unit
 ) {
-    val colors1 = SearchBarDefaults.colors(MaterialTheme.colorScheme.surfaceContainer)
     DockedSearchBar(
         inputField = {
             SearchBarDefaults.InputField(
@@ -85,7 +85,7 @@ fun SearchBar(
         onExpandedChange = onActiveChange,
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(10.dp),
-        colors = colors1,
+        colors = SearchBarDefaults.colors(MaterialTheme.colorScheme.surfaceContainer),
         tonalElevation = SearchBarDefaults.TonalElevation,
         shadowElevation = 5.dp
     ) {
@@ -123,8 +123,8 @@ fun SearchBar(
                         onClick = { onQueryChange(item) }
                     ) {
                         Icon(
-                            imageVector = Icons.Filled.ArrowUpward,
-                            contentDescription = "Insert history into search",
+                            painter = painterResource(id = R.drawable.arrow_insert_24px),
+                            contentDescription = "Replace search query with history item",
                         )
                     }
                 }
