@@ -7,6 +7,7 @@ import com.unimib.oases.data.mapper.toEntities
 import com.unimib.oases.data.mapper.toEntity
 import com.unimib.oases.domain.model.PatientDisease
 import com.unimib.oases.domain.repository.PatientDiseaseRepository
+import com.unimib.oases.util.Outcome
 import com.unimib.oases.util.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -18,36 +19,36 @@ class PatientDiseaseRepositoryImpl @Inject constructor(
     val roomDataSource: RoomDataSource,
 ): PatientDiseaseRepository {
 
-    override suspend fun addPatientDisease(patientDisease: PatientDisease):Resource<Unit> {
+    override suspend fun addPatientDisease(patientDisease: PatientDisease): Outcome {
         return try {
             roomDataSource.insertPatientDisease(patientDisease.toEntity())
-            Resource.Success(Unit)
+            Outcome.Success
         } catch (e: Exception) {
             Log.e("PatientDiseaseRepository", "Error adding patient disease: ${e.message}")
-            Resource.Error(e.message ?: "An error occurred")
+            Outcome.Error(e.message ?: "An error occurred")
         }
     }
 
-    override suspend fun addPatientDiseases(patientDiseases: List<PatientDisease>): Resource<Unit> {
+    override suspend fun addPatientDiseases(patientDiseases: List<PatientDisease>): Outcome {
         return try {
             roomDataSource.insertPatientDiseases(patientDiseases.toEntities())
-            Resource.Success(Unit)
+            Outcome.Success
         } catch (e: Exception) {
             Log.e("PatientDiseaseRepository", "Error adding patient disease: ${e.message}")
-            Resource.Error(e.message ?: "An error occurred")
+            Outcome.Error(e.message ?: "An error occurred")
         }
     }
 
     override suspend fun deletePatientDisease(
         diseaseName: String,
         patientId: String
-    ): Resource<Unit> {
+    ): Outcome {
         return try {
             roomDataSource.deletePatientDisease(patientId, diseaseName)
-            Resource.Success(Unit)
+            Outcome.Success
         } catch (e: Exception) {
             Log.e("PatientDiseaseRepository", "Error adding patient disease: ${e.message}")
-            Resource.Error(e.message ?: "An error occurred")
+            Outcome.Error(e.message ?: "An error occurred")
         }
     }
 

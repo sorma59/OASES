@@ -6,6 +6,7 @@ import com.unimib.oases.data.mapper.toDomain
 import com.unimib.oases.data.mapper.toEntity
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.domain.repository.PatientRepository
+import com.unimib.oases.util.Outcome
 import com.unimib.oases.util.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -38,7 +39,7 @@ class PatientRepositoryImpl @Inject constructor(
     private val _newPatientEvents = MutableSharedFlow<Patient>()
     override val newPatientEvents: SharedFlow<Patient> = _newPatientEvents.asSharedFlow()
 
-    override suspend fun addPatient(patient: Patient): Resource<Unit> {
+    override suspend fun addPatient(patient: Patient): Outcome {
 
         return try {
             roomDataSource.insertPatient(patient.toEntity())
@@ -50,27 +51,27 @@ class PatientRepositoryImpl @Inject constructor(
 //                Log.e("PatientRepositoryImpl", "Adding patient to queue: $patient")
 //            }
 
-            Resource.Success(Unit)
+            Outcome.Success
         } catch (e: Exception) {
-            Resource.Error(e.message ?: "An error occurred")
+            Outcome.Error(e.message ?: "An error occurred")
         }
     }
 
-    override suspend fun deletePatient(patient: Patient): Resource<Unit> {
+    override suspend fun deletePatient(patient: Patient): Outcome {
         return try {
             roomDataSource.deletePatient(patient.toEntity())
-            Resource.Success(Unit)
+            Outcome.Success
         } catch (e: Exception) {
-            Resource.Error(e.message ?: "An error occurred")
+            Outcome.Error(e.message ?: "An error occurred")
         }
     }
 
-    override fun deletePatientById(patientId: String): Resource<Unit> {
+    override fun deletePatientById(patientId: String): Outcome {
         return try {
             roomDataSource.deleteById(patientId)
-            Resource.Success(Unit)
+            Outcome.Success
         } catch (e: Exception) {
-            Resource.Error(e.message ?: "An error occurred")
+            Outcome.Error(e.message ?: "An error occurred")
         }
     }
 
@@ -86,9 +87,10 @@ class PatientRepositoryImpl @Inject constructor(
                 emit(Resource.Error(exception.message ?: "An error occurred"))
             }
             .collect { entity ->
-                val resource = entity?.let {
-                    Resource.Success(it.toDomain())
-                } ?: Resource.Error("No patient data found for patientId $patientId")
+                val resource = when (entity) {
+                    null -> Resource.NotFound()
+                    else -> Resource.Success(entity.toDomain())
+                }
                 emit(resource)
             }
     }
@@ -131,12 +133,12 @@ class PatientRepositoryImpl @Inject constructor(
 //        }
 //    }
 
-    override suspend fun updateStatus(patient: Patient, status: String, code: String, room: String): Resource<Unit> {
+    override suspend fun updateStatus(patient: Patient, status: String, code: String, room: String): Outcome {
         return try {
             roomDataSource.updateStatus(patient.toEntity(), status, code, room)
-            Resource.Success(Unit)
+            Outcome.Success
         } catch (e: Exception) {
-            Resource.Error(e.message ?: "An error occurred")
+            Outcome.Error(e.message ?: "An error occurred")
         }
     }
 }

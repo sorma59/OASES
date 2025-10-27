@@ -8,7 +8,9 @@ import com.unimib.oases.domain.repository.PatientDiseaseRepository
 import com.unimib.oases.domain.usecase.DiseaseUseCase
 import com.unimib.oases.domain.usecase.SavePastMedicalHistoryUseCase
 import com.unimib.oases.ui.navigation.NavigationEvent
+import com.unimib.oases.util.Outcome
 import com.unimib.oases.util.Resource
+import com.unimib.oases.util.firstSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -75,7 +77,7 @@ class PastHistoryViewModel @Inject constructor(
 
             when (diseasesResource) {
                 is Resource.Success -> {
-                    val diseasesData = diseasesResource.data.orEmpty()
+                    val diseasesData = diseasesResource.data
                     val newStates = diseasesData.map { PatientDiseaseState(it.name) }
 
                     _state.update {
@@ -102,29 +104,23 @@ class PastHistoryViewModel @Inject constructor(
         val patientId = _state.value.receivedId
 
         try {
-            val result = patientDiseaseRepository.getPatientDiseases(patientId).first {
-                it is Resource.Success || it is Resource.Error
-            }
+            val patientDiseases = patientDiseaseRepository
+                .getPatientDiseases(patientId)
+                .firstSuccess()
+            val dbMap = patientDiseases.associateBy { it.diseaseName }
 
-            if (result is Resource.Success) {
-                val patientDiseases = result.data.orEmpty()
-                val dbMap = patientDiseases.associateBy { it.diseaseName }
-
-                _state.update { currentState ->
-                    val updatedDiseases = currentState.diseases.map { diseaseUi ->
-                        dbMap[diseaseUi.disease]?.let { dbEntry ->
-                            diseaseUi.copy(
-                                isDiagnosed = dbEntry.isDiagnosed,
-                                additionalInfo = dbEntry.additionalInfo,
-                                date = dbEntry.diagnosisDate
-                            )
-                        } ?: diseaseUi
-                    }
-
-                    currentState.copy(diseases = updatedDiseases, isLoading = false)
+            _state.update { currentState ->
+                val updatedDiseases = currentState.diseases.map { diseaseUi ->
+                    dbMap[diseaseUi.disease]?.let { dbEntry ->
+                        diseaseUi.copy(
+                            isDiagnosed = dbEntry.isDiagnosed,
+                            additionalInfo = dbEntry.additionalInfo,
+                            date = dbEntry.diagnosisDate
+                        )
+                    } ?: diseaseUi
                 }
-            } else if (result is Resource.Error) {
-                _state.update { it.copy(error = result.message) }
+
+                currentState.copy(diseases = updatedDiseases, isLoading = false)
             }
         } catch (e: Exception) {
             _state.update { it.copy(error = e.message ?: "Unexpected error") }
@@ -190,9 +186,9 @@ class PastHistoryViewModel @Inject constructor(
                 viewModelScope.launch(ioDispatcher + errorHandler) {
                     val result = savePastMedicalHistoryUseCase(state.value)
                     when (result) {
-                        is Resource.Error -> _state.update { it.copy( error = result.message) }
+                        is Outcome.Error -> _state.update { it.copy( error = result.message) }
 
-                        is Resource.Success -> {
+                        is Outcome.Success -> {
                             _state.update { it.copy(toastMessage = "PMH saved successfully") }
                             navigationEventsChannel.send(NavigationEvent.NavigateBack)
                         }

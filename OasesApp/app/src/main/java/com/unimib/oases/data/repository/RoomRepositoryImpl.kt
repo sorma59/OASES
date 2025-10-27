@@ -6,6 +6,7 @@ import com.unimib.oases.data.mapper.toDomain
 import com.unimib.oases.data.mapper.toEntity
 import com.unimib.oases.domain.model.Room
 import com.unimib.oases.domain.repository.RoomRepository
+import com.unimib.oases.util.Outcome
 import com.unimib.oases.util.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -16,41 +17,40 @@ import javax.inject.Inject
 class RoomRepositoryImpl @Inject constructor(
     val roomDataSource: RoomDataSource,
 ): RoomRepository {
-    override suspend fun addRoom(room: Room): Resource<Unit> {
+    override suspend fun addRoom(room: Room): Outcome {
         return try {
             roomDataSource.insertRoom(room.toEntity())
-            Resource.Success(Unit)
+            Outcome.Success
         } catch (e: Exception) {
             Log.e("RoomRepository", "Error adding the room: ${e.message}")
-            Resource.Error(e.message ?: "An error occurred")
+            Outcome.Error(e.message ?: "An error occurred")
         }
     }
 
-    override suspend fun deleteRoom(room: Room): Resource<Unit> {
+    override suspend fun deleteRoom(room: Room): Outcome {
         return try {
             roomDataSource.deleteRoom(room.toEntity())
-            Resource.Success(Unit)
+            Outcome.Success
         } catch (e: Exception) {
-            Resource.Error(e.message ?: "Unknown error")
+            Outcome.Error(e.message ?: "Unknown error")
         }
     }
 
     override fun getAllRooms(): Flow<Resource<List<Room>>> = flow {
-//        if (Random.nextBoolean())
-//            emit(Resource.Error("Mock error"))
-//        else
-            roomDataSource.getAllRooms()
-                .onStart { emit(Resource.Loading()) }
-                .catch {
-                    emit(Resource.Error(it.message ?: "Unknown error"))
-                }
-                .collect {
-                    emit(
-                        Resource.Success(
-                            it.map { entity -> entity.toDomain() }
-                        )
+        roomDataSource.getAllRooms()
+            .onStart {
+                emit(Resource.Loading())
+            }
+            .catch {
+                emit(Resource.Error(it.message ?: "Unknown error"))
+            }
+            .collect {
+                emit(
+                    Resource.Success(
+                        it.map { entity -> entity.toDomain() }
                     )
-                }
+                )
+            }
     }
 
 }

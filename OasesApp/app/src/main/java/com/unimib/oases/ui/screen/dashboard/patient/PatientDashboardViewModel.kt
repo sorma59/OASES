@@ -8,6 +8,7 @@ import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.domain.usecase.ConfigPatientDashboardButtonsUseCase
 import com.unimib.oases.ui.navigation.NavigationEvent
+import com.unimib.oases.util.Outcome
 import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -131,12 +132,12 @@ class PatientDashboardViewModel @Inject constructor(
 
                     val result = patientRepository.deletePatientById(_state.value.patientId)
 
-                    if (result is Resource.Success){
+                    if (result is Outcome.Success){
                         uiEventsChannel.send(UiEvent.HideDialog)
                         _state.update { it.copy(toastMessage = "Patient successfully deleted") }
                         navigationEventsChannel.send(NavigationEvent.NavigateBack)
                     }
-                    else if (result is Resource.Error)
+                    else if (result is Outcome.Error)
                         _state.update { it.copy(toastMessage = "Patient deletion failed") }
                 }
             }

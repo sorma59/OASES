@@ -135,8 +135,8 @@ fun HomeScreen(
                         onItemClick = onPatientItemClick
                     )
                 }
-                if (state.errorMessage != null){
-                    Text(state.errorMessage!!)
+                if (state.error != null){
+                    Text(state.error!!)
                 }
 
             }

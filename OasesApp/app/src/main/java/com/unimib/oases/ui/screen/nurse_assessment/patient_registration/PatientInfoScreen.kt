@@ -12,11 +12,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -28,22 +24,17 @@ import com.unimib.oases.ui.components.util.FadeOverlay
 import com.unimib.oases.ui.components.util.OutlinedDropdown
 import com.unimib.oases.ui.components.util.button.RetryButton
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
-import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreenViewModel.ValidationEvent
 import com.unimib.oases.util.reactToKeyboardAppearance
-import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun PatientInfoScreen(
     state: PatientInfoState,
-    onEvent: (PatientInfoEvent) -> Unit,
-    validationEvents: Flow<ValidationEvent>
+    onEvent: (PatientInfoEvent) -> Unit
 ) {
 
 //    val patientInfoViewModel: PatientInfoViewModel = hiltViewModel()
 
 //    val state by patientInfoViewModel.state.collectAsState()
-
-    var showAlertDialog by remember { mutableStateOf(false) }
 
     // --- Remembered Lambdas --- to avoid recomposition,
     val onNameChange = remember<(String) -> Unit> {
@@ -78,17 +69,6 @@ fun PatientInfoScreen(
     }
 
     val context = LocalContext.current
-
-    LaunchedEffect(key1 = context) {
-        validationEvents.collect { event ->
-            when (event) {
-                is ValidationEvent.ValidationSuccess -> {
-                    if (state.isEdited)
-                        showAlertDialog = true
-                }
-            }
-        }
-    }
 
     val scrollState = rememberScrollState()
 

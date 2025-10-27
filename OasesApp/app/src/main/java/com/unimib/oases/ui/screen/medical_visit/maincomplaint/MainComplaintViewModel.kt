@@ -24,8 +24,9 @@ import com.unimib.oases.domain.usecase.TranslateLatestVitalSignsToSymptomsUseCas
 import com.unimib.oases.domain.usecase.TranslateTriageSymptomIdsToSymptomsUseCase
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.screen.nurse_assessment.patient_registration.Sex.Companion.fromDisplayName
-import com.unimib.oases.util.Resource
+import com.unimib.oases.util.Outcome
 import com.unimib.oases.util.firstNullableSuccess
+import com.unimib.oases.util.firstSuccess
 import com.unimib.oases.util.toggle
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -35,7 +36,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -204,21 +204,14 @@ class MainComplaintViewModel @Inject constructor(
     }
 
     private suspend fun getPatientData() {
-
         try {
-
-            val resource = patientRepository.getPatientById(_state.value.patientId).first {
-                it is Resource.Success || it is Resource.Error
-            }
-
-            when (resource) {
-                is Resource.Success -> {
-                    _state.update { it.copy(patient = resource.data) }
-                }
-                is Resource.Error -> {
-                    updateError(resource.message)
-                }
-                else -> Unit
+            val patient = patientRepository
+                .getPatientById(_state.value.patientId)
+                .firstSuccess()
+            _state.update {
+                it.copy(
+                    patient = patient
+                )
             }
         } catch (e: Exception) {
             updateError(e.message ?: "Unknown error")
@@ -231,27 +224,15 @@ class MainComplaintViewModel @Inject constructor(
             val visit = getCurrentVisitUseCase(_state.value.patientId).firstNullableSuccess()
 
             visit?.let {
-                val resource = triageEvaluationRepository.getTriageEvaluation(visit.id).first {
-                    it is Resource.Success || it is Resource.Error
-                }
+                val triageEvaluation = triageEvaluationRepository
+                    .getTriageEvaluation(visit.id)
+                    .firstSuccess()
 
-                when (resource) {
-                    is Resource.Success -> {
-                        resource.data?.let {
-                            val ids = it.redSymptomIds + it.yellowSymptomIds
-                            _state.update {
-                                it.copy(
-                                    symptoms = it.symptoms + translateTriageSymptomIdsToSymptomsUseCase(ids)
-                                )
-                            }
-                        }
-                    }
-
-                    is Resource.Error -> {
-                        _state.update { it.copy(error = resource.message) }
-                    }
-
-                    else -> Unit
+                val ids = triageEvaluation.redSymptomIds + triageEvaluation.yellowSymptomIds
+                _state.update {
+                    it.copy(
+                        symptoms = it.symptoms + translateTriageSymptomIdsToSymptomsUseCase(ids)
+                    )
                 }
             }
         } catch (e: Exception) {
@@ -334,14 +315,14 @@ class MainComplaintViewModel @Inject constructor(
                 viewModelScope.launch(dispatcher + errorHandler){
                     val result = submitMedicalVisitPartOneUseCase(state.value)
                     when(result){
-                        is Resource.Error -> {
+                        is Outcome.Error -> {
                             _state.update {
                                 it.copy(
                                     error = result.message
                                 )
                             }
                         }
-                        is Resource.Success -> {
+                        is Outcome.Success -> {
                             _state.update {
                                 it.copy(
                                     toastMessage = "Medical visit submitted successfully"

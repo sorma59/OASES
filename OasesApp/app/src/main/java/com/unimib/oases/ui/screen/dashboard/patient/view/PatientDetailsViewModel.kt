@@ -71,7 +71,7 @@ class PatientDetailsViewModel @Inject constructor(
             )
             when (resource) {
                 is Resource.Success -> {
-                    _state.update { it.copy(mainComplaintsSummaries = resource.data!!) }
+                    _state.update { it.copy(mainComplaintsSummaries = resource.data) }
                 }
 
                 is Resource.Error -> {

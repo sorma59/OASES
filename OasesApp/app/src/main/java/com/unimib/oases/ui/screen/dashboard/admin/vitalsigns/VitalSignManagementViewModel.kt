@@ -213,7 +213,7 @@ class VitalSignManagementViewModel @Inject constructor(
                     is Resource.Success -> {
                         _state.update{
                             _state.value.copy(
-                                vitalSigns = resource.data ?: emptyList(),
+                                vitalSigns = resource.data,
                                 isLoading = false
                             )
                         }
@@ -223,6 +223,17 @@ class VitalSignManagementViewModel @Inject constructor(
                         _state.update{
                             _state.value.copy(
                                 error = resource.message,
+                                isLoading = false
+                            )
+                        }
+                    }
+
+                    is Resource.NotFound -> {
+                        _state.update {
+                            it.copy(
+                                vitalSigns = emptyList(),
+                                error = resource.message,
+                                isLoading = false
                             )
                         }
                     }

@@ -10,4 +10,7 @@ data class TriageConfig(
 data class SymptomWithLabel(
     val symptom: TriageSymptom,
     val label: String
-)
+){
+    val id: String
+        get() = symptom.id
+}

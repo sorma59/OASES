@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unimib.oases.data.local.model.Role
 import com.unimib.oases.data.local.model.User
-import com.unimib.oases.domain.repository.UserRepository
+import com.unimib.oases.domain.usecase.AuthenticateUserUseCase
 import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val auth: AuthManager,
-    private val userRepository: UserRepository
+    private val authenticateUserUseCase: AuthenticateUserUseCase
 ) : ViewModel() {
 
     // Expose SSOT flows from AuthManager
@@ -42,18 +42,17 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             _loginState.value = AuthState.Loading
 
-            when (val result = userRepository.authenticate(username, password)) {
+            when (val result = authenticateUserUseCase(username, password)) {
                 is Resource.Success -> {
                     val user = result.data
-                    if (user != null) {
-                        auth.login(user) // updates SSOT
-                        _loginState.value = AuthState.Idle
-                    } else {
-                        _loginState.value = AuthState.Error("User not found")
-                    }
+                    auth.login(user) // updates SSOT
+                    _loginState.value = AuthState.Idle
                 }
                 is Resource.Error -> {
-                    _loginState.value = AuthState.Error(result.message ?: "Unknown error")
+                    _loginState.value = AuthState.Error(result.message)
+                }
+                is Resource.NotFound -> {
+                    _loginState.value = AuthState.Error("User not found")
                 }
                 else -> Unit
             }

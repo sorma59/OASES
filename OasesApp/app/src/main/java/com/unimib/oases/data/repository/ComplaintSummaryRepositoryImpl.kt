@@ -7,6 +7,7 @@ import com.unimib.oases.data.mapper.toDomain
 import com.unimib.oases.data.mapper.toEntity
 import com.unimib.oases.domain.model.ComplaintSummary
 import com.unimib.oases.domain.repository.ComplaintSummaryRepository
+import com.unimib.oases.util.Outcome
 import com.unimib.oases.util.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -19,21 +20,21 @@ class ComplaintSummaryRepositoryImpl @Inject constructor(
     private val roomDataSource: RoomDataSource
 ): ComplaintSummaryRepository {
 
-    override suspend fun addComplaintSummary(complaintSummary: ComplaintSummary): Resource<Unit> {
+    override suspend fun addComplaintSummary(complaintSummary: ComplaintSummary): Outcome {
         return try {
             roomDataSource.insertComplaintSummary(complaintSummary.toEntity())
-            Resource.Success(Unit)
+            Outcome.Success
         } catch (e: Exception) {
-            Resource.Error(e.message ?: "An error occurred")
+            Outcome.Error(e.message ?: "An error occurred")
         }
     }
 
-    override suspend fun deleteComplaintSummary(complaintSummary: ComplaintSummary): Resource<Unit> {
+    override suspend fun deleteComplaintSummary(complaintSummary: ComplaintSummary): Outcome {
         return try {
             roomDataSource.deleteComplaintSummary(complaintSummary.toEntity())
-            Resource.Success(Unit)
+            Outcome.Success
         } catch (e: Exception) {
-            Resource.Error(e.message ?: "An error occurred")
+            Outcome.Error(e.message ?: "An error occurred")
         }
     }
 
@@ -52,7 +53,7 @@ class ComplaintSummaryRepositoryImpl @Inject constructor(
                 emit(Resource.Error(message))
             }
 
-    override fun getComplaintSummary(visitId: String, complaintId: String): Flow<Resource<ComplaintSummary?>> = flow {
+    override fun getComplaintSummary(visitId: String, complaintId: String): Flow<Resource<ComplaintSummary>> = flow {
         roomDataSource.getComplaintSummary(visitId, complaintId)
             .onStart {
                 emit(Resource.Loading())
@@ -66,8 +67,11 @@ class ComplaintSummaryRepositoryImpl @Inject constructor(
                 emit(Resource.Error(exception.message ?: "An error occurred"))
             }
             .collect { entity ->
-                val domainModel = entity?.toDomain()
-                emit(Resource.Success(domainModel))
+                val resource = when (entity) {
+                    null -> Resource.NotFound()
+                    else -> Resource.Success(entity.toDomain())
+                }
+                emit(resource)
             }
     }
 

@@ -2,6 +2,7 @@ package com.unimib.oases.domain.usecase
 
 import com.unimib.oases.domain.model.Disease
 import com.unimib.oases.domain.repository.DiseaseRepository
+import com.unimib.oases.util.Outcome
 import com.unimib.oases.util.Resource
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -10,8 +11,8 @@ class DiseaseUseCase @Inject constructor(
     private val repo: DiseaseRepository
 ) {
 
-    suspend fun addDisease(disease: Disease) {
-        repo.addDisease(disease)
+    suspend fun addDisease(disease: Disease): Outcome {
+        return repo.addDisease(disease)
     }
 
     fun getFilteredDiseases(sex: String, age: String): Flow<Resource<List<Disease>>> {
@@ -24,7 +25,7 @@ class DiseaseUseCase @Inject constructor(
         return result
     }
 
-    suspend fun deleteDisease(disease: Disease){
-       repo.deleteDisease(disease)
+    suspend fun deleteDisease(disease: Disease): Outcome {
+       return repo.deleteDisease(disease)
     }
 }

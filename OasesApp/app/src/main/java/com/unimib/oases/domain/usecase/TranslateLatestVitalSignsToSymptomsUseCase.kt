@@ -14,9 +14,9 @@ class TranslateLatestVitalSignsToSymptomsUseCase @Inject constructor(
         val symptoms = mutableSetOf<Symptom>()
         val visit = getCurrentVisitUseCase(patientId).firstNullableSuccess()
         visit?.let {
+            //TODO("Replace magic numbers")
             val vitalSigns = getLatestVitalSignsUseCase(visit.id)
             for (vitalSign in vitalSigns) {
-
                 when (vitalSign.vitalSignName) {
                     "Temperature" -> {
                         if (vitalSign.value > 38)

@@ -4,6 +4,7 @@ import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.domain.model.Visit
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.domain.repository.VisitRepository
+import com.unimib.oases.util.Outcome
 import com.unimib.oases.util.Resource
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -21,11 +22,11 @@ class PatientUseCase @Inject constructor(
         return patientRepository.getPatientById(patientId)
     }
 
-    suspend fun deletePatient(patient: Patient): Resource<Unit> {
+    suspend fun deletePatient(patient: Patient): Outcome {
        return patientRepository.deletePatient(patient)
     }
 
-    fun deletePatientById(patientId: String): Resource<Unit> {
+    fun deletePatientById(patientId: String): Outcome {
         return patientRepository.deletePatientById(patientId)
     }
 
@@ -33,7 +34,7 @@ class PatientUseCase @Inject constructor(
 //        return patientRepository.updateTriageState(patient, triageState)
 //    }
 
-    suspend fun updateStatus(patient: Patient, status: String, code: String, room: String): Resource<Unit> {
+    suspend fun updateStatus(patient: Patient, status: String, code: String, room: String): Outcome {
         return patientRepository.updateStatus(patient, status, code, room)
     }
 

@@ -34,7 +34,7 @@ class UserManagementViewModel @Inject constructor(
     private var errorHandler = CoroutineExceptionHandler { _, e ->
         e.printStackTrace()
         _state.update{
-            _state.value.copy(
+            it.copy(
                 error = e.message,
                 isLoading = false
             )
@@ -45,7 +45,7 @@ class UserManagementViewModel @Inject constructor(
         when (event) {
             is UserManagementEvent.UserClicked -> {
                 _state.update{
-                    _state.value.copy(
+                    it.copy(
                         user = event.value
                     )
                 }
@@ -61,8 +61,8 @@ class UserManagementViewModel @Inject constructor(
 
             is UserManagementEvent.EnteredUsername -> {
                 _state.update{
-                    _state.value.copy(
-                        user = _state.value.user.copy(
+                    it.copy(
+                        user = it.user.copy(
                             username = event.value
                         ),
                         usernameError = null
@@ -72,8 +72,8 @@ class UserManagementViewModel @Inject constructor(
 
             is UserManagementEvent.EnteredPassword -> {
                 _state.update{
-                    _state.value.copy(
-                        user = _state.value.user.copy(
+                    it.copy(
+                        user = it.user.copy(
                             pwHash = event.value
                         ),
                         passwordError = null
@@ -92,8 +92,8 @@ class UserManagementViewModel @Inject constructor(
 
             is UserManagementEvent.SelectedRole -> {
                 _state.update{
-                    _state.value.copy(
-                        user = _state.value.user.copy(
+                    it.copy(
+                        user = it.user.copy(
                             role = event.value
                         )
                     )
@@ -104,7 +104,7 @@ class UserManagementViewModel @Inject constructor(
                 viewModelScope.launch(dispatcher + errorHandler) {
                     try {
                         _state.update{
-                            _state.value.copy(isLoading = true)
+                            it.copy(isLoading = true)
                         }
 
                         val result = saveUserUseCase(
@@ -153,14 +153,14 @@ class UserManagementViewModel @Inject constructor(
 
                     } catch (e: Exception) {
                         _state.update{
-                            _state.value.copy(
+                            it.copy(
                                 error = e.message
                             )
                         }
                     }
                     finally {
                         _state.update{
-                            _state.value.copy(
+                            it.copy(
                                 isLoading = false
                             )
                         }
@@ -170,7 +170,7 @@ class UserManagementViewModel @Inject constructor(
 
             is UserManagementEvent.OnToastShown -> {
                 _state.update {
-                    _state.value.copy(
+                    it.copy(
                         toastMessage = null
                     )
                 }
@@ -188,25 +188,38 @@ class UserManagementViewModel @Inject constructor(
                 when (resource) {
                     is Resource.Loading -> {
                         _state.update{
-                            _state.value.copy(
-                                isLoading = true
+                            it.copy(
+                                isLoading = true,
+                                error = null
                             )
                         }
                     }
 
                     is Resource.Success -> {
                         _state.update{
-                            _state.value.copy(
-                                users = resource.data ?: emptyList(),
-                                isLoading = false
+                            it.copy(
+                                users = resource.data,
+                                isLoading = false,
+                                error = null
                             )
                         }
                     }
 
                     is Resource.Error -> {
                         _state.update{
-                            _state.value.copy(
+                            it.copy(
                                 error = resource.message,
+                                isLoading = false
+                            )
+                        }
+                    }
+
+                    is Resource.NotFound -> {
+                        _state.update{
+                            it.copy(
+                                users = emptyList(),
+                                error = resource.message,
+                                isLoading = false
                             )
                         }
                     }

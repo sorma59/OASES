@@ -1,42 +1,90 @@
 package com.unimib.oases.util
 
 /**
- * A sealed class representing the status of a resource operation.
+ * A generic wrapper class that represents the state of a resource being loaded or fetched.
  *
- * This class is used to wrap the result of an operation, indicating whether it was
- * successful, resulted in an error, or is still loading.
+ * It enforces strict type safety:
+ * - `Resource.Success` can **never** contain a `null` value.
+ * - All other states may optionally include messages or partial data.
  *
- * @param T The type of data being wrapped.
- * @property data The data associated with the resource, if available.
- * @property message An error message, if applicable.
+ * @param T The non-nullable type of data this resource holds.
  */
-sealed class Resource<T>(var data: T? = null, val message: String? = null) {
+sealed class Resource<out T : Any> {
 
     /**
-     * Represents a successful resource operation.
+     * Represents a successful operation that produced valid, non-null data.
      *
-     * @param data The data associated with the successful operation.
-     */
-    class Success<T>(data: T) : Resource<T>(data)
-
-    /**
-     * Represents an error that occurred during a resource operation.
+     * This class enforces that the contained data [T] cannot be `null` at compile time.
      *
-     * @param message An error message describing the error.
-     * @param data The data associated with the error, if available.
+     * @param data The successfully retrieved or computed data.
      */
-    class Error<T>(message: String, data: T? = null) : Resource<T>(data, message)
+    data class Success<out T : Any>(val data: T) : Resource<T>()
 
     /**
-     * Represents a resource operation that is currently loading.
+     * Represents an error that occurred while fetching or processing a resource.
+     *
+     * @param message A human-readable message describing the error.
+     * @param data Optional data that may still be available (e.g., cached or partial data).
      */
-    class Loading<T>(message: String? = null) : Resource<T>(message = message)
+    data class Error<out T : Any>(
+        val message: String,
+        val data: T? = null
+    ) : Resource<T>()
 
-//    /**
-//     * Represents a resource that could not be found.
-//     * This is a specific type of error.
-//     *
-//     * @param message An error message indicating that the resource was not found.
-//     */
-//    class NotFound<T>(message: String? = "Resource not found"): Resource<T>(message = message)
+    /**
+     * Represents a resource that is currently being loaded.
+     *
+     * @param message Optional loading message (e.g., "Loading data...").
+     */
+    data class Loading<out T : Any>(
+        val message: String? = null
+    ) : Resource<T>()
+
+    /**
+     * Represents a specific error case where the requested resource could not be found.
+     *
+     * @param message Optional message, defaulting to `"Resource not found"`.
+     */
+    data class NotFound<out T : Any>(
+        val message: String? = "Resource not found"
+    ) : Resource<T>()
+
+    /**
+     * Companion object providing convenient factory functions
+     * for creating resource instances without exposing constructors directly.
+     */
+    companion object {
+
+        /**
+         * Creates a [Success] resource with guaranteed non-null data.
+         *
+         * @param data The successfully retrieved data.
+         */
+        fun <T : Any> success(data: T): Resource<T> = Success(data)
+
+        /**
+         * Creates an [Error] resource.
+         *
+         * @param message The error message.
+         * @param data Optional data available despite the error.
+         */
+        fun <T : Any> error(message: String, data: T? = null): Resource<T> =
+            Error(message, data)
+
+        /**
+         * Creates a [Loading] resource.
+         *
+         * @param message Optional loading message.
+         */
+        fun <T : Any> loading(message: String? = null): Resource<T> =
+            Loading(message)
+
+        /**
+         * Creates a [NotFound] resource.
+         *
+         * @param message Optional message describing the missing resource.
+         */
+        fun <T : Any> notFound(message: String? = "Resource not found"): Resource<T> =
+            NotFound(message)
+    }
 }

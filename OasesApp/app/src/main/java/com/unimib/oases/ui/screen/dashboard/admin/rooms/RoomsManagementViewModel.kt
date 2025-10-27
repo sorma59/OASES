@@ -10,10 +10,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -39,17 +37,6 @@ class RoomsManagementViewModel @Inject constructor(
             )
         }
     }
-
-    sealed class UiEvent {
-        // all events that gonna happen when we need to screen to display something and pass data back to the screen
-        data class showSnackbar(val message: String) : UiEvent()
-        object SaveUser : UiEvent()
-        object Back : UiEvent()
-    }
-
-
-    private val _eventFlow = MutableSharedFlow<UiEvent>()
-    val eventFlow = _eventFlow.asSharedFlow()
 
     fun onEvent(event: RoomsManagementEvent) {
         when (event) {
@@ -107,17 +94,12 @@ class RoomsManagementViewModel @Inject constructor(
                         // _eventFlow.emit(UiEvent.SaveUser) // I emit it into the screen then
                         // in the screen we handle it and we go back to the list
 
-                    } catch (e: Exception) {
+                    } catch (_: Exception) {
                         _state.update {
                             it.copy(
                                 isLoading = false
                             )
                         }
-                        _eventFlow.emit(
-                            UiEvent.showSnackbar(
-                                message = "Error adding room " + e.message
-                            )
-                        )
                     }
                 }
             }
@@ -144,7 +126,7 @@ class RoomsManagementViewModel @Inject constructor(
                     is Resource.Success -> {
                         _state.update {
                             it.copy(
-                                rooms = resource.data ?: emptyList(),
+                                rooms = resource.data,
                                 isLoading = false
                             )
                         }
@@ -154,6 +136,17 @@ class RoomsManagementViewModel @Inject constructor(
                         _state.update {
                             it.copy(
                                 error = resource.message,
+                                isLoading = false
+                            )
+                        }
+                    }
+
+                    is Resource.NotFound -> {
+                        _state.update {
+                            it.copy(
+                                rooms = emptyList(),
+                                error = resource.message,
+                                isLoading = false
                             )
                         }
                     }
@@ -161,7 +154,6 @@ class RoomsManagementViewModel @Inject constructor(
             }
         }
     }
-
 }
 
 

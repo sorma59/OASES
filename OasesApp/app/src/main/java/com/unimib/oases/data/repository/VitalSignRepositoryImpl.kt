@@ -7,6 +7,7 @@ import com.unimib.oases.data.mapper.toEntity
 import com.unimib.oases.domain.model.NumericPrecision
 import com.unimib.oases.domain.model.VitalSign
 import com.unimib.oases.domain.repository.VitalSignRepository
+import com.unimib.oases.util.Outcome
 import com.unimib.oases.util.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -21,22 +22,22 @@ class VitalSignRepositoryImpl @Inject constructor(
 
     private val precisionMap = mutableMapOf<String, NumericPrecision>()
 
-    override suspend fun addVitalSign(vitalSign: VitalSign): Resource<Unit> {
+    override suspend fun addVitalSign(vitalSign: VitalSign): Outcome {
         return try {
             roomDataSource.insertVitalSign(vitalSign.toEntity())
-            Resource.Success(Unit)
+            Outcome.Success
         } catch (e: Exception) {
             Log.e("DiseaseRepository", "Error adding vital sign: ${e.message}")
-            Resource.Error(e.message ?: "An error occurred")
+            Outcome.Error(e.message ?: "An error occurred")
         }
     }
 
-    override suspend fun deleteVitalSign(vitalSign: VitalSign): Resource<Unit> {
+    override suspend fun deleteVitalSign(vitalSign: VitalSign): Outcome {
         return try {
             roomDataSource.deleteVitalSign(vitalSign.toEntity())
-            Resource.Success(Unit)
+            Outcome.Success
         } catch (e: Exception) {
-            Resource.Error(e.message ?: "Unknown error")
+            Outcome.Error(e.message ?: "Unknown error")
         }
     }
 

@@ -36,7 +36,7 @@ class HomeScreenViewModel @Inject constructor(
         e.printStackTrace()
         _state.update{
             _state.value.copy(
-                errorMessage = e.message,
+                error = e.message,
                 isLoading = false
             )
         }
@@ -99,7 +99,7 @@ class HomeScreenViewModel @Inject constructor(
                     is Resource.Success -> {
                         _state.update{
                             _state.value.copy(
-                                patients = resource.data ?: emptyList(),
+                                patients = resource.data,
                                 isLoading = false
                             )
                         }
@@ -108,7 +108,17 @@ class HomeScreenViewModel @Inject constructor(
                     is Resource.Error -> {
                         _state.update{
                             _state.value.copy(
-                                errorMessage = resource.message,
+                                error = resource.message,
+                                isLoading = false
+                            )
+                        }
+                    }
+
+                    is Resource.NotFound -> {
+                        _state.update {
+                            it.copy(
+                                patients = emptyList(),
+                                error = resource.message,
                                 isLoading = false
                             )
                         }

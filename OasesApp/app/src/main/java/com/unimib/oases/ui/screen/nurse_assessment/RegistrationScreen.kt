@@ -148,8 +148,7 @@ fun RegistrationScreen(
                 when (currentTab) {
                     Tab.DEMOGRAPHICS -> PatientInfoScreen(
                         state = state.patientInfoState,
-                        onEvent = registrationScreenViewModel::onPatientInfoEvent,
-                        validationEvents = registrationScreenViewModel.validationEvents
+                        onEvent = registrationScreenViewModel::onPatientInfoEvent
                     )
                     Tab.CONTINUE_TO_TRIAGE -> ContinueToTriageDecisionScreen()
                     Tab.VITAL_SIGNS -> VitalSignsScreen(

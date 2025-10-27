@@ -9,6 +9,7 @@ import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.domain.usecase.SendPatientViaBluetoothUseCase
+import com.unimib.oases.util.Outcome
 import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -103,10 +104,10 @@ class SendPatientViaBluetoothViewModel @Inject constructor(
             updatePatientSendingState { it.copy(isLoading = true) }
             val resource = sendPatientViaBluetoothUseCase(patient.id, device)
             when(resource){
-                is Resource.Success -> {
+                is Outcome.Success -> {
                     updatePatientSendingState { it.copy(result = "Patient sent successfully, tap another device to send ${patient.name} again") }
                 }
-                is Resource.Error -> {
+                is Outcome.Error -> {
                     updatePatientSendingState { it.copy(result = "Failed to send patient: ${resource.message}") }
                 }
                 else -> Unit

@@ -2,14 +2,14 @@ package com.unimib.oases.domain.usecase
 
 import com.unimib.oases.data.local.model.Role
 import com.unimib.oases.domain.repository.UserRepository
-import com.unimib.oases.util.Resource
+import com.unimib.oases.util.Outcome
 import javax.inject.Inject
 
 class SaveUserUseCase @Inject constructor(
     private val repo: UserRepository
 ) {
 
-    operator fun invoke(username: String, pwHash: String, role: Role): SaveUserUseCaseResult {
+    suspend operator fun invoke(username: String, pwHash: String, role: Role): SaveUserUseCaseResult {
 
         val usernameError = validateUsername(username)
         val pwHashError = validatePassword(pwHash)
@@ -22,10 +22,10 @@ class SaveUserUseCase @Inject constructor(
         }
 
         return when (repo.createUser(username, pwHash, role)){
-            is Resource.Error -> {
+            is Outcome.Error -> {
                 SaveUserUseCaseResult.RepositoryFailure
             }
-            is Resource.Success -> {
+            is Outcome.Success -> {
                 SaveUserUseCaseResult.Success
             }
             else -> {

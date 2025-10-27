@@ -15,7 +15,7 @@ import com.unimib.oases.domain.model.symptom.Symptom
 
 fun List<ImmediateTreatmentQuestionState>.rebranch(node: ManualNode, answer: Boolean)
 : List<ImmediateTreatmentQuestionState> {
-    var list = this.toMutableList()
+    val list = this.toMutableList()
     while(list.last().node != node){
         list.removeAt(list.lastIndex)
     }

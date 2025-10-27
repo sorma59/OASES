@@ -87,9 +87,10 @@ fun Modifier.reactToKeyboardAppearance(): Modifier {
 }
 
 /**
- * Collects the first emitted [Resource] from this Flow that is either [Resource.Success] or [Resource.Error].
+ * Collects the first emitted [Resource] from this Flow that is either [Resource.Success], [Resource.Error] or [Resource.NotFound].
  *
- * If the first emitted Resource is [Resource.Error], this function throws an [Exception] with the
+ * If the first emitted Resource is [Resource.NotFound], this function throws a [NoSuchElementException] with the
+ * error message. Otherwise, if the first emitted Resource is [Resource.Error], this function throws an [Exception] with the
  * error message. Otherwise, it returns the non-null data from [Resource.Success].
  *
  * Usage example:
@@ -99,19 +100,21 @@ fun Modifier.reactToKeyboardAppearance(): Modifier {
  *
  * This function is intended for Room or repository Flows that emit [Resource] wrappers for results.
  *
+ * @throws NoSuchElementException if the first emitted Resource is [Resource.NotFound]
  * @throws Exception if the first emitted Resource is [Resource.Error]
  * @return T the data contained in the first [Resource.Success] emission
  */
-suspend fun <T> Flow<Resource<T>>.firstSuccess(): T {
-    val result = first { it is Resource.Success || it is Resource.Error }
+suspend fun <T : Any> Flow<Resource<T>>.firstSuccess(): T {
+    val result = first { it is Resource.Success || it is Resource.Error || it is Resource.NotFound }
+    if (result is Resource.NotFound) throw NoSuchElementException(result.message)
     if (result is Resource.Error) throw Exception(result.message)
-    return (result as Resource.Success).data!!
+    return (result as Resource.Success).data
 }
 
-
 /**
- * Collects the first emitted [Resource] from this Flow that is either [Resource.Success] or [Resource.Error].
+ * Collects the first emitted [Resource] from this Flow that is either [Resource.Success], [Resource.Error] or [Resource.NotFound].
  *
+ * If the first emitted Resource is [Resource.NotFound], this function returns null.
  * If the first emitted Resource is [Resource.Error], this function throws an [Exception] with the
  * error message. Otherwise, it returns the nullable data from [Resource.Success].
  *
@@ -125,8 +128,12 @@ suspend fun <T> Flow<Resource<T>>.firstSuccess(): T {
  * @throws Exception if the first emitted Resource is [Resource.Error]
  * @return T? the data contained in the first [Resource.Success] emission
  */
-suspend fun <T> Flow<Resource<T>>.firstNullableSuccess(): T? {
-    val result = first { it is Resource.Success || it is Resource.Error }
-    if (result is Resource.Error) throw Exception(result.message)
-    return (result as Resource.Success).data
+suspend fun <T : Any> Flow<Resource<T>>.firstNullableSuccess(): T? {
+    val result = first { it is Resource.Success || it is Resource.Error || it is Resource.NotFound }
+    return when (result) {
+        is Resource.NotFound -> null
+        is Resource.Error -> throw Exception(result.message)
+        is Resource.Success -> result.data
+        is Resource.Loading -> throw IllegalStateException("Resource of type Loading is not expected here")
+    }
 }

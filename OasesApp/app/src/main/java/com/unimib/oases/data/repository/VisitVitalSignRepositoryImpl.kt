@@ -6,6 +6,7 @@ import com.unimib.oases.data.mapper.toDomain
 import com.unimib.oases.data.mapper.toEntity
 import com.unimib.oases.domain.model.VisitVitalSign
 import com.unimib.oases.domain.repository.VisitVitalSignRepository
+import com.unimib.oases.util.Outcome
 import com.unimib.oases.util.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -17,12 +18,12 @@ class VisitVitalSignRepositoryImpl @Inject constructor(
     private val roomDataSource: RoomDataSource,
 ): VisitVitalSignRepository
 {
-    override suspend fun addVisitVitalSign(visitVitalSign: VisitVitalSign): Resource<Unit> {
+    override suspend fun addVisitVitalSign(visitVitalSign: VisitVitalSign): Outcome {
         return try {
             roomDataSource.insertVisitVitalSigns(visitVitalSign.toEntity())
-            Resource.Success(Unit)
+            Outcome.Success
         } catch (e: Exception) {
-            Resource.Error(e.message ?: "An error occurred")
+            Outcome.Error(e.message ?: "An error occurred")
         }
     }
 

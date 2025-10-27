@@ -6,6 +6,7 @@ import com.unimib.oases.data.mapper.toDomain
 import com.unimib.oases.data.mapper.toEntity
 import com.unimib.oases.domain.model.Visit
 import com.unimib.oases.domain.repository.VisitRepository
+import com.unimib.oases.util.Outcome
 import com.unimib.oases.util.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -17,23 +18,23 @@ class VisitRepositoryImpl @Inject constructor(
     private val roomDataSource: RoomDataSource,
 ): VisitRepository {
 
-    override suspend fun addVisit(visit: Visit): Resource<Unit> {
+    override suspend fun addVisit(visit: Visit): Outcome {
         return try {
             roomDataSource.insertVisit(visit.toEntity())
-            Resource.Success(Unit)
+            Outcome.Success
         } catch (e: Exception) {
             Log.e("VisitRepository", "Error adding visit: ${e.message}")
-            Resource.Error(e.message ?: "An error occurred")
+            Outcome.Error(e.message ?: "An error occurred")
         }
     }
 
-    override suspend fun updateVisit(visit: Visit): Resource<Unit> {
+    override suspend fun updateVisit(visit: Visit): Outcome {
         return try {
             roomDataSource.upsertVisit(visit.toEntity())
-            Resource.Success(Unit)
+            Outcome.Success
         } catch (e: Exception) {
             Log.e("VisitRepository", "Error updating visit: ${e.message}")
-            Resource.Error(e.message ?: "An error occurred")
+            Outcome.Error(e.message ?: "An error occurred")
         }
     }
 
@@ -49,7 +50,7 @@ class VisitRepositoryImpl @Inject constructor(
             }
     }
 
-    override fun getCurrentVisit(patientId: String): Flow<Resource<Visit?>> = flow {
+    override fun getCurrentVisit(patientId: String): Flow<Resource<Visit>> = flow {
         roomDataSource.getCurrentVisit(patientId)
             .onStart {
                 emit(Resource.Loading())
@@ -59,8 +60,11 @@ class VisitRepositoryImpl @Inject constructor(
                 emit(Resource.Error(it.message ?: "An error occurred"))
             }
             .collect { entity ->
-                val domainModel = entity?.toDomain()
-                emit(Resource.Success(domainModel))
+                val resource = when (entity) {
+                    null -> Resource.NotFound()
+                    else -> Resource.Success(entity.toDomain())
+                }
+                emit(resource)
             }
     }
 }

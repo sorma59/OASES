@@ -14,10 +14,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -38,30 +36,18 @@ class DiseaseManagementViewModel @Inject constructor(
     private var errorHandler = CoroutineExceptionHandler { _, e ->
         e.printStackTrace()
         _state.update{
-            _state.value.copy(
+            it.copy(
                 error = e.message,
                 isLoading = false
             )
         }
     }
 
-
-    sealed class UiEvent {
-        // all events that gonna happen when we need to screen to display something and pass data back to the screen
-        data class showSnackbar(val message: String) : UiEvent()
-        object SaveUser : UiEvent()
-        object Back : UiEvent()
-    }
-
-
-    private val _eventFlow = MutableSharedFlow<UiEvent>()
-    val eventFlow = _eventFlow.asSharedFlow()
-
     fun onEvent(event: DiseaseManagementEvent) {
         when (event) {
             is DiseaseManagementEvent.Click -> {
                 _state.update{
-                    _state.value.copy(
+                    it.copy(
                         disease = event.value
                     )
                 }
@@ -77,8 +63,8 @@ class DiseaseManagementViewModel @Inject constructor(
 
             is DiseaseManagementEvent.EnteredDiseaseName -> {
                 _state.update{
-                    _state.value.copy(
-                        disease = _state.value.disease.copy(
+                    it.copy(
+                        disease = it.disease.copy(
                             name = event.value
                         )
                     )
@@ -87,8 +73,8 @@ class DiseaseManagementViewModel @Inject constructor(
 
             is DiseaseManagementEvent.EnteredSexSpecificity -> {
                 _state.update{
-                    _state.value.copy(
-                        disease = _state.value.disease.copy(
+                    it.copy(
+                        disease = it.disease.copy(
                             sexSpecificity = fromSexSpecificityDisplayName(event.value)
                         )
                     )
@@ -97,8 +83,8 @@ class DiseaseManagementViewModel @Inject constructor(
 
             is DiseaseManagementEvent.EnteredAgeSpecificity -> {
                 _state.update{
-                    _state.value.copy(
-                        disease = _state.value.disease.copy(
+                    it.copy(
+                        disease = it.disease.copy(
                             ageSpecificity = fromAgeSpecificityDisplayName(event.value)
                         )
                     )
@@ -119,13 +105,13 @@ class DiseaseManagementViewModel @Inject constructor(
                 viewModelScope.launch(dispatcher + errorHandler) {
                     try {
                         _state.update{
-                            _state.value.copy(isLoading = true)
+                            it.copy(isLoading = true)
                         }
 
                         useCases.addDisease(_state.value.disease)
 
                         _state.update{
-                            _state.value.copy(isLoading = false,
+                            it.copy(isLoading = false,
                                 disease = Disease(
                                     name = "",
                                     sexSpecificity = SexSpecificity.ALL,
@@ -133,26 +119,18 @@ class DiseaseManagementViewModel @Inject constructor(
                                 )
                             )
                         }
-                        // _eventFlow.emit(UiEvent.SaveUser) // I emit it into the screen then
-                        // in the screen we handle it and we go back to the list
 
-                    } catch (e: Exception) {
+                    } catch (_: Exception) {
                         _state.update{
-                            _state.value.copy(
+                            it.copy(
                                 isLoading = false
                             )
                         }
-                        _eventFlow.emit(
-                            UiEvent.showSnackbar(
-                                message = "Error adding disease " + e.message
-                            )
-                        )
                     }
                 }
             }
         }
     }
-
 
     fun getDiseases() {
         getDiseasesJob?.cancel()
@@ -163,28 +141,43 @@ class DiseaseManagementViewModel @Inject constructor(
             result.collect { resource ->
                 when (resource) {
                     is Resource.Loading -> {
-                        _state.value = _state.value.copy(
-                            isLoading = true
-                        )
+                        _state.update {
+                            it.copy(
+                                isLoading = true
+                            )
+                        }
                     }
 
                     is Resource.Success -> {
-                        _state.value = _state.value.copy(
-                            diseases = resource.data ?: emptyList(),
-                            isLoading = false
-                        )
+                        _state.update {
+                            it.copy(
+                                diseases = resource.data,
+                                isLoading = false
+                            )
+                        }
                     }
 
                     is Resource.Error -> {
-                        _state.value = _state.value.copy(
-                            error = resource.message,
-                        )
+                        _state.update {
+                            it.copy(
+                                error = resource.message,
+                                isLoading = false
+                            )
+                        }
+                    }
+
+                    is Resource.NotFound -> {
+                        _state.update {
+                            it.copy(
+                                diseases = emptyList(),
+                                isLoading = false
+                            )
+                        }
                     }
                 }
             }
         }
     }
-
 }
 
 

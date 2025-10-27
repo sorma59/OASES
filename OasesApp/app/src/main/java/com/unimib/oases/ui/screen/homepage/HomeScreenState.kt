@@ -6,6 +6,6 @@ data class HomeScreenState(
     val patients: List<Patient> = emptyList(),
 
     val isLoading: Boolean = false,
-    val errorMessage: String? = null,
+    val error: String? = null,
     val toastMessage: String? = null
 )

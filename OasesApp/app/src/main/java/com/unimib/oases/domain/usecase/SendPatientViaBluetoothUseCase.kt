@@ -5,6 +5,7 @@ import com.unimib.oases.bluetooth.BluetoothCustomManager
 import com.unimib.oases.bluetooth.BluetoothEnvelope
 import com.unimib.oases.bluetooth.BluetoothEnvelopeType
 import com.unimib.oases.data.mapper.serializer.PatientFullDataSerializer
+import com.unimib.oases.util.Outcome
 import com.unimib.oases.util.Resource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -16,7 +17,7 @@ class SendPatientViaBluetoothUseCase @Inject constructor(
     private val bluetoothManager: BluetoothCustomManager,
     private val retrievePatientFullDataUseCase: RetrievePatientFullDataUseCase
 ) {
-    suspend operator fun invoke(patientId: String, device: BluetoothDevice): Resource<Unit> {
+    suspend operator fun invoke(patientId: String, device: BluetoothDevice): Outcome {
         return try {
             var enabled = false
             withContext(Dispatchers.IO){
@@ -33,10 +34,13 @@ class SendPatientViaBluetoothUseCase @Inject constructor(
 
                             val patientFullDataResource = retrievePatientFullDataUseCase(patientId)
 
+
+                            if (patientFullDataResource is Resource.NotFound)
+                                throw Exception(patientFullDataResource.message)
                             if (patientFullDataResource is Resource.Error)
                                 throw Exception(patientFullDataResource.message)
 
-                            val patientFullData = (patientFullDataResource as Resource.Success).data!!
+                            val patientFullData = (patientFullDataResource as Resource.Success).data
 
                             // Serialize the patient data
                             val bytes = PatientFullDataSerializer.serialize(patientFullData)
@@ -55,21 +59,21 @@ class SendPatientViaBluetoothUseCase @Inject constructor(
 
                             // Make sure the patient data is sent and received
                             delay(1000)
-                            Resource.Success(Unit)
+                            Outcome.Success
                         } else
-                            Resource.Error("Could not connect to device")
+                            Outcome.Error("Could not connect to device")
 
                     } catch (e: Exception) {
-                        Resource.Error(e.message ?: "An error occurred")
+                        Outcome.Error(e.message ?: "An error occurred")
                     } finally {
                         // Disconnect from the device
                         bluetoothManager.closeConnectionSocket()
                     }
                 } else
-                    Resource.Error("Bluetooth is not enabled")
+                    Outcome.Error("Bluetooth is not enabled")
             }
         } catch (e: Exception) {
-            Resource.Error(e.message ?: "An error occurred")
+            Outcome.Error(e.message ?: "An error occurred")
         }
     }
 }

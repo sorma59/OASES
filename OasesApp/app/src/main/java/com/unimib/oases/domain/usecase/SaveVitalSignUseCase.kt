@@ -2,7 +2,7 @@ package com.unimib.oases.domain.usecase
 
 import com.unimib.oases.domain.model.VitalSign
 import com.unimib.oases.domain.repository.VitalSignRepository
-import com.unimib.oases.util.Resource
+import com.unimib.oases.util.Outcome
 import javax.inject.Inject
 
 class SaveVitalSignUseCase @Inject constructor(
@@ -24,10 +24,10 @@ class SaveVitalSignUseCase @Inject constructor(
         }
 
         return when (repo.addVitalSign(VitalSign(name, acronym, unit))){
-            is Resource.Error -> {
+            is Outcome.Error -> {
                 SaveVitalSignUseCaseResult.RepositoryFailure
             }
-            is Resource.Success -> {
+            is Outcome.Success -> {
                 SaveVitalSignUseCaseResult.Success
             }
             else -> {

@@ -49,6 +49,7 @@ import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.VitalSignsEvent
 import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.VitalSignsState
 import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.toVisitVitalSigns
 import com.unimib.oases.util.DateTimeFormatter
+import com.unimib.oases.util.Outcome
 import com.unimib.oases.util.Resource
 import com.unimib.oases.util.debounce
 import com.unimib.oases.util.firstNullableSuccess
@@ -96,9 +97,15 @@ class RegistrationScreenViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ): ViewModel() {
 
-    private val _state = MutableStateFlow(RegistrationState(
-        patientId = savedStateHandle["patientId"]!!
-    ))
+    val receivedId: String? = savedStateHandle["patientId"]
+
+    private val _state = MutableStateFlow(
+        receivedId?.let {
+            RegistrationState(
+                patientId = it
+            )
+        } ?: RegistrationState()
+    )
     val state: StateFlow<RegistrationState> = _state.asStateFlow()
 
     val tabs = state.value.tabs
@@ -110,7 +117,6 @@ class RegistrationScreenViewModel @Inject constructor(
     val validationEvents = validationEventsChannel.receiveAsFlow()
 
     private var errorHandler = CoroutineExceptionHandler { _, e ->
-        Log.e("Prova", "errorHandler")
         e.printStackTrace()
         _state.update{
             _state.value.copy(
@@ -120,18 +126,29 @@ class RegistrationScreenViewModel @Inject constructor(
     }
 
     private val patientErrorHandler = CoroutineExceptionHandler { _, e ->
-        Log.e("Prova", "patientErrorHandler")
         e.printStackTrace()
-        updatePatientInfoState {
-            it.copy(
-                error = e.message,
-                isLoading = false
-            )
+        when (e) {
+            is NoSuchElementException -> {
+                updatePatientInfoState {
+                    it.copy(
+                        isNew = true,
+                        isLoading = false,
+                        error = null
+                    )
+                }
+            }
+            else -> {
+                updatePatientInfoState {
+                    it.copy(
+                        error = e.message,
+                        isLoading = false
+                    )
+                }
+            }
         }
     }
 
     private val visitErrorHandler = CoroutineExceptionHandler { _, e ->
-        Log.e("Prova", "visitErrorHandler")
         e.printStackTrace()
         updateVisitHistoryState {
             it.copy(
@@ -142,7 +159,6 @@ class RegistrationScreenViewModel @Inject constructor(
     }
 
     private val vitalSignsErrorHandler = CoroutineExceptionHandler { _, e ->
-        Log.e("Prova", "vitalSignsErrorHandler")
         e.printStackTrace()
         updateVitalSignsState {
             it.copy(
@@ -153,7 +169,6 @@ class RegistrationScreenViewModel @Inject constructor(
     }
 
     private val roomsErrorHandler = CoroutineExceptionHandler { _, e ->
-        Log.e("Prova", "roomsErrorHandler")
         e.printStackTrace()
         updateRoomState {
             it.copy(
@@ -174,7 +189,6 @@ class RegistrationScreenViewModel @Inject constructor(
     }
 
     private val malnutritionErrorHandler = CoroutineExceptionHandler { _, e ->
-        Log.e("Prova", "malnutritionErrorHandler")
         e.printStackTrace()
         updateMalnutritionScreeningState {
             it.copy(
@@ -227,9 +241,11 @@ class RegistrationScreenViewModel @Inject constructor(
                     error = null
                 )
             }
+
             val patient = patientUseCase
                 .getPatient(_state.value.patientId)
                 .firstSuccess()
+
             updatePatientInfoState {
                 it.copy(
                     patient = patient,
@@ -284,7 +300,7 @@ class RegistrationScreenViewModel @Inject constructor(
         }
         try {
             val result = insertPatientLocallyUseCase(_state.value.patientInfoState.patient)
-            if (result is Resource.Error)
+            if (result is Outcome.Error)
                 throw Exception(result.message)
         }
         catch (e: Exception){
@@ -310,11 +326,11 @@ class RegistrationScreenViewModel @Inject constructor(
             is VitalSignsEvent.ValueChanged -> {
                 updateVitalSignsState {
                     it.copy(
-                        vitalSigns = it.vitalSigns.map {
-                            if (it.name == event.vitalSign) {
-                                it.copy(value = event.value)
+                        vitalSigns = it.vitalSigns.map { vitalSign ->
+                            if (vitalSign.name == event.vitalSign) {
+                                vitalSign.copy(value = event.value)
                             } else {
-                                it
+                                vitalSign
                             }
                         }
                     )
@@ -336,7 +352,9 @@ class RegistrationScreenViewModel @Inject constructor(
     }
 
     private suspend fun loadVitalSigns() {
-        val vitalSigns = vitalSignsUseCases.getVitalSigns().firstSuccess()
+        val vitalSigns = vitalSignsUseCases
+            .getVitalSigns()
+            .firstSuccess()
         val newStates = vitalSigns.map { vitalSign -> // More efficient mapping
             PatientVitalSignState(vitalSign.name, vitalSign.acronym, vitalSign.unit)
         }
@@ -358,7 +376,9 @@ class RegistrationScreenViewModel @Inject constructor(
     }
 
     private suspend fun loadRooms(){
-        val rooms = roomUseCase.getRooms().firstSuccess()
+        val rooms = roomUseCase
+            .getRooms()
+            .firstSuccess()
         updateRoomState {
             it.copy(
                 rooms = rooms, // Set the list, don't append if it's initial load
@@ -447,7 +467,9 @@ class RegistrationScreenViewModel @Inject constructor(
     }
 
     private suspend fun loadTriageEvaluation(visitId: String){
-        val triageEvaluation = triageEvaluationRepository.getTriageEvaluation(visitId).firstSuccess()
+        val triageEvaluation = triageEvaluationRepository
+            .getTriageEvaluation(visitId)
+            .firstSuccess()
         updateTriageState {
             it.copy(
                 selectedReds = triageEvaluation.redSymptomIds.toSet(),
@@ -477,7 +499,7 @@ class RegistrationScreenViewModel @Inject constructor(
 
         patientUseCase.getPatientVisits(patientId).collect { visits ->
             if (visits is Resource.Success)
-                updateVisitHistoryState { it.copy(visits = visits.data ?: emptyList(), isLoading = false) }
+                updateVisitHistoryState { it.copy(visits = visits.data, isLoading = false) }
             else if (visits is Resource.Error)
                 updateVisitHistoryState { it.copy(error = visits.message, isLoading = false) }
         }
@@ -634,7 +656,7 @@ class RegistrationScreenViewModel @Inject constructor(
                 visitVitalSignsUseCase.addVisitVitalSign(it)
             }
 
-            patientUseCase.updateStatus(patient, PatientStatus.WAITING_FOR_VISIT.displayValue, triageCode.toString(), assignedRoom.toString())
+            patientUseCase.updateStatus(patient, PatientStatus.WAITING_FOR_VISIT.displayValue, triageCode.toString(), assignedRoom)
 
             if (state.value.triageState.loaded)
                 triageEvaluationRepository.insertTriageEvaluation(_state.value.triageState.mapToTriageEvaluation(visit.id))
@@ -642,8 +664,8 @@ class RegistrationScreenViewModel @Inject constructor(
             val screening = _state.value.malnutritionScreeningState.toMalnutritionScreeningOrNull(visit.id)
             if (screening != null) {
                 val result = malnutritionScreeningRepository.insertMalnutritionScreening(screening)
-                if (result is Resource.Error)
-                    Log.e("RegistrationScreenViewModel", result.message.toString())
+                if (result is Outcome.Error)
+                    Log.e("RegistrationScreenViewModel", result.message)
             }
         }
     }
@@ -657,7 +679,7 @@ class RegistrationScreenViewModel @Inject constructor(
             updateTriageState { it.copy(toastMessage = "This field is computed") }
         else {
             updateTriageState {
-                if (it.triageConfig?.redOptions?.any { it.symptom.symptom.id == fieldId } == true){
+                if (it.triageConfig?.redOptions?.any { option -> option.id == fieldId } == true){
                     it.copy(
                         selectedReds = it.selectedReds.toggle(fieldId)
                     )
