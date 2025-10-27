@@ -14,6 +14,9 @@ interface ComplaintSummaryDao {
     @Upsert
     suspend fun insert(complaintSummary: ComplaintSummaryEntity)
 
+    @Upsert
+    suspend fun insertAll(complaintSummaries: List<ComplaintSummaryEntity>)
+
     @Delete
     suspend fun delete(complaintSummary: ComplaintSummaryEntity)
 

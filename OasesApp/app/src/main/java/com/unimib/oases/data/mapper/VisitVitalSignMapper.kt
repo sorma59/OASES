@@ -20,3 +20,7 @@ fun VisitVitalSignEntity.toDomain(): VisitVitalSign {
         value = value
     )
 }
+
+fun List<VisitVitalSign>.toEntities(): List<VisitVitalSignEntity> {
+    return map { it.toEntity() }
+}

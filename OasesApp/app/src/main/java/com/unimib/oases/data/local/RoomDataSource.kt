@@ -190,8 +190,12 @@ class RoomDataSource @Inject constructor(
 
     // ----------------Visits Vital Signs----------------
 
-    suspend fun insertVisitVitalSigns(visitVitalSign: VisitVitalSignEntity) {
+    suspend fun insertVisitVitalSign(visitVitalSign: VisitVitalSignEntity) {
         visitVitalSignDao.insert(visitVitalSign)
+    }
+
+    suspend fun insertVisitVitalSigns(visitVitalSigns: List<VisitVitalSignEntity>) {
+        visitVitalSignDao.insertAll(visitVitalSigns)
     }
 
     fun getVisitVitalSigns(visitId: String): Flow<List<VisitVitalSignEntity>> {
@@ -223,6 +227,10 @@ class RoomDataSource @Inject constructor(
     // Complaint summaries --------------------------
     suspend fun insertComplaintSummary(complaintSummary: ComplaintSummaryEntity) {
         complaintSummaryDao.insert(complaintSummary)
+    }
+
+    suspend fun insertComplaintSummaries(complaintSummaries: List<ComplaintSummaryEntity>) {
+        complaintSummaryDao.insertAll(complaintSummaries)
     }
 
     suspend fun deleteComplaintSummary(complaintSummary: ComplaintSummaryEntity) {

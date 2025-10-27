@@ -29,3 +29,7 @@ fun ComplaintSummaryEntity.toDomain(): ComplaintSummary {
         additionalTests = additionalTests,
     )
 }
+
+fun List<ComplaintSummary>.toEntities(): List<ComplaintSummaryEntity> {
+    return this.map { it.toEntity() }
+}

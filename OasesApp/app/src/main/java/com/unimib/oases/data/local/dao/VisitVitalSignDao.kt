@@ -14,6 +14,8 @@ interface VisitVitalSignDao {
     @Upsert
     suspend fun insert(visitVitalSings: VisitVitalSignEntity)
 
+    @Upsert
+    suspend fun insertAll(visitVitalSigns: List<VisitVitalSignEntity>)
     @Delete
     suspend fun delete(visitVitalSign: VisitVitalSignEntity)
 

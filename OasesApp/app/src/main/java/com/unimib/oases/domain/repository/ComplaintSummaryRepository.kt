@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface ComplaintSummaryRepository {
     suspend fun addComplaintSummary(complaintSummary: ComplaintSummary): Outcome
+    suspend fun addComplaintSummaries(complaintSummaries: List<ComplaintSummary>): Outcome
     suspend fun deleteComplaintSummary(complaintSummary: ComplaintSummary): Outcome
     fun getVisitComplaintsSummaries(visitId: String): Flow<Resource<List<ComplaintSummary>>>
     fun getComplaintSummary(visitId: String, complaintId: String): Flow<Resource<ComplaintSummary>>

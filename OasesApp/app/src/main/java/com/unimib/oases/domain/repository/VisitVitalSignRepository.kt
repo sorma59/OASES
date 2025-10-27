@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface VisitVitalSignRepository {
     suspend fun addVisitVitalSign(visitVitalSign: VisitVitalSign): Outcome
+    suspend fun addVisitVitalSigns(visitVitalSigns: List<VisitVitalSign>): Outcome
     fun getVisitVitalSigns(visitId: String): Flow<Resource<List<VisitVitalSign>>>
     fun getVisitLatestVitalSigns(visitId: String): Flow<Resource<List<VisitVitalSign>>>
 }

@@ -42,16 +42,14 @@ class HandleReceivedPatientUseCase @Inject constructor(
             }
 
             // Add the patient diseases to the db
-            patientFullData.patientDiseases.forEach {
-                if (patientDiseaseRepository.addPatientDisease(it) is Outcome.Error)
-                    throw Exception("Failed to insert patient disease $it")
-            }
+            if (patientDiseaseRepository.addPatientDiseases(patientFullData.patientDiseases) is Outcome.Error)
+                throw Exception("Failed to insert patient diseases for patient ${patientFullData.patientDetails.name}")
+
 
             // Add the visit vital signs to the db
-            patientFullData.vitalSigns.forEach {
-                if (visitVitalSignRepository.addVisitVitalSign(it) is Outcome.Error)
-                    throw Exception("Failed to insert visit vital sign $it")
-            }
+            if (visitVitalSignRepository.addVisitVitalSigns(patientFullData.vitalSigns) is Outcome.Error)
+                throw Exception("Failed to insert visit vital signs to visit")
+
 
             patientFullData.triageEvaluation?.let {
                 // Add the triage evaluation to the db
@@ -66,10 +64,9 @@ class HandleReceivedPatientUseCase @Inject constructor(
             }
 
             // Add the complaint summaries to the db
-            patientFullData.complaintsSummaries.forEach {
-                if (complaintSummaryRepository.addComplaintSummary(it) is Outcome.Error)
-                    throw Exception("Failed to insert complaint summary $it")
-            }
+            if (complaintSummaryRepository.addComplaintSummaries(patientFullData.complaintsSummaries) is Outcome.Error)
+                throw Exception("Failed to insert complaint summaries")
+
             BluetoothPatientHandlingResult.PatientReceived(patientFullData.patientDetails)
         } catch (e: Exception) {
             Log.e("PatientWithTriageDataInsertUseCase", "Failed to insert patient full data", e)
