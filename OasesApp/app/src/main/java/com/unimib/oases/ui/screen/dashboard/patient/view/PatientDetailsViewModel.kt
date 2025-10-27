@@ -7,6 +7,7 @@ import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.domain.usecase.GetCurrentVisitMainComplaintUseCase
 import com.unimib.oases.domain.usecase.GetCurrentVisitUseCase
+import com.unimib.oases.domain.usecase.GetPatientChronicDiseasesUseCase
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.util.Resource
 import com.unimib.oases.util.firstNullableSuccess
@@ -28,6 +29,7 @@ class PatientDetailsViewModel @Inject constructor(
     private val patientRepository: PatientRepository,
     private val getCurrentVisitUseCase: GetCurrentVisitUseCase,
     private val getCurrentVisitMainComplaintUseCase: GetCurrentVisitMainComplaintUseCase,
+    private val getPatientChronicDiseasesUseCase: GetPatientChronicDiseasesUseCase,
     savedStateHandle: SavedStateHandle,
     @IoDispatcher private val dispatcher: CoroutineDispatcher
 ): ViewModel() {
@@ -57,10 +59,22 @@ class PatientDetailsViewModel @Inject constructor(
         _state.update { it.copy(isLoading = true, currentVisitRelatedError = null, demographicsError = null) }
         viewModelScope.launch(dispatcher + errorHandler) {
             getPatientDemographics()
+            getPastMedicalHistory()
             getCurrentVisit()
             getComplaintsSummaries()
         }
         _state.update { it.copy(isLoading = false) }
+    }
+
+    private suspend fun getPastMedicalHistory() {
+        try {
+            val patientDiseases = getPatientChronicDiseasesUseCase(
+                _state.value.patientId
+            )
+            _state.update { it.copy(chronicDiseases = patientDiseases) }
+        } catch (e: Exception) {
+            _state.update { it.copy(currentVisitRelatedError = e.message) }
+        }
     }
 
     private suspend fun getComplaintsSummaries() {

@@ -4,7 +4,6 @@ import android.util.Log
 import com.unimib.oases.domain.model.PatientFullData
 import com.unimib.oases.domain.repository.ComplaintSummaryRepository
 import com.unimib.oases.domain.repository.MalnutritionScreeningRepository
-import com.unimib.oases.domain.repository.PatientDiseaseRepository
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.domain.repository.TriageEvaluationRepository
 import com.unimib.oases.domain.repository.VisitVitalSignRepository
@@ -19,8 +18,8 @@ import javax.inject.Inject
 
 class RetrievePatientFullDataUseCase @Inject constructor(
     private val getCurrentVisitUseCase: GetCurrentVisitUseCase,
+    private val getPatientChronicDiseasesUseCase: GetPatientChronicDiseasesUseCase,
     private val patientRepository: PatientRepository,
-    private val patientDiseaseRepository: PatientDiseaseRepository,
     private val visitVitalSignRepository: VisitVitalSignRepository,
     private val triageEvaluationRepository: TriageEvaluationRepository,
     private val malnutritionScreeningRepository: MalnutritionScreeningRepository,
@@ -48,9 +47,7 @@ class RetrievePatientFullDataUseCase @Inject constructor(
 
                     // Patient's PMH
                     val patientDiseasesDeferred = async {
-                        patientDiseaseRepository
-                            .getPatientDiseases(patientId)
-                            .firstSuccess()
+                        getPatientChronicDiseasesUseCase(patientId)
                     }
 
                     val visit = visitDeferred.await()

@@ -4,13 +4,12 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unimib.oases.di.IoDispatcher
-import com.unimib.oases.domain.repository.PatientDiseaseRepository
 import com.unimib.oases.domain.usecase.DiseaseUseCase
+import com.unimib.oases.domain.usecase.GetPatientChronicDiseasesUseCase
 import com.unimib.oases.domain.usecase.SavePastMedicalHistoryUseCase
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.util.Outcome
 import com.unimib.oases.util.Resource
-import com.unimib.oases.util.firstSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -27,7 +26,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PastHistoryViewModel @Inject constructor(
     private val diseaseUseCases: DiseaseUseCase,
-    private val patientDiseaseRepository: PatientDiseaseRepository,
+    private val getPatientChronicDiseasesUseCase: GetPatientChronicDiseasesUseCase,
     private val savePastMedicalHistoryUseCase: SavePastMedicalHistoryUseCase,
     savedStateHandle: SavedStateHandle,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -104,9 +103,7 @@ class PastHistoryViewModel @Inject constructor(
         val patientId = _state.value.receivedId
 
         try {
-            val patientDiseases = patientDiseaseRepository
-                .getPatientDiseases(patientId)
-                .firstSuccess()
+            val patientDiseases = getPatientChronicDiseasesUseCase(patientId)
             val dbMap = patientDiseases.associateBy { it.diseaseName }
 
             _state.update { currentState ->

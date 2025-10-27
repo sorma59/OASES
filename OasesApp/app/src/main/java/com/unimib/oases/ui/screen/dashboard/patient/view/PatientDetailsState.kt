@@ -2,6 +2,7 @@ package com.unimib.oases.ui.screen.dashboard.patient.view
 
 import com.unimib.oases.domain.model.ComplaintSummary
 import com.unimib.oases.domain.model.Patient
+import com.unimib.oases.domain.model.PatientDisease
 import com.unimib.oases.domain.model.Visit
 
 data class PatientDetailsState(
@@ -11,6 +12,8 @@ data class PatientDetailsState(
     val currentVisit: Visit? = null,
 
     val mainComplaintsSummaries: List<ComplaintSummary> = emptyList(),
+
+    val chronicDiseases: List<PatientDisease> = emptyList(),
 
     val isLoading: Boolean = false,
     val currentVisitRelatedError: String? = null,
