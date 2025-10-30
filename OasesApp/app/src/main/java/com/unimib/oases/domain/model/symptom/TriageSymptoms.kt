@@ -65,39 +65,44 @@ enum class SymptomTriageCode {
     RED, YELLOW
 }
 
-fun redForAll(category: PatientCategory) = SymptomTriageCode.RED
+val redForAll = { _: PatientCategory -> SymptomTriageCode.RED }
 
-fun yellowForAll(category: PatientCategory) = SymptomTriageCode.YELLOW
+val yellowForAll = { _: PatientCategory -> SymptomTriageCode.YELLOW }
 
-fun yellowForAdultRedForKid(category: PatientCategory) =
+val yellowForAdultRedForKid = { category: PatientCategory ->
     when (category) {
         PatientCategory.PEDIATRIC -> SymptomTriageCode.RED
         PatientCategory.ADULT -> SymptomTriageCode.YELLOW
     }
+}
 
-fun redForAdultNullForKid(category: PatientCategory) =
+val redForAdultNullForKid = { category: PatientCategory ->
     when (category) {
         PatientCategory.PEDIATRIC -> null
         PatientCategory.ADULT -> SymptomTriageCode.RED
     }
+}
 
-fun yellowForAdultNullForKid(category: PatientCategory) =
+val yellowForAdultNullForKid = { category: PatientCategory ->
     when (category) {
         PatientCategory.PEDIATRIC -> null
         PatientCategory.ADULT -> SymptomTriageCode.YELLOW
     }
+}
 
-fun nullForAdultYellowForKid(category: PatientCategory) =
+val nullForAdultYellowForKid = { category: PatientCategory ->
     when (category) {
         PatientCategory.PEDIATRIC -> SymptomTriageCode.YELLOW
         PatientCategory.ADULT -> null
     }
+}
 
-fun nullForAdultRedForKid(category: PatientCategory) =
+val nullForAdultRedForKid = { category: PatientCategory ->
     when (category) {
         PatientCategory.PEDIATRIC -> SymptomTriageCode.RED
         PatientCategory.ADULT -> null
     }
+}
 
 val triageSymptoms = TriageSymptom.entries.associateBy { it.symptom.id }
 
@@ -110,257 +115,257 @@ enum class TriageSymptom(
 ) {
     UNCONSCIOUSNESS(
         Unconsciousness,
-        ::redForAll
+        redForAll
     ),
     CONVULSIONS(
         Convulsions,
-        ::redForAll,
+        redForAll,
     ),
     RESPIRATORY_DISTRESS(
         RespiratoryDistress,
-        ::redForAll,
+        redForAll,
     ),
     SHOCK(
         Shock,
-        ::redForAll,
+        redForAll,
     ),
     HEAVY_ACTIVE_BLEEDING(
         HeavyBleeding,
-        ::redForAll
+        redForAll
     ),
 //    SEVERE_DEHYDRATION(
 //        SevereDehydration,
-//        ::nullForAdultRedForKid
+//        nullForAdultRedForKid
 //    ),
     HIGH_RISK_TRAUMA(
         HighRiskTrauma,
-        ::redForAll
+        redForAll
     ),
     MAJOR_BURNS(
         MajorBurns,
-        ::redForAll
+        redForAll
     ),
     THREATENED_LIMB(
         ThreatenedLimb,
-        ::redForAll
+        redForAll
     ),
     POISONING_INTOXICATION(
         PoisoningIntoxication,
-        ::redForAll
+        redForAll
     ),
     ACUTE_TESTICULAR_OR_SCROTAL_PAIN_OR_PRIAPISM(
         AcuteTesticularOrScrotalPainOrPriapism,
-        ::yellowForAdultRedForKid
+        yellowForAdultRedForKid
     ),
     SNAKE_BITE(
         SnakeBite,
-        ::redForAll
+        redForAll
     ),
     AGGRESSIVE_BEHAVIOR(
         AggressiveBehavior,
-        ::redForAdultNullForKid
+        redForAdultNullForKid
     ),
     YOUNGER_THAN_EIGHT_DAYS(
         YoungerThanEightDays,
-        ::nullForAdultRedForKid
+        nullForAdultRedForKid
     ),
     PRETERM_AND_UNDER_ONE_MONTH(
         PretermAndUnderOneMonth,
-        ::nullForAdultRedForKid
+        nullForAdultRedForKid
     ),
 //    YOUNGER_THAN_TWO_MONTHS_AND_LOW_OR_HIGH_TEMPERATURE(
 //        YoungerThanTwoMonthsAndLowOrHighTemperature,
-//        ::nullForAdultRedForKid,
+//        nullForAdultRedForKid,
 //        isComputed = true
 //    ),
     PREGNANCY(
         CurrentPregnancy,
-        ::redForAdultNullForKid,
+        redForAdultNullForKid,
         isParent = true
     ),
     PREGNANCY_HIGH_BP(
         PregnancyWithHighBloodPressure,
-        ::redForAdultNullForKid,
+        redForAdultNullForKid,
         parent = PREGNANCY,
         isComputed = true
     ),
     PREGNANCY_WITH_HEAVY_BLEEDING(
         PregnancyWithHeavyBleeding,
-        ::redForAdultNullForKid,
+        redForAdultNullForKid,
         parent = PREGNANCY
     ),
     PREGNANCY_WITH_SEVERE_ABDOMINAL_PAIN(
         PregnancyWithSevereAbdominalPain,
-        ::redForAdultNullForKid,
+        redForAdultNullForKid,
         parent = PREGNANCY
     ),
     PREGNANCY_WITH_SEIZURES(
         PregnancyWithSeizures,
-        ::redForAdultNullForKid,
+        redForAdultNullForKid,
         parent = PREGNANCY
     ),
     PREGNANCY_WITH_ALTERED_MENTAL_STATUS(
         PregnancyWithAlteredMentalStatus,
-        ::redForAdultNullForKid,
+        redForAdultNullForKid,
         parent = PREGNANCY
     ),
     PREGNANCY_WITH_SEVERE_HEADACHE(
         PregnancyWithSevereHeadache,
-        ::redForAdultNullForKid,
+        redForAdultNullForKid,
         parent = PREGNANCY
     ),
     PREGNANCY_WITH_VISUAL_CHANGES(
         PregnancyWithVisualChanges,
-        ::redForAdultNullForKid,
+        redForAdultNullForKid,
         parent = PREGNANCY
     ),
     PREGNANCY_WITH_TRAUMA(
         PregnancyWithTrauma,
-        ::redForAdultNullForKid,
+        redForAdultNullForKid,
         parent = PREGNANCY
     ),
     PREGNANCY_WITH_ACTIVE_LABOR(
         PregnancyWithActiveLabor,
-        ::redForAdultNullForKid,
+        redForAdultNullForKid,
         parent = PREGNANCY
     ),
     AIRWAY_SWELLING_OR_MASS_OF_MOUTH_OR_THROAT_OR_NECK(
         AirwaySwellingOrMassOfMouthOrThroatOrNeck,
-        ::yellowForAll
+        yellowForAll
     ),
     WHEEZING(
         Wheezing,
-        ::yellowForAll
+        yellowForAll
     ),
     ACTIVE_BLEEDING(
         NonHeavyBleeding,
-        ::yellowForAll
+        yellowForAll
     ),
     SEVERE_PALLOR(
         SeverePallor,
-        ::yellowForAll
+        yellowForAll
     ),
     ONGOING_SEVERE_VOMITING_OR_ONGOING_SEVERE_DIARRHEA(
         OngoingSevereVomitingOrOngoingSevereDiarrhea,
-        ::yellowForAll
+        yellowForAll
     ),
     MODERATE_DEHYDRATION(
         ModerateDehydration,
-        ::nullForAdultYellowForKid
+        nullForAdultYellowForKid
     ),
     UNABLE_TO_FEED_OR_DRINK(
         UnableToFeedOrDrink,
-        ::yellowForAll
+        yellowForAll
     ),
     RECENT_FAINTING(
         RecentFainting,
-        ::yellowForAll
+        yellowForAll
     ),
     LETHARGY_OR_CONFUSION_OR_AGITATION(
         LethargyOrConfusionOrAgitation,
-        ::yellowForAdultNullForKid
+        yellowForAdultNullForKid
     ),
     LETHARGY_OR_RESTLESS_OR_IRRITABLE_OR_CONFUSED(
         LethargyOrRestlessOrIrritableOrConfused,
-        ::nullForAdultYellowForKid
+        nullForAdultYellowForKid
     ),
     FOCAL_NEUROLOGIC_DEFICIT_OR_FOCAL_VISUAL_DEFICIT(
         FocalNeurologicDeficitOrFocalVisualDeficit,
-        ::yellowForAll
+        yellowForAll
     ),
     HEADACHE_WITH_STIFF_NECK(
         HeadacheWithStiffNeck,
-        ::yellowForAll
+        yellowForAll
     ),
     SEVERE_PAIN(
         SeverePain,
-        ::yellowForAll
+        yellowForAll
     ),
     UNABLE_TO_PASS_URINE(
         UnableToPassUrine,
-        ::yellowForAll
+        yellowForAll
     ),
     ACUTE_LIMB_DEFORMITY_OR_OPEN_FRACTURE(
         AcuteLimbDeformityOrOpenFracture,
-        ::yellowForAll
+        yellowForAll
     ),
     OTHER_TRAUMA(
         NonHighRiskTrauma,
-        ::yellowForAll
+        yellowForAll
     ),
     OTHER_BURNS(
         NonMajorBurns,
-        ::yellowForAll
+        yellowForAll
     ),
     SEXUAL_ASSAULT(
         SexualAssault,
-        ::yellowForAll
+        yellowForAll
     ),
     ANIMAL_BITE_OR_NEEDLESTICK_PUNCTURE(
         AnimalBiteOrNeedlestickPuncture,
-        ::yellowForAll
+        yellowForAll
     ),
     SEVERE_VISIBLE_MALNUTRITION(
         SevereMalnutrition,
-        ::nullForAdultYellowForKid
+        nullForAdultYellowForKid
     ),
     YOUNGER_THAN_SIX_MONTHS(
         YoungerThanSixMonths,
-        ::nullForAdultYellowForKid,
+        nullForAdultYellowForKid,
         isComputed = true
     ),
     OTHER_PREGNANCY_RELATED_COMPLAINTS(
         NonHighRiskPregnancyRelatedComplaints,
-        ::yellowForAdultNullForKid
+        yellowForAdultNullForKid
     ),
     AGE_OVER_EIGHTY_YEARS(
         AgeOverEightyYears,
-        ::yellowForAdultNullForKid,
+        yellowForAdultNullForKid,
         isComputed = true
     ),
     LOW_SPO2(
         LowSpo2,
-        ::yellowForAll,
+        yellowForAll,
         isComputed = true
     ),
     LOW_RR(
         LowRr,
-        ::yellowForAll,
+        yellowForAll,
         isComputed = true
     ),
     HIGH_RR(
         HighRr,
-        ::yellowForAll,
+        yellowForAll,
         isComputed = true
     ),
     LOW_TEMP(
         LowTemp,
-        ::yellowForAll,
+        yellowForAll,
         isComputed = true
     ),
     HIGH_TEMP(
         HighTemp,
-        ::yellowForAll,
+        yellowForAll,
         isComputed = true
     ),
     LOW_HR(
         LowHr,
-        ::yellowForAll,
+        yellowForAll,
         isComputed = true
     ),
     HIGH_HR(
         HighHr,
-        ::yellowForAll,
+        yellowForAll,
         isComputed = true
     ),
     LOW_SBP(
         LowSbp,
-        ::yellowForAdultNullForKid,
+        yellowForAdultNullForKid,
         isComputed = true
     ),
     HIGH_SBP(
         HighSbp,
-        ::yellowForAdultNullForKid,
+        yellowForAdultNullForKid,
         isComputed = true
     );
 
