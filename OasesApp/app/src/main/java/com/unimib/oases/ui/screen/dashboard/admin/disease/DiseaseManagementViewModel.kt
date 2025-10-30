@@ -43,6 +43,10 @@ class DiseaseManagementViewModel @Inject constructor(
         }
     }
 
+    init {
+        getDiseases()
+    }
+
     fun onEvent(event: DiseaseManagementEvent) {
         when (event) {
             is DiseaseManagementEvent.Click -> {
@@ -56,7 +60,6 @@ class DiseaseManagementViewModel @Inject constructor(
             is DiseaseManagementEvent.Delete -> {
                 viewModelScope.launch(dispatcher + errorHandler) {
                     useCases.deleteDisease(event.value)
-                    getDiseases()
                     undoDisease = event.value
                 }
             }
@@ -95,7 +98,6 @@ class DiseaseManagementViewModel @Inject constructor(
                 viewModelScope.launch(dispatcher + errorHandler) {
                     useCases.addDisease(undoDisease ?: return@launch)
                     undoDisease = null
-                    getDiseases()
                 }
             }
 

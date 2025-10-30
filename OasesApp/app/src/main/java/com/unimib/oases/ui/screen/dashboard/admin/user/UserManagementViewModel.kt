@@ -41,6 +41,10 @@ class UserManagementViewModel @Inject constructor(
         }
     }
 
+    init {
+        getUsers()
+    }
+
     fun onEvent(event: UserManagementEvent) {
         when (event) {
             is UserManagementEvent.UserClicked -> {
@@ -54,7 +58,6 @@ class UserManagementViewModel @Inject constructor(
             is UserManagementEvent.Delete -> {
                 viewModelScope.launch(dispatcher + errorHandler) {
                     useCases.deleteUser(event.value)
-                    getUsers()
                     undoUser = event.value
                 }
             }
@@ -85,7 +88,6 @@ class UserManagementViewModel @Inject constructor(
                 viewModelScope.launch(dispatcher + errorHandler) {
                     useCases.createUser(undoUser ?: return@launch)
                     undoUser = null
-                    getUsers()
                 }
             }
 

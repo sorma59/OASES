@@ -54,12 +54,20 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun UserManagementScreen(
-    userManagementViewModel: UserManagementViewModel = hiltViewModel(),
-) {
+fun UserManagementScreen() {
+
+    val userManagementViewModel: UserManagementViewModel = hiltViewModel()
 
     val state by userManagementViewModel.state.collectAsState()
 
+    UserManagementContent(state, userManagementViewModel)
+}
+
+@Composable
+private fun UserManagementContent(
+    state: UserManagementState,
+    userManagementViewModel: UserManagementViewModel
+) {
     val context = LocalContext.current
 
     val snackbarHostState =
@@ -75,10 +83,6 @@ fun UserManagementScreen(
     val dismissDeletionDialog = {
         showDeletionDialog = false
         userToDelete = null
-    }
-
-    LaunchedEffect(key1 = true) {
-        userManagementViewModel.getUsers()
     }
 
     LaunchedEffect(key1 = state.toastMessage) {
@@ -111,14 +115,20 @@ fun UserManagementScreen(
 
             OutlinedTextField(
                 value = state.user.username,
-                onValueChange = { userManagementViewModel.onEvent(UserManagementEvent.EnteredUsername(it)) },
+                onValueChange = {
+                    userManagementViewModel.onEvent(
+                        UserManagementEvent.EnteredUsername(
+                            it
+                        )
+                    )
+                },
                 label = { Text("Username") },
                 singleLine = true,
                 isError = state.usernameError != null,
                 modifier = Modifier.fillMaxWidth()
             )
 
-            if (state.usernameError != null){
+            if (state.usernameError != null) {
                 Text(
                     text = state.usernameError!!,
                     color = MaterialTheme.colorScheme.error
@@ -129,7 +139,13 @@ fun UserManagementScreen(
 
             OutlinedTextField(
                 value = state.user.pwHash,
-                onValueChange = { userManagementViewModel.onEvent(UserManagementEvent.EnteredPassword(it)) },
+                onValueChange = {
+                    userManagementViewModel.onEvent(
+                        UserManagementEvent.EnteredPassword(
+                            it
+                        )
+                    )
+                },
                 label = { Text("Password") },
                 singleLine = true,
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -144,7 +160,7 @@ fun UserManagementScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            if (state.passwordError != null){
+            if (state.passwordError != null) {
                 Text(
                     text = state.passwordError!!,
                     color = MaterialTheme.colorScheme.error
@@ -179,7 +195,13 @@ fun UserManagementScreen(
                 ) {
                     RadioButton(
                         selected = (roleOption == state.user.role),
-                        onClick = { userManagementViewModel.onEvent(UserManagementEvent.SelectedRole(roleOption)) }
+                        onClick = {
+                            userManagementViewModel.onEvent(
+                                UserManagementEvent.SelectedRole(
+                                    roleOption
+                                )
+                            )
+                        }
                     )
                     Text(
                         text = roleOption.displayName,
@@ -240,7 +262,11 @@ fun UserManagementScreen(
                                     showDeletionDialog = true
                                 },
                                 onClick = {
-                                    userManagementViewModel.onEvent(UserManagementEvent.UserClicked(user))
+                                    userManagementViewModel.onEvent(
+                                        UserManagementEvent.UserClicked(
+                                            user
+                                        )
+                                    )
                                 }
                             )
                         }
@@ -250,7 +276,7 @@ fun UserManagementScreen(
         }
     }
 
-    if (showDeletionDialog){
+    if (showDeletionDialog) {
         AlertDialog(
             onDismissRequest = dismissDeletionDialog,
             title = { "Delete User" },

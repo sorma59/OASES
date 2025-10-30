@@ -50,12 +50,19 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun VitalSignManagementScreen(
-    vitalSignsManagementViewModel: VitalSignManagementViewModel = hiltViewModel(),
-) {
+fun VitalSignManagementScreen() {
+    val vitalSignsManagementViewModel: VitalSignManagementViewModel = hiltViewModel()
 
     val state by vitalSignsManagementViewModel.state.collectAsState()
 
+    VitalSignManagementContent(vitalSignsManagementViewModel, state)
+}
+
+@Composable
+private fun VitalSignManagementContent(
+    vitalSignsManagementViewModel: VitalSignManagementViewModel,
+    state: VitalSignManagementState
+) {
     val snackbarHostState =
         remember { SnackbarHostState() } // for hosting snackbars, if I delete a item I get a snackbar to undo the item
 
@@ -72,13 +79,9 @@ fun VitalSignManagementScreen(
         vitalSignToDelete = null
     }
 
-    LaunchedEffect(key1 = true) {
-        vitalSignsManagementViewModel.getVitalSigns()
-    }
-
     LaunchedEffect(key1 = state.toastMessage) {
         if (state.toastMessage != null) {
-            ToastUtils.showToast(context, state.toastMessage!!)
+            ToastUtils.showToast(context, state.toastMessage)
             vitalSignsManagementViewModel.onEvent(
                 VitalSignManagementEvent.ToastShown
             )
@@ -107,7 +110,13 @@ fun VitalSignManagementScreen(
 
             OutlinedTextField(
                 value = state.vitalSign.name,
-                onValueChange = { vitalSignsManagementViewModel.onEvent(VitalSignManagementEvent.EnteredVitalSignName(it)) },
+                onValueChange = {
+                    vitalSignsManagementViewModel.onEvent(
+                        VitalSignManagementEvent.EnteredVitalSignName(
+                            it
+                        )
+                    )
+                },
                 label = { Text("Name") },
                 placeholder = { Text("e.g. Systolic Blood Pressure, ...") },
                 singleLine = true,
@@ -115,16 +124,22 @@ fun VitalSignManagementScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            if (state.nameError != null){
+            if (state.nameError != null) {
                 Text(
-                    text = state.nameError!!,
+                    text = state.nameError,
                     color = MaterialTheme.colorScheme.error
                 )
             }
 
             OutlinedTextField(
                 value = state.vitalSign.acronym,
-                onValueChange = { vitalSignsManagementViewModel.onEvent(VitalSignManagementEvent.EnteredVitalSignAcronym(it)) },
+                onValueChange = {
+                    vitalSignsManagementViewModel.onEvent(
+                        VitalSignManagementEvent.EnteredVitalSignAcronym(
+                            it
+                        )
+                    )
+                },
                 label = { Text("Acronym") },
                 placeholder = { Text("e.g. SBP, SpO2, ...") },
                 singleLine = true,
@@ -132,9 +147,9 @@ fun VitalSignManagementScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            if (state.acronymError != null){
+            if (state.acronymError != null) {
                 Text(
-                    text = state.acronymError!!,
+                    text = state.acronymError,
                     color = MaterialTheme.colorScheme.error
                 )
             }
@@ -153,9 +168,9 @@ fun VitalSignManagementScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            if (state.unitError != null){
+            if (state.unitError != null) {
                 Text(
-                    text = state.unitError!!,
+                    text = state.unitError,
                     color = MaterialTheme.colorScheme.error
                 )
             }
@@ -182,7 +197,13 @@ fun VitalSignManagementScreen(
                 ) {
                     RadioButton(
                         selected = (precisionOption.displayName == state.vitalSign.precision),
-                        onClick = { vitalSignsManagementViewModel.onEvent(VitalSignManagementEvent.SelectedPrecision(precisionOption.displayName)) }
+                        onClick = {
+                            vitalSignsManagementViewModel.onEvent(
+                                VitalSignManagementEvent.SelectedPrecision(
+                                    precisionOption.displayName
+                                )
+                            )
+                        }
                     )
                     Text(
                         text = precisionOption.displayName + examples,
@@ -233,14 +254,18 @@ fun VitalSignManagementScreen(
                     ) {
                         items(state.vitalSigns.size) { i ->
                             val vitalSign = state.vitalSigns[i]
-                            VitalSignListItem (
+                            VitalSignListItem(
                                 vitalSign = vitalSign,
                                 onDelete = {
                                     vitalSignToDelete = vitalSign
                                     showDeletionDialog = true
                                 },
                                 onClick = {
-                                    vitalSignsManagementViewModel.onEvent(VitalSignManagementEvent.Click(vitalSign))
+                                    vitalSignsManagementViewModel.onEvent(
+                                        VitalSignManagementEvent.Click(
+                                            vitalSign
+                                        )
+                                    )
                                 }
                             )
                         }
@@ -250,7 +275,7 @@ fun VitalSignManagementScreen(
         }
     }
 
-    if (showDeletionDialog){
+    if (showDeletionDialog) {
         AlertDialog(
             onDismissRequest = dismissDeletionDialog,
             title = { "Delete Vital Sign" },
@@ -258,7 +283,11 @@ fun VitalSignManagementScreen(
             confirmButton = {
                 DeleteButton(
                     onDelete = {
-                        vitalSignsManagementViewModel.onEvent(VitalSignManagementEvent.Delete(vitalSignToDelete!!))
+                        vitalSignsManagementViewModel.onEvent(
+                            VitalSignManagementEvent.Delete(
+                                vitalSignToDelete!!
+                            )
+                        )
                         scope.launch {
                             val undo = snackbarHostState.showSnackbar(
                                 message = "Deleted vital sign ${vitalSignToDelete?.name ?: ""}",

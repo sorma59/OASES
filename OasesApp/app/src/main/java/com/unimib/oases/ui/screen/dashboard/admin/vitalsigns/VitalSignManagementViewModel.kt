@@ -41,6 +41,10 @@ class VitalSignManagementViewModel @Inject constructor(
         }
     }
 
+    init {
+        getVitalSigns()
+    }
+
     fun onEvent(event: VitalSignManagementEvent) {
         when (event) {
             is VitalSignManagementEvent.Click -> {
@@ -54,7 +58,6 @@ class VitalSignManagementViewModel @Inject constructor(
             is VitalSignManagementEvent.Delete -> {
                 viewModelScope.launch(dispatcher + errorHandler) {
                     useCases.deleteVitalSign(event.value)
-                    getVitalSigns()
                     undoVitalSign = event.value
                 }
             }
@@ -106,7 +109,6 @@ class VitalSignManagementViewModel @Inject constructor(
                 viewModelScope.launch(dispatcher + errorHandler) {
                     useCases.addVitalSign(undoVitalSign ?: return@launch)
                     undoVitalSign = null
-                    getVitalSigns()
                 }
             }
 

@@ -26,7 +26,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,16 +45,23 @@ import com.unimib.oases.ui.components.util.button.DismissButton
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 import kotlinx.coroutines.launch
 
-
 @Composable
-fun DiseaseManagementScreen(
-    diseaseManagementViewModel: DiseaseManagementViewModel = hiltViewModel(),
-) {
+fun DiseaseManagementScreen() {
+
+    val diseaseManagementViewModel: DiseaseManagementViewModel = hiltViewModel()
 
     val state by diseaseManagementViewModel.state.collectAsState()
 
+    DiseaseManagementContent(state, diseaseManagementViewModel)
+}
+
+@Composable
+private fun DiseaseManagementContent(
+    state: DiseaseManagementState,
+    diseaseManagementViewModel: DiseaseManagementViewModel
+) {
     val snackbarHostState =
-        remember { SnackbarHostState() } // for hosting snackbars, if I delete a intem I get a snackbar to undo the item
+        remember { SnackbarHostState() } // for hosting snackbars, if I delete a item I get a snackbar to undo the item
 
     val scope = rememberCoroutineScope()
 
@@ -66,10 +72,6 @@ fun DiseaseManagementScreen(
     val dismissDeletionDialog = {
         showDeletionDialog = false
         diseaseToDelete = null
-    }
-
-    LaunchedEffect(key1 = true) {
-        diseaseManagementViewModel.getDiseases()
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -94,7 +96,13 @@ fun DiseaseManagementScreen(
 
             OutlinedTextField(
                 value = state.disease.name,
-                onValueChange = { diseaseManagementViewModel.onEvent(DiseaseManagementEvent.EnteredDiseaseName(it)) },
+                onValueChange = {
+                    diseaseManagementViewModel.onEvent(
+                        DiseaseManagementEvent.EnteredDiseaseName(
+                            it
+                        )
+                    )
+                },
                 label = { Text("Disease") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
@@ -102,16 +110,28 @@ fun DiseaseManagementScreen(
 
             OutlinedDropdown(
                 selected = state.disease.sexSpecificity.displayName,
-                onSelected = { diseaseManagementViewModel.onEvent(DiseaseManagementEvent.EnteredSexSpecificity(it)) },
-                options = SexSpecificity.entries.map {it.displayName},
+                onSelected = {
+                    diseaseManagementViewModel.onEvent(
+                        DiseaseManagementEvent.EnteredSexSpecificity(
+                            it
+                        )
+                    )
+                },
+                options = SexSpecificity.entries.map { it.displayName },
                 labelText = "Sex specificity",
                 modifier = Modifier.fillMaxWidth()
             )
 
             OutlinedDropdown(
                 selected = state.disease.ageSpecificity.displayName,
-                onSelected = { diseaseManagementViewModel.onEvent(DiseaseManagementEvent.EnteredAgeSpecificity(it)) },
-                options = AgeSpecificity.entries.map {it.displayName},
+                onSelected = {
+                    diseaseManagementViewModel.onEvent(
+                        DiseaseManagementEvent.EnteredAgeSpecificity(
+                            it
+                        )
+                    )
+                },
+                options = AgeSpecificity.entries.map { it.displayName },
                 labelText = "Age specificity",
                 modifier = Modifier.fillMaxWidth()
             )
@@ -121,14 +141,7 @@ fun DiseaseManagementScreen(
 
             Button(
                 onClick = {
-
-//                        if (state.disease.username.isBlank() || state.dise.pwHash.isBlank()) {
-//                            state.error = "Username and password cannot be empty!"
-//                            return@Button
-//                        }
-
                     diseaseManagementViewModel.onEvent(DiseaseManagementEvent.SaveDisease)
-
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -173,14 +186,18 @@ fun DiseaseManagementScreen(
                     ) {
                         items(state.diseases.size) { i ->
                             val disease = state.diseases[i]
-                            DiseaseListItem (
+                            DiseaseListItem(
                                 disease = disease,
                                 onDelete = {
                                     diseaseToDelete = disease
                                     showDeletionDialog = true
                                 },
                                 onClick = {
-                                    diseaseManagementViewModel.onEvent(DiseaseManagementEvent.Click(disease))
+                                    diseaseManagementViewModel.onEvent(
+                                        DiseaseManagementEvent.Click(
+                                            disease
+                                        )
+                                    )
                                 }
                             )
                         }
@@ -190,7 +207,7 @@ fun DiseaseManagementScreen(
         }
     }
 
-    if (showDeletionDialog){
+    if (showDeletionDialog) {
         AlertDialog(
             onDismissRequest = dismissDeletionDialog,
             title = { "Delete Disease" },
@@ -198,7 +215,11 @@ fun DiseaseManagementScreen(
             confirmButton = {
                 DeleteButton(
                     onDelete = {
-                        diseaseManagementViewModel.onEvent(DiseaseManagementEvent.Delete(diseaseToDelete!!))
+                        diseaseManagementViewModel.onEvent(
+                            DiseaseManagementEvent.Delete(
+                                diseaseToDelete!!
+                            )
+                        )
                         scope.launch {
                             val undo = snackbarHostState.showSnackbar(
                                 message = "Deleted disease ${diseaseToDelete?.name ?: ""}",

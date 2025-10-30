@@ -38,6 +38,10 @@ class RoomsManagementViewModel @Inject constructor(
         }
     }
 
+    init {
+        getRooms()
+    }
+
     fun onEvent(event: RoomsManagementEvent) {
         when (event) {
             is RoomsManagementEvent.Click -> {
@@ -51,7 +55,7 @@ class RoomsManagementViewModel @Inject constructor(
             is RoomsManagementEvent.Delete -> {
                 viewModelScope.launch(dispatcher + errorHandler) {
                     useCases.deleteRoom(event.value)
-                    getRooms()
+
                     undoRoom = event.value
                 }
             }
@@ -70,7 +74,6 @@ class RoomsManagementViewModel @Inject constructor(
                 viewModelScope.launch(dispatcher + errorHandler) {
                     useCases.addRoom(undoRoom ?: return@launch)
                     undoRoom = null
-                    getRooms()
                 }
             }
 

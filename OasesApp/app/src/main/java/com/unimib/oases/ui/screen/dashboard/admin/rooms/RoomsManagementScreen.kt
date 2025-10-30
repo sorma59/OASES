@@ -26,7 +26,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,10 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.unimib.oases.domain.model.AgeSpecificity
 import com.unimib.oases.domain.model.Room
-import com.unimib.oases.domain.model.SexSpecificity
-import com.unimib.oases.ui.components.util.OutlinedDropdown
 import com.unimib.oases.ui.components.util.button.DeleteButton
 import com.unimib.oases.ui.components.util.button.DismissButton
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
@@ -48,12 +44,20 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun RoomsManagementScreen(
-    roomManagementViewModel: RoomsManagementViewModel = hiltViewModel(),
-) {
+fun RoomsManagementScreen() {
+
+    val roomManagementViewModel: RoomsManagementViewModel = hiltViewModel()
 
     val state by roomManagementViewModel.state.collectAsState()
 
+    RoomsManagementContent(state, roomManagementViewModel)
+}
+
+@Composable
+private fun RoomsManagementContent(
+    state: RoomManagementState,
+    roomManagementViewModel: RoomsManagementViewModel
+) {
     val snackbarHostState =
         remember { SnackbarHostState() } // for hosting snackbars, if I delete a intem I get a snackbar to undo the item
 
@@ -66,10 +70,6 @@ fun RoomsManagementScreen(
     val dismissDeletionDialog = {
         showDeletionDialog = false
         roomToDelete = null
-    }
-
-    LaunchedEffect(key1 = true) {
-        roomManagementViewModel.getRooms()
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -94,7 +94,13 @@ fun RoomsManagementScreen(
 
             OutlinedTextField(
                 value = state.room.name,
-                onValueChange = { roomManagementViewModel.onEvent(RoomsManagementEvent.EnteredRoomName(it)) },
+                onValueChange = {
+                    roomManagementViewModel.onEvent(
+                        RoomsManagementEvent.EnteredRoomName(
+                            it
+                        )
+                    )
+                },
                 label = { Text("Room") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
@@ -157,7 +163,7 @@ fun RoomsManagementScreen(
                     ) {
                         items(state.rooms.size) { i ->
                             val room = state.rooms[i]
-                            RoomListItem (
+                            RoomListItem(
                                 room = room,
                                 onDelete = {
                                     roomToDelete = room
@@ -174,7 +180,7 @@ fun RoomsManagementScreen(
         }
     }
 
-    if (showDeletionDialog){
+    if (showDeletionDialog) {
         AlertDialog(
             onDismissRequest = dismissDeletionDialog,
             title = { "Delete Room" },
