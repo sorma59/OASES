@@ -83,7 +83,7 @@ fun OasesDrawer(
                 drawerContainerColor = MaterialTheme.colorScheme.secondaryContainer,
             ) {
 
-                UserRow(currentUser, authViewModel)
+                UserRow(currentUser, authViewModel::signOut)
 
                 HorizontalDivider(
                     color = MaterialTheme.colorScheme.onSecondaryContainer,
@@ -98,7 +98,7 @@ fun OasesDrawer(
 }
 
 @Composable
-private fun UserRow(currentUser: User?, authViewModel: AuthViewModel) {
+private fun UserRow(currentUser: User?, onSignOut: () -> Unit) {
     Row(
         modifier = Modifier
             .background(Color.Transparent)
@@ -140,7 +140,7 @@ private fun UserRow(currentUser: User?, authViewModel: AuthViewModel) {
         }
 
         IconButton(
-            onClick = authViewModel::signOut
+            onClick = onSignOut
         ){
             Icon(
                 imageVector = Icons.AutoMirrored.Default.Logout,

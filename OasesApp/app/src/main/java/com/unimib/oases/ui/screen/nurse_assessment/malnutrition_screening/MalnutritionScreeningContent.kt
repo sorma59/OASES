@@ -21,7 +21,7 @@ import com.unimib.oases.ui.components.util.button.RetryButton
 import java.util.Locale
 
 @Composable
-fun MalnutritionScreeningScreen(
+fun MalnutritionScreeningContent(
     state: MalnutritionScreeningState,
     onEvent: (MalnutritionScreeningEvent) -> Unit
 ){

@@ -52,13 +52,13 @@ fun DiseaseManagementScreen() {
 
     val state by diseaseManagementViewModel.state.collectAsState()
 
-    DiseaseManagementContent(state, diseaseManagementViewModel)
+    DiseaseManagementContent(state, diseaseManagementViewModel::onEvent)
 }
 
 @Composable
 private fun DiseaseManagementContent(
     state: DiseaseManagementState,
-    diseaseManagementViewModel: DiseaseManagementViewModel
+    onEvent: (DiseaseManagementEvent) -> Unit
 ) {
     val snackbarHostState =
         remember { SnackbarHostState() } // for hosting snackbars, if I delete a item I get a snackbar to undo the item
@@ -97,7 +97,7 @@ private fun DiseaseManagementContent(
             OutlinedTextField(
                 value = state.disease.name,
                 onValueChange = {
-                    diseaseManagementViewModel.onEvent(
+                    onEvent(
                         DiseaseManagementEvent.EnteredDiseaseName(
                             it
                         )
@@ -111,7 +111,7 @@ private fun DiseaseManagementContent(
             OutlinedDropdown(
                 selected = state.disease.sexSpecificity.displayName,
                 onSelected = {
-                    diseaseManagementViewModel.onEvent(
+                    onEvent(
                         DiseaseManagementEvent.EnteredSexSpecificity(
                             it
                         )
@@ -125,7 +125,7 @@ private fun DiseaseManagementContent(
             OutlinedDropdown(
                 selected = state.disease.ageSpecificity.displayName,
                 onSelected = {
-                    diseaseManagementViewModel.onEvent(
+                    onEvent(
                         DiseaseManagementEvent.EnteredAgeSpecificity(
                             it
                         )
@@ -141,7 +141,7 @@ private fun DiseaseManagementContent(
 
             Button(
                 onClick = {
-                    diseaseManagementViewModel.onEvent(DiseaseManagementEvent.SaveDisease)
+                    onEvent(DiseaseManagementEvent.SaveDisease)
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -193,7 +193,7 @@ private fun DiseaseManagementContent(
                                     showDeletionDialog = true
                                 },
                                 onClick = {
-                                    diseaseManagementViewModel.onEvent(
+                                    onEvent(
                                         DiseaseManagementEvent.Click(
                                             disease
                                         )
@@ -215,7 +215,7 @@ private fun DiseaseManagementContent(
             confirmButton = {
                 DeleteButton(
                     onDelete = {
-                        diseaseManagementViewModel.onEvent(
+                        onEvent(
                             DiseaseManagementEvent.Delete(
                                 diseaseToDelete!!
                             )
@@ -226,7 +226,7 @@ private fun DiseaseManagementContent(
                                 actionLabel = "UNDO"
                             )
                             if (undo == SnackbarResult.ActionPerformed) {
-                                diseaseManagementViewModel.onEvent(DiseaseManagementEvent.UndoDelete)
+                                onEvent(DiseaseManagementEvent.UndoDelete)
                             }
                         }
                         dismissDeletionDialog()

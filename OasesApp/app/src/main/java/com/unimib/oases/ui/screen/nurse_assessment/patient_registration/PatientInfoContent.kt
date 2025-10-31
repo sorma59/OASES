@@ -27,7 +27,7 @@ import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircu
 import com.unimib.oases.util.reactToKeyboardAppearance
 
 @Composable
-fun PatientInfoScreen(
+fun PatientInfoContent(
     state: PatientInfoState,
     onEvent: (PatientInfoEvent) -> Unit
 ) {

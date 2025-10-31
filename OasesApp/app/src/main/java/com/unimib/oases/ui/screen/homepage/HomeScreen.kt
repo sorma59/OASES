@@ -34,17 +34,40 @@ import com.unimib.oases.ui.screen.login.AuthViewModel
 import com.unimib.oases.ui.screen.root.AppViewModel
 import com.unimib.oases.ui.util.ToastUtils
 
-
 @Composable
 fun HomeScreen(
     authViewModel: AuthViewModel,
     appViewModel: AppViewModel,
-    homeScreenViewModel: HomeScreenViewModel = hiltViewModel()
 ) {
+
+    val homeScreenViewModel: HomeScreenViewModel = hiltViewModel()
+
+    val state by homeScreenViewModel.state.collectAsState()
 
     val context = LocalContext.current
 
-    val state by homeScreenViewModel.state.collectAsState()
+    LaunchedEffect(Unit) {
+        homeScreenViewModel.navigationEvents.collect {
+            appViewModel.onNavEvent(it)
+        }
+    }
+
+    LaunchedEffect(state.toastMessage) {
+        state.toastMessage?.let { message ->
+            ToastUtils.showToast(context, message)
+        }
+        homeScreenViewModel.onToastMessageShown()
+    }
+
+    HomeContent(state, homeScreenViewModel::onEvent, authViewModel)
+}
+
+@Composable
+private fun HomeContent(
+    state: HomeScreenState,
+    onEvent: (HomeScreenEvent) -> Unit,
+    authViewModel: AuthViewModel
+) {
 
     var searchText by remember { mutableStateOf("") }
     var active by remember { mutableStateOf(false) }
@@ -60,7 +83,7 @@ fun HomeScreen(
     }
 
     val onPatientItemClick = { patientId: String ->
-        homeScreenViewModel.onEvent(HomeScreenEvent.PatientItemClicked(patientId))
+        onEvent(HomeScreenEvent.PatientItemClicked(patientId))
     }
 
     val userRole by authViewModel.userRole.collectAsState()
@@ -71,21 +94,6 @@ fun HomeScreen(
         item.publicId.contains(searchText, ignoreCase = true) || // Public id
         item.name.contains(searchText, ignoreCase = true)        // Name
     }
-
-    LaunchedEffect(Unit) {
-        homeScreenViewModel.navigationEvents.collect{
-            appViewModel.onNavEvent(it)
-        }
-    }
-
-    LaunchedEffect(state.toastMessage) {
-        state.toastMessage?.let { message ->
-            ToastUtils.showToast(context, message)
-        }
-        homeScreenViewModel.onToastMessageShown()
-    }
-
-
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -126,23 +134,22 @@ fun HomeScreen(
                         )
                     }
                 }
-                if(state.isLoading){
+                if (state.isLoading) {
                     CustomCircularProgressIndicator()
-                }
-                else if (state.patients.isNotEmpty()) {
+                } else if (state.patients.isNotEmpty()) {
                     PatientList(
                         patients = filteredItems,
                         onItemClick = onPatientItemClick
                     )
                 }
-                if (state.error != null){
-                    Text(state.error!!)
+                state.error?.let {
+                    Text(text = it)
                 }
 
             }
             if (shouldShowAddPatientButton) { //TODO(Refactor this?)
                 FloatingActionButton(
-                    onClick = { homeScreenViewModel.onEvent(HomeScreenEvent.AddButtonClicked) },
+                    onClick = { onEvent(HomeScreenEvent.AddButtonClicked) },
                     modifier = Modifier.padding(30.dp),
                     containerColor = MaterialTheme.colorScheme.primary
                 ) {

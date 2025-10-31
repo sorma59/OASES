@@ -45,7 +45,7 @@ import com.unimib.oases.ui.util.ToastUtils
 import kotlinx.coroutines.launch
 
 @Composable
-fun RedCodeScreen(
+fun RedCodeContent(
     state: TriageState,
     onEvent: (TriageEvent) -> Unit,
 ) {

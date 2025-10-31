@@ -40,11 +40,19 @@ fun MedicalVisitScreen(
 
     val state by viewModel.state.collectAsState()
 
+    MedicalVisitContent(state, appViewModel)
+}
+
+@Composable
+private fun MedicalVisitContent(
+    state: MedicalVisitState,
+    appViewModel: AppViewModel
+) {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
-    ){
+    ) {
         Spacer(Modifier.height(64.dp))
 
         HorizontalDivider()

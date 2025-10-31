@@ -54,38 +54,9 @@ fun MainComplaintScreen(
 
     val state by viewModel.state.collectAsState()
 
-    val scrollState = rememberScrollState()
-
-    val context = LocalContext.current
-
     val additionalTestsText by viewModel.additionalTestsText.collectAsState()
 
-    val onAdditionalTestsChanged: (String) -> Unit = {
-        viewModel.onEvent(
-            MainComplaintEvent.AdditionalTestsTextChanged(it)
-        )
-    }
-
-    val onCheckedChange: (LabelledTest) -> Unit = {
-        viewModel.onEvent(
-            MainComplaintEvent.TestSelected(it)
-        )
-    }
-
-    val isChecked: (LabelledTest) -> Boolean = { state.requestedTests.contains(it) }
-
-    val onGenerateTestsPressed: () -> Unit = {
-        viewModel.onEvent(MainComplaintEvent.GenerateTestsPressed)
-    }
-
-    val shouldShowGenerateTestsButton by remember {
-        derivedStateOf {
-            state.detailsQuestions.isNotEmpty()
-            && state.detailsQuestionsToShow == state.detailsQuestions.size
-        }
-    }
-
-    val onSubmit = { viewModel.onEvent(MainComplaintEvent.SubmitPressed) }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.navigationEvents.collect {
@@ -100,19 +71,54 @@ fun MainComplaintScreen(
         viewModel.onEvent(MainComplaintEvent.ToastShown)
     }
 
-    state.error?.let{
+    MainComplaintContent(state, { additionalTestsText }, viewModel::onEvent)
+}
+
+@Composable
+private fun MainComplaintContent(
+    state: MainComplaintState,
+    additionalTestsText: () -> String,
+    onEvent: (MainComplaintEvent) -> Unit
+) {
+    val scrollState = rememberScrollState()
+
+    val onAdditionalTestsChanged: (String) -> Unit = {
+        onEvent(
+            MainComplaintEvent.AdditionalTestsTextChanged(it)
+        )
+    }
+
+    val onCheckedChange: (LabelledTest) -> Unit = {
+        onEvent(
+            MainComplaintEvent.TestSelected(it)
+        )
+    }
+
+    val isChecked: (LabelledTest) -> Boolean = { state.requestedTests.contains(it) }
+
+    val onGenerateTestsPressed: () -> Unit = {
+        onEvent(MainComplaintEvent.GenerateTestsPressed)
+    }
+
+    val shouldShowGenerateTestsButton by remember {
+        derivedStateOf {
+            state.detailsQuestions.isNotEmpty()
+                    && state.detailsQuestionsToShow == state.detailsQuestions.size
+        }
+    }
+
+    val onSubmit = { onEvent(MainComplaintEvent.SubmitPressed) }
+
+    state.error?.let {
         Box(
-            Modifier
-                .fillMaxSize()
-        ){
+            Modifier.fillMaxSize()
+        ) {
             RetryButton(
                 error = it,
-                onClick = { viewModel.onEvent(MainComplaintEvent.RetryButtonClicked) }
+                onClick = { onEvent(MainComplaintEvent.RetryButtonClicked) }
             )
         }
-    } ?:
-
-    if (state.isLoading)
+    } ?: if (state.isLoading)
         CustomCircularProgressIndicator()
     else
         Column(
@@ -121,15 +127,15 @@ fun MainComplaintScreen(
                 .padding(24.dp)
                 .verticalScroll(scrollState),
             verticalArrangement = Arrangement.spacedBy(24.dp)
-        ){
+        ) {
 
             TitleText("Ask these questions:")
 
-            ImmediateTreatmentQuestions(state, viewModel)
+            ImmediateTreatmentQuestions(state, onEvent)
 
             DetailsQuestions(
                 state,
-                viewModel::onEvent
+                onEvent
             )
 
             GenerateTestsButton(
@@ -138,7 +144,6 @@ fun MainComplaintScreen(
             )
 
             state.complaint?.let {
-
                 Tests(
                     state,
                     isChecked,
@@ -225,7 +230,7 @@ private fun Tests(
     state: MainComplaintState,
     isChecked: (LabelledTest) -> Boolean,
     onCheckedChange: (LabelledTest) -> Unit,
-    additionalTestsText: String,
+    additionalTestsText: () -> String,
     onAdditionalTestsChanged: (String) -> Unit
 ) {
     Column(
@@ -254,14 +259,14 @@ private fun Tests(
 
 @Composable
 private fun AdditionalTests(
-    text: String,
+    text: () -> String,
     onValueChange: (String) -> Unit
 ) {
     Column{
         TitleText("Additional tests", fontSize = 18)
 
         OutlinedTextField(
-            value = text,
+            value = text(),
             onValueChange = onValueChange,
             label = { Text("Write here any additional test you have ordered") },
             minLines = 3,
@@ -313,7 +318,7 @@ private fun DetailsQuestions(
 @Composable
 private fun ImmediateTreatmentQuestions(
     state: MainComplaintState,
-    viewModel: MainComplaintViewModel,
+    onEvent: (MainComplaintEvent) -> Unit,
     readOnly: Boolean = false
 ) {
     state.complaint?.let {
@@ -333,7 +338,7 @@ private fun ImmediateTreatmentQuestions(
                             YesOrNoQuestion(
                                 question = node.value,
                                 onAnswer = {
-                                    viewModel.onEvent(MainComplaintEvent.NodeAnswered(it, node, algorithm))
+                                    onEvent(MainComplaintEvent.NodeAnswered(it, node, algorithm))
                                 },
                                 enabled = !readOnly,
                                 answer = answer

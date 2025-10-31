@@ -31,7 +31,7 @@ import com.unimib.oases.ui.components.util.button.RetryButton
 import com.unimib.oases.ui.util.ToastUtils
 
 @Composable
-fun YellowCodeScreen(
+fun YellowCodeContent(
     state: TriageState,
     onEvent: (TriageEvent) -> Unit,
 ) {

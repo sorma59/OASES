@@ -50,13 +50,13 @@ fun RoomsManagementScreen() {
 
     val state by roomManagementViewModel.state.collectAsState()
 
-    RoomsManagementContent(state, roomManagementViewModel)
+    RoomsManagementContent(state, roomManagementViewModel::onEvent)
 }
 
 @Composable
 private fun RoomsManagementContent(
     state: RoomManagementState,
-    roomManagementViewModel: RoomsManagementViewModel
+    onEvent: (RoomsManagementEvent) -> Unit
 ) {
     val snackbarHostState =
         remember { SnackbarHostState() } // for hosting snackbars, if I delete a intem I get a snackbar to undo the item
@@ -95,7 +95,7 @@ private fun RoomsManagementContent(
             OutlinedTextField(
                 value = state.room.name,
                 onValueChange = {
-                    roomManagementViewModel.onEvent(
+                    onEvent(
                         RoomsManagementEvent.EnteredRoomName(
                             it
                         )
@@ -117,7 +117,7 @@ private fun RoomsManagementContent(
 //                            return@Button
 //                        }
 
-                    roomManagementViewModel.onEvent(RoomsManagementEvent.SaveRoom)
+                    onEvent(RoomsManagementEvent.SaveRoom)
 
                 },
                 modifier = Modifier.fillMaxWidth()
@@ -170,7 +170,7 @@ private fun RoomsManagementContent(
                                     showDeletionDialog = true
                                 },
                                 onClick = {
-                                    roomManagementViewModel.onEvent(RoomsManagementEvent.Click(room))
+                                    onEvent(RoomsManagementEvent.Click(room))
                                 }
                             )
                         }
@@ -188,14 +188,14 @@ private fun RoomsManagementContent(
             confirmButton = {
                 DeleteButton(
                     onDelete = {
-                        roomManagementViewModel.onEvent(RoomsManagementEvent.Delete(roomToDelete!!))
+                        onEvent(RoomsManagementEvent.Delete(roomToDelete!!))
                         scope.launch {
                             val undo = snackbarHostState.showSnackbar(
                                 message = "Deleted room ${roomToDelete?.name ?: ""}",
                                 actionLabel = "UNDO"
                             )
                             if (undo == SnackbarResult.ActionPerformed) {
-                                roomManagementViewModel.onEvent(RoomsManagementEvent.UndoDelete)
+                                onEvent(RoomsManagementEvent.UndoDelete)
                             }
                         }
                         dismissDeletionDialog()

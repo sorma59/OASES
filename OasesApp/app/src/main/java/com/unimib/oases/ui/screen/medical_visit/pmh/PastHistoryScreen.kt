@@ -58,13 +58,22 @@ fun PastHistoryScreen(
         }
     }
 
+    PastHistoryContent(state, viewModel, readOnly)
+}
+
+@Composable
+private fun PastHistoryContent(
+    state: PastHistoryState,
+    viewModel: PastHistoryViewModel,
+    readOnly: Boolean
+) {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Bottom
-    ){
+    ) {
 
-        Box(Modifier.weight(1f)){
+        Box(Modifier.weight(1f)) {
             state.error?.let {
                 RetryButton(
                     error = it,

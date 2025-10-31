@@ -42,6 +42,9 @@ class HomeScreenViewModel @Inject constructor(
         }
     }
 
+    init {
+        getPatients()
+    }
 
     fun onEvent(event: HomeScreenEvent) {
         when (event) {
@@ -75,10 +78,6 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     // ----------------------Patients-------------------------------
-
-    init {
-        getPatients()
-    }
 
     fun getPatients() {
         getPatientsJob?.cancel()

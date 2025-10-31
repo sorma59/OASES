@@ -15,7 +15,7 @@ import com.unimib.oases.ui.components.util.button.RetryButton
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 
 @Composable
-fun VisitHistoryScreen(
+fun VisitHistoryContent(
     state: VisitHistoryState,
     onEvent: (VisitHistoryEvent) -> Unit,
 ) {

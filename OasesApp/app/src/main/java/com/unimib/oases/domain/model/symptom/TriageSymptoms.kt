@@ -104,8 +104,6 @@ val nullForAdultRedForKid = { category: PatientCategory ->
     }
 }
 
-val triageSymptoms = TriageSymptom.entries.associateBy { it.symptom.id }
-
 enum class TriageSymptom(
     val symptom: Symptom,
     val colorAssigner: (PatientCategory) -> SymptomTriageCode?,
@@ -370,6 +368,9 @@ enum class TriageSymptom(
     );
 
     companion object {
+
+        val triageSymptoms by lazy { TriageSymptom.entries.associateBy { it.symptom.id } }
+
         // Common
         const val SPO2_LOW = 90
         const val TEMP_LOW = 35.0

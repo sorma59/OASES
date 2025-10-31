@@ -10,7 +10,7 @@ import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.model.NumericPrecision
 import com.unimib.oases.domain.model.Room
 import com.unimib.oases.domain.model.Visit
-import com.unimib.oases.domain.model.symptom.triageSymptoms
+import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.triageSymptoms
 import com.unimib.oases.domain.model.toState
 import com.unimib.oases.domain.repository.MalnutritionScreeningRepository
 import com.unimib.oases.domain.repository.TriageEvaluationRepository

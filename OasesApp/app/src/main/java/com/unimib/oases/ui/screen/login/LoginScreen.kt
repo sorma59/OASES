@@ -23,6 +23,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -48,6 +49,15 @@ fun LoginScreen(
 
     val state = authViewModel.loginState.collectAsState()
 
+    LoginContent(state, modifier, authViewModel::authenticate)
+}
+
+@Composable
+private fun LoginContent(
+    state: State<AuthState>,
+    modifier: Modifier,
+    authenticate: (String, String) -> Unit
+) {
     var username by remember { mutableStateOf("") }
 
     var passwordVisible by remember { mutableStateOf(false) }
@@ -88,7 +98,7 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height(50.dp))
 
 
-        when(state.value){
+        when (state.value) {
 
             AuthState.Loading -> CustomCircularProgressIndicator()
 
@@ -133,7 +143,7 @@ fun LoginScreen(
 
                         Button(
                             onClick = {
-                                authViewModel.authenticate(username, password)
+                                authenticate(username, password)
                             },
                             shape = RoundedCornerShape(10.dp),
                             modifier = Modifier
@@ -150,5 +160,4 @@ fun LoginScreen(
             }
         }
     }
-
 }

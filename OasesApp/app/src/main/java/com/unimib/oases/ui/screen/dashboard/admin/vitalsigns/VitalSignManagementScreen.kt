@@ -55,13 +55,13 @@ fun VitalSignManagementScreen() {
 
     val state by vitalSignsManagementViewModel.state.collectAsState()
 
-    VitalSignManagementContent(vitalSignsManagementViewModel, state)
+    VitalSignManagementContent(state, vitalSignsManagementViewModel::onEvent)
 }
 
 @Composable
 private fun VitalSignManagementContent(
-    vitalSignsManagementViewModel: VitalSignManagementViewModel,
-    state: VitalSignManagementState
+    state: VitalSignManagementState,
+    onEvent: (VitalSignManagementEvent) -> Unit,
 ) {
     val snackbarHostState =
         remember { SnackbarHostState() } // for hosting snackbars, if I delete a item I get a snackbar to undo the item
@@ -82,7 +82,7 @@ private fun VitalSignManagementContent(
     LaunchedEffect(key1 = state.toastMessage) {
         if (state.toastMessage != null) {
             ToastUtils.showToast(context, state.toastMessage)
-            vitalSignsManagementViewModel.onEvent(
+            onEvent(
                 VitalSignManagementEvent.ToastShown
             )
         }
@@ -111,7 +111,7 @@ private fun VitalSignManagementContent(
             OutlinedTextField(
                 value = state.vitalSign.name,
                 onValueChange = {
-                    vitalSignsManagementViewModel.onEvent(
+                    onEvent(
                         VitalSignManagementEvent.EnteredVitalSignName(
                             it
                         )
@@ -134,7 +134,7 @@ private fun VitalSignManagementContent(
             OutlinedTextField(
                 value = state.vitalSign.acronym,
                 onValueChange = {
-                    vitalSignsManagementViewModel.onEvent(
+                    onEvent(
                         VitalSignManagementEvent.EnteredVitalSignAcronym(
                             it
                         )
@@ -157,7 +157,7 @@ private fun VitalSignManagementContent(
             OutlinedTextField(
                 value = state.vitalSign.unit,
                 onValueChange = {
-                    vitalSignsManagementViewModel.onEvent(
+                    onEvent(
                         VitalSignManagementEvent.EnteredVitalSignUnit(it)
                     )
                 },
@@ -188,7 +188,7 @@ private fun VitalSignManagementContent(
                         .selectable(
                             selected = (precisionOption.displayName == state.vitalSign.precision),
                             onClick = {
-                                vitalSignsManagementViewModel.onEvent(
+                                onEvent(
                                     VitalSignManagementEvent.SelectedPrecision(precisionOption.displayName)
                                 )
                             }
@@ -198,7 +198,7 @@ private fun VitalSignManagementContent(
                     RadioButton(
                         selected = (precisionOption.displayName == state.vitalSign.precision),
                         onClick = {
-                            vitalSignsManagementViewModel.onEvent(
+                            onEvent(
                                 VitalSignManagementEvent.SelectedPrecision(
                                     precisionOption.displayName
                                 )
@@ -217,7 +217,7 @@ private fun VitalSignManagementContent(
 
             Button(
                 onClick = {
-                    vitalSignsManagementViewModel.onEvent(VitalSignManagementEvent.SaveVitalSign)
+                    onEvent(VitalSignManagementEvent.SaveVitalSign)
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -261,7 +261,7 @@ private fun VitalSignManagementContent(
                                     showDeletionDialog = true
                                 },
                                 onClick = {
-                                    vitalSignsManagementViewModel.onEvent(
+                                    onEvent(
                                         VitalSignManagementEvent.Click(
                                             vitalSign
                                         )
@@ -283,7 +283,7 @@ private fun VitalSignManagementContent(
             confirmButton = {
                 DeleteButton(
                     onDelete = {
-                        vitalSignsManagementViewModel.onEvent(
+                        onEvent(
                             VitalSignManagementEvent.Delete(
                                 vitalSignToDelete!!
                             )
@@ -294,7 +294,7 @@ private fun VitalSignManagementContent(
                                 actionLabel = "UNDO"
                             )
                             if (undo == SnackbarResult.ActionPerformed) {
-                                vitalSignsManagementViewModel.onEvent(VitalSignManagementEvent.UndoDelete)
+                                onEvent(VitalSignManagementEvent.UndoDelete)
                             }
                         }
                         dismissDeletionDialog()

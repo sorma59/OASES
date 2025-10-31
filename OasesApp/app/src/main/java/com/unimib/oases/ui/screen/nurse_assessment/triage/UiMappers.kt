@@ -3,7 +3,7 @@ package com.unimib.oases.ui.screen.nurse_assessment.triage
 import com.unimib.oases.domain.model.TriageEvaluation
 import com.unimib.oases.domain.model.symptom.Pregnancy
 import com.unimib.oases.domain.model.symptom.TriageSymptom
-import com.unimib.oases.domain.model.symptom.triageSymptoms
+import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.triageSymptoms
 
 //fun TriageEvaluation.mapToTriageState(): TriageState{
 //    return TriageState(

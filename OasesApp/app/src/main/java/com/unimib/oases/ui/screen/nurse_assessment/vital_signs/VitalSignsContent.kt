@@ -22,7 +22,7 @@ import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircu
 import com.unimib.oases.util.reactToKeyboardAppearance
 
 @Composable
-fun VitalSignsScreen(
+fun VitalSignsContent(
     state: VitalSignsState,
     onEvent: (VitalSignsEvent) -> Unit,
     getPrecisionFor: (String) -> NumericPrecision?

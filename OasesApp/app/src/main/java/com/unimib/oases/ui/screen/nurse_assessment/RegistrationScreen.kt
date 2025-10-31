@@ -22,19 +22,31 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.unimib.oases.domain.model.NumericPrecision
 import com.unimib.oases.domain.model.symptom.PatientCategory
 import com.unimib.oases.ui.components.util.button.BottomButtons
 import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreenViewModel.ValidationEvent
-import com.unimib.oases.ui.screen.nurse_assessment.malnutrition_screening.MalnutritionScreeningScreen
+import com.unimib.oases.ui.screen.nurse_assessment.malnutrition_screening.MalnutritionScreeningContent
+import com.unimib.oases.ui.screen.nurse_assessment.malnutrition_screening.MalnutritionScreeningEvent
+import com.unimib.oases.ui.screen.nurse_assessment.malnutrition_screening.MalnutritionScreeningState
+import com.unimib.oases.ui.screen.nurse_assessment.patient_registration.PatientInfoContent
 import com.unimib.oases.ui.screen.nurse_assessment.patient_registration.PatientInfoEvent
-import com.unimib.oases.ui.screen.nurse_assessment.patient_registration.PatientInfoScreen
-import com.unimib.oases.ui.screen.nurse_assessment.room_selection.RoomScreen
+import com.unimib.oases.ui.screen.nurse_assessment.patient_registration.PatientInfoState
+import com.unimib.oases.ui.screen.nurse_assessment.room_selection.RoomContent
+import com.unimib.oases.ui.screen.nurse_assessment.room_selection.RoomEvent
+import com.unimib.oases.ui.screen.nurse_assessment.room_selection.RoomState
 import com.unimib.oases.ui.screen.nurse_assessment.transitionscreens.ContinueToTriageDecisionScreen
 import com.unimib.oases.ui.screen.nurse_assessment.transitionscreens.SubmissionScreen
-import com.unimib.oases.ui.screen.nurse_assessment.triage.RedCodeScreen
-import com.unimib.oases.ui.screen.nurse_assessment.triage.YellowCodeScreen
-import com.unimib.oases.ui.screen.nurse_assessment.visit_history.VisitHistoryScreen
-import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.VitalSignsScreen
+import com.unimib.oases.ui.screen.nurse_assessment.triage.RedCodeContent
+import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageEvent
+import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageState
+import com.unimib.oases.ui.screen.nurse_assessment.triage.YellowCodeContent
+import com.unimib.oases.ui.screen.nurse_assessment.visit_history.VisitHistoryContent
+import com.unimib.oases.ui.screen.nurse_assessment.visit_history.VisitHistoryEvent
+import com.unimib.oases.ui.screen.nurse_assessment.visit_history.VisitHistoryState
+import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.VitalSignsContent
+import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.VitalSignsEvent
+import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.VitalSignsState
 import com.unimib.oases.ui.screen.root.AppViewModel
 
 @Composable
@@ -48,66 +60,9 @@ fun RegistrationScreen(
 
     val validationEvents = registrationScreenViewModel.validationEvents
 
-    var showAlertDialog by remember { mutableStateOf(false) }
-
-    val currentTab = state.currentTab
-
-    val prefixText = remember(currentTab) {
-        when (currentTab){
-            Tab.RED_CODE, Tab.YELLOW_CODE -> {
-                when (state.triageState.patientCategory){
-                    PatientCategory.ADULT -> "Adult "
-                    PatientCategory.PEDIATRIC -> "Pediatric "
-                }
-            }
-            else -> ""
-        }
-    }
-
-    val nextButtonText by remember(currentTab) { // Outer remember for tab changes
-        derivedStateOf { // Inner derived state for isEdited/isNew changes within the DEMOGRAPHICS tab
-            when (currentTab) {
-                Tab.DEMOGRAPHICS -> {
-                    if (state.patientInfoState.isEdited || state.patientInfoState.isNew)
-                        "Submit"
-                    else
-                        "Next"
-                }
-                Tab.CONTINUE_TO_TRIAGE -> "Triage"
-                Tab.VITAL_SIGNS, Tab.ROOM_SELECTION, Tab.RED_CODE, Tab.YELLOW_CODE, Tab.HISTORY, Tab.MALNUTRITION_SCREENING -> "Next"
-                Tab.SUBMIT_ALL -> "Submit"
-            }
-        }
-    }
-
-
-    val cancelButtonText = remember(currentTab){
-        when (currentTab) {
-            Tab.DEMOGRAPHICS -> "Cancel"
-            Tab.CONTINUE_TO_TRIAGE -> "Home"
-            else -> "Back"
-        }
-    }
-
-    val onConfirm by remember(currentTab, state.patientInfoState.isEdited, state.patientInfoState.isNew) {
-        derivedStateOf {
-            if (currentTab == Tab.DEMOGRAPHICS &&
-                (state.patientInfoState.isEdited ||
-                        state.patientInfoState.isNew)
-            ) {
-                { registrationScreenViewModel.onPatientInfoEvent(PatientInfoEvent.NextButtonPressed) }
-            } else
-                registrationScreenViewModel::onNext
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        registrationScreenViewModel.navigationEvents.collect {
-            appViewModel.onNavEvent(it)
-        }
-    }
-
     val context = LocalContext.current
+
+    var showAlertDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(key1 = context) {
         validationEvents.collect { event ->
@@ -119,6 +74,119 @@ fun RegistrationScreen(
                         registrationScreenViewModel.onNext()
                 }
             }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        registrationScreenViewModel.navigationEvents.collect {
+            appViewModel.onNavEvent(it)
+        }
+    }
+
+    RegistrationContent(
+        state.currentTab,
+        state.patientInfoState,
+        state.vitalSignsState,
+        state.triageState,
+        state.roomState,
+        state.visitHistoryState,
+        state.malnutritionScreeningState,
+        registrationScreenViewModel::onPatientInfoEvent,
+        registrationScreenViewModel::onVitalSignsEvent,
+        registrationScreenViewModel::onTriageEvent,
+        registrationScreenViewModel::onRoomEvent,
+        registrationScreenViewModel::onVisitHistoryEvent,
+        registrationScreenViewModel::onMalnutritionScreeningEvent,
+        registrationScreenViewModel::getPrecisionFor,
+        registrationScreenViewModel::onNext,
+        registrationScreenViewModel::onBack,
+        showAlertDialog,
+        {
+            showAlertDialog = false
+        },
+        {
+            showAlertDialog = false
+            registrationScreenViewModel.onNext()
+        }
+    )
+}
+
+@Composable
+fun RegistrationContent(
+    currentTab: Tab,
+    patientInfoState: PatientInfoState,
+    vitalSignsState: VitalSignsState,
+    triageState: TriageState,
+    roomState: RoomState,
+    visitHistoryState: VisitHistoryState,
+    malnutritionScreeningState: MalnutritionScreeningState,
+    onPatientInfoEvent: (PatientInfoEvent) -> Unit,
+    onVitalSignsEvent: (VitalSignsEvent) -> Unit,
+    onTriageEvent: (TriageEvent) -> Unit,
+    onRoomEvent: (RoomEvent) -> Unit,
+    onVisitHistoryEvent: (VisitHistoryEvent) -> Unit,
+    onMalnutritionScreeningEvent: (MalnutritionScreeningEvent) -> Unit,
+    getPrecisionFor: (String) -> NumericPrecision?,
+    onNext: () -> Unit,
+    onBack: () -> Unit,
+//    onConfirm: () -> Unit,
+    showAlertDialog: Boolean,
+    onDismissAlertDialog: () -> Unit,
+    onConfirmAlertDialog: () -> Unit
+) {
+
+    val prefixText = remember(currentTab) {
+        when (currentTab) {
+            Tab.RED_CODE, Tab.YELLOW_CODE -> {
+                when (triageState.patientCategory) {
+                    PatientCategory.ADULT -> "Adult "
+                    PatientCategory.PEDIATRIC -> "Pediatric "
+                }
+            }
+
+            else -> ""
+        }
+    }
+
+    val nextButtonText by remember(currentTab) { // Outer remember for tab changes
+        derivedStateOf { // Inner derived state for isEdited/isNew changes within the DEMOGRAPHICS tab
+            when (currentTab) {
+                Tab.DEMOGRAPHICS -> {
+                    if (patientInfoState.isEdited || patientInfoState.isNew)
+                        "Submit"
+                    else
+                        "Next"
+                }
+
+                Tab.CONTINUE_TO_TRIAGE -> "Triage"
+                Tab.VITAL_SIGNS, Tab.ROOM_SELECTION, Tab.RED_CODE, Tab.YELLOW_CODE, Tab.HISTORY, Tab.MALNUTRITION_SCREENING -> "Next"
+                Tab.SUBMIT_ALL -> "Submit"
+            }
+        }
+    }
+
+
+    val cancelButtonText = remember(currentTab) {
+        when (currentTab) {
+            Tab.DEMOGRAPHICS -> "Cancel"
+            Tab.CONTINUE_TO_TRIAGE -> "Home"
+            else -> "Back"
+        }
+    }
+
+    val onConfirm by remember(
+        currentTab,
+        patientInfoState.isEdited,
+        patientInfoState.isNew
+    ) {
+        derivedStateOf {
+            if (currentTab == Tab.DEMOGRAPHICS &&
+                (patientInfoState.isEdited ||
+                        patientInfoState.isNew)
+            ) {
+                { onPatientInfoEvent(PatientInfoEvent.NextButtonPressed) }
+            } else
+                onNext
         }
     }
 
@@ -146,44 +214,49 @@ fun RegistrationScreen(
                 contentAlignment = Alignment.Center
             ) {
                 when (currentTab) {
-                    Tab.DEMOGRAPHICS -> PatientInfoScreen(
-                        state = state.patientInfoState,
-                        onEvent = registrationScreenViewModel::onPatientInfoEvent
+                    Tab.DEMOGRAPHICS -> PatientInfoContent(
+                        state = patientInfoState,
+                        onEvent = onPatientInfoEvent
                     )
+
                     Tab.CONTINUE_TO_TRIAGE -> ContinueToTriageDecisionScreen()
-                    Tab.VITAL_SIGNS -> VitalSignsScreen(
-                        state = state.vitalSignsState,
-                        onEvent = registrationScreenViewModel::onVitalSignsEvent,
-                        getPrecisionFor = registrationScreenViewModel::getPrecisionFor
-                    )
-                    Tab.RED_CODE -> RedCodeScreen(
-                        state = state.triageState,
-                        onEvent = registrationScreenViewModel::onTriageEvent,
-                    )
-                    Tab.YELLOW_CODE -> YellowCodeScreen(
-                        state = state.triageState,
-                        onEvent = registrationScreenViewModel::onTriageEvent
+                    Tab.VITAL_SIGNS -> VitalSignsContent(
+                        state = vitalSignsState,
+                        onEvent = onVitalSignsEvent,
+                        getPrecisionFor = getPrecisionFor
                     )
 
-                    Tab.ROOM_SELECTION -> RoomScreen(
-                        state = state.roomState,
-                        onEvent = registrationScreenViewModel::onRoomEvent,
+                    Tab.RED_CODE -> RedCodeContent(
+                        state = triageState,
+                        onEvent = onTriageEvent,
                     )
 
-                    Tab.HISTORY -> VisitHistoryScreen(
-                        state = state.visitHistoryState,
-                        onEvent = registrationScreenViewModel::onVisitHistoryEvent
+                    Tab.YELLOW_CODE -> YellowCodeContent(
+                        state = triageState,
+                        onEvent = onTriageEvent
                     )
-                    Tab.MALNUTRITION_SCREENING -> MalnutritionScreeningScreen(
-                        state = state.malnutritionScreeningState,
-                        onEvent = registrationScreenViewModel::onMalnutritionScreeningEvent
+
+                    Tab.ROOM_SELECTION -> RoomContent(
+                        state = roomState,
+                        onEvent = onRoomEvent,
                     )
+
+                    Tab.HISTORY -> VisitHistoryContent(
+                        state = visitHistoryState,
+                        onEvent = onVisitHistoryEvent
+                    )
+
+                    Tab.MALNUTRITION_SCREENING -> MalnutritionScreeningContent(
+                        state = malnutritionScreeningState,
+                        onEvent = onMalnutritionScreeningEvent
+                    )
+
                     Tab.SUBMIT_ALL -> SubmissionScreen()
                 }
             }
 
             BottomButtons(
-                onCancel = registrationScreenViewModel::onBack,
+                onCancel = onBack,
                 onConfirm = onConfirm,
                 cancelButtonText = cancelButtonText,
                 confirmButtonText = nextButtonText
@@ -193,9 +266,7 @@ fun RegistrationScreen(
 
     if (showAlertDialog) {
         AlertDialog(
-            onDismissRequest = {
-                showAlertDialog = false
-            },
+            onDismissRequest = onDismissAlertDialog,
             title = {
                 Text(text = "Confirm patient saving")
             },
@@ -204,19 +275,14 @@ fun RegistrationScreen(
             },
             confirmButton = {
                 TextButton(
-                    onClick = {
-                        showAlertDialog = false
-                        registrationScreenViewModel.onNext()
-                    }
+                    onClick = onConfirmAlertDialog
                 ) {
                     Text("Confirm")
                 }
             },
             dismissButton = {
                 TextButton(
-                    onClick = {
-                        showAlertDialog = false
-                    }
+                    onClick = onDismissAlertDialog
                 ) {
                     Text("Cancel")
                 }

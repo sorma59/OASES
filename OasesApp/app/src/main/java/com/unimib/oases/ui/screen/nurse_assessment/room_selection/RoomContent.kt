@@ -26,26 +26,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.unimib.oases.domain.model.Room
 
-
-data class Room(
-    val id: Int,
-    val name: String,
-    val icon: ImageVector,
-    val capacity: Int,
-    val color: Color,
-    val description: String
-)
-
-
 @Composable
-fun RoomScreen(
+fun RoomContent(
     state: RoomState,
     onEvent: (RoomEvent) -> Unit,
 ) {
@@ -61,8 +49,11 @@ fun RoomScreen(
     Box{
         Column(modifier = Modifier.padding(30.dp)){
 
-
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
                 Text("Patient triage code: ")
 
                 Icon(
@@ -72,8 +63,6 @@ fun RoomScreen(
                     tint = codeColor
                 )
             }
-
-
 
             Spacer(modifier = Modifier.height(20.dp))
             FlowRow(
@@ -85,7 +74,8 @@ fun RoomScreen(
 
                     RoomCard(
                         room = room,
-                        modifier = Modifier.weight(0.5f)
+                        modifier = Modifier
+                            .weight(0.5f)
                             .height(150.dp)
                             .clickable {
                                 if (state.currentRoom == room) {
@@ -98,17 +88,9 @@ fun RoomScreen(
                     )
                 }
             }
-
         }
-
     }
-
-
-
 }
-
-
-
 
 @Composable
 fun RoomCard(
@@ -151,19 +133,17 @@ fun RoomCard(
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold,
-                color = if(isSelected) Color.White else Color.Gray,
+                color = if (isSelected) Color.White else Color.Gray,
             )
-
         }
     }
-
 }
 
 
 @Preview(apiLevel = 34)
 @Composable
 fun RoomScreenPreview() {
-    RoomScreen(
+    RoomContent(
         RoomState(),
         onEvent = {},
     )

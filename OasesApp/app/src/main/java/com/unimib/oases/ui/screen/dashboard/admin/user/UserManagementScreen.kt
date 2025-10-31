@@ -60,13 +60,55 @@ fun UserManagementScreen() {
 
     val state by userManagementViewModel.state.collectAsState()
 
-    UserManagementContent(state, userManagementViewModel)
+    UserManagementContent(state, userManagementViewModel::onEvent)
 }
+
+@Composable
+fun UserListItem(
+    user: User,
+    onDelete: () -> Unit,
+    onClick: () -> Unit
+) {
+    Card(
+        onClick = onClick,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column {
+                Text(
+                    text = user.username,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+
+            IconButton(
+                onClick = onDelete,
+                modifier = Modifier.size(48.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Delete user",
+                    tint = MaterialTheme.colorScheme.error
+                )
+            }
+        }
+    }
+}
+
 
 @Composable
 private fun UserManagementContent(
     state: UserManagementState,
-    userManagementViewModel: UserManagementViewModel
+    onEvent: (UserManagementEvent) -> Unit
 ) {
     val context = LocalContext.current
 
@@ -88,7 +130,7 @@ private fun UserManagementContent(
     LaunchedEffect(key1 = state.toastMessage) {
         state.toastMessage?.let {
             ToastUtils.showToast(context, it)
-            userManagementViewModel.onEvent(UserManagementEvent.OnToastShown)
+            onEvent(UserManagementEvent.OnToastShown)
         }
     }
 
@@ -116,7 +158,7 @@ private fun UserManagementContent(
             OutlinedTextField(
                 value = state.user.username,
                 onValueChange = {
-                    userManagementViewModel.onEvent(
+                    onEvent(
                         UserManagementEvent.EnteredUsername(
                             it
                         )
@@ -130,7 +172,7 @@ private fun UserManagementContent(
 
             if (state.usernameError != null) {
                 Text(
-                    text = state.usernameError!!,
+                    text = state.usernameError,
                     color = MaterialTheme.colorScheme.error
                 )
             }
@@ -140,7 +182,7 @@ private fun UserManagementContent(
             OutlinedTextField(
                 value = state.user.pwHash,
                 onValueChange = {
-                    userManagementViewModel.onEvent(
+                    onEvent(
                         UserManagementEvent.EnteredPassword(
                             it
                         )
@@ -162,7 +204,7 @@ private fun UserManagementContent(
 
             if (state.passwordError != null) {
                 Text(
-                    text = state.passwordError!!,
+                    text = state.passwordError,
                     color = MaterialTheme.colorScheme.error
                 )
             }
@@ -184,7 +226,7 @@ private fun UserManagementContent(
                         .selectable(
                             selected = (roleOption == state.user.role),
                             onClick = {
-                                userManagementViewModel.onEvent(
+                                onEvent(
                                     UserManagementEvent.SelectedRole(
                                         roleOption
                                     )
@@ -196,7 +238,7 @@ private fun UserManagementContent(
                     RadioButton(
                         selected = (roleOption == state.user.role),
                         onClick = {
-                            userManagementViewModel.onEvent(
+                            onEvent(
                                 UserManagementEvent.SelectedRole(
                                     roleOption
                                 )
@@ -215,7 +257,7 @@ private fun UserManagementContent(
 
             Button(
                 onClick = {
-                    userManagementViewModel.onEvent(
+                    onEvent(
                         UserManagementEvent.SaveUser
                     )
                 },
@@ -262,7 +304,7 @@ private fun UserManagementContent(
                                     showDeletionDialog = true
                                 },
                                 onClick = {
-                                    userManagementViewModel.onEvent(
+                                    onEvent(
                                         UserManagementEvent.UserClicked(
                                             user
                                         )
@@ -284,14 +326,14 @@ private fun UserManagementContent(
             confirmButton = {
                 DeleteButton(
                     onDelete = {
-                        userManagementViewModel.onEvent(UserManagementEvent.Delete(userToDelete!!))
+                        onEvent(UserManagementEvent.Delete(userToDelete!!))
                         scope.launch {
                             val undo = snackbarHostState.showSnackbar(
                                 message = "Deleted user ${userToDelete?.username ?: ""}",
                                 actionLabel = "UNDO"
                             )
                             if (undo == SnackbarResult.ActionPerformed) {
-                                userManagementViewModel.onEvent(UserManagementEvent.UndoDelete)
+                                onEvent(UserManagementEvent.UndoDelete)
                             }
                         }
                         dismissDeletionDialog()
@@ -307,47 +349,5 @@ private fun UserManagementContent(
                 )
             }
         )
-    }
-}
-
-
-@Composable
-fun UserListItem(
-    user: User,
-    onDelete: () -> Unit,
-    onClick: () -> Unit
-) {
-    Card(
-        onClick = onClick,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Column {
-                Text(
-                    text = user.username,
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
-
-            IconButton(
-                onClick = onDelete,
-                modifier = Modifier.size(48.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Delete user",
-                    tint = MaterialTheme.colorScheme.error
-                )
-            }
-        }
     }
 }
