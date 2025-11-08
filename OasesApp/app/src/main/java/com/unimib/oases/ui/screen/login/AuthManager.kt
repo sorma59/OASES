@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -24,7 +25,7 @@ class AuthManager @Inject constructor(
     val currentUser: StateFlow<User?> = _currentUser
 
     // Derived state: user role
-    val userRole: StateFlow<Role?> = _currentUser
+    val userRole: StateFlow<Role?> = currentUser
         .map { it?.role }
         .stateIn(
             scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
@@ -34,20 +35,24 @@ class AuthManager @Inject constructor(
 
     init {
         // Load persisted user into flow
-        _currentUser.value = userPreferences.getUser()
+        _currentUser.update {
+            userPreferences.getUser()
+        }
     }
 
     fun login(user: User) {
-        _currentUser.value = user
+        _currentUser.update{ user }
         userPreferences.saveUser(user)
     }
 
     fun logout() {
-        _currentUser.value = null
+        _currentUser.update {
+            null
+        }
         userPreferences.clear()
     }
 
     // For synchronous access in non-composables
-    fun getCurrentUser(): User? = _currentUser.value
-    fun getCurrentRole(): Role? = _currentUser.value?.role
+    fun getCurrentUser(): User? = currentUser.value
+    fun getCurrentRole(): Role? = currentUser.value?.role
 }
