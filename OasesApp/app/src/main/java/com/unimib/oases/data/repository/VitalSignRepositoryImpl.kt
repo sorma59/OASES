@@ -25,7 +25,7 @@ class VitalSignRepositoryImpl @Inject constructor(
     override suspend fun addVitalSign(vitalSign: VitalSign): Outcome {
         return try {
             roomDataSource.insertVitalSign(vitalSign.toEntity())
-            Outcome.Success
+            Outcome.Success(vitalSign.name)
         } catch (e: Exception) {
             Log.e("DiseaseRepository", "Error adding vital sign: ${e.message}")
             Outcome.Error(e.message ?: "An error occurred")
@@ -35,7 +35,7 @@ class VitalSignRepositoryImpl @Inject constructor(
     override suspend fun deleteVitalSign(vitalSign: VitalSign): Outcome {
         return try {
             roomDataSource.deleteVitalSign(vitalSign.toEntity())
-            Outcome.Success
+            Outcome.Success(vitalSign.name)
         } catch (e: Exception) {
             Outcome.Error(e.message ?: "Unknown error")
         }

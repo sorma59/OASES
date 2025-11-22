@@ -2,7 +2,7 @@ package com.unimib.oases.domain.model.complaint
 
 import com.unimib.oases.domain.model.complaint.binarytree.SeizuresTree
 import com.unimib.oases.domain.model.symptom.PatientCategory
-import com.unimib.oases.ui.screen.nurse_assessment.patient_registration.Sex
+import com.unimib.oases.ui.screen.nurse_assessment.demographics.Sex
 
 class SeizuresOrComa(
     sex: Sex,

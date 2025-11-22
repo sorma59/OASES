@@ -7,7 +7,7 @@ import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.model.BluetoothEvent
 import com.unimib.oases.ui.components.scaffold.UiEvent
 import com.unimib.oases.ui.navigation.NavigationEvent
-import com.unimib.oases.ui.navigation.Screen
+import com.unimib.oases.ui.navigation.Route
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -19,7 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AppViewModel @Inject constructor(
     private val bluetoothManager: BluetoothCustomManager,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ): ViewModel() {
 
     private val _navEvents = MutableSharedFlow<NavigationEvent>()
@@ -40,7 +40,7 @@ class AppViewModel @Inject constructor(
                         showSnackbar(
                             message = "${event.patientFullData.patientDetails.name} was successfully sent to this device",
                             actionLabel = "View",
-                            onAction = { navigateTo(Screen.PatientDashboard.route + "/patientId=${event.patientFullData.patientDetails.id}") }
+                            onAction = { navigateTo(Route.PatientDashboard(event.patientFullData.patientDetails.id)) }
                         )
                     }
 
@@ -54,7 +54,7 @@ class AppViewModel @Inject constructor(
         }
     }
 
-    fun navigateTo(route: String) {
+    fun navigateTo(route: Route) {
         viewModelScope.launch {
             _navEvents.emit(NavigationEvent.Navigate(route))
         }

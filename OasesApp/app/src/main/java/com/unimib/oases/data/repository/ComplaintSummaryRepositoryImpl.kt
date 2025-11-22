@@ -24,7 +24,7 @@ class ComplaintSummaryRepositoryImpl @Inject constructor(
     override suspend fun addComplaintSummary(complaintSummary: ComplaintSummary): Outcome {
         return try {
             roomDataSource.insertComplaintSummary(complaintSummary.toEntity())
-            Outcome.Success
+            Outcome.Success(complaintSummary.complaintId)
         } catch (e: Exception) {
             Outcome.Error(e.message ?: "An error occurred")
         }
@@ -33,7 +33,7 @@ class ComplaintSummaryRepositoryImpl @Inject constructor(
     override suspend fun addComplaintSummaries(complaintSummaries: List<ComplaintSummary>): Outcome {
         return try {
             roomDataSource.insertComplaintSummaries(complaintSummaries.toEntities())
-            Outcome.Success
+            Outcome.Success()
         } catch (e: Exception) {
             Outcome.Error(e.message ?: "An error occurred")
         }
@@ -42,7 +42,7 @@ class ComplaintSummaryRepositoryImpl @Inject constructor(
     override suspend fun deleteComplaintSummary(complaintSummary: ComplaintSummary): Outcome {
         return try {
             roomDataSource.deleteComplaintSummary(complaintSummary.toEntity())
-            Outcome.Success
+            Outcome.Success(complaintSummary.complaintId)
         } catch (e: Exception) {
             Outcome.Error(e.message ?: "An error occurred")
         }

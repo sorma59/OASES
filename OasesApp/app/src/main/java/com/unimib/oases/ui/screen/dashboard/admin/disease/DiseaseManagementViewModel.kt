@@ -4,10 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.model.AgeSpecificity
-import com.unimib.oases.domain.model.AgeSpecificity.Companion.fromAgeSpecificityDisplayName
 import com.unimib.oases.domain.model.Disease
 import com.unimib.oases.domain.model.SexSpecificity
-import com.unimib.oases.domain.model.SexSpecificity.Companion.fromSexSpecificityDisplayName
 import com.unimib.oases.domain.usecase.DiseaseUseCase
 import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -78,7 +76,7 @@ class DiseaseManagementViewModel @Inject constructor(
                 _state.update{
                     it.copy(
                         disease = it.disease.copy(
-                            sexSpecificity = fromSexSpecificityDisplayName(event.value)
+                            sexSpecificity = event.sexSpecificity
                         )
                     )
                 }
@@ -88,7 +86,7 @@ class DiseaseManagementViewModel @Inject constructor(
                 _state.update{
                     it.copy(
                         disease = it.disease.copy(
-                            ageSpecificity = fromAgeSpecificityDisplayName(event.value)
+                            ageSpecificity = event.ageSpecificity
                         )
                     )
                 }

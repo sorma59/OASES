@@ -7,6 +7,6 @@ package com.unimib.oases.util
  */
 sealed class Outcome {
     object Loading : Outcome()
-    object Success: Outcome()
+    data class Success(val id: String? = null): Outcome()
     data class Error(val message: String): Outcome()
 }

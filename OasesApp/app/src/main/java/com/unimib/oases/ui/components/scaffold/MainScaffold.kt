@@ -1,6 +1,7 @@
 package com.unimib.oases.ui.components.scaffold
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DrawerValue
@@ -17,7 +18,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.unimib.oases.bluetooth.BluetoothCustomManager
 import com.unimib.oases.ui.components.util.permission.BluetoothPermissionHandler
@@ -25,16 +25,18 @@ import com.unimib.oases.ui.components.util.permission.NoPermissionMessage
 import com.unimib.oases.ui.components.util.permission.NotificationPermissionHandler
 import com.unimib.oases.ui.navigation.AppNavigation
 import com.unimib.oases.ui.navigation.NavigationEvent
-import com.unimib.oases.ui.navigation.Screen.Companion.screenOf
+import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.ui.screen.login.AuthViewModel
 import com.unimib.oases.ui.screen.root.AppViewModel
 import com.unimib.oases.ui.util.SnackbarController
 import com.unimib.oases.ui.util.ToastUtils
 import kotlinx.coroutines.launch
+import kotlinx.serialization.InternalSerializationApi
 
+@OptIn(InternalSerializationApi::class)
 @Composable
 fun MainScaffold(
-    startDestination: String,
+    startDestination: Route,
     bluetoothManager: BluetoothCustomManager,
     authViewModel: AuthViewModel,
     appViewModel: AppViewModel = hiltViewModel()
@@ -45,26 +47,52 @@ fun MainScaffold(
 
     val snackbarHostState = remember { SnackbarHostState() }
 
-    val backStackEntry = navController.currentBackStackEntryAsState()
-    val currentRoute = backStackEntry.value?.destination?.route
-    val screen = remember(currentRoute) { screenOf(currentRoute ?: startDestination) }
-
     val scope = rememberCoroutineScope()
 
     val context = LocalContext.current
 
     val hasPermissions by bluetoothManager.hasPermissions.collectAsState()
 
-    val onNavigationIconClick = { screenType: OasesTopAppBarType ->
-        when (screenType) {
-            OasesTopAppBarType.MENU -> {
-                scope.launch {
-                    drawerState.open()
-                }
-            }
-            OasesTopAppBarType.BACK -> appViewModel.onNavEvent(NavigationEvent.NavigateBack)
-        }
-    }
+//    var currentRoute: Route by remember { mutableStateOf(startDestination) }
+
+    // Create a single Json instance for decoding route arguments
+//    val json = remember {
+//        Json {
+//            ignoreUnknownKeys = true
+//            encodeDefaults = true
+//        }
+//    }
+//
+//    // Cache serializers for all known Route subclasses
+//    val routeSerializers = remember {
+//        Route::class.sealedSubclasses
+//            .mapNotNull { subclass ->
+//                subclass.simpleName?.let { routeName ->
+//                    subclass.serializerOrNull()?.let { serializer ->
+//                        routeName to serializer
+//                    }
+//                }
+//            }
+//            .toMap()
+//    }
+//
+//    // Listen for route changes and decode automatically
+//    LaunchedEffect(navBackStackEntry) {
+//
+//        val destinationRoute = navBackStackEntry?.destination?.route ?: return@LaunchedEffect
+//
+//        // Find a matching serializer by name prefix
+//        val serializerEntry = routeSerializers.entries.find { (name, _) ->
+//            destinationRoute.startsWith(name)
+//        } ?: return@LaunchedEffect
+//
+//        val serializer = serializerEntry.value
+//        Log.d("Prova", "about to change the current Route: $currentRoute")
+//        currentRoute = run {
+//            json.decodeFromString(serializer, destinationRoute)
+//        }
+//        Log.d("Prova", "changed the current Route: $currentRoute")
+//    }
 
     BluetoothPermissionHandler(
         context = context,
@@ -96,8 +124,15 @@ fun MainScaffold(
             Scaffold(
                 topBar = {
                     OasesTopAppBar(
-                        onNavigationIconClick = { onNavigationIconClick(screen.type) },
-                        screen = screen
+                        navController = navController,
+                        onBack = {
+                            appViewModel.onNavEvent(NavigationEvent.NavigateBack)
+                        },
+                        onMenuClick = {
+                            scope.launch {
+                                drawerState.open()
+                            }
+                        },
                     )
 
                 },
@@ -133,6 +168,20 @@ fun MainScaffold(
                 when (event) {
                     is NavigationEvent.Navigate -> navController.navigate(event.route)
                     NavigationEvent.NavigateBack -> navController.popBackStack()
+                    is NavigationEvent.NavigateBackWithResult<*> -> {
+
+                        val previousEntry = navController.previousBackStackEntry
+                        if (previousEntry == null) {
+                            Log.e("Navigation", "Cannot set result, previous back stack entry is null")
+                            navController.popBackStack() // Still pop, but log error
+                            return@collect
+                        }
+
+                        previousEntry.savedStateHandle[event.key] = event.result
+
+                        navController.popBackStack()
+                    }
+
                 }
             }
         }

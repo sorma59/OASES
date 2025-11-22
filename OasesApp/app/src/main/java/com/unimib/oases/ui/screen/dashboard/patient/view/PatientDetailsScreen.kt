@@ -228,7 +228,7 @@ private fun PatientDetails(patient: Patient) {
             )
 
             Text(
-                text = patient.sex,
+                text = patient.sex.displayName,
                 fontSize = 16.sp,
                 color = MaterialTheme.colorScheme.outline
             )
@@ -310,7 +310,7 @@ private fun PatientDetails(patient: Patient) {
             Spacer(Modifier.width(6.dp))
 
             Text(
-                text = patient.status,
+                text = patient.status.displayValue,
                 fontSize = 14.sp
             )
         }

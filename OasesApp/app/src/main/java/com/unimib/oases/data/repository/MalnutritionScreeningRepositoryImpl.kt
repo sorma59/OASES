@@ -21,7 +21,7 @@ class MalnutritionScreeningRepositoryImpl @Inject constructor(
     override suspend fun insertMalnutritionScreening(malnutritionScreening: MalnutritionScreening): Outcome {
         return try {
             roomDataSource.insertMalnutritionScreening(malnutritionScreening.toEntity())
-            Outcome.Success
+            Outcome.Success(malnutritionScreening.visitId)
         } catch (e: Exception) {
             Outcome.Error(e.message ?: "An error occurred")
         }

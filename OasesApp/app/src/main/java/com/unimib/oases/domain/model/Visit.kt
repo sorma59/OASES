@@ -17,7 +17,9 @@ data class Visit(
 enum class TriageCode{
     RED,
     YELLOW,
-    GREEN;
+    GREEN,
+    NONE;
+
 
     companion object {
         fun fromTriageCodeName(name: String): TriageCode =

@@ -3,8 +3,8 @@ package com.unimib.oases.ui.screen.medical_visit.maincomplaint
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.unimib.oases.data.local.model.PatientStatus
 import com.unimib.oases.di.IoDispatcher
+import com.unimib.oases.domain.model.PatientStatus
 import com.unimib.oases.domain.model.complaint.ComplaintId
 import com.unimib.oases.domain.model.complaint.ComplaintQuestion
 import com.unimib.oases.domain.model.complaint.Diarrhea
@@ -23,7 +23,6 @@ import com.unimib.oases.domain.usecase.SubmitMedicalVisitPartOneUseCase
 import com.unimib.oases.domain.usecase.TranslateLatestVitalSignsToSymptomsUseCase
 import com.unimib.oases.domain.usecase.TranslateTriageSymptomIdsToSymptomsUseCase
 import com.unimib.oases.ui.navigation.NavigationEvent
-import com.unimib.oases.ui.screen.nurse_assessment.patient_registration.Sex.Companion.fromDisplayName
 import com.unimib.oases.util.Outcome
 import com.unimib.oases.util.firstNullableSuccess
 import com.unimib.oases.util.firstSuccess
@@ -63,7 +62,7 @@ class MainComplaintViewModel @Inject constructor(
     private var errorHandler = CoroutineExceptionHandler { _, e ->
         e.printStackTrace()
         _state.update{
-            _state.value.copy(
+            it.copy(
                 error = e.message
             )
         }
@@ -109,13 +108,13 @@ class MainComplaintViewModel @Inject constructor(
 
     private fun getComplaint() {
 
-        val patient = _state.value.patient
-        patient?.let {
-            val age = it.ageInMonths / 12
-            val sex = fromDisplayName(it.sex)
-            val patientCategory = getPatientCategoryUseCase(it.ageInMonths)
+        val patient = state.value.patient
+        patient?.let { patient ->
+            val age = patient.ageInMonths / 12
+            val sex = patient.sex
+            val patientCategory = getPatientCategoryUseCase(patient.ageInMonths)
 
-            when (_state.value.complaintId) {
+            when (state.value.complaintId) {
                 ComplaintId.DIARRHEA.id -> {
                     _state.update{
                         it.copy(
@@ -154,7 +153,7 @@ class MainComplaintViewModel @Inject constructor(
     private fun handleComplaint() {
         setAlgorithms()
         showFirstAlgorithm()
-        showFirstQuestion(_state.value.complaint!!.immediateTreatmentTrees.first().root)
+        showFirstQuestion(state.value.complaint!!.immediateTreatmentTrees.first().root)
     }
 
     private fun setAlgorithms() {
@@ -206,7 +205,7 @@ class MainComplaintViewModel @Inject constructor(
     private suspend fun getPatientData() {
         try {
             val patient = patientRepository
-                .getPatientById(_state.value.patientId)
+                .getPatientById(state.value.patientId)
                 .firstSuccess()
             _state.update {
                 it.copy(
@@ -221,7 +220,7 @@ class MainComplaintViewModel @Inject constructor(
     private suspend fun getTriageData(){
         try {
 
-            val visit = getCurrentVisitUseCase(_state.value.patientId).firstNullableSuccess()
+            val visit = getCurrentVisitUseCase(state.value.patientId).firstNullableSuccess()
 
             visit?.let {
                 val triageEvaluation = triageEvaluationRepository
@@ -246,7 +245,7 @@ class MainComplaintViewModel @Inject constructor(
         try {
             _state.update {
                 it.copy(
-                    symptoms = _state.value.symptoms + translateLatestVitalSignsToSymptomsUseCase(_state.value.patientId)
+                    symptoms = _state.value.symptoms + translateLatestVitalSignsToSymptomsUseCase(state.value.patientId)
                 )
             }
         } catch (e: Exception) {
@@ -313,8 +312,7 @@ class MainComplaintViewModel @Inject constructor(
 
             MainComplaintEvent.SubmitPressed -> {
                 viewModelScope.launch(dispatcher + errorHandler){
-                    val result = submitMedicalVisitPartOneUseCase(state.value)
-                    when(result){
+                    when(val result = submitMedicalVisitPartOneUseCase(state.value)){
                         is Outcome.Error -> {
                             _state.update {
                                 it.copy(
@@ -328,8 +326,8 @@ class MainComplaintViewModel @Inject constructor(
                                     toastMessage = "Medical visit submitted successfully"
                                 )
                             }
-                            patientRepository.addPatient(_state.value.patient!!.copy(
-                                status = PatientStatus.WAITING_FOR_TEST_RESULTS.displayValue
+                            patientRepository.addPatient(state.value.patient!!.copy(
+                                status = PatientStatus.WAITING_FOR_TEST_RESULTS
                             ))
                             navigationEventsChannel.send(NavigationEvent.NavigateBack)
                         }

@@ -20,5 +20,4 @@ fun ActionIcon(
     IconButton(onClick = onClick, modifier = modifier.background(backgroundColor)) {
         Icon(imageVector = icon, contentDescription = contentDescription, tint = tint)
     }
-
 }

@@ -18,7 +18,7 @@ class TriageEvaluationRepositoryImpl @Inject constructor(private val roomDataSou
     override suspend fun insertTriageEvaluation(triageEvaluation: TriageEvaluation): Outcome {
         return try {
             roomDataSource.insertTriageEvaluation(triageEvaluation.toEntity())
-            Outcome.Success
+            Outcome.Success(triageEvaluation.visitId)
         } catch (e: Exception){
             Outcome.Error(e.message ?: "Unknown error while trying to insert triage evaluation")
         }

@@ -1,4 +1,4 @@
-package com.unimib.oases.ui.screen.nurse_assessment.room_selection
+package com.unimib.oases.ui.screen.nurse_assessment.triage
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -31,19 +31,21 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.unimib.oases.domain.model.Room
+import com.unimib.oases.domain.model.TriageCode
+import com.unimib.oases.ui.screen.nurse_assessment.PatientRegistrationScreensUiMode
 
 @Composable
 fun RoomContent(
-    state: RoomState,
-    onEvent: (RoomEvent) -> Unit,
+    state: TriageState,
+    onEvent: (TriageEvent) -> Unit,
 ) {
-    // Initial Retry moved to RegistrationScreenViewModel's init
+    // Initial Retry moved to TriageViewModel's init
 
-    val codeColor = when (state.currentTriageCode) {
-        "GREEN" -> Color.Green // Green
-        "RED" -> Color.Red   // Red
-        "YELLOW" -> Color.Yellow // Yellow
-        else -> Color.Gray    // Grey (default)
+    val codeColor = when (state.editingState!!.triageData.triageCode) {
+        TriageCode.GREEN -> Color.Green // Green
+        TriageCode.RED -> Color.Red     // Red
+        TriageCode.YELLOW -> Color.Yellow // Yellow
+        TriageCode.NONE -> throw Exception("The triage code cannot be \"none\" here")
     }
 
     Box{
@@ -58,7 +60,7 @@ fun RoomContent(
 
                 Icon(
                     imageVector = Icons.Default.Circle,
-                    contentDescription = "Edit",
+                    contentDescription = "Triage code",
                     modifier = Modifier.size(20.dp),
                     tint = codeColor
                 )
@@ -70,21 +72,16 @@ fun RoomContent(
                 verticalArrangement = Arrangement.spacedBy(10.dp),
                 maxItemsInEachRow = 2
             ) {
-                state.rooms.forEach { room ->
-
+                state.editingState.roomsState.rooms.forEach { room ->
                     RoomCard(
                         room = room,
                         modifier = Modifier
                             .weight(0.5f)
                             .height(150.dp)
                             .clickable {
-                                if (state.currentRoom == room) {
-                                    onEvent(RoomEvent.RoomDeselected)
-                                } else {
-                                    onEvent(RoomEvent.RoomSelected(room))
-                                }
+                                onEvent(TriageEvent.RoomClicked(room))
                             },
-                        isSelected = state.currentRoom == room
+                        isSelected = state.editingState.triageData.selectedRoom == room
                     )
                 }
             }
@@ -144,7 +141,11 @@ fun RoomCard(
 @Composable
 fun RoomScreenPreview() {
     RoomContent(
-        RoomState(),
+        TriageState(
+            patientId = "",
+            visitId = null,
+            uiMode = PatientRegistrationScreensUiMode.Standalone()
+        ),
         onEvent = {},
     )
 }

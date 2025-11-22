@@ -18,17 +18,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.unimib.oases.ui.components.input.LabeledCheckbox
 import com.unimib.oases.ui.components.util.FadeOverlay
 import com.unimib.oases.ui.components.util.button.RetryButton
-import com.unimib.oases.ui.util.ToastUtils
 
 @Composable
 fun YellowCodeContent(
@@ -37,15 +34,6 @@ fun YellowCodeContent(
 ) {
 
     val scrollState = rememberScrollState()
-
-    val context = LocalContext.current
-
-    LaunchedEffect(state.toastMessage) {
-        if (state.toastMessage != null) {
-            ToastUtils.showToast(context, state.toastMessage)
-            onEvent(TriageEvent.ToastShown)
-        }
-    }
 
     Column(
         modifier = Modifier
@@ -73,15 +61,13 @@ fun YellowCodeContent(
             )
         }
 
-        if (state.error != null){
+        state.error?.let {
             RetryButton(
-                error = state.error,
+                error = it,
                 onClick = { onEvent(TriageEvent.Retry) }
             )
-        }
-
-        else {
-            Box{
+        } ?: state.editingState?.let {
+            Box {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier
@@ -89,11 +75,11 @@ fun YellowCodeContent(
                         .verticalScroll(scrollState)
                 ) {
 
-                    state.triageConfig!!.yellowOptions.forEach {
-                        val id = it.symptom.symptom.id
+                    it.triageConfig.yellowOptions.forEach { (symptom, label) ->
+                        val id = symptom.symptom.id
                         LabeledCheckbox(
-                            label = it.label,
-                            checked = state.selectedYellows.contains(id),
+                            label = label,
+                            checked = it.triageData.selectedYellows.contains(id),
                             onCheckedChange = { onEvent(TriageEvent.FieldToggled(id)) }
                         )
                     }
@@ -103,6 +89,9 @@ fun YellowCodeContent(
 
                 FadeOverlay(Modifier.align(Alignment.BottomCenter))
             }
-        }
+        } ?: RetryButton(
+            error = "Failed to enter editing mode",
+            onClick = { onEvent(TriageEvent.EditButtonPressed) }
+        )
     }
 }

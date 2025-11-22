@@ -109,7 +109,7 @@ private fun DiseaseManagementContent(
             )
 
             OutlinedDropdown(
-                selected = state.disease.sexSpecificity.displayName,
+                selected = state.disease.sexSpecificity,
                 onSelected = {
                     onEvent(
                         DiseaseManagementEvent.EnteredSexSpecificity(
@@ -117,13 +117,14 @@ private fun DiseaseManagementContent(
                         )
                     )
                 },
-                options = SexSpecificity.entries.map { it.displayName },
+                options = SexSpecificity.entries,
+                optionToText = { it.displayName },
                 labelText = "Sex specificity",
                 modifier = Modifier.fillMaxWidth()
             )
 
             OutlinedDropdown(
-                selected = state.disease.ageSpecificity.displayName,
+                selected = state.disease.ageSpecificity,
                 onSelected = {
                     onEvent(
                         DiseaseManagementEvent.EnteredAgeSpecificity(
@@ -131,7 +132,8 @@ private fun DiseaseManagementContent(
                         )
                     )
                 },
-                options = AgeSpecificity.entries.map { it.displayName },
+                options = AgeSpecificity.entries,
+                optionToText = { it.displayName },
                 labelText = "Age specificity",
                 modifier = Modifier.fillMaxWidth()
             )

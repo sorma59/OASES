@@ -31,6 +31,7 @@ fun VisitCard(visit: Visit) {
         TriageCode.GREEN -> Color.Green
         TriageCode.YELLOW -> Color.Yellow
         TriageCode.RED -> Color.Red
+        TriageCode.NONE -> Color.Gray
     }
     val textColor = MaterialTheme.colorScheme.onPrimaryContainer
     val cardBackgroundColor = MaterialTheme.colorScheme.primaryContainer

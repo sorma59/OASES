@@ -8,7 +8,7 @@ import com.unimib.oases.bluetooth.BluetoothCustomManager
 import com.unimib.oases.data.local.model.Role
 import com.unimib.oases.ui.components.scaffold.LoginScaffold
 import com.unimib.oases.ui.components.scaffold.MainScaffold
-import com.unimib.oases.ui.navigation.Screen
+import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.ui.screen.login.AuthViewModel
 
 @Composable
@@ -24,8 +24,8 @@ fun OasesRoot(
         true -> {
 
             val startDestination = when (role!!) {
-                Role.ADMIN -> Screen.AdminDashboard.route
-                Role.DOCTOR, Role.NURSE -> Screen.Home.route
+                Role.ADMIN -> Route.AdminDashboard
+                Role.DOCTOR, Role.NURSE -> Route.Home
             }
 
             MainScaffold(startDestination, bluetoothCustomManager, authViewModel)

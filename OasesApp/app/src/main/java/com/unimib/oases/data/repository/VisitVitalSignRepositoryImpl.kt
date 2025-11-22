@@ -22,7 +22,7 @@ class VisitVitalSignRepositoryImpl @Inject constructor(
     override suspend fun addVisitVitalSign(visitVitalSign: VisitVitalSign): Outcome {
         return try {
             roomDataSource.insertVisitVitalSign(visitVitalSign.toEntity())
-            Outcome.Success
+            Outcome.Success()
         } catch (e: Exception) {
             Outcome.Error(e.message ?: "An error occurred")
         }
@@ -31,7 +31,7 @@ class VisitVitalSignRepositoryImpl @Inject constructor(
     override suspend fun addVisitVitalSigns(visitVitalSigns: List<VisitVitalSign>): Outcome {
         return try {
             roomDataSource.insertVisitVitalSigns(visitVitalSigns.toEntities())
-            Outcome.Success
+            Outcome.Success()
         } catch (e: Exception) {
             Log.e("VisitVitalSignRepository", "Error adding vital signs to visit: ${e.message}")
             Outcome.Error(e.message ?: "An error occurred")

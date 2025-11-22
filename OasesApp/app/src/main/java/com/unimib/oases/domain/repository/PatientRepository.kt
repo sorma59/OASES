@@ -13,7 +13,7 @@ interface PatientRepository {
     fun deletePatientById(patientId: String): Outcome
     fun getPatientById(patientId: String): Flow<Resource<Patient>>
 //    suspend fun updateTriageState(patient: Patient, triageState: String): Resource<Unit>
-    suspend fun updateStatus(patient: Patient, status: String, code: String, room: String): Outcome
+    suspend fun updateStatus(patientId: String, status: String, code: String, room: String): Outcome
     fun getPatients(): Flow<Resource<List<Patient>>>
     fun doOnlineTasks()
     fun doOfflineTasks()

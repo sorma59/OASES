@@ -14,6 +14,8 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MedicalServices
 import androidx.compose.material.icons.filled.PersonSearch
+import androidx.compose.material.icons.filled.PriorityHigh
+import androidx.compose.material.icons.filled.Straighten
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -42,10 +44,7 @@ import com.unimib.oases.ui.components.util.button.DeleteButton
 import com.unimib.oases.ui.components.util.button.DismissButton
 import com.unimib.oases.ui.components.util.button.RetryButton
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
-import com.unimib.oases.ui.navigation.Screen.MedicalVisit
-import com.unimib.oases.ui.navigation.Screen.PatientRegistration
-import com.unimib.oases.ui.navigation.Screen.SendPatient
-import com.unimib.oases.ui.navigation.Screen.ViewPatientDetails
+import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.ui.screen.root.AppViewModel
 import com.unimib.oases.ui.util.ToastUtils
 
@@ -125,12 +124,12 @@ fun PatientDashboardScreen(
                     verticalArrangement = Arrangement.spacedBy(30.dp),
                     horizontalAlignment = Alignment.End
                 ) {
-                    for (button in state.buttons) {
+                    for (action in state.actions) {
 
                         Row(verticalAlignment = Alignment.CenterVertically) {
 
                             Text(
-                                text = button.text,
+                                text = action.text,
                                 fontSize = 30.sp
                             )
 
@@ -140,19 +139,19 @@ fun PatientDashboardScreen(
                                 onClick = {
                                     viewModel.onEvent(
                                         PatientDashboardEvent.ActionButtonClicked(
-                                            button
+                                            action
                                         )
                                     )
                                 },
                                 colors = IconButtonDefaults.iconButtonColors(
-                                    containerColor = button.buttonColor(),
-                                    contentColor = button.buttonTintColor()
+                                    containerColor = action.buttonColor(),
+                                    contentColor = action.buttonTintColor()
                                 ),
                                 modifier = Modifier.size(Dp(ButtonDefaults.IconSize.value * 4f))
                             ) {
                                 Icon(
-                                    imageVector = button.icon,
-                                    contentDescription = button.contentDescription,
+                                    imageVector = action.icon,
+                                    contentDescription = action.contentDescription,
                                     modifier = Modifier.size(Dp(ButtonDefaults.IconSize.value * 2f))
                                 )
                             }
@@ -193,32 +192,118 @@ fun PatientDashboardScreen(
     }
 }
 
-enum class PatientDashboardButton(
-    val text: String,
-    val icon: ImageVector,
-    val contentDescription: String,
-    val route: String? = null,
-    val roles: List<Role> = Role.entries
-){
-    VIEW("View", Icons.Default.PersonSearch, "View patient data", ViewPatientDetails.route + "/patientId="),
-    EDIT("Edit", Icons.Default.Edit, "Edit patient data", PatientRegistration.route + "?patientId="),
-    SEND("Send", Icons.AutoMirrored.Filled.Send, "Send patient data", SendPatient.route + "/patientId="),
-    START_VISIT("Start visit", Icons.Default.MedicalServices , "Start a new visit", MedicalVisit.route + "/patientId=", listOf(Role.DOCTOR)),
-    DELETE("Delete", Icons.Default.Delete, "Delete patient data");
+sealed interface PatientDashboardAction {
+    val text: String
+    val icon: ImageVector
+    val contentDescription: String
+    val roles: List<Role>
+
+    companion object {
+        val entries: List<PatientDashboardAction> by lazy {
+            listOf(
+                Demographics,
+                Triage,
+                MalnutritionScreening,
+                Send,
+                StartVisit,
+                Delete
+            )
+        }
+    }
 
     /**
-     * Returns the appropriate color for this button.
-     * Defaults to MaterialTheme.colorScheme.primary.
+     * A sealed sub-interface specifically for buttons that navigate.
+     * Its primary responsibility is to create a Route.
      */
+    sealed interface Navigable : PatientDashboardAction
+
+    sealed interface PatientNavigable: Navigable {
+        fun createRoute(patientId: String): Route
+    }
+
+    /**
+     * A data object for buttons that perform an on-screen action, like showing a dialog.
+     */
+    data object Delete : PatientDashboardAction {
+        override val text = "Delete"
+        override val icon = Icons.Default.Delete
+        override val contentDescription = "Delete patient data"
+        override val roles = Role.entries
+    }
+
+    // --- Concrete implementations of Navigable actions ---
+
+    data object View : PatientNavigable {
+        override val text = "View"
+        override val icon = Icons.Default.PersonSearch
+        override val contentDescription = "View patient data"
+        override val roles = Role.entries
+        override fun createRoute(patientId: String) = Route.ViewPatientDetails(patientId)
+    }
+
+    data object Edit : PatientNavigable {
+        override val text = "Edit"
+        override val icon = Icons.Default.Edit
+        override val contentDescription = "Edit patient data"
+        override val roles = Role.entries
+        // Editing demographics for an existing patient
+        override fun createRoute(patientId: String) = Route.Demographics(patientId)
+    }
+
+    data object Demographics: PatientNavigable {
+        override val text = "Demographics"
+        override val icon = Icons.Default.PersonSearch
+        override val contentDescription = "Demographics"
+        override val roles = Role.entries
+        override fun createRoute(patientId: String) = Route.Demographics(patientId)
+    }
+
+    data object Triage: Navigable {
+        override val text = "Triage"
+        override val icon = Icons.Default.PriorityHigh
+        override val contentDescription = "Triage"
+        override val roles = Role.entries
+        // Editing demographics for an existing patient
+        fun createRoute(patientId: String, visitId: String?) = Route.Triage(patientId, visitId)
+    }
+
+    data object MalnutritionScreening: Navigable {
+        override val text = "Malnutrition Screening"
+        override val icon = Icons.Default.Straighten
+        override val contentDescription = "Malnutrition Screening"
+        override val roles = Role.entries
+
+        fun createRoute(patientId: String, visitId: String) = Route.MalnutritionScreening(
+            patientId, visitId
+        )
+    }
+
+    data object Send : PatientNavigable {
+        override val text = "Send"
+        override val icon = Icons.AutoMirrored.Filled.Send
+        override val contentDescription = "Send patient data"
+        override val roles = Role.entries
+        override fun createRoute(patientId: String) = Route.SendPatient(patientId)
+    }
+
+    data object StartVisit : PatientNavigable {
+        override val text = "Start visit"
+        override val icon = Icons.Default.MedicalServices
+        override val contentDescription = "Start a new visit"
+        override val roles = listOf(Role.DOCTOR)
+        override fun createRoute(patientId: String) = Route.MedicalVisit(patientId)
+    }
+
+    // --- UI Logic common to all actions ---
     @Composable
-    fun buttonColor() = when (this){
-        DELETE -> MaterialTheme.colorScheme.error
+    fun buttonColor() = when (this) {
+        is Delete -> MaterialTheme.colorScheme.error
         else -> MaterialTheme.colorScheme.primary
     }
 
     @Composable
-    fun buttonTintColor() = when (this){
-        DELETE -> MaterialTheme.colorScheme.onError
+    fun buttonTintColor() = when (this) {
+        is Delete -> MaterialTheme.colorScheme.onError
         else -> MaterialTheme.colorScheme.onPrimary
     }
 }

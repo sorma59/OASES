@@ -1,0 +1,33 @@
+package com.unimib.oases.ui.screen.nurse_assessment.transitionscreens
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.unimib.oases.ui.components.util.CenteredText
+
+@Composable
+fun ContinueToMalnutritionDecisionScreen() {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+
+        CenteredText(
+            "The triage data was saved, you will be able to edit it later on.",
+            fontSize = 20.sp
+        )
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        CenteredText(
+            "Do you want to continue with the malnutrition screening or go back to home?",
+            fontSize = 20.sp
+        )
+    }
+}

@@ -21,7 +21,7 @@ class ConfigTriageUseCase @Inject constructor(
             when (it.colorAssigner(category)) {
                 SymptomTriageCode.RED -> redOptions.add(symptom)
                 SymptomTriageCode.YELLOW -> yellowOptions.add(symptom)
-                null -> {}
+                null -> Unit
             }
         }
 

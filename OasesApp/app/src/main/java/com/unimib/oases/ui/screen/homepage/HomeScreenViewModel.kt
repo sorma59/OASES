@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.usecase.PatientUseCase
 import com.unimib.oases.ui.navigation.NavigationEvent
-import com.unimib.oases.ui.navigation.Screen
+import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -22,7 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
     private val useCases: PatientUseCase,
-    @IoDispatcher private val dispatcher: CoroutineDispatcher,
+    @param:IoDispatcher private val dispatcher: CoroutineDispatcher,
 ): ViewModel() {
 
     private val _state = MutableStateFlow(HomeScreenState())
@@ -60,7 +60,7 @@ class HomeScreenViewModel @Inject constructor(
                 viewModelScope.launch {
                     navigationEventsChannel.send(
                         NavigationEvent.Navigate(
-                            Screen.PatientRegistration.route
+                            Route.PatientRegistration
                         )
                     )
                 }
@@ -69,7 +69,7 @@ class HomeScreenViewModel @Inject constructor(
                 viewModelScope.launch {
                     navigationEventsChannel.send(
                         NavigationEvent.Navigate(
-                            Screen.PatientDashboard.route + "/patientId=${event.patientId}"
+                            Route.PatientDashboard(event.patientId)
                         )
                     )
                 }

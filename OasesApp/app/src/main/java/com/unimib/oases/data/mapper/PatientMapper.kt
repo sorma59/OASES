@@ -2,9 +2,9 @@ package com.unimib.oases.data.mapper
 
 import com.unimib.oases.data.local.model.PatientEntity
 import com.unimib.oases.domain.model.Patient
-import com.unimib.oases.ui.screen.nurse_assessment.patient_registration.Sex.Companion.fromDisplayName
+import com.unimib.oases.domain.model.PatientStatus
+import com.unimib.oases.domain.model.TriageCode
 import com.unimib.oases.util.DateTimeFormatter
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 fun PatientEntity.toDomain(): Patient {
@@ -15,16 +15,16 @@ fun PatientEntity.toDomain(): Patient {
         name = name,
         birthDate = birthDate,
         ageInMonths = ageInMonths ?: 0,
-        sex = sex.displayName,
+        sex = sex,
         village = village,
         parish = parish,
         subCounty = subCounty,
         district = district,
         nextOfKin = nextOfKin,
         contact = contact,
-        status = status,
-        code = code,
-        room = room,
+        status = PatientStatus.valueOf(status),
+        code = TriageCode.valueOf(code),
+        roomName = room,
         arrivalTime = LocalDateTime.parse(arrivalTime),
         image = image,
 
@@ -37,16 +37,16 @@ fun Patient.toEntity(): PatientEntity {
         publicId = publicId,
         name = name,
         birthDate = birthDate,
-        sex = fromDisplayName(sex),
+        sex = sex,
         village = village,
         parish = parish,
         subCounty = subCounty,
         district = district,
         nextOfKin = nextOfKin,
         contact = contact,
-        status = status,
-        code = code,
-        room = room,
+        status = status.name,
+        code = code.name,
+        room = roomName,
         arrivalTime = arrivalTime.toString(),
         image = image
     )

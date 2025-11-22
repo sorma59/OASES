@@ -1,34 +1,23 @@
 package com.unimib.oases.domain.usecase
 
 import com.unimib.oases.domain.common.FormErrorMessages
-import com.unimib.oases.ui.screen.nurse_assessment.patient_registration.Sex
+import com.unimib.oases.domain.usecase.ValidatePatientInfoFormUseCase.ValidationResult
+import com.unimib.oases.ui.screen.nurse_assessment.demographics.FormErrors
+import com.unimib.oases.ui.screen.nurse_assessment.demographics.Sex
 import javax.inject.Inject
 
 class ValidatePatientInfoFormUseCase @Inject constructor() {
 
-    operator fun invoke(name: String, birthDate: String, sex: String): ValidationResult {
+    operator fun invoke(name: String, birthDate: String, sex: Sex): ValidationResult {
 
         val nameError = validateName(name)
         val birthDateError = validateBirthDate(birthDate)
         val sexError = validateSex(sex)
 
-        val hasError = listOf(
+        return ValidationResult(
             nameError,
             birthDateError,
             sexError
-        ).any { it != null }
-
-        if (hasError){
-            return ValidationResult(
-                successful = false,
-                nameErrorMessage = nameError,
-                birthDateErrorMessage = birthDateError,
-                sexErrorMessage = sexError
-            )
-        }
-
-        return ValidationResult(
-            successful = true
         )
     }
 
@@ -46,18 +35,28 @@ class ValidatePatientInfoFormUseCase @Inject constructor() {
         return null
     }
 
-    private fun validateSex(sex: String): String? {
-        if (sex == Sex.UNSPECIFIED.displayName) {
+    private fun validateSex(sex: Sex): String? {
+        if (sex == Sex.UNSPECIFIED) {
             return FormErrorMessages.SEX_NOT_SELECTED
         }
         return null
     }
 
     data class ValidationResult(
-        val successful: Boolean,
         val nameErrorMessage: String? = null,
         val birthDateErrorMessage: String? = null,
         val sexErrorMessage: String? = null
-    )
+    ){
+        val isSuccessful: Boolean
+            get() = nameErrorMessage == null && birthDateErrorMessage == null && sexErrorMessage == null
+    }
 
+}
+
+fun ValidationResult.toFormErrors(): FormErrors {
+    return FormErrors(
+        nameErrorMessage,
+        birthDateErrorMessage,
+        sexErrorMessage
+    )
 }

@@ -181,9 +181,8 @@ class PastHistoryViewModel @Inject constructor(
             PastHistoryEvent.Cancel -> navigationEventsChannel.trySend(NavigationEvent.NavigateBack)
             PastHistoryEvent.Save -> {
                 viewModelScope.launch(ioDispatcher + errorHandler) {
-                    val result = savePastMedicalHistoryUseCase(state.value)
-                    when (result) {
-                        is Outcome.Error -> _state.update { it.copy( error = result.message) }
+                    when (val outcome = savePastMedicalHistoryUseCase(state.value)) {
+                        is Outcome.Error -> _state.update { it.copy( error = outcome.message) }
 
                         is Outcome.Success -> {
                             _state.update { it.copy(toastMessage = "PMH saved successfully") }

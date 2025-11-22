@@ -59,7 +59,7 @@ class SendPatientViaBluetoothUseCase @Inject constructor(
 
                             // Make sure the patient data is sent and received
                             delay(1000)
-                            Outcome.Success
+                            Outcome.Success()
                         } else
                             Outcome.Error("Could not connect to device")
 

@@ -4,7 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.unimib.oases.data.local.TableNames
-import com.unimib.oases.ui.screen.nurse_assessment.patient_registration.Sex
+import com.unimib.oases.ui.screen.nurse_assessment.demographics.Sex
 
 @Entity(tableName = TableNames.PATIENT)
 data class PatientEntity (
@@ -25,14 +25,3 @@ data class PatientEntity (
     @ColumnInfo(name = "arrival_time") val arrivalTime: String,
     @ColumnInfo(name = "image") val image: ByteArray? = null
 )
-
-/**
- * Represents the different states a patient can be in during their hospital visit.
- */
-enum class PatientStatus(val displayValue: String) {
-    WAITING_FOR_TRIAGE("Waiting for triage"),
-    WAITING_FOR_VISIT("Waiting for visit"),
-    WAITING_FOR_TEST_RESULTS("Waiting for test results"),
-    HOSPITALIZED("Hospitalized"),
-    DISMISSED("Dismissed")
-}

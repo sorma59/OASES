@@ -45,7 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.unimib.oases.data.local.model.User
-import com.unimib.oases.ui.navigation.Screen
+import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.ui.screen.login.AuthViewModel
 import com.unimib.oases.util.LocalWindowSizeClass
 import kotlinx.coroutines.launch
@@ -166,7 +166,7 @@ private fun Buttons(
             icon = Icons.Default.Bluetooth,
             label = "Bluetooth",
             contentDescription = "Bluetooth",
-            onClick = { navController.navigate(Screen.PairDevice.route) }
+            onClick = { navController.navigate(Route.PairDevice) }
         )
     }
 }

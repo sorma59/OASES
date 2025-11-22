@@ -21,7 +21,7 @@ class DiseaseRepositoryImpl @Inject constructor(
     override suspend fun addDisease(disease: Disease): Outcome {
         return try {
             roomDataSource.insertDisease(disease.toEntity())
-            Outcome.Success
+            Outcome.Success(disease.name)
         } catch (e: Exception) {
             Log.e("DiseaseRepository", "Error adding disease: ${e.message}")
             Outcome.Error(e.message ?: "An error occurred")
@@ -31,7 +31,7 @@ class DiseaseRepositoryImpl @Inject constructor(
     override suspend fun deleteDisease(disease: Disease): Outcome {
         return try {
             roomDataSource.deleteDisease(disease.toEntity())
-            Outcome.Success
+            Outcome.Success(disease.name)
         } catch (e: Exception) {
             Outcome.Error(e.message ?: "Unknown error")
         }

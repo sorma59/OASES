@@ -38,14 +38,5 @@ enum class AgeSpecificity(val displayName: String) {
         fun fromAgeSpecificityDisplayName(displayName: String): AgeSpecificity {
             return AgeSpecificity.entries.find { it.displayName == displayName } ?: ALL
         }
-
-        // Optional: Function to get enum from stored name (robust)
-        fun fromStoredName(storedName: String): AgeSpecificity? {
-            return try {
-                AgeSpecificity.valueOf(storedName)
-            } catch (e: IllegalArgumentException) {
-                null // Handle cases where the stored name might be invalid
-            }
-        }
     }
 }

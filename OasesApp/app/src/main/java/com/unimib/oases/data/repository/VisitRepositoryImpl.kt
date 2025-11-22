@@ -4,6 +4,9 @@ import android.util.Log
 import com.unimib.oases.data.local.RoomDataSource
 import com.unimib.oases.data.mapper.toDomain
 import com.unimib.oases.data.mapper.toEntity
+import com.unimib.oases.domain.model.Room
+import com.unimib.oases.domain.model.TriageCode
+import com.unimib.oases.domain.model.TriageEvaluation
 import com.unimib.oases.domain.model.Visit
 import com.unimib.oases.domain.repository.VisitRepository
 import com.unimib.oases.util.Outcome
@@ -21,9 +24,24 @@ class VisitRepositoryImpl @Inject constructor(
     override suspend fun addVisit(visit: Visit): Outcome {
         return try {
             roomDataSource.insertVisit(visit.toEntity())
-            Outcome.Success
+            Outcome.Success(visit.id)
         } catch (e: Exception) {
             Log.e("VisitRepository", "Error adding visit: ${e.message}")
+            Outcome.Error(e.message ?: "An error occurred")
+        }
+    }
+
+    override suspend fun addVisitWithTriageEvaluation(
+        visit: Visit,
+        triageEvaluation: TriageEvaluation,
+        triageCode: TriageCode,
+        room: Room
+    ): Outcome {
+        return try {
+            roomDataSource.insertVisitWithTriageEvaluation(visit.toEntity(), triageEvaluation.toEntity(), triageCode, room)
+            Outcome.Success(visit.id)
+        } catch (e: Exception) {
+            Log.e("VisitRepository", "Error adding visit with triage evaluation: ${e.message}")
             Outcome.Error(e.message ?: "An error occurred")
         }
     }
@@ -31,7 +49,7 @@ class VisitRepositoryImpl @Inject constructor(
     override suspend fun updateVisit(visit: Visit): Outcome {
         return try {
             roomDataSource.upsertVisit(visit.toEntity())
-            Outcome.Success
+            Outcome.Success(visit.id)
         } catch (e: Exception) {
             Log.e("VisitRepository", "Error updating visit: ${e.message}")
             Outcome.Error(e.message ?: "An error occurred")

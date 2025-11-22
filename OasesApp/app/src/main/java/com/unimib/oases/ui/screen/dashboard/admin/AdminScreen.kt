@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.unimib.oases.ui.components.text.AutoResizedText
-import com.unimib.oases.ui.navigation.Screen
+import com.unimib.oases.ui.navigation.Route
 
 @Composable
 fun AdminScreen(
@@ -61,7 +61,7 @@ fun AdminScreen(
 
                     item {
                         Button(
-                            onClick = { navController.navigate(Screen.UserManagement.route) },
+                            onClick = { navController.navigate(Route.UserManagement) },
                             shape = MaterialTheme.shapes.extraSmall,
                             modifier = Modifier
                                 .padding(5.dp)
@@ -88,7 +88,7 @@ fun AdminScreen(
 
                     item {
                         Button(
-                            onClick = { navController.navigate(Screen.DiseaseManagement.route) },
+                            onClick = { navController.navigate(Route.DiseaseManagement) },
                             shape = MaterialTheme.shapes.extraSmall,
                             modifier = Modifier
                                 .padding(5.dp)
@@ -116,7 +116,7 @@ fun AdminScreen(
 
                     item {
                         Button(
-                            onClick = { navController.navigate(Screen.VitalSignsManagement.route) },
+                            onClick = { navController.navigate(Route.VitalSignsManagement) },
                             shape = MaterialTheme.shapes.extraSmall,
                             modifier = Modifier
                                 .padding(5.dp)
@@ -144,7 +144,7 @@ fun AdminScreen(
 
                     item {
                         Button(
-                            onClick = { navController.navigate(Screen.RoomsManagement.route) },
+                            onClick = { navController.navigate(Route.RoomsManagement) },
                             shape = MaterialTheme.shapes.extraSmall,
                             modifier = Modifier
                                 .padding(5.dp)

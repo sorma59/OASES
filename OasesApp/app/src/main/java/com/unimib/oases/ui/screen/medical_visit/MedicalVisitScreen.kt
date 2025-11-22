@@ -27,8 +27,7 @@ import com.unimib.oases.domain.model.complaint.ComplaintId
 import com.unimib.oases.ui.components.util.CenteredTextInBox
 import com.unimib.oases.ui.components.util.TitleText
 import com.unimib.oases.ui.navigation.NavigationEvent
-import com.unimib.oases.ui.navigation.Screen
-import com.unimib.oases.ui.navigation.Screen.MainComplaintScreen
+import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.ui.screen.root.AppViewModel
 
 @Composable
@@ -74,7 +73,7 @@ private fun PastMedicalHistoryBox(
 ){
     BoxButton(
         label = "Past Medical History",
-        destination = Screen.PastMedicalHistoryScreen.route + "/patientId=$patientId",
+        destination = Route.PastMedicalHistory(patientId),
         appViewModel
     )
 }
@@ -110,7 +109,7 @@ private fun MainComplaintBoxButton(
 ){
     BoxButton(
         complaintId.label,
-        MainComplaintScreen.route + "/patientId=$patientId/complaintId=${complaintId.id}",
+        Route.MainComplaint(patientId, complaintId.id),
         appViewModel
     )
 }
@@ -118,7 +117,7 @@ private fun MainComplaintBoxButton(
 @Composable
 private fun BoxButton(
     label: String,
-    destination: String,
+    destination: Route,
     appViewModel: AppViewModel
 ) {
     Box(

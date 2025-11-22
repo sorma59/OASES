@@ -1,5 +1,6 @@
 package com.unimib.oases.data.local
 
+import androidx.room.withTransaction
 import com.unimib.oases.data.local.dao.ComplaintSummaryDao
 import com.unimib.oases.data.local.dao.DiseaseDao
 import com.unimib.oases.data.local.dao.MalnutritionScreeningDao
@@ -25,6 +26,9 @@ import com.unimib.oases.data.local.model.User
 import com.unimib.oases.data.local.model.VisitEntity
 import com.unimib.oases.data.local.model.VisitVitalSignEntity
 import com.unimib.oases.data.local.model.VitalSignEntity
+import com.unimib.oases.domain.model.PatientStatus
+import com.unimib.oases.domain.model.Room
+import com.unimib.oases.domain.model.TriageCode
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -69,8 +73,8 @@ class RoomDataSource @Inject constructor(
 //        patientDao.updateTriageState(patient.id, triageState)
 //    }
 
-    suspend fun updateStatus(patient: PatientEntity, status: String, code: String, room: String) {
-        patientDao.updateStatus(patient.id, status, code, room)
+    suspend fun updateStatus(patientId: String, status: String, code: String, room: String) {
+        patientDao.updateStatus(patientId, status, code, room)
     }
 
     // ----------------Users---------------
@@ -174,6 +178,24 @@ class RoomDataSource @Inject constructor(
 
     suspend fun insertVisit(visit: VisitEntity) {
         visitDao.insert(visit)
+    }
+
+    suspend fun insertVisitWithTriageEvaluation(
+        visit: VisitEntity,
+        triageEvaluation: TriageEvaluationEntity,
+        triageCode: TriageCode,
+        room: Room
+    ) {
+        appDatabase.withTransaction {
+            insertVisit(visit)
+            insertTriageEvaluation(triageEvaluation)
+            updateStatus(
+                visit.patientId,
+                status = PatientStatus.WAITING_FOR_VISIT.name,
+                code = triageCode.name,
+                room = room.name,
+            )
+        }
     }
 
     suspend fun upsertVisit(visit: VisitEntity) {

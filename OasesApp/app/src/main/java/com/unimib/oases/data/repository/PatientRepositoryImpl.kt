@@ -51,7 +51,7 @@ class PatientRepositoryImpl @Inject constructor(
 //                Log.e("PatientRepositoryImpl", "Adding patient to queue: $patient")
 //            }
 
-            Outcome.Success
+            Outcome.Success(patient.id)
         } catch (e: Exception) {
             Outcome.Error(e.message ?: "An error occurred")
         }
@@ -60,7 +60,7 @@ class PatientRepositoryImpl @Inject constructor(
     override suspend fun deletePatient(patient: Patient): Outcome {
         return try {
             roomDataSource.deletePatient(patient.toEntity())
-            Outcome.Success
+            Outcome.Success(patient.id)
         } catch (e: Exception) {
             Outcome.Error(e.message ?: "An error occurred")
         }
@@ -69,7 +69,7 @@ class PatientRepositoryImpl @Inject constructor(
     override fun deletePatientById(patientId: String): Outcome {
         return try {
             roomDataSource.deleteById(patientId)
-            Outcome.Success
+            Outcome.Success(patientId)
         } catch (e: Exception) {
             Outcome.Error(e.message ?: "An error occurred")
         }
@@ -133,10 +133,10 @@ class PatientRepositoryImpl @Inject constructor(
 //        }
 //    }
 
-    override suspend fun updateStatus(patient: Patient, status: String, code: String, room: String): Outcome {
+    override suspend fun updateStatus(patientId: String, status: String, code: String, room: String): Outcome {
         return try {
-            roomDataSource.updateStatus(patient.toEntity(), status, code, room)
-            Outcome.Success
+            roomDataSource.updateStatus(patientId, status, code, room)
+            Outcome.Success(patientId)
         } catch (e: Exception) {
             Outcome.Error(e.message ?: "An error occurred")
         }

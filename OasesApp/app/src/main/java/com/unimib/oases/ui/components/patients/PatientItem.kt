@@ -88,7 +88,7 @@ fun PatientItem(
                     ){
                         Text(patient.publicId, color = MaterialTheme.colorScheme.onPrimary)
                         Text(
-                            text = patient.status,
+                            text = patient.status.displayValue,
                             color = MaterialTheme.colorScheme.onPrimary,
                             textAlign = TextAlign.End,
                         )
@@ -102,7 +102,7 @@ fun PatientItem(
 //@Composable
 //fun BluetoothButton(patient: Patient, navController: NavController) {
 //
-//    val route = Screen.SendPatient.route
+//    val route = Route.SendPatient.route
 //
 //    IconButton(
 //        onClick = {

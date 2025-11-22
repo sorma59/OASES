@@ -5,5 +5,13 @@ sealed class MalnutritionScreeningEvent {
     data class HeightChanged(val height: String) : MalnutritionScreeningEvent()
     data class MuacChanged(val muac: String) : MalnutritionScreeningEvent()
 
+    data object EditButtonPressed: MalnutritionScreeningEvent()
+    data object CreateButtonPressed: MalnutritionScreeningEvent()
+    data object BackButtonPressed: MalnutritionScreeningEvent()
+    data object NextButtonPressed: MalnutritionScreeningEvent()
+
+    data object ConfirmDialog: MalnutritionScreeningEvent()
+    data object DismissDialog: MalnutritionScreeningEvent()
+
     data object Retry: MalnutritionScreeningEvent()
 }

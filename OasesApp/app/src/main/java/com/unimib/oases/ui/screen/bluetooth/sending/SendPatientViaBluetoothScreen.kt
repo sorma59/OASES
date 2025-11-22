@@ -29,7 +29,7 @@ import com.unimib.oases.ui.components.bluetooth.devices.DeviceList
 import com.unimib.oases.ui.components.patients.PatientItem
 import com.unimib.oases.ui.components.util.TitleText
 import com.unimib.oases.ui.components.util.button.BottomButtons
-import com.unimib.oases.ui.navigation.Screen
+import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.ui.util.ToastUtils
 
 @Composable
@@ -129,7 +129,7 @@ fun SendPatientViaBluetoothScreen(
                             Spacer(modifier = Modifier.height(16.dp))
 
                             TextButton(
-                                onClick = { navController.navigate(Screen.PairDevice.route) }
+                                onClick = { navController.navigate(Route.PairDevice) }
                             ) { Text("Need to pair a new device?") }
                         }
                     }

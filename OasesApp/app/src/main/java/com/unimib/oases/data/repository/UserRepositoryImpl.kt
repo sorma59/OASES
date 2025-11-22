@@ -24,7 +24,7 @@ class UserRepositoryImpl @Inject constructor(
             val hash = PasswordUtils.hashPassword(password, salt)
             val user = User(username, hash, role, salt)
             if (insert(user))
-                Outcome.Success
+                Outcome.Success()
             else
                 Outcome.Error("Error creating user")
         } catch (e: Exception) {
@@ -44,7 +44,7 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun deleteUser(user: User): Outcome {
         return try {
             roomDataSource.deleteUser(user)
-            Outcome.Success
+            Outcome.Success()
         } catch (e: Exception) {
             Outcome.Error(e.message ?: "Unknown error")
         }

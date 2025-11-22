@@ -127,11 +127,11 @@ fun RedCodeContent(
                         .fillMaxWidth()
                         .verticalScroll(scrollState)
                 ) {
-                    state.triageConfig!!.redOptions.forEach {
+                    state.editingState!!.triageConfig.redOptions.forEach {
                         val id = it.symptom.symptom.id
                         ConditionalAnimatedVisibility(
                             applyWrapper = it.symptom.parent != null,
-                            visible = state.selectedReds.contains(it.symptom.parent?.symptom?.symptomId?.value?.string),
+                            visible = state.editingState.triageData.selectedReds.contains(it.symptom.parent?.symptom?.symptomId?.value?.string),
                             content = {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
@@ -143,7 +143,7 @@ fun RedCodeContent(
                                 ) {
                                     LabeledCheckbox(
                                         label = it.label,
-                                        checked = state.selectedReds.contains(id),
+                                        checked = state.editingState.triageData.selectedReds.contains(id),
                                         onCheckedChange = { boolean: Boolean ->
                                             if (it.symptom.isParent)
                                                 handlePregnancyChangeAndScroll(boolean)
@@ -159,9 +159,9 @@ fun RedCodeContent(
                                         && it.symptom.isParent
                                     ) {
                                         ShowMoreArrow(
-                                            expanded = state.selectedReds.contains(id),
-                                            onClick = {
-                                                handlePregnancyChangeAndScroll(it)
+                                            expanded = state.editingState.triageData.selectedReds.contains(id),
+                                            onClick = {  value ->
+                                                handlePregnancyChangeAndScroll(value)
                                             }
                                         )
                                     }

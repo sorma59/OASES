@@ -20,7 +20,7 @@ class RoomRepositoryImpl @Inject constructor(
     override suspend fun addRoom(room: Room): Outcome {
         return try {
             roomDataSource.insertRoom(room.toEntity())
-            Outcome.Success
+            Outcome.Success(room.name)
         } catch (e: Exception) {
             Log.e("RoomRepository", "Error adding the room: ${e.message}")
             Outcome.Error(e.message ?: "An error occurred")
@@ -30,7 +30,7 @@ class RoomRepositoryImpl @Inject constructor(
     override suspend fun deleteRoom(room: Room): Outcome {
         return try {
             roomDataSource.deleteRoom(room.toEntity())
-            Outcome.Success
+            Outcome.Success(room.name)
         } catch (e: Exception) {
             Outcome.Error(e.message ?: "Unknown error")
         }

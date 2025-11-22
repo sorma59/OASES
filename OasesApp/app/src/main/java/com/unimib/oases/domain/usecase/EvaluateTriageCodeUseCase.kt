@@ -18,9 +18,8 @@ class EvaluateTriageCodeUseCase @Inject constructor() {
         val symptoms = selectedSymptoms.toMutableSet()
         val symptomsToRemove = mutableSetOf<String>()
         symptoms.forEach { id ->
-            val symptom = triageSymptoms[id]
-            if (symptom == null)
-                throw IllegalArgumentException("TriageSymptom $id not found")
+            val symptom =
+                triageSymptoms[id] ?: throw IllegalArgumentException("TriageSymptom $id not found")
             if (symptom.parent != null)
                 if (!symptoms.contains(symptom.parent.symptom.id))
                     symptomsToRemove.add(id) // A child without its parent does not count

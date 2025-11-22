@@ -4,7 +4,6 @@ package com.unimib.oases.ui.components.card
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,18 +18,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Circle
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -52,6 +46,9 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.unimib.oases.domain.model.Patient
+import com.unimib.oases.domain.model.PatientStatus
+import com.unimib.oases.domain.model.TriageCode
+import com.unimib.oases.ui.screen.nurse_assessment.demographics.Sex
 import com.unimib.oases.ui.theme.OasesTheme
 import com.unimib.oases.util.StringFormatHelper.getAgeWithSuffix
 import kotlinx.coroutines.launch
@@ -77,11 +74,11 @@ fun PatientCard(
     }
     val scope = rememberCoroutineScope()
 
-    val codeColor = when (patient.code.uppercase()) {
-        "GREEN" -> Color.Green // Green
-        "RED" -> Color.Red   // Red
-        "YELLOW" -> Color.Yellow // Yellow
-        else -> Color.Gray    // Grey (default)
+    val codeColor = when (patient.code) {
+        TriageCode.GREEN -> Color.Green
+        TriageCode.RED -> Color.Red
+        TriageCode.YELLOW -> Color.Yellow
+        TriageCode.NONE -> Color.Gray
     }
 
 
@@ -167,9 +164,9 @@ fun PatientCard(
 
                     Row(modifier = Modifier.background(color = Color(0xFF005981), shape = RoundedCornerShape(bottomStart = 10.dp)).padding(bottom = 5.dp, top = 5.dp, start = 10.dp, end = 5.dp).height(25.dp), verticalAlignment = Alignment.CenterVertically){
 
-                        if(patient.room.isNotEmpty()) {
+                        if(patient.roomName.isNotEmpty()) {
                             Text(
-                                text = patient.room,
+                                text = patient.roomName,
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.surface,
                                 fontWeight = FontWeight.Normal,
@@ -246,7 +243,7 @@ fun PatientCard(
                         Spacer(modifier = Modifier.height(10.dp))
 
                         Text(
-                            text = patient.status,
+                            text = patient.status.displayValue,
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.surface,
                             fontWeight = FontWeight.Medium,
@@ -294,17 +291,17 @@ fun PatientCardPreview() {
                 name = "John Doe",
                 ageInMonths = 45,
                 publicId = "P12345",
-                code = "RED",
-                status = "Waiting for visit",
+                code = TriageCode.RED,
+                status = PatientStatus.WAITING_FOR_VISIT,
                 birthDate = "",
-                sex = "",
+                sex = Sex.FEMALE,
                 village = "",
                 parish = "",
                 subCounty = "",
                 district = "",
                 nextOfKin = "",
                 contact = "",
-                room = "Emergency Room",
+                roomName = "Emergency Room",
                 arrivalTime = LocalDateTime.now(),
             ),
             onCardClick = {}

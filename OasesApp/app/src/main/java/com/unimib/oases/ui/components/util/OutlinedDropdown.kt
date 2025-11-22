@@ -15,10 +15,11 @@ import androidx.compose.ui.Modifier
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OutlinedDropdown(
-    selected: String,
-    onSelected: (String) -> Unit,
-    options: List<String>,
+fun <T> OutlinedDropdown(
+    selected: T,
+    onSelected: (T) -> Unit,
+    options: List<T>,
+    optionToText: (T) -> String, // Lambda to get the display text for an option
     labelText: String,
     modifier: Modifier = Modifier,
     isError: Boolean = false
@@ -31,7 +32,7 @@ fun OutlinedDropdown(
         modifier = modifier
     ) {
         AnimatedLabelOutlinedTextField(
-            value = selected,
+            value = optionToText(selected),
             onValueChange = { },
             labelText = labelText,
             modifier = Modifier.fillMaxWidth(),
@@ -49,7 +50,7 @@ fun OutlinedDropdown(
         ) {
             options.forEach { option ->
                 DropdownMenuItem(
-                    text = { Text(text = option) },
+                    text = { Text(text = optionToText(option)) },
                     onClick = {
                         onSelected(option)
                         expanded = false
