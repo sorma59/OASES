@@ -212,7 +212,7 @@ private fun DiseaseManagementContent(
     if (showDeletionDialog) {
         AlertDialog(
             onDismissRequest = dismissDeletionDialog,
-            title = { "Delete Disease" },
+            title = { Text("Delete Disease") },
             text = { Text("Are you sure you want to delete this disease?") },
             confirmButton = {
                 DeleteButton(

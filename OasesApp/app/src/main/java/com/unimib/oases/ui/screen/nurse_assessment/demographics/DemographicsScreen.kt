@@ -281,11 +281,4 @@ enum class Sex(val displayName: String) {
     MALE("Male"),
     FEMALE("Female"),
     UNSPECIFIED("Unspecified");
-
-    companion object {
-        // Function to get enum from display name (useful for UI)
-        fun fromDisplayName(displayName: String): Sex {
-            return entries.find { it.displayName == displayName } ?: UNSPECIFIED
-        }
-    }
 }

@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MedicalServices
 import androidx.compose.material.icons.filled.PersonSearch
 import androidx.compose.material.icons.filled.PriorityHigh
@@ -232,24 +231,6 @@ sealed interface PatientDashboardAction {
     }
 
     // --- Concrete implementations of Navigable actions ---
-
-    data object View : PatientNavigable {
-        override val text = "View"
-        override val icon = Icons.Default.PersonSearch
-        override val contentDescription = "View patient data"
-        override val roles = Role.entries
-        override fun createRoute(patientId: String) = Route.ViewPatientDetails(patientId)
-    }
-
-    data object Edit : PatientNavigable {
-        override val text = "Edit"
-        override val icon = Icons.Default.Edit
-        override val contentDescription = "Edit patient data"
-        override val roles = Role.entries
-        // Editing demographics for an existing patient
-        override fun createRoute(patientId: String) = Route.Demographics(patientId)
-    }
-
     data object Demographics: PatientNavigable {
         override val text = "Demographics"
         override val icon = Icons.Default.PersonSearch

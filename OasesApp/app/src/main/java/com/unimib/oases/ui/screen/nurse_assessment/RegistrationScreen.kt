@@ -18,7 +18,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.asFlow
 import androidx.navigation.NavController
-import com.unimib.oases.domain.model.NumericPrecision
 import com.unimib.oases.ui.components.util.button.BottomButtons
 import com.unimib.oases.ui.components.util.button.RetryButton
 import com.unimib.oases.ui.navigation.Route
@@ -100,17 +99,6 @@ fun RegistrationScreen(
     RegistrationContent(
         state,
         registrationScreenViewModel::onEvent,
-//        state.vitalSignsState,
-//        state.triageState,
-//        state.roomsState,
-//        state.visitHistoryState,
-//        state.malnutritionScreeningState,
-//        registrationScreenViewModel::onVitalSignsEvent,
-//        registrationScreenViewModel::onTriageEvent,
-//        registrationScreenViewModel::onRoomEvent,
-//        registrationScreenViewModel::onVisitHistoryEvent,
-//        registrationScreenViewModel::onMalnutritionScreeningEvent,
-        registrationScreenViewModel::getPrecisionFor,
         registrationScreenViewModel::onNext,
         registrationScreenViewModel::onBack
     )
@@ -120,33 +108,9 @@ fun RegistrationScreen(
 fun RegistrationContent(
     state: RegistrationState,
     onEvent: (RegistrationEvent) -> Unit,
-//    vitalSignsState: VitalSignsState,
-//    triageState: TriageState,
-//    roomsState: RoomsState,
-//    visitHistoryState: VisitHistoryState,
-//    malnutritionScreeningState: MalnutritionScreeningState,
-//    onVitalSignsEvent: (VitalSignsEvent) -> Unit,
-//    onTriageEvent: (TriageEvent) -> Unit,
-//    onRoomEvent: (RoomEvent) -> Unit,
-//    onVisitHistoryEvent: (VisitHistoryEvent) -> Unit,
-//    onMalnutritionScreeningEvent: (MalnutritionScreeningEvent) -> Unit,
-    getPrecisionFor: (String) -> NumericPrecision?,
     onNext: () -> Unit,
     onBack: () -> Unit
 ) {
-
-//    val prefixText = remember(currentTab) {
-//        when (currentTab) {
-//            Tab.RED_CODE, Tab.YELLOW_CODE -> {
-//                when (triageState.patientCategory) {
-//                    PatientCategory.ADULT -> "Adult "
-//                    PatientCategory.PEDIATRIC -> "Pediatric "
-//                }
-//            }
-//
-//            else -> ""
-//        }
-//    }
 
     val nextButtonText = remember(state.currentTab) {
         when (state.currentTab) {
@@ -164,22 +128,6 @@ fun RegistrationContent(
             else -> "Back"
         }
     }
-
-//    val onConfirm by remember(
-//        currentTab,
-//        demographicsState.isEdited,
-//        demographicsState.isNew
-//    ) {
-//        derivedStateOf {
-//            if (currentTab == Tab.DEMOGRAPHICS &&
-//                (demographicsState.isEdited ||
-//                demographicsState.isNew)
-//            ) {
-//                { onPatientInfoEvent(DemographicsEvent.NextButtonPressed) }
-//            } else
-//                onNext
-//        }
-//    }
 
     state.error?.let {
         RetryButton(
@@ -215,45 +163,9 @@ fun RegistrationContent(
 
                     Tab.START_WITH_DEMOGRAPHICS_DECISION -> StartWithDemographicsDecisionScreen()
 
-//                    Tab.DEMOGRAPHICS -> PatientInfoContent(
-//                        state = demographicsState,
-//                        onEvent = onPatientInfoEvent
-//                    )
-
                     Tab.CONTINUE_TO_TRIAGE -> ContinueToTriageDecisionScreen()
 
-//                    Tab.VITAL_SIGNS -> VitalSignsContent(
-//                        state = vitalSignsState,
-//                        onEvent = onVitalSignsEvent,
-//                        getPrecisionFor = getPrecisionFor
-//                    )
-//
-//                    Tab.RED_CODE -> RedCodeContent(
-//                        state = triageState,
-//                        onEvent = onTriageEvent,
-//                    )
-//
-//                    Tab.YELLOW_CODE -> YellowCodeContent(
-//                        state = triageState,
-//                        onEvent = onTriageEvent
-//                    )
-//
-//                    Tab.ROOM_SELECTION -> RoomContent(
-//                        state = roomsState,
-//                        onEvent = onRoomEvent,
-//                    )
-
                     Tab.CONTINUE_TO_MALNUTRITION_SCREENING -> ContinueToMalnutritionDecisionScreen()
-
-//                    Tab.MALNUTRITION_SCREENING -> MalnutritionScreeningContent(
-//                        state = malnutritionScreeningState,
-//                        onEvent = onMalnutritionScreeningEvent
-//                    )
-//
-//                    Tab.HISTORY -> VisitHistoryContent(
-//                        state = visitHistoryState,
-//                        onEvent = onVisitHistoryEvent
-//                    )
 
                     Tab.SUBMIT_ALL -> SubmissionScreen()
                 }
