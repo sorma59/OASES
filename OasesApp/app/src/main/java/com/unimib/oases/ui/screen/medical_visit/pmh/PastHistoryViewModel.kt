@@ -29,7 +29,7 @@ class PastHistoryViewModel @Inject constructor(
     private val getPatientChronicDiseasesUseCase: GetPatientChronicDiseasesUseCase,
     private val savePastMedicalHistoryUseCase: SavePastMedicalHistoryUseCase,
     savedStateHandle: SavedStateHandle,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ): ViewModel() {
 
     private var errorHandler = CoroutineExceptionHandler { _, e ->

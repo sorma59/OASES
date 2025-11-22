@@ -21,7 +21,7 @@ import javax.inject.Inject
 class UserManagementViewModel @Inject constructor(
     private val useCases: UserUseCase,
     private val saveUserUseCase: SaveUserUseCase,
-    @IoDispatcher private val dispatcher: CoroutineDispatcher
+    @param:IoDispatcher private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
 

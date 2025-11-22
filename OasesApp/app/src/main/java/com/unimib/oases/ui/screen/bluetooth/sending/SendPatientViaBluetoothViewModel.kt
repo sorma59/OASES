@@ -26,7 +26,7 @@ class SendPatientViaBluetoothViewModel @Inject constructor(
     private val sendPatientViaBluetoothUseCase: SendPatientViaBluetoothUseCase,
     private val bluetoothCustomManager: BluetoothCustomManager,
     savedStateHandle: SavedStateHandle,
-    @IoDispatcher private val dispatcher: CoroutineDispatcher,
+    @param:IoDispatcher private val dispatcher: CoroutineDispatcher,
     private val patientRepository: PatientRepository,
 ) : ViewModel(){
 

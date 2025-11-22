@@ -21,7 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class DiseaseManagementViewModel @Inject constructor(
     private val useCases: DiseaseUseCase,
-    @IoDispatcher private val dispatcher: CoroutineDispatcher
+    @param:IoDispatcher private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
 

@@ -54,7 +54,7 @@ class MainComplaintViewModel @Inject constructor(
     private val translateLatestVitalSignsToSymptomsUseCase: TranslateLatestVitalSignsToSymptomsUseCase,
     private val selectSymptomUseCase: SelectSymptomUseCase,
     savedStateHandle: SavedStateHandle,
-    @IoDispatcher private val dispatcher: CoroutineDispatcher,
+    @param:IoDispatcher private val dispatcher: CoroutineDispatcher,
     private val patientRepository: PatientRepository,
     private val triageEvaluationRepository: TriageEvaluationRepository
 ): ViewModel() {

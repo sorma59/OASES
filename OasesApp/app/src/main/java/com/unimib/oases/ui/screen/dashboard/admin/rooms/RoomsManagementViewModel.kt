@@ -19,7 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class RoomsManagementViewModel @Inject constructor(
     private val useCases: RoomUseCase,
-    @IoDispatcher private val dispatcher: CoroutineDispatcher
+    @param:IoDispatcher private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     private var getRoomsJob: Job? = null

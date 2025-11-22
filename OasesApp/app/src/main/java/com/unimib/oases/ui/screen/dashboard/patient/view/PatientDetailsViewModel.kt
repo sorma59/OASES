@@ -31,7 +31,7 @@ class PatientDetailsViewModel @Inject constructor(
     private val getCurrentVisitMainComplaintUseCase: GetCurrentVisitMainComplaintUseCase,
     private val getPatientChronicDiseasesUseCase: GetPatientChronicDiseasesUseCase,
     savedStateHandle: SavedStateHandle,
-    @IoDispatcher private val dispatcher: CoroutineDispatcher
+    @param:IoDispatcher private val dispatcher: CoroutineDispatcher
 ): ViewModel() {
 
     private var errorHandler = CoroutineExceptionHandler { _, e ->

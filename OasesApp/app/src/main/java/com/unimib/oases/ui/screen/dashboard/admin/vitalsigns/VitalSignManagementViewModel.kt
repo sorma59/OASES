@@ -21,7 +21,7 @@ import javax.inject.Inject
 class VitalSignManagementViewModel @Inject constructor(
     private val useCases: VitalSignUseCase,
     private val saveVitalSignUseCase: SaveVitalSignUseCase,
-    @IoDispatcher private val dispatcher: CoroutineDispatcher
+    @param:IoDispatcher private val dispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
 
