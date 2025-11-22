@@ -3,13 +3,18 @@ package com.unimib.oases.ui.screen.nurse_assessment.demographics
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardDoubleArrowLeft
+import androidx.compose.material.icons.filled.KeyboardDoubleArrowRight
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -122,6 +127,45 @@ private fun DemographicsEditing(
 
     val scrollState = rememberScrollState()
 
+    @Composable
+    fun BirthDateAndAgeInputFields(
+        data: PatientData,
+        errors: FormErrors
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            DateSelector(
+                selectedDate = data.birthDate,
+                onDateSelected = onBirthDateChange,
+                context = context,
+                labelText = "Date of Birth",
+                isError = errors.birthDateError != null,
+                modifier = Modifier.weight(1f)
+            )
+
+            Column {
+                Icon(
+                    Icons.Default.KeyboardDoubleArrowRight,
+                    contentDescription = "Arrow to the right"
+                )
+
+                Icon(
+                    Icons.Default.KeyboardDoubleArrowLeft,
+                    contentDescription = "Arrow to the right"
+                )
+            }
+
+            AgeInputField(
+                ageInMonths = data.ageInMonths,
+                onAgeChange = onAgeChange,
+                isError = errors.birthDateError != null,
+                modifier = Modifier.weight(1f)
+            )
+        }
+    }
+
     state.editingState?.let {
         Column(
             Modifier.reactToKeyboardAppearance()
@@ -151,14 +195,8 @@ private fun DemographicsEditing(
                             color = MaterialTheme.colorScheme.error
                         )
                     }
-                    
-                    DateSelector(
-                        selectedDate = it.patientData.birthDate,
-                        onDateSelected = onBirthDateChange,
-                        context = context,
-                        labelText = "Date of Birth",
-                        isError = it.formErrors.birthDateError != null
-                    )
+
+                    BirthDateAndAgeInputFields(it.patientData, it.formErrors)
 
                     it.formErrors.birthDateError?.let { error ->
                         Text(
@@ -166,11 +204,6 @@ private fun DemographicsEditing(
                             color = MaterialTheme.colorScheme.error
                         )
                     }
-
-                    AgeInputField(
-                        ageInMonths = it.patientData.ageInMonths,
-                        onAgeChange = onAgeChange
-                    )
 
                     OutlinedDropdown(
                         selected = it.patientData.sex,
