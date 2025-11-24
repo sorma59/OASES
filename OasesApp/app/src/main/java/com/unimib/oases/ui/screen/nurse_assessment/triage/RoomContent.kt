@@ -143,7 +143,7 @@ fun RoomScreenPreview() {
     RoomContent(
         TriageState(
             patientId = "",
-            visitId = null,
+            visitId = "",
             uiMode = PatientRegistrationScreensUiMode.Standalone()
         ),
         onEvent = {},

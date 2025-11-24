@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 class VisitVitalSignsUseCase @Inject constructor(
     private val visitVitalSignRepository: VisitVitalSignRepository
 ){
-    suspend fun addVisitVitalSign(visitVitalSign: VisitVitalSign): Outcome {
+    suspend fun addVisitVitalSign(visitVitalSign: VisitVitalSign): Outcome<Unit> {
         return visitVitalSignRepository.addVisitVitalSign(visitVitalSign)
     }
 

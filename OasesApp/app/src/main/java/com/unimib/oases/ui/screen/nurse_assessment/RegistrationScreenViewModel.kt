@@ -43,21 +43,13 @@ class RegistrationScreenViewModel @Inject constructor(
 
     fun onEvent(event: RegistrationEvent) {
         when (event) {
-            is RegistrationEvent.PatientCreated -> {
+            is RegistrationEvent.PatientAndVisitCreated -> {
                _state.update {
                    it.copy(
-                       patientId = event.patientId
+                       patientId = event.patientId,
+                       visitId = event.visitId
                    )
                }
-                onEvent(RegistrationEvent.StepCompleted)
-            }
-
-            is RegistrationEvent.VisitCreated -> {
-                _state.update {
-                    it.copy(
-                        visitId = event.visitId
-                    )
-                }
                 onEvent(RegistrationEvent.StepCompleted)
             }
 
@@ -269,7 +261,9 @@ class RegistrationScreenViewModel @Inject constructor(
                 Route.Triage::class -> {
                     val patientId = state.value.patientId
                     requireNotNull(patientId) { "Cannot navigate to Triage without a patientId." }
-                    Route.Triage(patientId, isWizardMode = true)
+                    val visitId = state.value.visitId
+                    requireNotNull(visitId) { "Cannot navigate to Malnutrition Screening without a visitId." }
+                    Route.Triage(patientId, visitId, isWizardMode = true)
                 }
 
                 Route.MalnutritionScreening::class -> {
@@ -303,7 +297,6 @@ class RegistrationScreenViewModel @Inject constructor(
 
     companion object {
         const val DEMOGRAPHICS_COMPLETED_KEY = "demographics_completed"
-        const val TRIAGE_COMPLETED_KEY = "triage_completed"
         const val STEP_COMPLETED_KEY = "step_completed"
     }
 }

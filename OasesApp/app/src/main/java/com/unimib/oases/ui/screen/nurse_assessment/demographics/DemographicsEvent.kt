@@ -4,10 +4,8 @@ sealed class DemographicsEvent {
 
     data class NameChanged(val name: String): DemographicsEvent()
     data class BirthDateChanged(val birthDate: String): DemographicsEvent()
-//    data class BirthDateComputed(val birthDate: String): DemographicsEvent()
     data class AgeChanged(val ageInMonths: Int): DemographicsEvent()
-//    data class AgeComputed(val ageInMonths: Int): DemographicsEvent()
-    data class SexChanged(val sex: Sex): DemographicsEvent()
+    data class SexChanged(val sexOption: SexOption): DemographicsEvent()
     data class VillageChanged(val village: String): DemographicsEvent()
     data class ParishChanged(val parish: String): DemographicsEvent()
     data class SubCountyChanged(val subCounty: String): DemographicsEvent()

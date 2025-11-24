@@ -5,11 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.unimib.oases.di.IoDispatcher
-import com.unimib.oases.domain.model.Patient
-import com.unimib.oases.domain.model.PatientStatus
-import com.unimib.oases.domain.model.TriageCode
-import com.unimib.oases.domain.usecase.InsertPatientLocallyUseCase
+import com.unimib.oases.domain.model.PatientAndVisitIds
 import com.unimib.oases.domain.usecase.PatientUseCase
+import com.unimib.oases.domain.usecase.SavePatientDataAndCreateVisitUseCase
+import com.unimib.oases.domain.usecase.SavePatientDataUseCase
 import com.unimib.oases.domain.usecase.ValidatePatientInfoFormUseCase
 import com.unimib.oases.domain.usecase.toFormErrors
 import com.unimib.oases.ui.navigation.NavigationEvent
@@ -30,13 +29,13 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.random.Random
 
 @HiltViewModel
 class DemographicsViewModel @Inject constructor(
     private val patientUseCase: PatientUseCase,
-    private val insertPatientLocallyUseCase: InsertPatientLocallyUseCase,
     private val validatePatientInfoFormUseCase: ValidatePatientInfoFormUseCase,
+    private val savePatientDataUseCase: SavePatientDataUseCase,
+    private val savePatientDataAndCreateVisitUseCase: SavePatientDataAndCreateVisitUseCase,
     savedStateHandle: SavedStateHandle,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ): ViewModel(){
@@ -111,30 +110,21 @@ class DemographicsViewModel @Inject constructor(
 
     private fun goBack() {
         if (state.value.uiMode is PatientRegistrationScreensUiMode.Wizard)
-            concludeDemographics()
+            goBackToWizard(null)
         else
-            _state.update {
-                it.copy(uiMode = PatientRegistrationScreensUiMode.Standalone(false))
-            }
+            goBackToViewMode()
     }
 
-    private suspend fun savePatientData(): Boolean {
-        if (Random.nextBoolean()) //TODO("DEBUG ONLY: REMOVE")
-            return false
+    private fun goBackToViewMode() {
         _state.update {
-            it.copy(isLoading = true)
+            it.copy(
+                uiMode = PatientRegistrationScreensUiMode.Standalone(false)
+            )
         }
-        val patient = _state.value.editingState!!.patientData.toModel()
-        val result = insertPatientLocallyUseCase(patient)
+    }
 
-        if (result is Outcome.Success)
-            saveEdits(result.id!!)
-
-        _state.update {
-            it.copy(isLoading = false)
-        }
-
-        return (result is Outcome.Success)
+    private fun goBackToWizard(ids: PatientAndVisitIds?) {
+        concludeDemographics(ids)
     }
 
     fun onEvent(
@@ -161,7 +151,7 @@ class DemographicsViewModel @Inject constructor(
                 }
             }
             is DemographicsEvent.BirthDateChanged -> {
-                val newAgeInMonths = DateTimeFormatter().calculateAgeInMonths(event.birthDate)
+                val newAgeInMonths = DateTimeFormatter.calculateAgeInMonths(event.birthDate)
                 _state.update {
                     it.editingState?.let { editing ->
                         it.copy(
@@ -181,7 +171,7 @@ class DemographicsViewModel @Inject constructor(
                 }
             }
             is DemographicsEvent.AgeChanged -> {
-                val newBirthDate = DateTimeFormatter().calculateBirthDate(event.ageInMonths)
+                val newBirthDate = DateTimeFormatter.calculateBirthDate(event.ageInMonths)
                 _state.update {
                     it.editingState?.let { editing ->
                         it.copy(
@@ -206,7 +196,7 @@ class DemographicsViewModel @Inject constructor(
                         it.copy(
                             editingState = editing.copy(
                                 patientData = editing.patientData.copy(
-                                    sex = event.sex
+                                    sexOption = event.sexOption
                                 ),
                                 formErrors = editing.formErrors.copy(
                                     sexError = null
@@ -321,41 +311,12 @@ class DemographicsViewModel @Inject constructor(
             }
 
             DemographicsEvent.ConfirmDialog -> {
-                _state.update {
-                    it.copy(
-                        editingState = it.editingState!!.copy(
-                            savingState = it.editingState.savingState.copy(
-                                isLoading = true,
-                                error = null
-                            )
-                        )
-                    )
-                }
+                setSavingStateToLoading()
                 viewModelScope.launch {
-                    if (savePatientData()) {
-                        _state.update {
-                            it.copy(
-                                showAlertDialog = false,
-                                editingState = it.editingState!!.copy(
-                                    savingState = it.editingState.savingState.copy(
-                                        isLoading = false
-                                    )
-                                ),
-                            )
-                        }
-                        goBack()
-                    }
+                    if (state.value.uiMode is PatientRegistrationScreensUiMode.Wizard)
+                        handleWizardDialogConfirmation()
                     else
-                        _state.update {
-                            it.copy(
-                                editingState = it.editingState!!.copy(
-                                    savingState = it.editingState.savingState.copy(
-                                        error = "Save unsuccessful, try again",
-                                        isLoading = false
-                                    )
-                                )
-                            )
-                        }
+                        handleStandaloneDialogConfirmation()
                 }
             }
             DemographicsEvent.DismissDialog -> {
@@ -369,11 +330,57 @@ class DemographicsViewModel @Inject constructor(
         }
     }
 
-    private suspend fun navigateBackWithResult() {
+    private fun setSavingStateToLoading() {
+        _state.update {
+            it.copy(
+                editingState = it.editingState!!.copy(
+                    savingState = it.editingState.savingState.copy(
+                        isLoading = true,
+                        error = null
+                    )
+                )
+            )
+        }
+    }
+
+    private suspend fun handleWizardDialogConfirmation() {
+        val patientData = state.value.editingState!!.patientData
+        val result = savePatientDataAndCreateVisitUseCase(patientData)
+        if (result is Outcome.Success)
+            goBackToWizard(result.data)
+        else
+            showSavingError()
+    }
+
+    private fun showSavingError(error: String? = null) {
+        _state.update {
+            it.copy(
+                editingState = it.editingState!!.copy(
+                    savingState = it.editingState.savingState.copy(
+                        error = error ?: "Save unsuccessful, try again",
+                        isLoading = false
+                    )
+                )
+            )
+        }
+    }
+
+    private suspend fun handleStandaloneDialogConfirmation() {
+        val patientData = state.value.editingState!!.patientData
+        val result = savePatientDataUseCase(patientData)
+        if (result is Outcome.Success) {
+            saveEdits(result.data)
+            goBackToViewMode()
+        }
+        else
+            showSavingError()
+    }
+
+    private suspend fun navigateBackWithResult(result: PatientAndVisitIds?) {
         navigationEventsChannel.send(
             NavigationEvent.NavigateBackWithResult(
                 DEMOGRAPHICS_COMPLETED_KEY,
-                state.value.storedData.id
+                result
             )
         )
     }
@@ -386,7 +393,7 @@ class DemographicsViewModel @Inject constructor(
         val result = validatePatientInfoFormUseCase(
             name = state.name,
             birthDate = state.birthDate,
-            sex = state.sex
+            sexOption = state.sexOption
         )
 
         // Update state with errors
@@ -401,8 +408,8 @@ class DemographicsViewModel @Inject constructor(
         return result.isSuccessful
     }
 
-    private fun concludeDemographics(){
-        viewModelScope.launch{ navigateBackWithResult() }
+    private fun concludeDemographics(ids: PatientAndVisitIds?) {
+        viewModelScope.launch { navigateBackWithResult(ids) }
     }
 
     private fun saveEdits(patientId: String) {
@@ -425,58 +432,4 @@ class DemographicsViewModel @Inject constructor(
             )
         }
     }
-}
-
-private fun PatientData.toModel(): Patient {
-    return if (id != null)
-        Patient(
-            id = id,
-            name = name,
-            birthDate = birthDate,
-            ageInMonths = ageInMonths,
-            sex = sex,
-            village = village,
-            parish = parish,
-            subCounty = subCounty,
-            district = district,
-            nextOfKin = nextOfKin,
-            contact = contact,
-            arrivalTime = arrivalTime,
-            code = TriageCode.NONE,
-            roomName = "",
-            status = PatientStatus.WAITING_FOR_TRIAGE
-        )
-    else
-        Patient(
-            name = name,
-            birthDate = birthDate,
-            ageInMonths = ageInMonths,
-            sex = sex,
-            village = village,
-            parish = parish,
-            subCounty = subCounty,
-            district = district,
-            nextOfKin = nextOfKin,
-            contact = contact,
-            arrivalTime = arrivalTime,
-            code = TriageCode.NONE,
-            roomName = "",
-            status = PatientStatus.WAITING_FOR_TRIAGE
-        )
-}
-
-private fun Patient.toState(): PatientData {
-    return PatientData(
-        id = id,
-        name = name,
-        birthDate = birthDate,
-        ageInMonths = ageInMonths,
-        sex = sex,
-        village = village,
-        parish = parish,
-        subCounty = subCounty,
-        district = district,
-        nextOfKin = nextOfKin,
-        contact = contact
-    )
 }

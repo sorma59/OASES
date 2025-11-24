@@ -1,15 +1,20 @@
 package com.unimib.oases.data.mapper
 
 import com.unimib.oases.data.local.model.VisitEntity
-import com.unimib.oases.domain.model.TriageCode.Companion.fromTriageCodeName
+import com.unimib.oases.domain.model.PatientStatus
+import com.unimib.oases.domain.model.TriageCode
 import com.unimib.oases.domain.model.Visit
 import java.time.LocalDate
+import java.time.LocalTime
 
 fun Visit.toEntity(): VisitEntity {
     return VisitEntity(
         id = id,
         patientId = patientId,
         triageCode = triageCode.name,
+        patientStatus = patientStatus.name,
+        roomName = roomName,
+        arrivalTime = arrivalTime.toString(),
         date = date.toString(),
         description = description
     )
@@ -19,7 +24,10 @@ fun VisitEntity.toDomain(): Visit {
     return Visit(
         id = id,
         patientId = patientId,
-        triageCode = fromTriageCodeName(triageCode),
+        triageCode = TriageCode.valueOf(triageCode),
+        patientStatus = PatientStatus.valueOf(patientStatus),
+        roomName = roomName,
+        arrivalTime = LocalTime.parse(arrivalTime),
         date = LocalDate.parse(date),
         description = description
     )

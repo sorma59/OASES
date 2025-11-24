@@ -5,10 +5,10 @@ import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.util.Outcome
 import javax.inject.Inject
 
-class InsertPatientLocallyUseCase @Inject constructor(
+class InsertPatientUseCase @Inject constructor(
     private val patientRepository: PatientRepository
 ) {
-    suspend operator fun invoke(patient: Patient): Outcome {
+    suspend operator fun invoke(patient: Patient): Outcome<String> {
         return patientRepository.addPatient(patient)
     }
 }

@@ -3,16 +3,16 @@ package com.unimib.oases.domain.usecase
 import com.unimib.oases.domain.common.FormErrorMessages
 import com.unimib.oases.domain.usecase.ValidatePatientInfoFormUseCase.ValidationResult
 import com.unimib.oases.ui.screen.nurse_assessment.demographics.FormErrors
-import com.unimib.oases.ui.screen.nurse_assessment.demographics.Sex
+import com.unimib.oases.ui.screen.nurse_assessment.demographics.SexOption
 import javax.inject.Inject
 
 class ValidatePatientInfoFormUseCase @Inject constructor() {
 
-    operator fun invoke(name: String, birthDate: String, sex: Sex): ValidationResult {
+    operator fun invoke(name: String, birthDate: String, sexOption: SexOption): ValidationResult {
 
         val nameError = validateName(name)
         val birthDateError = validateBirthDate(birthDate)
-        val sexError = validateSex(sex)
+        val sexError = validateSex(sexOption)
 
         return ValidationResult(
             nameError,
@@ -35,10 +35,9 @@ class ValidatePatientInfoFormUseCase @Inject constructor() {
         return null
     }
 
-    private fun validateSex(sex: Sex): String? {
-        if (sex == Sex.UNSPECIFIED) {
+    private fun validateSex(sexOption: SexOption): String? {
+        if (sexOption.sex == null)
             return FormErrorMessages.SEX_NOT_SELECTED
-        }
         return null
     }
 

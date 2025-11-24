@@ -2,7 +2,6 @@ package com.unimib.oases.domain.model
 
 import com.unimib.oases.ui.screen.nurse_assessment.demographics.Sex
 import com.unimib.oases.util.PasswordUtils
-import java.time.LocalDateTime
 import java.util.UUID
 
 data class Patient(
@@ -18,10 +17,10 @@ data class Patient(
     val district: String,
     val nextOfKin: String,
     val contact: String,
-    val status: PatientStatus,
-    val code: TriageCode,
-    val roomName: String,
-    val arrivalTime: LocalDateTime = LocalDateTime.now(),
+//    val status: PatientStatus,
+//    val code: TriageCode,
+//    val roomName: String,
+//    val arrivalTime: LocalDateTime = LocalDateTime.now(),
     val image: ByteArray? = null
 )
 

@@ -4,7 +4,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unimib.oases.di.IoDispatcher
-import com.unimib.oases.domain.model.PatientStatus
 import com.unimib.oases.domain.model.complaint.ComplaintId
 import com.unimib.oases.domain.model.complaint.ComplaintQuestion
 import com.unimib.oases.domain.model.complaint.Diarrhea
@@ -326,9 +325,7 @@ class MainComplaintViewModel @Inject constructor(
                                     toastMessage = "Medical visit submitted successfully"
                                 )
                             }
-                            patientRepository.addPatient(state.value.patient!!.copy(
-                                status = PatientStatus.WAITING_FOR_TEST_RESULTS
-                            ))
+                            patientRepository.addPatient(state.value.patient!!)
                             navigationEventsChannel.send(NavigationEvent.NavigateBack)
                         }
 

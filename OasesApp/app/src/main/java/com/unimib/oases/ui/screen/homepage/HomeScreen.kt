@@ -27,7 +27,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.unimib.oases.data.local.model.Role
-import com.unimib.oases.ui.components.patients.PatientList
+import com.unimib.oases.ui.components.patients.PatientsWithVisitInfoList
 import com.unimib.oases.ui.components.search.SearchBar
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 import com.unimib.oases.ui.screen.login.AuthViewModel
@@ -90,9 +90,9 @@ private fun HomeContent(
 
     val shouldShowAddPatientButton = userRole == Role.NURSE
 
-    val filteredItems = state.patients.filter { item ->
-        item.publicId.contains(searchText, ignoreCase = true) || // Public id
-        item.name.contains(searchText, ignoreCase = true)        // Name
+    val filteredItems = state.patientsWithVisitInfo.filter { item ->
+        item.patient.publicId.contains(searchText, ignoreCase = true) || // Public id
+        item.patient.name.contains(searchText, ignoreCase = true)        // Name
     }
 
     Column(
@@ -136,9 +136,9 @@ private fun HomeContent(
                 }
                 if (state.isLoading) {
                     CustomCircularProgressIndicator()
-                } else if (state.patients.isNotEmpty()) {
-                    PatientList(
-                        patients = filteredItems,
+                } else if (state.patientsWithVisitInfo.isNotEmpty()) {
+                    PatientsWithVisitInfoList(
+                        patientsWithVisitInfo = filteredItems,
                         onItemClick = onPatientItemClick
                     )
                 }

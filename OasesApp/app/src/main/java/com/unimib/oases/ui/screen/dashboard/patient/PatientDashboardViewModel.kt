@@ -11,7 +11,6 @@ import com.unimib.oases.domain.usecase.GetCurrentVisitUseCase
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.util.Outcome
 import com.unimib.oases.util.Resource
-import com.unimib.oases.util.firstNullableSuccess
 import com.unimib.oases.util.firstSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -124,8 +123,8 @@ class PatientDashboardViewModel @Inject constructor(
 
                         is PatientDashboardAction.Triage -> {
                             val visitId = getCurrentVisitUseCase(state.value.patientId)
-                                .firstNullableSuccess()
-                                ?.id
+                                .firstSuccess()
+                                .id
                             navigationEventsChannel.send(
                                 NavigationEvent.Navigate(
                                     event.action.createRoute(

@@ -18,12 +18,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.asFlow
 import androidx.navigation.NavController
+import com.unimib.oases.domain.model.PatientAndVisitIds
 import com.unimib.oases.ui.components.util.button.BottomButtons
 import com.unimib.oases.ui.components.util.button.RetryButton
 import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreenViewModel.Companion.DEMOGRAPHICS_COMPLETED_KEY
 import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreenViewModel.Companion.STEP_COMPLETED_KEY
-import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreenViewModel.Companion.TRIAGE_COMPLETED_KEY
 import com.unimib.oases.ui.screen.nurse_assessment.transitionscreens.ContinueToMalnutritionDecisionScreen
 import com.unimib.oases.ui.screen.nurse_assessment.transitionscreens.ContinueToTriageDecisionScreen
 import com.unimib.oases.ui.screen.nurse_assessment.transitionscreens.StartWithDemographicsDecisionScreen
@@ -53,7 +53,7 @@ fun RegistrationScreen(
             ?.getLiveData<Boolean>(STEP_COMPLETED_KEY)
             ?.asFlow()
             ?.collect { completed ->
-                if (completed == true) {
+                if (completed) {
                     registrationScreenViewModel.onEvent(RegistrationEvent.StepCompleted)
                     navController.currentBackStackEntry
                         ?.savedStateHandle
@@ -67,31 +67,19 @@ fun RegistrationScreen(
     LaunchedEffect(navController.currentBackStackEntry) {
         navController.currentBackStackEntry
             ?.savedStateHandle
-            ?.getLiveData<String?>(DEMOGRAPHICS_COMPLETED_KEY)
+            ?.getLiveData<PatientAndVisitIds?>(DEMOGRAPHICS_COMPLETED_KEY)
             ?.asFlow()
-            ?.collect { patientId ->
-                patientId?.let {
-                    registrationScreenViewModel.onEvent(RegistrationEvent.PatientCreated(it))
+            ?.collect { ids ->
+                ids?.let {
+                    registrationScreenViewModel.onEvent(
+                        RegistrationEvent.PatientAndVisitCreated(
+                            it.patientId, it.visitId
+                        )
+                    )
                     navController.currentBackStackEntry
                         ?.savedStateHandle
                         // Remove the mapping since it is a one timer
-                        ?.remove<String?>(DEMOGRAPHICS_COMPLETED_KEY)
-                }
-            }
-    }
-
-    LaunchedEffect(navController.currentBackStackEntry) {
-        navController.currentBackStackEntry
-            ?.savedStateHandle
-            ?.getLiveData<String?>(TRIAGE_COMPLETED_KEY)
-            ?.asFlow()
-            ?.collect { visitId ->
-                visitId?.let {
-                    registrationScreenViewModel.onEvent(RegistrationEvent.VisitCreated(it))
-                    navController.currentBackStackEntry
-                        ?.savedStateHandle
-                        // Remove the mapping since it is a one timer
-                        ?.remove<String?>(TRIAGE_COMPLETED_KEY)
+                        ?.remove<PatientAndVisitIds?>(DEMOGRAPHICS_COMPLETED_KEY)
                 }
             }
     }

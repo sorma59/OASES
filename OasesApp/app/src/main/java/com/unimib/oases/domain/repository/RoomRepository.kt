@@ -6,7 +6,7 @@ import com.unimib.oases.util.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface RoomRepository {
-    suspend fun addRoom(room: Room): Outcome
-    suspend fun deleteRoom(room: Room): Outcome
+    suspend fun addRoom(room: Room): Outcome<Unit>
+    suspend fun deleteRoom(room: Room): Outcome<Unit>
     fun getAllRooms(): Flow<Resource<List<Room>>>
 }

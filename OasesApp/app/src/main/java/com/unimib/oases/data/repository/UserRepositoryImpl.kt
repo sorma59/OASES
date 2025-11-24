@@ -17,14 +17,14 @@ class UserRepositoryImpl @Inject constructor(
     private val roomDataSource: RoomDataSource
 ): UserRepository {
 
-    override suspend fun createUser(username: String, password: String, role: Role): Outcome {
+    override suspend fun createUser(username: String, password: String, role: Role): Outcome<Unit> {
         return try {
             // Generate a unique salt for each password
             val salt = PasswordUtils.generateSalt()
             val hash = PasswordUtils.hashPassword(password, salt)
             val user = User(username, hash, role, salt)
             if (insert(user))
-                Outcome.Success()
+                Outcome.Success(Unit)
             else
                 Outcome.Error("Error creating user")
         } catch (e: Exception) {
@@ -41,10 +41,10 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun deleteUser(user: User): Outcome {
+    override suspend fun deleteUser(user: User): Outcome<Unit> {
         return try {
             roomDataSource.deleteUser(user)
-            Outcome.Success()
+            Outcome.Success(Unit)
         } catch (e: Exception) {
             Outcome.Error(e.message ?: "Unknown error")
         }

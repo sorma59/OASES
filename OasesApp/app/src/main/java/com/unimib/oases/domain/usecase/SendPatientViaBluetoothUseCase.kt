@@ -17,7 +17,7 @@ class SendPatientViaBluetoothUseCase @Inject constructor(
     private val bluetoothManager: BluetoothCustomManager,
     private val retrievePatientFullDataUseCase: RetrievePatientFullDataUseCase
 ) {
-    suspend operator fun invoke(patientId: String, device: BluetoothDevice): Outcome {
+    suspend operator fun invoke(patientId: String, device: BluetoothDevice): Outcome<Unit> {
         return try {
             var enabled = false
             withContext(Dispatchers.IO){
@@ -59,7 +59,7 @@ class SendPatientViaBluetoothUseCase @Inject constructor(
 
                             // Make sure the patient data is sent and received
                             delay(1000)
-                            Outcome.Success()
+                            Outcome.Success(Unit)
                         } else
                             Outcome.Error("Could not connect to device")
 

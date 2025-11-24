@@ -6,6 +6,6 @@ import com.unimib.oases.util.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface TriageEvaluationRepository {
-    suspend fun insertTriageEvaluation(triageEvaluation: TriageEvaluation): Outcome
+    suspend fun insertTriageEvaluation(triageEvaluation: TriageEvaluation): Outcome<Unit>
     fun getTriageEvaluation(visitId: String): Flow<Resource<TriageEvaluation>>
 }

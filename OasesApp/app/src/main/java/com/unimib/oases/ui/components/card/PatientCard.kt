@@ -47,13 +47,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.domain.model.PatientStatus
+import com.unimib.oases.domain.model.PatientWithVisitInfo
 import com.unimib.oases.domain.model.TriageCode
 import com.unimib.oases.ui.screen.nurse_assessment.demographics.Sex
 import com.unimib.oases.ui.theme.OasesTheme
+import com.unimib.oases.util.DateTimeFormatter
 import com.unimib.oases.util.StringFormatHelper.getAgeWithSuffix
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
+import java.time.LocalTime
 import kotlin.math.roundToInt
 
 @Composable
@@ -63,7 +64,7 @@ fun PatientCard(
     modifier: Modifier = Modifier,
     onExpanded: () -> Unit = {},
     onCollapsed: () -> Unit = {},
-    patient: Patient,
+    patientWithVisitInfo: PatientWithVisitInfo,
     onCardClick: (String) -> Unit,
 ) {
     var contextMenuWidth by remember {
@@ -74,13 +75,12 @@ fun PatientCard(
     }
     val scope = rememberCoroutineScope()
 
-    val codeColor = when (patient.code) {
+    val codeColor = when (patientWithVisitInfo.code) {
         TriageCode.GREEN -> Color.Green
         TriageCode.RED -> Color.Red
         TriageCode.YELLOW -> Color.Yellow
         TriageCode.NONE -> Color.Gray
     }
-
 
     LaunchedEffect(key1 = isRevealed, contextMenuWidth) {
         if (isRevealed) {
@@ -90,11 +90,9 @@ fun PatientCard(
         }
     }
 
-    val ageString = getAgeWithSuffix(ageInMonths = patient.ageInMonths)
+    val ageString = getAgeWithSuffix(ageInMonths = patientWithVisitInfo.patient.ageInMonths)
 
     Box(
-
-
         modifier = modifier
             .fillMaxWidth()
             .background(color = Color.Transparent)
@@ -116,7 +114,7 @@ fun PatientCard(
             actions()
         }
         Card(
-            onClick = { onCardClick(patient.id) },
+            onClick = { onCardClick(patientWithVisitInfo.patient.id) },
             shape = RoundedCornerShape(0.dp),
             modifier = Modifier
                 .fillMaxSize()
@@ -164,18 +162,15 @@ fun PatientCard(
 
                     Row(modifier = Modifier.background(color = Color(0xFF005981), shape = RoundedCornerShape(bottomStart = 10.dp)).padding(bottom = 5.dp, top = 5.dp, start = 10.dp, end = 5.dp).height(25.dp), verticalAlignment = Alignment.CenterVertically){
 
-                        if(patient.roomName.isNotEmpty()) {
-                            Text(
-                                text = patient.roomName,
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.surface,
-                                fontWeight = FontWeight.Normal,
-                                overflow = TextOverflow.Ellipsis,
-                                maxLines = 1,
-                                modifier = Modifier.padding(end = 5.dp)
-
-                            )
-                        }
+                        Text(
+                            text = patientWithVisitInfo.room ?: "Room not yet selected",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.surface,
+                            fontWeight = FontWeight.Normal,
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1,
+                            modifier = Modifier.padding(end = 5.dp)
+                        )
 
                         Icon(
                             imageVector = Icons.Default.Circle,
@@ -183,24 +178,14 @@ fun PatientCard(
                             modifier = Modifier.size(20.dp),
                             tint = codeColor
                         )
-
-
-
                     }
-
-
-
-
-
-
-
                 }
 
                 Spacer(modifier = Modifier.height(10.dp))
 
                 Row(  modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom){
                     Text(
-                        text = patient.name + ", ",
+                        text = patientWithVisitInfo.patient.name + ", ",
                         style = MaterialTheme.typography.displayMedium,
                         color = MaterialTheme.colorScheme.surface,
                         fontWeight = FontWeight.Bold,
@@ -231,7 +216,7 @@ fun PatientCard(
 
                     Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.Start){
                         Text(
-                            text = patient.publicId,
+                            text = patientWithVisitInfo.patient.publicId,
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.surface,
                             fontWeight = FontWeight.Medium,
@@ -243,7 +228,7 @@ fun PatientCard(
                         Spacer(modifier = Modifier.height(10.dp))
 
                         Text(
-                            text = patient.status.displayValue,
+                            text = patientWithVisitInfo.status.displayValue,
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.surface,
                             fontWeight = FontWeight.Medium,
@@ -253,16 +238,13 @@ fun PatientCard(
                         )
                     }
 
-
-
-
                 }
 
                 Spacer(modifier = Modifier.height(5.dp))
 
                 Row(modifier = Modifier.fillMaxWidth().padding(end = 10.dp), horizontalArrangement = Arrangement.End){
                     Text(
-                        text = patient.arrivalTime.format(DateTimeFormatter.ofPattern("HH:mm")),
+                        text = patientWithVisitInfo.arrivalTime.format(DateTimeFormatter.hoursAndMinutesFormatter),
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.surface,
                         fontWeight = FontWeight.Normal,
@@ -286,23 +268,25 @@ fun PatientCardPreview() {
             modifier = Modifier,
             onExpanded = {},
             onCollapsed = {},
-            patient = Patient(
-                id = "1",
-                name = "John Doe",
-                ageInMonths = 45,
-                publicId = "P12345",
-                code = TriageCode.RED,
+            patientWithVisitInfo = PatientWithVisitInfo(
+                patient = Patient(
+                    id = "1",
+                    name = "John Doe",
+                    ageInMonths = 45,
+                    publicId = "P12345",
+                    birthDate = "",
+                    sex = Sex.FEMALE,
+                    village = "",
+                    parish = "",
+                    subCounty = "",
+                    district = "",
+                    nextOfKin = "",
+                    contact = ""
+                ),
                 status = PatientStatus.WAITING_FOR_VISIT,
-                birthDate = "",
-                sex = Sex.FEMALE,
-                village = "",
-                parish = "",
-                subCounty = "",
-                district = "",
-                nextOfKin = "",
-                contact = "",
-                roomName = "Emergency Room",
-                arrivalTime = LocalDateTime.now(),
+                code = TriageCode.RED,
+                room = "Emergency Room",
+                arrivalTime = LocalTime.now(),
             ),
             onCardClick = {}
         )

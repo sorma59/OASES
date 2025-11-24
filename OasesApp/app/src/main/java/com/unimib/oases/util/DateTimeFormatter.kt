@@ -5,7 +5,9 @@ import java.time.Period
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 
-class DateTimeFormatter {
+object DateTimeFormatter {
+
+    val hoursAndMinutesFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
     /**
      * Calculates age based on a birth date string.

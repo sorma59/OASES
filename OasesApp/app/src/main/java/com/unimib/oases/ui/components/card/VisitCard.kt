@@ -58,11 +58,11 @@ fun VisitCard(visit: Visit) {
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "Status: " + visit.status,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = textColor
-                )
+//                Text(
+//                    text = "Status: " + visit.status,
+//                    style = MaterialTheme.typography.bodyMedium,
+//                    color = textColor
+//                )
                 Spacer(modifier = Modifier.weight(1f))
                 Icon(
                     imageVector = Icons.Filled.Circle,

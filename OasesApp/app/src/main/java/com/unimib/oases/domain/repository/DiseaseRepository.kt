@@ -7,8 +7,8 @@ import kotlinx.coroutines.flow.Flow
 
 
 interface DiseaseRepository {
-    suspend fun addDisease(disease: Disease): Outcome
-    suspend fun deleteDisease(disease: Disease): Outcome
+    suspend fun addDisease(disease: Disease): Outcome<Unit>
+    suspend fun deleteDisease(disease: Disease): Outcome<Unit>
     fun getFilteredDiseases(sex: String, age: String): Flow<Resource<List<Disease>>>
     fun getAllDiseases(): Flow<Resource<List<Disease>>>
 }

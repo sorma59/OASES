@@ -7,9 +7,9 @@ import com.unimib.oases.util.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
-    suspend fun createUser(username: String, password: String, role: Role): Outcome
+    suspend fun createUser(username: String, password: String, role: Role): Outcome<Unit>
     fun getUser(username: String): Flow<Resource<User>>
-    suspend fun deleteUser(user: User): Outcome
+    suspend fun deleteUser(user: User): Outcome<Unit>
     fun getAllUsers(): Flow<Resource<List<User>>>
     fun getAllNurses(): Flow<Resource<List<User>>>
     fun getAllDoctors(): Flow<Resource<List<User>>>

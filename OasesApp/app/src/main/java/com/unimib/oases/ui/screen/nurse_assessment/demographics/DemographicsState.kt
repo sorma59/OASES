@@ -1,8 +1,6 @@
 package com.unimib.oases.ui.screen.nurse_assessment.demographics
 
-import com.unimib.oases.domain.model.PatientStatus
 import com.unimib.oases.ui.screen.nurse_assessment.PatientRegistrationScreensUiMode
-import java.time.LocalDateTime
 
 data class DemographicsState(
     val storedData: PatientData,
@@ -35,18 +33,16 @@ data class PatientData(
     val name: String = "",
     val birthDate: String = "",
     val ageInMonths: Int = 0,
-    val sex: Sex = Sex.UNSPECIFIED,
+    val sexOption: SexOption = SexOption.UNSPECIFIED_OPTION,
     val village: String = "",
     val parish: String = "",
     val subCounty: String = "",
     val district: String = "",
     val nextOfKin: String = "",
-    val contact: String = "",
-    val status: String = PatientStatus.WAITING_FOR_TRIAGE.displayValue
+    val contact: String = ""
 ) {
     val age: Int
         get() = ageInMonths / 12
-    val arrivalTime: LocalDateTime = LocalDateTime.now()
 }
 
 data class SavingState(

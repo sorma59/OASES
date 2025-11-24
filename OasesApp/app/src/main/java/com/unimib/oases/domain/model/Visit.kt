@@ -1,33 +1,23 @@
 package com.unimib.oases.domain.model
 
 import java.time.LocalDate
+import java.time.LocalTime
 import java.util.UUID
 
 data class Visit(
     val id: String = UUID.randomUUID().toString(),
     val patientId: String,
-    val triageCode: TriageCode = TriageCode.GREEN,
+    val triageCode: TriageCode = TriageCode.NONE,
+    val patientStatus: PatientStatus = PatientStatus.WAITING_FOR_TRIAGE,
+    val roomName: String? = null,
+    val arrivalTime: LocalTime = LocalTime.now(),
     val date: LocalDate = LocalDate.now(),
     val description: String = ""
-){
-    val status: VisitStatus
-        get() = if (date.isBefore(LocalDate.now())) VisitStatus.CLOSED else VisitStatus.OPEN
-}
+)
 
 enum class TriageCode{
     RED,
     YELLOW,
     GREEN,
-    NONE;
-
-
-    companion object {
-        fun fromTriageCodeName(name: String): TriageCode =
-            entries.first { it.name == name }
-    }
-}
-
-enum class VisitStatus{
-    OPEN,
-    CLOSED
+    NONE
 }

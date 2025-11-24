@@ -19,20 +19,20 @@ class PatientDiseaseRepositoryImpl @Inject constructor(
     val roomDataSource: RoomDataSource,
 ): PatientDiseaseRepository {
 
-    override suspend fun addPatientDisease(patientDisease: PatientDisease): Outcome {
+    override suspend fun addPatientDisease(patientDisease: PatientDisease): Outcome<Unit> {
         return try {
             roomDataSource.insertPatientDisease(patientDisease.toEntity())
-            Outcome.Success()
+            Outcome.Success(Unit)
         } catch (e: Exception) {
             Log.e("PatientDiseaseRepository", "Error adding patient disease: ${e.message}")
             Outcome.Error(e.message ?: "An error occurred")
         }
     }
 
-    override suspend fun addPatientDiseases(patientDiseases: List<PatientDisease>): Outcome {
+    override suspend fun addPatientDiseases(patientDiseases: List<PatientDisease>): Outcome<Unit> {
         return try {
             roomDataSource.insertPatientDiseases(patientDiseases.toEntities())
-            Outcome.Success()
+            Outcome.Success(Unit)
         } catch (e: Exception) {
             Log.e("PatientDiseaseRepository", "Error adding patient disease: ${e.message}")
             Outcome.Error(e.message ?: "An error occurred")
@@ -42,10 +42,10 @@ class PatientDiseaseRepositoryImpl @Inject constructor(
     override suspend fun deletePatientDisease(
         diseaseName: String,
         patientId: String
-    ): Outcome {
+    ): Outcome<Unit> {
         return try {
             roomDataSource.deletePatientDisease(patientId, diseaseName)
-            Outcome.Success()
+            Outcome.Success(Unit)
         } catch (e: Exception) {
             Log.e("PatientDiseaseRepository", "Error adding patient disease: ${e.message}")
             Outcome.Error(e.message ?: "An error occurred")

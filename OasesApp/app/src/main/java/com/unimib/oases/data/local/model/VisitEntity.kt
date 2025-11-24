@@ -22,6 +22,9 @@ data class VisitEntity(
     @PrimaryKey val id: String,
     @ColumnInfo("patient_id") val patientId: String,
     @ColumnInfo("triage_code") val triageCode: String,
+    @ColumnInfo("patient_status") val patientStatus: String,
+    @ColumnInfo("room_name") val roomName: String?,
+    @ColumnInfo("arrival_time") val arrivalTime: String,
     @ColumnInfo("date") val date: String,
     @ColumnInfo("description") val description: String
 )

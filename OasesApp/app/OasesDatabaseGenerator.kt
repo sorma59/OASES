@@ -2,7 +2,7 @@ import java.sql.DriverManager
 
 fun main() {
     val dbName = "oases.db"
-    val dbVersion = 1 // Update when db version changes
+    val dbVersion = 2 // Update when db version changes
     val conn = DriverManager.getConnection("jdbc:sqlite:$dbName")
     val stmt = conn.createStatement()
 
@@ -79,11 +79,7 @@ fun main() {
             district TEXT NOT NULL,
             next_of_kin TEXT NOT NULL,
             contact TEXT NOT NULL,
-            status TEXT NOT NULL,
-            image BLOB DEFAULT NULL,
-            arrival_time TEXT NOT NULL,
-            code TEXT NOT NULL,
-            room TEXT NOT NULL
+            image BLOB DEFAULT NULL
         )
     """.trimIndent())
 
@@ -93,6 +89,9 @@ fun main() {
             id TEXT NOT NULL PRIMARY KEY,
             patient_id TEXT NOT NULL,
             triage_code TEXT NOT NULL,
+            patient_status TEXT NOT NULL,
+            room_name TEXT,    
+            arrival_time TEXT NOT NULL DEFAULT '',                
             date TEXT NOT NULL,
             description TEXT NOT NULL,
             FOREIGN KEY(patient_id) REFERENCES patients(id) ON UPDATE NO ACTION ON DELETE CASCADE
@@ -274,7 +273,7 @@ fun main() {
         println("✔ Rooms added: $name")
     }
 
-    stmt.executeUpdate("PRAGMA oases_version = $dbVersion;")
+    stmt.executeUpdate("PRAGMA user_version = $dbVersion;")
 
     conn.close()
     println("✅ Database '$dbName' created with ${vitalSigns.size} vital signs and ${diseases.size} diseases.")

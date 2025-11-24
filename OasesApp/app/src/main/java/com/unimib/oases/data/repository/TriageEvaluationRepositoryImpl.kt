@@ -15,10 +15,10 @@ import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
 class TriageEvaluationRepositoryImpl @Inject constructor(private val roomDataSource: RoomDataSource): TriageEvaluationRepository {
-    override suspend fun insertTriageEvaluation(triageEvaluation: TriageEvaluation): Outcome {
+    override suspend fun insertTriageEvaluation(triageEvaluation: TriageEvaluation): Outcome<Unit> {
         return try {
             roomDataSource.insertTriageEvaluation(triageEvaluation.toEntity())
-            Outcome.Success(triageEvaluation.visitId)
+            Outcome.Success(Unit)
         } catch (e: Exception){
             Outcome.Error(e.message ?: "Unknown error while trying to insert triage evaluation")
         }

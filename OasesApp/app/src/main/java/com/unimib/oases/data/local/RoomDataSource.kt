@@ -26,9 +26,7 @@ import com.unimib.oases.data.local.model.User
 import com.unimib.oases.data.local.model.VisitEntity
 import com.unimib.oases.data.local.model.VisitVitalSignEntity
 import com.unimib.oases.data.local.model.VitalSignEntity
-import com.unimib.oases.domain.model.PatientStatus
-import com.unimib.oases.domain.model.Room
-import com.unimib.oases.domain.model.TriageCode
+import com.unimib.oases.data.local.model.relation.PatientWithVisitInfoEntity
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -53,6 +51,16 @@ class RoomDataSource @Inject constructor(
         patientDao.insert(patient)
     }
 
+    suspend fun insertPatientAndCreateVisit(
+        patient: PatientEntity,
+        visit: VisitEntity,
+    ) {
+        appDatabase.withTransaction {
+            insertPatient(patient)
+            insertVisit(visit)
+        }
+    }
+
     suspend fun deletePatient(patient: PatientEntity) {
         patientDao.delete(patient)
     }
@@ -65,6 +73,10 @@ class RoomDataSource @Inject constructor(
         return patientDao.getPatients()
     }
 
+    fun getPatientsWithVisitInfo(): Flow<List<PatientWithVisitInfoEntity>> {
+        return patientDao.getPatientsWithLatestVisitInfo()
+    }
+
     fun getPatientById(id: String): Flow<PatientEntity?> {
         return patientDao.getPatientById(id)
     }
@@ -72,10 +84,6 @@ class RoomDataSource @Inject constructor(
 //    fun updateTriageState(patient: PatientEntity, triageState: String) {
 //        patientDao.updateTriageState(patient.id, triageState)
 //    }
-
-    suspend fun updateStatus(patientId: String, status: String, code: String, room: String) {
-        patientDao.updateStatus(patientId, status, code, room)
-    }
 
     // ----------------Users---------------
 
@@ -180,21 +188,13 @@ class RoomDataSource @Inject constructor(
         visitDao.insert(visit)
     }
 
-    suspend fun insertVisitWithTriageEvaluation(
+    suspend fun insertTriageEvaluationAndUpdateVisit(
         visit: VisitEntity,
-        triageEvaluation: TriageEvaluationEntity,
-        triageCode: TriageCode,
-        room: Room
+        triageEvaluation: TriageEvaluationEntity
     ) {
         appDatabase.withTransaction {
             insertVisit(visit)
             insertTriageEvaluation(triageEvaluation)
-            updateStatus(
-                visit.patientId,
-                status = PatientStatus.WAITING_FOR_VISIT.name,
-                code = triageCode.name,
-                room = room.name,
-            )
         }
     }
 
@@ -204,6 +204,10 @@ class RoomDataSource @Inject constructor(
 
     fun getVisits(patientId: String): Flow<List<VisitEntity>> {
         return visitDao.getVisits(patientId)
+    }
+
+    fun getVisitById(visitId: String): Flow<VisitEntity> {
+        return visitDao.getVisitById(visitId)
     }
 
     fun getCurrentVisit(patientId: String): Flow<VisitEntity?> {

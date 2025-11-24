@@ -19,19 +19,19 @@ class VisitVitalSignRepositoryImpl @Inject constructor(
     private val roomDataSource: RoomDataSource,
 ): VisitVitalSignRepository
 {
-    override suspend fun addVisitVitalSign(visitVitalSign: VisitVitalSign): Outcome {
+    override suspend fun addVisitVitalSign(visitVitalSign: VisitVitalSign): Outcome<Unit> {
         return try {
             roomDataSource.insertVisitVitalSign(visitVitalSign.toEntity())
-            Outcome.Success()
+            Outcome.Success(Unit)
         } catch (e: Exception) {
             Outcome.Error(e.message ?: "An error occurred")
         }
     }
 
-    override suspend fun addVisitVitalSigns(visitVitalSigns: List<VisitVitalSign>): Outcome {
+    override suspend fun addVisitVitalSigns(visitVitalSigns: List<VisitVitalSign>): Outcome<Unit> {
         return try {
             roomDataSource.insertVisitVitalSigns(visitVitalSigns.toEntities())
-            Outcome.Success()
+            Outcome.Success(Unit)
         } catch (e: Exception) {
             Log.e("VisitVitalSignRepository", "Error adding vital signs to visit: ${e.message}")
             Outcome.Error(e.message ?: "An error occurred")

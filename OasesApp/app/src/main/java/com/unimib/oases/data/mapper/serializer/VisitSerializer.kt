@@ -1,11 +1,12 @@
 package com.unimib.oases.data.mapper.serializer
 
 import android.util.Log
+import com.unimib.oases.domain.model.PatientStatus
 import com.unimib.oases.domain.model.TriageCode
-import com.unimib.oases.domain.model.TriageCode.Companion.fromTriageCodeName
 import com.unimib.oases.domain.model.Visit
 import java.nio.ByteBuffer
 import java.time.LocalDate
+import java.time.LocalTime
 
 object VisitSerializer {
 
@@ -13,6 +14,9 @@ object VisitSerializer {
         val idBytes = visit.id.toByteArray(Charsets.UTF_8)
         val patientIdBytes = visit.patientId.toByteArray(Charsets.UTF_8)
         val triageCodeBytes = visit.triageCode.name.toByteArray(Charsets.UTF_8)
+        val patientStatusBytes = visit.patientStatus.name.toByteArray(Charsets.UTF_8)
+        val roomNameBytes = visit.roomName?.toByteArray()
+        val arrivalTimeBytes = visit.arrivalTime.toString().toByteArray()
         val dateBytes = visit.date.toString().toByteArray(Charsets.UTF_8)
         val descriptionBytes = visit.description.toByteArray(Charsets.UTF_8)
 
@@ -20,24 +24,28 @@ object VisitSerializer {
             4 + idBytes.size +
             4 + patientIdBytes.size +
             4 + triageCodeBytes.size +
+            4 + patientStatusBytes.size +
+            1 + (roomNameBytes?.let { 4 + it.size } ?: 0) +
+            4 + arrivalTimeBytes.size +
             4 + dateBytes.size +
             4 + descriptionBytes.size
         )
 
-        buffer.putInt(idBytes.size)
-        buffer.put(idBytes)
+        buffer.putData(idBytes)
 
-        buffer.putInt(patientIdBytes.size)
-        buffer.put(patientIdBytes)
+        buffer.putData(patientIdBytes)
 
-        buffer.putInt(triageCodeBytes.size)
-        buffer.put(triageCodeBytes)
+        buffer.putData(triageCodeBytes)
 
-        buffer.putInt(dateBytes.size)
-        buffer.put(dateBytes)
+        buffer.putData(patientStatusBytes)
 
-        buffer.putInt(descriptionBytes.size)
-        buffer.put(descriptionBytes)
+        buffer.putNullableBytes(roomNameBytes)
+
+        buffer.putData(arrivalTimeBytes)
+
+        buffer.putData(dateBytes)
+
+        buffer.putData(descriptionBytes)
 
         return buffer.array()
     }
@@ -48,24 +56,31 @@ object VisitSerializer {
         val id = buffer.readString()
         val patientId = buffer.readString()
         val triageCode = buffer.readString()
+        val patientStatus = buffer.readString()
+        val roomName = buffer.readNullableString()
+        val arrivalTime = buffer.readString()
         val date = buffer.readString()
         val description = buffer.readString()
 
         return Visit(
             id = id,
             patientId = patientId,
-            triageCode = fromTriageCodeName(triageCode),
+            triageCode = TriageCode.valueOf(triageCode),
+            patientStatus = PatientStatus.valueOf(patientStatus),
+            roomName = roomName,
+            arrivalTime = LocalTime.parse(arrivalTime),
             date = LocalDate.parse(date),
             description = description
         )
     }
 
     // ----------------Testing--------------------
-    fun test() {
+    fun testVisitSerializer() {
         val original = Visit(
             id = "id",
             patientId = "patientId",
             triageCode = TriageCode.GREEN,
+            roomName = "aaaa",
             date = LocalDate.now(),
             description = "description"
         )

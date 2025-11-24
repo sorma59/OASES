@@ -17,7 +17,7 @@ sealed class Route {
     @Serializable
     data class Triage(
         val patientId: String,
-        val visitId: String? = null,
+        val visitId: String,
         val isWizardMode: Boolean = false
     ) : Route()
     @Serializable

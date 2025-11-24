@@ -5,6 +5,9 @@ import com.unimib.oases.data.local.RoomDataSource
 import com.unimib.oases.data.mapper.toDomain
 import com.unimib.oases.data.mapper.toEntity
 import com.unimib.oases.domain.model.Patient
+import com.unimib.oases.domain.model.PatientAndVisitIds
+import com.unimib.oases.domain.model.PatientWithVisitInfo
+import com.unimib.oases.domain.model.Visit
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.util.Outcome
 import com.unimib.oases.util.Resource
@@ -23,7 +26,6 @@ class PatientRepositoryImpl @Inject constructor(
 //    private val firestoreManager: FirestoreManager
 ) : PatientRepository {
 
-
 //    init {
 //        CoroutineScope(dispatcher).launch {
 //            firestoreManager.onlineStatus.collect { isOnline ->
@@ -39,7 +41,7 @@ class PatientRepositoryImpl @Inject constructor(
     private val _newPatientEvents = MutableSharedFlow<Patient>()
     override val newPatientEvents: SharedFlow<Patient> = _newPatientEvents.asSharedFlow()
 
-    override suspend fun addPatient(patient: Patient): Outcome {
+    override suspend fun addPatient(patient: Patient): Outcome<String> {
 
         return try {
             roomDataSource.insertPatient(patient.toEntity())
@@ -57,19 +59,28 @@ class PatientRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun deletePatient(patient: Patient): Outcome {
+    override suspend fun addPatientAndCreateVisit(patient: Patient, visit: Visit): Outcome<PatientAndVisitIds> {
         return try {
-            roomDataSource.deletePatient(patient.toEntity())
-            Outcome.Success(patient.id)
+            roomDataSource.insertPatientAndCreateVisit(patient.toEntity(), visit.toEntity())
+            Outcome.Success(PatientAndVisitIds(patient.id, visit.id))
         } catch (e: Exception) {
             Outcome.Error(e.message ?: "An error occurred")
         }
     }
 
-    override fun deletePatientById(patientId: String): Outcome {
+    override suspend fun deletePatient(patient: Patient): Outcome<Unit> {
+        return try {
+            roomDataSource.deletePatient(patient.toEntity())
+            Outcome.Success(Unit)
+        } catch (e: Exception) {
+            Outcome.Error(e.message ?: "An error occurred")
+        }
+    }
+
+    override fun deletePatientById(patientId: String): Outcome<Unit> {
         return try {
             roomDataSource.deleteById(patientId)
-            Outcome.Success(patientId)
+            Outcome.Success(Unit)
         } catch (e: Exception) {
             Outcome.Error(e.message ?: "An error occurred")
         }
@@ -94,8 +105,6 @@ class PatientRepositoryImpl @Inject constructor(
                 emit(resource)
             }
     }
-
-
 
     override fun doOnlineTasks(){
         println("Doing Online tasks")
@@ -124,6 +133,21 @@ class PatientRepositoryImpl @Inject constructor(
             }
     }
 
+    override fun getPatientsWithVisitInfo(): Flow<Resource<List<PatientWithVisitInfo>>>  = flow {
+        roomDataSource.getPatientsWithVisitInfo()
+            .onStart {
+                emit(Resource.Loading())
+            }
+            .catch {
+                Log.e("PatientRepositoryImpl", "Error getting patients and their visits info: ${it.message}")
+                emit(Resource.Error(it.localizedMessage ?: "Unknown error occurred"))
+            }
+            .collect { entities ->
+                val patientsWithVisitInfo = entities.map { entity -> entity.toDomain() }
+                emit(Resource.Success(patientsWithVisitInfo))
+            }
+    }
+
 //    override suspend fun updateTriageState(patient: Patient, triageState: String): Resource<Unit> {
 //        return try {
 //            roomDataSource.updateTriageState(patient.toEntity(), triageState)
@@ -132,13 +156,4 @@ class PatientRepositoryImpl @Inject constructor(
 //            Resource.Error(e.message ?: "An error occurred")
 //        }
 //    }
-
-    override suspend fun updateStatus(patientId: String, status: String, code: String, room: String): Outcome {
-        return try {
-            roomDataSource.updateStatus(patientId, status, code, room)
-            Outcome.Success(patientId)
-        } catch (e: Exception) {
-            Outcome.Error(e.message ?: "An error occurred")
-        }
-    }
 }

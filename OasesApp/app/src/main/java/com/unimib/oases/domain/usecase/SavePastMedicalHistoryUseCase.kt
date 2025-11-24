@@ -10,7 +10,7 @@ class SavePastMedicalHistoryUseCase @Inject constructor(
     private val patientDiseaseRepository: PatientDiseaseRepository
 ) {
 
-    suspend operator fun invoke(state: PastHistoryState): Outcome {
+    suspend operator fun invoke(state: PastHistoryState): Outcome<Unit> {
         return try {
             val patientDiseases = state.toPatientDiseases()
             return patientDiseaseRepository.addPatientDiseases(patientDiseases)

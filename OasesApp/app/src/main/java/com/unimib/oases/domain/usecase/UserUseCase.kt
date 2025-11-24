@@ -12,7 +12,7 @@ class UserUseCase @Inject constructor(
     private val repo: UserRepository
 ) {
 
-    suspend fun createUser(user: User): Outcome {
+    suspend fun createUser(user: User): Outcome<Unit> {
         return repo.createUser(user.username, user.pwHash, user.role)
     }
 
@@ -21,7 +21,7 @@ class UserUseCase @Inject constructor(
         return result
     }
 
-    suspend fun deleteUser(user: User): Outcome{
+    suspend fun deleteUser(user: User): Outcome<Unit> {
         return repo.deleteUser(user)
     }
 

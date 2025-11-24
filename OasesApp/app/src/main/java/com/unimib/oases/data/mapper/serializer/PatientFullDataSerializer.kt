@@ -6,24 +6,6 @@ import com.unimib.oases.domain.model.PatientFullData
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-fun ByteBuffer.putNullable(nullableByteArray: ByteArray?){
-    nullableByteArray?.let {
-        this.put(1) // Presence flag
-        this.putInt(nullableByteArray.size)
-        this.put(nullableByteArray)
-    } ?: this.put(0) // Absence flag
-}
-
-fun <T> ByteBuffer.readNullable(deserializer: (ByteArray) -> T): T? {
-    val presenceFlag = this.get().toInt()
-    return if (presenceFlag == 1) {
-        val size = this.int
-        val itemBytes = ByteArray(size).also { this.get(it) }
-        deserializer(itemBytes)
-    } else
-        null
-}
-
 object PatientFullDataSerializer {
 
     fun serialize(patientFullData: PatientFullData): ByteArray {

@@ -5,8 +5,8 @@ package com.unimib.oases.util
  * Loading, Success, or Error. This is used to represent the state of asynchronous
  * operations, such as database queries, but not readings, for that view [Resource] .
  */
-sealed class Outcome {
-    object Loading : Outcome()
-    data class Success(val id: String? = null): Outcome()
-    data class Error(val message: String): Outcome()
+sealed class Outcome<out T> {
+    object Loading : Outcome<Nothing>()
+    data class Success<out T>(val data: T): Outcome<T>()
+    data class Error(val message: String): Outcome<Nothing>()
 }

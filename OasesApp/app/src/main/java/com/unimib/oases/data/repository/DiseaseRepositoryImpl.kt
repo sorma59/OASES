@@ -18,20 +18,20 @@ class DiseaseRepositoryImpl @Inject constructor(
     private val roomDataSource: RoomDataSource,
 ): DiseaseRepository {
 
-    override suspend fun addDisease(disease: Disease): Outcome {
+    override suspend fun addDisease(disease: Disease): Outcome<Unit> {
         return try {
             roomDataSource.insertDisease(disease.toEntity())
-            Outcome.Success(disease.name)
+            Outcome.Success(Unit)
         } catch (e: Exception) {
             Log.e("DiseaseRepository", "Error adding disease: ${e.message}")
             Outcome.Error(e.message ?: "An error occurred")
         }
     }
 
-    override suspend fun deleteDisease(disease: Disease): Outcome {
+    override suspend fun deleteDisease(disease: Disease): Outcome<Unit> {
         return try {
             roomDataSource.deleteDisease(disease.toEntity())
-            Outcome.Success(disease.name)
+            Outcome.Success(Unit)
         } catch (e: Exception) {
             Outcome.Error(e.message ?: "Unknown error")
         }

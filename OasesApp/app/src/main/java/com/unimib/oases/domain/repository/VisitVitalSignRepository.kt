@@ -7,8 +7,8 @@ import com.unimib.oases.util.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface VisitVitalSignRepository {
-    suspend fun addVisitVitalSign(visitVitalSign: VisitVitalSign): Outcome
-    suspend fun addVisitVitalSigns(visitVitalSigns: List<VisitVitalSign>): Outcome
+    suspend fun addVisitVitalSign(visitVitalSign: VisitVitalSign): Outcome<Unit>
+    suspend fun addVisitVitalSigns(visitVitalSigns: List<VisitVitalSign>): Outcome<Unit>
     fun getVisitVitalSigns(visitId: String): Flow<Resource<List<VisitVitalSign>>>
     fun getVisitLatestVitalSigns(visitId: String): Flow<Resource<List<VisitVitalSign>>>
 }

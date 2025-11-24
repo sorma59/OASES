@@ -309,10 +309,11 @@ private fun PatientDetails(patient: Patient) {
 
             Spacer(Modifier.width(6.dp))
 
-            Text(
-                text = patient.status.displayValue,
-                fontSize = 14.sp
-            )
+            //TODO(undo comment when PatientWithVisitInfoEntity exists)
+//            Text(
+//                text = patient.status.displayValue,
+//                fontSize = 14.sp
+//            )
         }
     }
 }

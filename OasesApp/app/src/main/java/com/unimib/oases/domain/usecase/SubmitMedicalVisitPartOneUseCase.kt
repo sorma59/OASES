@@ -10,7 +10,7 @@ class SubmitMedicalVisitPartOneUseCase @Inject constructor(
     private val complaintSummaryRepository: ComplaintSummaryRepository
 ){
 
-    suspend operator fun invoke(state: MainComplaintState): Outcome {
+    suspend operator fun invoke(state: MainComplaintState): Outcome<Unit> {
         return try {
             val complaintSummary = buildComplaintSummaryFromStateUseCase(state)
             complaintSummaryRepository.addComplaintSummary(complaintSummary)

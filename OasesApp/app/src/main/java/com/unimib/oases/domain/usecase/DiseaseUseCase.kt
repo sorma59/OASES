@@ -11,7 +11,7 @@ class DiseaseUseCase @Inject constructor(
     private val repo: DiseaseRepository
 ) {
 
-    suspend fun addDisease(disease: Disease): Outcome {
+    suspend fun addDisease(disease: Disease): Outcome<Unit> {
         return repo.addDisease(disease)
     }
 
@@ -25,7 +25,7 @@ class DiseaseUseCase @Inject constructor(
         return result
     }
 
-    suspend fun deleteDisease(disease: Disease): Outcome {
+    suspend fun deleteDisease(disease: Disease): Outcome<Unit> {
        return repo.deleteDisease(disease)
     }
 }

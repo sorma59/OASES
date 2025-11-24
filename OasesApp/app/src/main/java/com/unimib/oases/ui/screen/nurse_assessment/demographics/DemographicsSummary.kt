@@ -10,8 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.outlined.LocationOn // Suggestion: A more specific icon for location
-import androidx.compose.material.icons.outlined.MedicalServices
+import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -57,7 +56,7 @@ fun DemographicsSummary(
                     )
 
                     Text(
-                        text = state.storedData.sex.displayName,
+                        text = state.storedData.sexOption.displayName,
                         fontSize = 16.sp,
                         color = MaterialTheme.colorScheme.outline
                     )
@@ -145,24 +144,6 @@ fun DemographicsSummary(
 
                 Text(
                     text = state.storedData.nextOfKin,
-                    fontSize = 14.sp
-                )
-            }
-
-            Spacer(Modifier.height(16.dp))
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.MedicalServices,
-                    contentDescription = "Patient Status"
-                )
-
-                Spacer(Modifier.width(6.dp))
-
-                Text(
-                    text = state.storedData.status,
                     fontSize = 14.sp
                 )
             }

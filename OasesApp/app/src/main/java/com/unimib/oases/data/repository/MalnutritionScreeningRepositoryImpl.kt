@@ -18,10 +18,10 @@ class MalnutritionScreeningRepositoryImpl @Inject constructor(
     private val roomDataSource: RoomDataSource
 ): MalnutritionScreeningRepository {
 
-    override suspend fun insertMalnutritionScreening(malnutritionScreening: MalnutritionScreening): Outcome {
+    override suspend fun insertMalnutritionScreening(malnutritionScreening: MalnutritionScreening): Outcome<Unit> {
         return try {
             roomDataSource.insertMalnutritionScreening(malnutritionScreening.toEntity())
-            Outcome.Success(malnutritionScreening.visitId)
+            Outcome.Success(Unit)
         } catch (e: Exception) {
             Outcome.Error(e.message ?: "An error occurred")
         }

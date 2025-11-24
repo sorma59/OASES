@@ -11,11 +11,11 @@ import javax.inject.Inject
 class VitalSignUseCase @Inject constructor (
     private val repo: VitalSignRepository
 ){
-    suspend fun addVitalSign(vitalSign: VitalSign): Outcome {
+    suspend fun addVitalSign(vitalSign: VitalSign): Outcome<Unit> {
         return repo.addVitalSign(vitalSign)
     }
 
-    suspend fun deleteVitalSign(vitalSign: VitalSign): Outcome {
+    suspend fun deleteVitalSign(vitalSign: VitalSign): Outcome<Unit> {
         return repo.deleteVitalSign(vitalSign)
     }
 

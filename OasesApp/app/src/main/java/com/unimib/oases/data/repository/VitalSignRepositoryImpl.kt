@@ -22,20 +22,20 @@ class VitalSignRepositoryImpl @Inject constructor(
 
     private val precisionMap = mutableMapOf<String, NumericPrecision>()
 
-    override suspend fun addVitalSign(vitalSign: VitalSign): Outcome {
+    override suspend fun addVitalSign(vitalSign: VitalSign): Outcome<Unit> {
         return try {
             roomDataSource.insertVitalSign(vitalSign.toEntity())
-            Outcome.Success(vitalSign.name)
+            Outcome.Success(Unit)
         } catch (e: Exception) {
             Log.e("DiseaseRepository", "Error adding vital sign: ${e.message}")
             Outcome.Error(e.message ?: "An error occurred")
         }
     }
 
-    override suspend fun deleteVitalSign(vitalSign: VitalSign): Outcome {
+    override suspend fun deleteVitalSign(vitalSign: VitalSign): Outcome<Unit> {
         return try {
             roomDataSource.deleteVitalSign(vitalSign.toEntity())
-            Outcome.Success(vitalSign.name)
+            Outcome.Success(Unit)
         } catch (e: Exception) {
             Outcome.Error(e.message ?: "Unknown error")
         }

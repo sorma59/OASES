@@ -93,7 +93,7 @@ private fun DemographicsEditing(
     val onAgeChange = remember<(Int) -> Unit> {
         { newAge -> onEvent(DemographicsEvent.AgeChanged(newAge)) }
     }
-    val onSexChange = remember<(Sex) -> Unit> {
+    val onSexChange = remember<(SexOption) -> Unit> {
         { newSex -> onEvent(DemographicsEvent.SexChanged(newSex)) }
     }
     val onVillageChange = remember<(String) -> Unit> {
@@ -206,10 +206,10 @@ private fun DemographicsEditing(
                     }
 
                     OutlinedDropdown(
-                        selected = it.patientData.sex,
+                        selected = it.patientData.sexOption,
                         onSelected = onSexChange,
-                        options = Sex.entries,
-                        optionToText = {option: Sex -> option.displayName },
+                        options = SexOption.entries,
+                        optionToText = {sexOption: SexOption -> sexOption.displayName },
                         labelText = "Sex",
                         modifier = Modifier.fillMaxWidth(),
                         isError = it.formErrors.sexError != null
@@ -310,8 +310,22 @@ private fun DemographicsEditing(
     }
 }
 
+enum class SexOption(val sex: Sex?, val displayName: String){
+    MALE_OPTION(Sex.MALE, "Male"),
+    FEMALE_OPTION(Sex.FEMALE, "Female"),
+    UNSPECIFIED_OPTION(null, "Select sex");
+
+    companion object {
+        fun fromSex(sex: Sex): SexOption {
+            return when (sex){
+                Sex.MALE -> MALE_OPTION
+                Sex.FEMALE -> FEMALE_OPTION
+            }
+        }
+    }
+}
+
 enum class Sex(val displayName: String) {
     MALE("Male"),
-    FEMALE("Female"),
-    UNSPECIFIED("Unspecified");
+    FEMALE("Female")
 }

@@ -1,6 +1,5 @@
 package com.unimib.oases.ui.screen.nurse_assessment.triage
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,14 +10,17 @@ import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.triageSympt
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.domain.repository.RoomRepository
 import com.unimib.oases.domain.repository.TriageEvaluationRepository
+import com.unimib.oases.domain.repository.VisitRepository
 import com.unimib.oases.domain.usecase.ConfigTriageUseCase
 import com.unimib.oases.domain.usecase.EvaluateTriageCodeUseCase
+import com.unimib.oases.domain.usecase.GetCurrentVisitUseCase
 import com.unimib.oases.domain.usecase.SaveTriageDataUseCase
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.ui.screen.nurse_assessment.PatientRegistrationScreensUiMode
-import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreenViewModel.Companion.TRIAGE_COMPLETED_KEY
+import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreenViewModel.Companion.STEP_COMPLETED_KEY
 import com.unimib.oases.util.Outcome
+import com.unimib.oases.util.firstNullableSuccess
 import com.unimib.oases.util.firstSuccess
 import com.unimib.oases.util.toggle
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -31,7 +33,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.random.Random
 
 private fun TriageState.toggleRoom(room: Room): TriageState{
     return if (this.editingState!!.triageData.selectedRoom == room)
@@ -44,16 +45,17 @@ private fun TriageState.toggleRoom(room: Room): TriageState{
 class TriageViewModel @Inject constructor(
     private val triageEvaluationRepository: TriageEvaluationRepository,
     private val roomRepository: RoomRepository,
+    private val visitRepository: VisitRepository,
     private val patientRepository: PatientRepository,
     private val configTriageUseCase: ConfigTriageUseCase,
     private val evaluateTriageCodeUseCase: EvaluateTriageCodeUseCase,
     private val saveTriageDataUseCase: SaveTriageDataUseCase,
+    private val getCurrentVisitUseCase: GetCurrentVisitUseCase,
     savedStateHandle: SavedStateHandle,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
     ): ViewModel() {
 
     private val errorHandler = CoroutineExceptionHandler { _, e ->
-        Log.e("Prova", "${e.message}")
         e.printStackTrace()
         _state.update {
             it.copy(
@@ -101,8 +103,8 @@ class TriageViewModel @Inject constructor(
     init {
         viewModelScope.launch(coroutineContext) {
             getPatientData()
-            state.value.visitId?.let { refresh(it) }
-            if (initialUiMode is PatientRegistrationScreensUiMode.Wizard) {
+            refresh()
+            if (state.value.uiMode is PatientRegistrationScreensUiMode.Wizard) {
                 _state.update {
                     check(it.patient != null) {
                         "Patient absent"
@@ -119,26 +121,29 @@ class TriageViewModel @Inject constructor(
         }
     }
 
+    private suspend fun getCurrentVisitData() {
+        val visit = getCurrentVisitUseCase(state.value.patientId)
+            .firstSuccess()
+        _state.update {
+            it.copy(
+                visit = visit,
+                storedData = it.storedData?.copy(
+                    triageCode = visit.triageCode,
+                    selectedRoom = visit.roomName?.let { name -> Room(name) }
+                )
+            )
+        }
+    }
+
     private suspend fun getPatientData() {
         val patient = patientRepository
             .getPatientById(state.value.patientId)
             .firstSuccess()
-        if (state.value.uiMode is PatientRegistrationScreensUiMode.Wizard)
-            _state.update {
-                it.copy(
-                    patient = patient
-                )
-            }
-        else
-            _state.update {
-                it.copy(
-                    patient = patient,
-                    storedData = it.storedData.copy(
-                        triageCode = patient.code,
-                        selectedRoom = Room(patient.roomName)
-                    )
-                )
-            }
+        _state.update {
+            it.copy(
+                patient = patient
+            )
+        }
     }
 
     private suspend fun collectRooms() {
@@ -152,7 +157,7 @@ class TriageViewModel @Inject constructor(
                         rooms = rooms
                     ),
                     triageData = triageState.editingState.triageData.copy(
-                        selectedRoom = state.value.patient?.roomName?.let { Room(it) }
+                        selectedRoom = state.value.visit?.roomName?.let { Room(it) }
                     )
                 )
             )
@@ -189,28 +194,12 @@ class TriageViewModel @Inject constructor(
             TriageEvent.BackButtonPressed -> onBack()
 
             TriageEvent.ConfirmDialog -> {
-                _state.update {
-                    it.copy( savingState = it.savingState.copy(isLoading = true, error = null) )
-                }
+                setSavingStateToLoading()
                 viewModelScope.launch {
-                    if (saveTriageData()) {
-                        _state.update {
-                            it.copy(
-                                showAlertDialog = false,
-                                savingState = it.savingState.copy(isLoading = false)
-                            )
-                        }
-                        goBack()
-                    }
+                    if (state.value.uiMode is PatientRegistrationScreensUiMode.Wizard)
+                        handleWizardDialogConfirmation()
                     else
-                        _state.update {
-                            it.copy(
-                                savingState = it.savingState.copy(
-                                    error = "Save unsuccessful, try again",
-                                    isLoading = false
-                                )
-                            )
-                        }
+                        handleStandaloneDialogConfirmation()
                 }
             }
 
@@ -232,34 +221,90 @@ class TriageViewModel @Inject constructor(
         }
     }
 
-    private suspend fun navigateBackWithResult() {
+    private suspend fun handleWizardDialogConfirmation() {
+        if (saveTriageDataUseCase(state.value) is Outcome.Success)
+            goBackToWizard()
+        else
+            showSavingError()
+    }
+
+    private suspend fun handleStandaloneDialogConfirmation() {
+        if (saveTriageDataUseCase(state.value) is Outcome.Success){
+            saveEdits()
+            goBackToViewMode()
+        }
+        else
+            showSavingError()
+    }
+
+    private fun showSavingError(error: String? = null) {
+        _state.update {
+            it.copy(
+                savingState = it.savingState.copy(
+                    error = error ?: "Save unsuccessful, try again",
+                    isLoading = false
+                )
+            )
+        }
+    }
+
+    private fun setSavingStateToLoading() {
+        _state.update {
+            it.copy(savingState = it.savingState.copy(isLoading = true, error = null))
+        }
+    }
+
+    private suspend fun navigateBackWithResult(result: Boolean) {
         navigationEventsChannel.send(
             NavigationEvent.NavigateBackWithResult(
-                TRIAGE_COMPLETED_KEY,
-                state.value.visitId
+                STEP_COMPLETED_KEY,
+                result
             )
         )
     }
 
-    fun refresh(visitId: String) {
+    fun refresh() {
         viewModelScope.launch(coroutineContext) {
             _state.update { it.copy(error = null, isLoading = true) }
-            loadTriageEvaluation(visitId)
-            updateTriageCode()
-            _state.update { it.copy(isLoading = false) }
+            if (state.value.uiMode is PatientRegistrationScreensUiMode.Wizard)
+                loadVisit(state.value.visitId)
+            else{
+                loadTriageEvaluationAndVisit(state.value.visitId)
+                updateTriageCode()
+            }
         }
     }
 
-    private suspend fun loadTriageEvaluation(visitId: String){
+    private suspend fun loadTriageEvaluationAndVisit(visitId: String){
+        loadVisit(visitId)
+        val visit = state.value.visit
+        check(visit != null) {
+            "Visit cannot be null here"
+        }
         val triageEvaluation = triageEvaluationRepository
             .getTriageEvaluation(visitId)
+            .firstNullableSuccess()
+        triageEvaluation?.let {
+            _state.update {
+                it.copy(
+                    storedData = TriageData(
+                        selectedReds = triageEvaluation.redSymptomIds.toSet(),
+                        selectedYellows = triageEvaluation.yellowSymptomIds.toSet(),
+                        triageCode = visit.triageCode,
+                        selectedRoom = Room(visit.roomName!!)
+                    )
+                )
+            }
+        }
+    }
+
+    private suspend fun loadVisit(visitId: String) {
+        val visit = visitRepository
+            .getVisitById(visitId)
             .firstSuccess()
         _state.update {
             it.copy(
-                storedData = it.storedData.copy(
-                    selectedReds = triageEvaluation.redSymptomIds.toSet(),
-                    selectedYellows = triageEvaluation.yellowSymptomIds.toSet()
-                )
+                visit = visit
             )
         }
     }
@@ -315,7 +360,7 @@ class TriageViewModel @Inject constructor(
                         )
                     else
                         it.copy(
-                            storedData = it.storedData.copy(
+                            storedData = it.storedData?.copy(
                                 triageCode = evaluateTriageCodeUseCase(it.storedData.selectedReds, it.storedData.selectedYellows)
                             )
                         )
@@ -379,11 +424,23 @@ class TriageViewModel @Inject constructor(
 
     private fun goBack() {
         if (state.value.uiMode is PatientRegistrationScreensUiMode.Wizard)
-            concludeTriage()
+            concludeTriage(false)
         else
             _state.update {
                 it.copy(uiMode = PatientRegistrationScreensUiMode.Standalone(false))
             }
+    }
+
+    private fun goBackToViewMode() {
+        _state.update {
+            it.copy(
+                uiMode = PatientRegistrationScreensUiMode.Standalone(false)
+            )
+        }
+    }
+
+    private fun goBackToWizard() {
+        concludeTriage(true)
     }
 
 //    private fun onNext(){
@@ -395,27 +452,8 @@ class TriageViewModel @Inject constructor(
 //                goToRoomSelection()
 //    }
 
-    private suspend fun saveTriageData(): Boolean{
-        if (Random.nextBoolean()) //TODO("DEBUG ONLY: REMOVE")
-            return false
-        _state.update {
-            it.copy(isLoading = true)
-        }
-
-        val result = saveTriageDataUseCase(state.value)
-
-        if (result is Outcome.Success)
-            saveEdits(result.id!!)
-
-        _state.update {
-            it.copy(isLoading = false)
-        }
-        
-        return (result is Outcome.Success)
-    }
-
-    private fun concludeTriage(){
-        viewModelScope.launch{ navigateBackWithResult() }
+    private fun concludeTriage(result: Boolean){
+        viewModelScope.launch{ navigateBackWithResult(result) }
     }
 
 //    private fun TriageEvaluation.toState(): TriageState {
@@ -431,27 +469,38 @@ class TriageViewModel @Inject constructor(
 //        )
 //    }
 
-    private fun saveEdits(visitId: String) {
+    private fun saveEdits() {
         _state.update {
             it.copy(
-                visitId = visitId,
                 storedData = it.editingState!!.triageData
             )
         }
     }
 
     private fun enterEditMode() {
+        val patient = state.value.patient ?: return
+
         _state.update {
-            it.copy(
-                uiMode = PatientRegistrationScreensUiMode.Standalone(true),
-                editingState = EditingState(
-                    triageConfig = configTriageUseCase(state.value.patient!!.ageInMonths),
+            val triageConfig = configTriageUseCase(patient.ageInMonths)
+
+            val editingState = if (it.storedData == null) {
+                EditingState(triageConfig = triageConfig)
+            } else {
+                EditingState(
+                    triageConfig = triageConfig,
                     triageData = it.storedData
                 )
+            }
+
+            it.copy(
+                uiMode = PatientRegistrationScreensUiMode.Standalone(true),
+                editingState = editingState
             )
         }
+
         viewModelScope.launch(roomsContext) {
             collectRooms()
         }
     }
+
 }

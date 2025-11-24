@@ -3,6 +3,7 @@ package com.unimib.oases.ui.screen.homepage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unimib.oases.di.IoDispatcher
+import com.unimib.oases.domain.usecase.GetPatientsWithVisitInfoUseCase
 import com.unimib.oases.domain.usecase.PatientUseCase
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Route
@@ -10,7 +11,6 @@ import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,6 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
     private val useCases: PatientUseCase,
+    private val getPatientsWithVisitInfoUseCase: GetPatientsWithVisitInfoUseCase,
     @param:IoDispatcher private val dispatcher: CoroutineDispatcher,
 ): ViewModel() {
 
@@ -31,8 +32,7 @@ class HomeScreenViewModel @Inject constructor(
     private val navigationEventsChannel = Channel<NavigationEvent>()
     val navigationEvents = navigationEventsChannel.receiveAsFlow()
 
-    private var getPatientsJob: Job? = null
-    private var errorHandler = CoroutineExceptionHandler { _, e ->
+    private val errorHandler = CoroutineExceptionHandler { _, e ->
         e.printStackTrace()
         _state.update{
             _state.value.copy(
@@ -42,8 +42,10 @@ class HomeScreenViewModel @Inject constructor(
         }
     }
 
+    private val coroutineContext = dispatcher + errorHandler
+
     init {
-        getPatients()
+        getPatientsWithVisitInfo()
     }
 
     fun onEvent(event: HomeScreenEvent) {
@@ -79,51 +81,49 @@ class HomeScreenViewModel @Inject constructor(
 
     // ----------------------Patients-------------------------------
 
-    fun getPatients() {
-        getPatientsJob?.cancel()
+    fun getPatientsWithVisitInfo() {
+        viewModelScope.launch(coroutineContext) {
 
-        getPatientsJob = viewModelScope.launch(dispatcher + errorHandler) {
-            val result = useCases.getPatients()
-
-            result.collect { resource ->
-                when (resource) {
-                    is Resource.Loading -> {
-                        _state.update{
-                            _state.value.copy(
-                                isLoading = true
-                            )
+            getPatientsWithVisitInfoUseCase()
+                .collect { resource ->
+                    when (resource) {
+                        is Resource.Loading -> {
+                            _state.update{
+                                _state.value.copy(
+                                    isLoading = true
+                                )
+                            }
                         }
-                    }
 
-                    is Resource.Success -> {
-                        _state.update{
-                            _state.value.copy(
-                                patients = resource.data,
-                                isLoading = false
-                            )
+                        is Resource.Success -> {
+                            _state.update{
+                                _state.value.copy(
+                                    patientsWithVisitInfo = resource.data,
+                                    isLoading = false
+                                )
+                            }
                         }
-                    }
 
-                    is Resource.Error -> {
-                        _state.update{
-                            _state.value.copy(
-                                error = resource.message,
-                                isLoading = false
-                            )
+                        is Resource.Error -> {
+                            _state.update{
+                                _state.value.copy(
+                                    error = resource.message,
+                                    isLoading = false
+                                )
+                            }
                         }
-                    }
 
-                    is Resource.NotFound -> {
-                        _state.update {
-                            it.copy(
-                                patients = emptyList(),
-                                error = resource.message,
-                                isLoading = false
-                            )
+                        is Resource.NotFound -> {
+                            _state.update {
+                                it.copy(
+                                    patientsWithVisitInfo = emptyList(),
+                                    error = resource.message,
+                                    isLoading = false
+                                )
+                            }
                         }
                     }
                 }
-            }
         }
     }
 

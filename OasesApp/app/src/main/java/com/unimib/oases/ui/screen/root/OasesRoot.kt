@@ -20,7 +20,7 @@ fun OasesRoot(
 
     val isAuthenticated by authViewModel.isAuthenticated.collectAsState()
 
-    when(isAuthenticated){
+    when (isAuthenticated){
         true -> {
 
             val startDestination = when (role!!) {

@@ -1,7 +1,7 @@
 package com.unimib.oases.domain.usecase
 
+import com.unimib.oases.domain.model.PatientStatus
 import com.unimib.oases.domain.model.TriageEvaluation
-import com.unimib.oases.domain.model.Visit
 import com.unimib.oases.domain.model.symptom.Pregnancy
 import com.unimib.oases.domain.model.symptom.TriageSymptom
 import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.triageSymptoms
@@ -14,33 +14,18 @@ class SaveTriageDataUseCase @Inject constructor(
     private val visitRepository: VisitRepository
 ) {
 
-    suspend operator fun invoke(state: TriageState): Outcome {
-        return state.visitId?.let { // The visit exists: hence exists a triageEvaluation
-            val visit = Visit(
-                id = it,
-                patientId = state.patientId,
-                triageCode = state.editingState!!.triageData.triageCode
-            )
-            val triageEvaluation = state.toModel(it)
-            visitRepository.addVisitWithTriageEvaluation(
-                visit,
-                triageEvaluation,
-                state.editingState.triageData.triageCode,
-                state.editingState.triageData.selectedRoom!!
-            )
-        } ?: run {
-            val visit = Visit(
-                patientId = state.patientId,
-                triageCode = state.editingState!!.triageData.triageCode
-            )
-            val triageEvaluation = state.toModel(visit.id)
-            visitRepository.addVisitWithTriageEvaluation(
-                visit,
-                triageEvaluation,
-                state.editingState.triageData.triageCode,
-                state.editingState.triageData.selectedRoom!!
-            )
-        }
+    suspend operator fun invoke(state: TriageState): Outcome<Unit> {
+
+        val visit = state.visit!!.copy(
+            triageCode = state.editingState!!.triageData.triageCode,
+            patientStatus = PatientStatus.WAITING_FOR_VISIT,
+            roomName = state.editingState.triageData.selectedRoom!!.name
+        )
+        val triageEvaluation = state.toModel(state.visitId)
+        return visitRepository.insertTriageEvaluationAndUpdateVisit(
+            visit,
+            triageEvaluation
+        )
     }
 
     private fun TriageState.toModel(visitId: String): TriageEvaluation{
@@ -59,5 +44,4 @@ class SaveTriageDataUseCase @Inject constructor(
         else
             selectedReds.minus(TriageSymptom.PREGNANCY.id)
     }
-
 }

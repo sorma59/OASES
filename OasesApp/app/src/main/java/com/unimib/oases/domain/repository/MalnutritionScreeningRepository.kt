@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface MalnutritionScreeningRepository {
 
-    suspend fun insertMalnutritionScreening(malnutritionScreening: MalnutritionScreening): Outcome
+    suspend fun insertMalnutritionScreening(malnutritionScreening: MalnutritionScreening): Outcome<Unit>
 
     fun getMalnutritionScreening(visitId: String): Flow<Resource<MalnutritionScreening>>
 

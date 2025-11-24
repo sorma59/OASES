@@ -7,9 +7,9 @@ import com.unimib.oases.util.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface VitalSignRepository {
-    suspend fun addVitalSign(vitalSign: VitalSign): Outcome
+    suspend fun addVitalSign(vitalSign: VitalSign): Outcome<Unit>
 
-    suspend fun deleteVitalSign(vitalSign: VitalSign): Outcome
+    suspend fun deleteVitalSign(vitalSign: VitalSign): Outcome<Unit>
 
     fun getAllVitalSigns(): Flow<Resource<List<VitalSign>>>
 

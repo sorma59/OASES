@@ -15,7 +15,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.ui.components.util.CenteredTextInBox
@@ -87,33 +86,16 @@ fun PatientItem(
                             .fillMaxWidth()
                     ){
                         Text(patient.publicId, color = MaterialTheme.colorScheme.onPrimary)
-                        Text(
-                            text = patient.status.displayValue,
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            textAlign = TextAlign.End,
-                        )
+
+                        //TODO(undo comment when PatientWithVisitInfoEntity exists)
+//                        Text(
+//                            text = patient.status.displayValue,
+//                            color = MaterialTheme.colorScheme.onPrimary,
+//                            textAlign = TextAlign.End,
+//                        )
                     }
                 }
             }
         }
     }
 }
-
-//@Composable
-//fun BluetoothButton(patient: Patient, navController: NavController) {
-//
-//    val route = Route.SendPatient.route
-//
-//    IconButton(
-//        onClick = {
-//            navController.currentBackStackEntry?.savedStateHandle?.set("patient", patient)
-//            navController.navigate(route)
-//        },
-//    ) {
-//        Icon(
-//            imageVector = Icons.Default.Bluetooth,
-//            contentDescription = "Send Patient via Bluetooth",
-//            tint = MaterialTheme.colorScheme.onPrimary
-//        )
-//    }
-//}

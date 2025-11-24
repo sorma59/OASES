@@ -245,7 +245,7 @@ sealed interface PatientDashboardAction {
         override val contentDescription = "Triage"
         override val roles = Role.entries
         // Editing demographics for an existing patient
-        fun createRoute(patientId: String, visitId: String?) = Route.Triage(patientId, visitId)
+        fun createRoute(patientId: String, visitId: String) = Route.Triage(patientId, visitId)
     }
 
     data object MalnutritionScreening: Navigable {

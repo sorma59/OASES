@@ -10,11 +10,11 @@ import javax.inject.Inject
 class RoomUseCase @Inject constructor(
     private val repo: RoomRepository
 ) {
-    suspend fun addRoom(room: Room): Outcome{
+    suspend fun addRoom(room: Room): Outcome<Unit> {
         return repo.addRoom(room)
     }
 
-    suspend fun deleteRoom(room: Room): Outcome{
+    suspend fun deleteRoom(room: Room): Outcome<Unit> {
         return repo.deleteRoom(room)
     }
 

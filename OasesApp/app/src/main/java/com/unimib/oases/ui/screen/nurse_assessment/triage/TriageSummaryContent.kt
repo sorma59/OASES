@@ -43,7 +43,7 @@ fun TriageSummaryContent(
     modifier: Modifier = Modifier
 ){
 
-    if (state.visitId == null){
+    if (state.storedData == null){
         StartButton(
             text = "Triage yet to be performed",
             onClick = { onEvent(TriageEvent.CreateButtonPressed) }
@@ -209,7 +209,7 @@ fun TriageSummaryContentPreview(){
     TriageSummaryContent(
         state = TriageState(
             patientId = "",
-            visitId = null,
+            visitId = "",
             uiMode = PatientRegistrationScreensUiMode.Standalone(),
             storedData = TriageData(
                 selectedReds = setOf("unconsciousness", "respiratory_distress", "shock", "heavy_bleeding", "severe_dehydration"),

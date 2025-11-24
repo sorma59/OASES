@@ -9,7 +9,7 @@ import com.unimib.oases.ui.screen.nurse_assessment.PatientRegistrationScreensUiM
 data class TriageData(
     val selectedReds: Set<String> = emptySet(),
     val selectedYellows: Set<String> = emptySet(),
-    val triageCode: TriageCode = TriageCode.GREEN,
+    val triageCode: TriageCode,
     val selectedRoom: Room? = null
 )
 
@@ -19,7 +19,7 @@ data class TriageData(
  */
 data class EditingState(
     val triageConfig: TriageConfig,
-    val triageData: TriageData = TriageData(),
+    val triageData: TriageData = TriageData(triageCode = TriageCode.GREEN),
     val roomsState: RoomsState = RoomsState(),
     val tabStack: List<TriageTab> = listOf(TriageTab.REDS),
 ) {
@@ -66,7 +66,7 @@ data class SavingState(
 data class TriageState(
     // --- Core Identifiers (Always present) ---
     val patientId: String,
-    val visitId: String?,
+    val visitId: String,
     val uiMode: PatientRegistrationScreensUiMode,
     // --- High-Level UI State ---
     val isLoading: Boolean = true, // For initial screen data load
@@ -76,7 +76,7 @@ data class TriageState(
     // --- Domain Data ---
     val patient: Patient? = null,
     val visit: Visit? = null,
-    val storedData: TriageData = TriageData(),
+    val storedData: TriageData? = null,
 
     // --- Sub-States for Different UI Concerns ---
     // This is nullable: it only exists when the UI mode is Wizard.

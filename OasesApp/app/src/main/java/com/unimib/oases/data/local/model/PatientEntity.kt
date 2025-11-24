@@ -4,7 +4,6 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.unimib.oases.data.local.TableNames
-import com.unimib.oases.ui.screen.nurse_assessment.demographics.Sex
 
 @Entity(tableName = TableNames.PATIENT)
 data class PatientEntity (
@@ -12,16 +11,12 @@ data class PatientEntity (
     @ColumnInfo(name = "public_id") val publicId: String,
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "birth_date") val birthDate: String,
-    @ColumnInfo(name = "sex") val sex: Sex,
+    @ColumnInfo(name = "sex") val sex: String,
     @ColumnInfo(name = "village") val village: String,
     @ColumnInfo(name = "parish") val parish: String,
     @ColumnInfo(name = "sub_county") val subCounty: String,
     @ColumnInfo(name = "district") val district: String,
     @ColumnInfo(name = "next_of_kin") val nextOfKin: String,
     @ColumnInfo(name = "contact") val contact: String,
-    @ColumnInfo(name = "status") val status: String,
-    @ColumnInfo(name = "code") val code: String,
-    @ColumnInfo(name = "room") val room: String,
-    @ColumnInfo(name = "arrival_time") val arrivalTime: String,
     @ColumnInfo(name = "image") val image: ByteArray? = null
 )

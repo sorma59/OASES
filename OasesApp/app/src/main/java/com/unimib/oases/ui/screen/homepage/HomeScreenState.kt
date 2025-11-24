@@ -1,9 +1,9 @@
 package com.unimib.oases.ui.screen.homepage
 
-import com.unimib.oases.domain.model.Patient
+import com.unimib.oases.domain.model.PatientWithVisitInfo
 
 data class HomeScreenState(
-    val patients: List<Patient> = emptyList(),
+    val patientsWithVisitInfo: List<PatientWithVisitInfo> = emptyList(),
 
     val isLoading: Boolean = false,
     val error: String? = null,

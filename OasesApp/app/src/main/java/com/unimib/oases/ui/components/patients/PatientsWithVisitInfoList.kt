@@ -5,11 +5,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
@@ -17,25 +15,25 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.unimib.oases.domain.model.Patient
+import com.unimib.oases.domain.model.PatientWithVisitInfo
 import com.unimib.oases.ui.components.card.PatientCard
 import com.unimib.oases.ui.components.util.CenteredText
 import com.unimib.oases.ui.components.util.SmallGrayText
 
 @Composable
-fun PatientList(
+fun PatientsWithVisitInfoList(
     modifier: Modifier = Modifier,
-    patients: List<Patient> = emptyList(),
+    patientsWithVisitInfo: List<PatientWithVisitInfo> = emptyList(),
     onItemClick: (String) -> Unit = {},
     title: String = "Patient List",
     noPatientsMessage: String = "No patients found."
 ) {
 
-    val patientList = remember { mutableStateListOf<Patient>() }
+    val patientList = remember { mutableStateListOf<PatientWithVisitInfo>() }
 
-    LaunchedEffect(patients) {
+    LaunchedEffect(patientsWithVisitInfo) {
         patientList.clear()
-        patientList.addAll(patients)
+        patientList.addAll(patientsWithVisitInfo)
     }
 
 
@@ -60,7 +58,7 @@ fun PatientList(
 
                     items(patientList) { patient ->
                         PatientCard(
-                            patient = patient,
+                            patientWithVisitInfo = patient,
                             isRevealed = false,
                             onExpanded = {},
                             actions = {},

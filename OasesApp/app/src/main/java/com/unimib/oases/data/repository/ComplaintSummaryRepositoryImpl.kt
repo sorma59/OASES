@@ -21,28 +21,28 @@ class ComplaintSummaryRepositoryImpl @Inject constructor(
     private val roomDataSource: RoomDataSource
 ): ComplaintSummaryRepository {
 
-    override suspend fun addComplaintSummary(complaintSummary: ComplaintSummary): Outcome {
+    override suspend fun addComplaintSummary(complaintSummary: ComplaintSummary): Outcome<Unit> {
         return try {
             roomDataSource.insertComplaintSummary(complaintSummary.toEntity())
-            Outcome.Success(complaintSummary.complaintId)
+            Outcome.Success(Unit)
         } catch (e: Exception) {
             Outcome.Error(e.message ?: "An error occurred")
         }
     }
 
-    override suspend fun addComplaintSummaries(complaintSummaries: List<ComplaintSummary>): Outcome {
+    override suspend fun addComplaintSummaries(complaintSummaries: List<ComplaintSummary>): Outcome<Unit> {
         return try {
             roomDataSource.insertComplaintSummaries(complaintSummaries.toEntities())
-            Outcome.Success()
+            Outcome.Success(Unit)
         } catch (e: Exception) {
             Outcome.Error(e.message ?: "An error occurred")
         }
     }
 
-    override suspend fun deleteComplaintSummary(complaintSummary: ComplaintSummary): Outcome {
+    override suspend fun deleteComplaintSummary(complaintSummary: ComplaintSummary): Outcome<Unit> {
         return try {
             roomDataSource.deleteComplaintSummary(complaintSummary.toEntity())
-            Outcome.Success(complaintSummary.complaintId)
+            Outcome.Success(Unit)
         } catch (e: Exception) {
             Outcome.Error(e.message ?: "An error occurred")
         }

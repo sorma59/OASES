@@ -38,7 +38,7 @@ import com.unimib.oases.data.local.model.VitalSignEntity
         RoomEntity::class,
         ComplaintSummaryEntity::class
     ],
-    version = 1
+    version = 2
 )
 // If modified, assets database must be modified too
 @TypeConverters(Converters::class)

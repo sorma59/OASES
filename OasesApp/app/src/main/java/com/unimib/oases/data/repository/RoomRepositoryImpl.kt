@@ -17,20 +17,20 @@ import javax.inject.Inject
 class RoomRepositoryImpl @Inject constructor(
     val roomDataSource: RoomDataSource,
 ): RoomRepository {
-    override suspend fun addRoom(room: Room): Outcome {
+    override suspend fun addRoom(room: Room): Outcome<Unit> {
         return try {
             roomDataSource.insertRoom(room.toEntity())
-            Outcome.Success(room.name)
+            Outcome.Success(Unit)
         } catch (e: Exception) {
             Log.e("RoomRepository", "Error adding the room: ${e.message}")
             Outcome.Error(e.message ?: "An error occurred")
         }
     }
 
-    override suspend fun deleteRoom(room: Room): Outcome {
+    override suspend fun deleteRoom(room: Room): Outcome<Unit> {
         return try {
             roomDataSource.deleteRoom(room.toEntity())
-            Outcome.Success(room.name)
+            Outcome.Success(Unit)
         } catch (e: Exception) {
             Outcome.Error(e.message ?: "Unknown error")
         }
