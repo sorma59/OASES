@@ -40,7 +40,14 @@ class AppViewModel @Inject constructor(
                         showSnackbar(
                             message = "${event.patientFullData.patientDetails.name} was successfully sent to this device",
                             actionLabel = "View",
-                            onAction = { navigateTo(Route.PatientDashboard(event.patientFullData.patientDetails.id)) }
+                            onAction = {
+                                navigateTo(
+                                    Route.PatientDashboard(
+                                        event.patientFullData.patientDetails.id,
+                                        event.patientFullData.visit.id
+                                    )
+                                )
+                            }
                         )
                     }
 

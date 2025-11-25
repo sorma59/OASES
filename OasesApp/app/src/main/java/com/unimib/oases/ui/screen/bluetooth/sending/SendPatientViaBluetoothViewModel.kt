@@ -4,19 +4,20 @@ import android.bluetooth.BluetoothDevice
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.unimib.oases.bluetooth.BluetoothCustomManager
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.model.Patient
-import com.unimib.oases.domain.repository.PatientRepository
+import com.unimib.oases.domain.repository.VisitRepository
 import com.unimib.oases.domain.usecase.SendPatientViaBluetoothUseCase
+import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.util.Outcome
-import com.unimib.oases.util.Resource
+import com.unimib.oases.util.firstSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -25,20 +26,25 @@ import javax.inject.Inject
 class SendPatientViaBluetoothViewModel @Inject constructor(
     private val sendPatientViaBluetoothUseCase: SendPatientViaBluetoothUseCase,
     private val bluetoothCustomManager: BluetoothCustomManager,
+    private val visitRepository: VisitRepository,
     savedStateHandle: SavedStateHandle,
-    @param:IoDispatcher private val dispatcher: CoroutineDispatcher,
-    private val patientRepository: PatientRepository,
+    @param:IoDispatcher private val dispatcher: CoroutineDispatcher
 ) : ViewModel(){
 
+    private val args = savedStateHandle.toRoute<Route.SendPatient>()
+
     private val _state = MutableStateFlow(
-        SendPatientViaBluetoothState(patientId = savedStateHandle["patientId"]!!)
+        SendPatientViaBluetoothState(
+            patientId = args.patientId,
+            visitId = args.visitId
+        )
     )
     val state: StateFlow<SendPatientViaBluetoothState> = _state.asStateFlow()
 
     init {
         bluetoothCustomManager.fetchPairedDevices()
         observePairedDevices()
-        getPatientData()
+        getPatientAndVisitData()
     }
 
     private fun observePairedDevices() {
@@ -49,31 +55,22 @@ class SendPatientViaBluetoothViewModel @Inject constructor(
         }
     }
 
-    private fun getPatientData() {
+    private fun getPatientAndVisitData() {
 
         viewModelScope.launch(dispatcher) {
             try {
 
                 updatePatientRetrievalState { it.copy(isLoading = true, error = null) }
 
-                val resource = patientRepository.getPatientById(_state.value.patientId).first {
-                    it is Resource.Success || it is Resource.Error
+                val patientWithVisitInfo = visitRepository
+                    .getVisitWithPatientInfo(state.value.visitId)
+                    .firstSuccess()
+                _state.update{
+                    it.copy(patientWithVisitInfo = patientWithVisitInfo)
                 }
 
-                when (resource) {
-                    is Resource.Success -> {
-                        _state.update{
-                            it.copy(patient = resource.data)
-                        }
-                    }
-                    is Resource.Error -> {
-                        updatePatientRetrievalState {
-                            it.copy(error = resource.message)
-                        }
-                    }
-                    else -> Unit
-                }
-            } catch (e: Exception) {
+            }
+            catch (e: Exception) {
                 updatePatientRetrievalState { it.copy(error = e.message) }
             } finally {
                 updatePatientRetrievalState { it.copy(isLoading = false) }
@@ -84,17 +81,17 @@ class SendPatientViaBluetoothViewModel @Inject constructor(
     fun onEvent(event: SendPatientViaBluetoothEvent) {
         when (event) {
             is SendPatientViaBluetoothEvent.SendPatient -> {
-                val patient = _state.value.patient
-                patient?.let { sendPatient(patient, event.device) }
-                    ?: run {
-                        _state.update { it.copy(toastMessage = "Patient data is missing") }
-                    }
+                val patient = state.value.patientWithVisitInfo?.patient
+                check(patient != null) {
+                    "Patient and Visit cannot be null here"
+                }
+                sendPatient(patient, event.device)
             }
             SendPatientViaBluetoothEvent.SendResultShown -> resetSendPatientResult()
             SendPatientViaBluetoothEvent.OnToastShown -> _state.update { it.copy(toastMessage = null) }
             SendPatientViaBluetoothEvent.PatientItemClicked -> {
-                if (_state.value.patient == null)
-                    getPatientData()
+                if (_state.value.patientWithVisitInfo == null)
+                    getPatientAndVisitData()
             }
         }
     }

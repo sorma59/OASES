@@ -12,9 +12,6 @@ import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.util.Outcome
 import com.unimib.oases.util.Resource
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onStart
@@ -38,8 +35,6 @@ class PatientRepositoryImpl @Inject constructor(
 //        }
 //    }
 
-    private val _newPatientEvents = MutableSharedFlow<Patient>()
-    override val newPatientEvents: SharedFlow<Patient> = _newPatientEvents.asSharedFlow()
 
     override suspend fun addPatient(patient: Patient): Outcome<String> {
 

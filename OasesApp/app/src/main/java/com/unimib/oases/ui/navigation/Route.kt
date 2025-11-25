@@ -23,6 +23,7 @@ sealed class Route {
     @Serializable
     data class VitalSigns(
         val patientId: String,
+        val visitId: String,
         val isWizardMode: Boolean = false
     ): Route()
     @Serializable
@@ -32,11 +33,17 @@ sealed class Route {
         val isWizardMode: Boolean = false
     ) : Route()
     @Serializable
-    data class SendPatient(val patientId: String): Route()
+    data class SendPatient(
+        val patientId: String,
+        val visitId: String
+    ): Route()
     @Serializable
     data class MedicalVisit(val patientId: String): Route()
     @Serializable
-    data class PatientDashboard(val patientId: String): Route()
+    data class PatientDashboard(
+        val patientId: String,
+        val visitId: String
+    ): Route()
     @Serializable
     data class ViewPatientDetails(val patientId: String): Route()
     @Serializable

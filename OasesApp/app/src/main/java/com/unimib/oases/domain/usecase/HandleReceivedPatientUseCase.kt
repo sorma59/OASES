@@ -35,11 +35,11 @@ class HandleReceivedPatientUseCase @Inject constructor(
             if (patientRepository.addPatient(patientFullData.patientDetails) is Outcome.Error)
                 throw Exception("Failed to insert patient ${patientFullData.patientDetails}")
 
-            patientFullData.visit?.let {
-                // Add the visit to the db
-                if (visitRepository.addVisit(it) is Outcome.Error)
-                    throw Exception("Failed to insert visit $it")
-            }
+
+            // Add the visit to the db
+            if (visitRepository.addVisit(patientFullData.visit) is Outcome.Error)
+                throw Exception("Failed to insert visit ${patientFullData.visit}")
+
 
             // Add the patient diseases to the db
             if (patientDiseaseRepository.addPatientDiseases(patientFullData.patientDiseases) is Outcome.Error)

@@ -2,15 +2,13 @@ package com.unimib.oases.data.local.model.relation
 
 import androidx.room.Embedded
 import com.unimib.oases.data.local.model.PatientEntity
+import com.unimib.oases.data.local.model.VisitEntity
 
 data class PatientWithVisitInfoEntity(
-    // Patient Details
-    @Embedded
+    // Prefixes needed to distinguish between patient's id and visit's
+    @Embedded(prefix = "patient_")
     val patientEntity: PatientEntity,
 
-    // Latest Visit Details
-    val status: String,
-    val code: String,
-    val room: String?,
-    val arrivalTime: String
+    @Embedded(prefix = "visit_")
+    val visitEntity: VisitEntity
 )

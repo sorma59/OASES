@@ -7,10 +7,8 @@ import com.unimib.oases.domain.model.Visit
 import com.unimib.oases.util.Outcome
 import com.unimib.oases.util.Resource
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharedFlow
 
 interface PatientRepository {
-    val newPatientEvents: SharedFlow<Patient>
     suspend fun addPatient(patient: Patient): Outcome<String>
 
     suspend fun addPatientAndCreateVisit(patient: Patient, visit: Visit): Outcome<PatientAndVisitIds>

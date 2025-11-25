@@ -1,11 +1,12 @@
 package com.unimib.oases.ui.screen.bluetooth.sending
 
 import android.bluetooth.BluetoothDevice
-import com.unimib.oases.domain.model.Patient
+import com.unimib.oases.domain.model.PatientWithVisitInfo
 
 data class SendPatientViaBluetoothState(
     val patientId: String,
-    val patient: Patient? = null,
+    val visitId: String,
+    val patientWithVisitInfo: PatientWithVisitInfo? = null,
     val pairedDevices: List<BluetoothDevice> = emptyList(),
 
     val patientRetrievalState: PatientRetrievalState = PatientRetrievalState(),

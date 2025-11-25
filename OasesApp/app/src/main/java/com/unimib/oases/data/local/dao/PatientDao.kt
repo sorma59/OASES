@@ -26,11 +26,27 @@ interface PatientDao {
     // *** NEW, POWERFUL FUNCTION FOR YOUR HOME SCREEN ***
     @Query("""
         SELECT
-            p.*,  -- Select all columns from the patient table for the @Embedded PatientEntity
-            v.patient_status AS status,
-            v.triage_code AS code,
-            v.room_name AS room, -- Use the correct column name 'roomName' from VisitEntity
-            v.arrival_time AS arrivalTime
+            p.id AS patient_id,
+            p.public_id AS patient_public_id,
+            p.name AS patient_name,
+            p.birth_date AS patient_birth_date,
+            p.sex AS patient_sex,
+            p.village AS patient_village,
+            p.parish AS patient_parish,
+            p.sub_county AS patient_sub_county,
+            p.district AS patient_district,
+            p.next_of_kin AS patient_next_of_kin,
+            p.contact AS patient_contact,
+            p.image AS patient_image,
+    
+            v.id AS visit_id,
+            v.patient_id AS visit_patient_id,
+            v.triage_code AS visit_triage_code,
+            v.patient_status AS visit_patient_status,
+            v.room_name AS visit_room_name,
+            v.arrival_time AS visit_arrival_time,
+            v.date AS visit_date,
+            v.description AS visit_description
         FROM
             ${TableNames.PATIENT} p
         INNER JOIN
@@ -40,8 +56,8 @@ interface PatientDao {
             -- It compares a time string with a date string.
             -- It should be based on the latest arrivalTime for that day or the latest visit entry.
             -- Corrected logic to find the latest visit based on arrival_time:
-            v.arrival_time = (
-                SELECT MAX(v2.arrival_time) 
+            v.date = (
+                SELECT MAX(v2.date) 
                 FROM ${TableNames.VISIT} v2 
                 WHERE v2.patient_id = p.id
             )

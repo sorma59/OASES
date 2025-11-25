@@ -42,7 +42,7 @@ class RetrievePatientFullDataUseCase @Inject constructor(
 
                     // Current visit
                     val visitDeferred = async {
-                        getCurrentVisitUseCase(patientId).firstNullableSuccess()
+                        getCurrentVisitUseCase(patientId).firstSuccess()
                     }
 
                     // Patient's PMH
@@ -51,13 +51,6 @@ class RetrievePatientFullDataUseCase @Inject constructor(
                     }
 
                     val visit = visitDeferred.await()
-
-                    if (visit == null)
-                        return@coroutineScope Resource.Success(
-                            PatientFullData(
-                                patientDetails = patientDeferred.await(),
-                            )
-                        )
 
                     // Current visit's vital signs
                     val vitalSignsDeferred = async {
@@ -70,7 +63,7 @@ class RetrievePatientFullDataUseCase @Inject constructor(
                     val triageEvaluationDeferred = async {
                         triageEvaluationRepository
                             .getTriageEvaluation(visit.id)
-                            .firstSuccess()
+                            .firstNullableSuccess()
                     }
 
                     // Current visit's malnutrition screening

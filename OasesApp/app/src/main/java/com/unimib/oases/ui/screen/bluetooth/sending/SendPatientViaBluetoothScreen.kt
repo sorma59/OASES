@@ -92,7 +92,7 @@ fun SendPatientViaBluetoothScreen(
                     Spacer(modifier = Modifier.height(32.dp))
 
                     PatientItem(
-                        patient = state.patient,
+                        patientWithVisitInfo = state.patientWithVisitInfo,
                         modifier = Modifier.padding(horizontal = 16.dp),
                         onClick = {
                             viewModel.onEvent(SendPatientViaBluetoothEvent.PatientItemClicked)

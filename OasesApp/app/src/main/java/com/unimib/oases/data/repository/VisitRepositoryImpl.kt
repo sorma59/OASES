@@ -4,6 +4,7 @@ import android.util.Log
 import com.unimib.oases.data.local.RoomDataSource
 import com.unimib.oases.data.mapper.toDomain
 import com.unimib.oases.data.mapper.toEntity
+import com.unimib.oases.domain.model.PatientWithVisitInfo
 import com.unimib.oases.domain.model.TriageEvaluation
 import com.unimib.oases.domain.model.Visit
 import com.unimib.oases.domain.repository.VisitRepository
@@ -71,6 +72,20 @@ class VisitRepositoryImpl @Inject constructor(
             }
             .catch {
                 Log.e("VisitRepository", "Error getting visit with id: $visitId")
+                emit(Resource.Error(it.message ?: "An error occurred"))
+            }
+            .collect {
+                emit(Resource.Success(it.toDomain()))
+            }
+    }
+
+    override fun getVisitWithPatientInfo(visitId: String): Flow<Resource<PatientWithVisitInfo>> = flow {
+        roomDataSource.getVisitWithPatientInfo(visitId)
+            .onStart {
+                emit(Resource.Loading())
+            }
+            .catch {
+                Log.e("VisitRepository", "Error getting visit and patient info with visit's id: $visitId")
                 emit(Resource.Error(it.message ?: "An error occurred"))
             }
             .collect {

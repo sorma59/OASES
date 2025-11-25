@@ -17,13 +17,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,9 +42,12 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.unimib.oases.domain.model.Patient
+import com.unimib.oases.domain.model.PatientAndVisitIds
 import com.unimib.oases.domain.model.PatientStatus
 import com.unimib.oases.domain.model.PatientWithVisitInfo
 import com.unimib.oases.domain.model.TriageCode
+import com.unimib.oases.domain.model.Visit
+import com.unimib.oases.ui.components.patients.RoomAndCodeText
 import com.unimib.oases.ui.screen.nurse_assessment.demographics.Sex
 import com.unimib.oases.ui.theme.OasesTheme
 import com.unimib.oases.util.DateTimeFormatter
@@ -65,7 +64,7 @@ fun PatientCard(
     onExpanded: () -> Unit = {},
     onCollapsed: () -> Unit = {},
     patientWithVisitInfo: PatientWithVisitInfo,
-    onCardClick: (String) -> Unit,
+    onCardClick: (PatientAndVisitIds) -> Unit,
 ) {
     var contextMenuWidth by remember {
         mutableFloatStateOf(0f)
@@ -74,13 +73,6 @@ fun PatientCard(
         Animatable(initialValue = 0f)
     }
     val scope = rememberCoroutineScope()
-
-    val codeColor = when (patientWithVisitInfo.code) {
-        TriageCode.GREEN -> Color.Green
-        TriageCode.RED -> Color.Red
-        TriageCode.YELLOW -> Color.Yellow
-        TriageCode.NONE -> Color.Gray
-    }
 
     LaunchedEffect(key1 = isRevealed, contextMenuWidth) {
         if (isRevealed) {
@@ -114,7 +106,7 @@ fun PatientCard(
             actions()
         }
         Card(
-            onClick = { onCardClick(patientWithVisitInfo.patient.id) },
+            onClick = { onCardClick(patientWithVisitInfo.getIds()) },
             shape = RoundedCornerShape(0.dp),
             modifier = Modifier
                 .fillMaxSize()
@@ -157,28 +149,13 @@ fun PatientCard(
                     .fillMaxWidth()
                     .padding(start = 10.dp, end = 0.dp, top = 0.dp, bottom = 10.dp)
             ) {
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Absolute.Right){
-
-
-                    Row(modifier = Modifier.background(color = Color(0xFF005981), shape = RoundedCornerShape(bottomStart = 10.dp)).padding(bottom = 5.dp, top = 5.dp, start = 10.dp, end = 5.dp).height(25.dp), verticalAlignment = Alignment.CenterVertically){
-
-                        Text(
-                            text = patientWithVisitInfo.room ?: "Room not yet selected",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.surface,
-                            fontWeight = FontWeight.Normal,
-                            overflow = TextOverflow.Ellipsis,
-                            maxLines = 1,
-                            modifier = Modifier.padding(end = 5.dp)
-                        )
-
-                        Icon(
-                            imageVector = Icons.Default.Circle,
-                            contentDescription = "Edit",
-                            modifier = Modifier.size(20.dp),
-                            tint = codeColor
-                        )
-                    }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(4.dp),
+                    horizontalArrangement = Arrangement.End
+                ){
+                    RoomAndCodeText(patientWithVisitInfo.visit)
                 }
 
                 Spacer(modifier = Modifier.height(10.dp))
@@ -228,7 +205,7 @@ fun PatientCard(
                         Spacer(modifier = Modifier.height(10.dp))
 
                         Text(
-                            text = patientWithVisitInfo.status.displayValue,
+                            text = patientWithVisitInfo.visit.patientStatus.displayValue,
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.surface,
                             fontWeight = FontWeight.Medium,
@@ -244,7 +221,7 @@ fun PatientCard(
 
                 Row(modifier = Modifier.fillMaxWidth().padding(end = 10.dp), horizontalArrangement = Arrangement.End){
                     Text(
-                        text = patientWithVisitInfo.arrivalTime.format(DateTimeFormatter.hoursAndMinutesFormatter),
+                        text = patientWithVisitInfo.visit.arrivalTime.format(DateTimeFormatter.hoursAndMinutesFormatter),
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.surface,
                         fontWeight = FontWeight.Normal,
@@ -283,10 +260,14 @@ fun PatientCardPreview() {
                     nextOfKin = "",
                     contact = ""
                 ),
-                status = PatientStatus.WAITING_FOR_VISIT,
-                code = TriageCode.RED,
-                room = "Emergency Room",
-                arrivalTime = LocalTime.now(),
+                visit = Visit(
+                    "3",
+                    patientId = "1",
+                    patientStatus = PatientStatus.WAITING_FOR_VISIT,
+                    triageCode = TriageCode.RED,
+                    roomName = "Emergency Room",
+                    arrivalTime = LocalTime.now()
+                )
             ),
             onCardClick = {}
         )

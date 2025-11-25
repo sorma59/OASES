@@ -113,7 +113,7 @@ fun PatientDashboardScreen(
             ) {
 
                 PatientItem(
-                    patient = state.patient,
+                    patientWithVisitInfo = state.patientWithVisitInfo,
                     onClick = { viewModel.onEvent(PatientDashboardEvent.PatientItemClicked) },
                     errorText = "Could not load patient info, tap to retry",
                     isLoading = state.isLoading
@@ -165,7 +165,7 @@ fun PatientDashboardScreen(
         AlertDialog(
             onDismissRequest = { showAlertDialog = false },
             title = {
-                Text(text = "Confirm deletion of ${state.patient?.name}")
+                Text(text = "Confirm deletion of ${state.patientWithVisitInfo?.patient?.name}")
             },
             text = {
                 Text(text = "Are you sure you want to delete this patient? All the records related to this patient will be deleted.")
@@ -259,12 +259,12 @@ sealed interface PatientDashboardAction {
         )
     }
 
-    data object Send : PatientNavigable {
+    data object Send : Navigable {
         override val text = "Send"
         override val icon = Icons.AutoMirrored.Filled.Send
         override val contentDescription = "Send patient data"
         override val roles = Role.entries
-        override fun createRoute(patientId: String) = Route.SendPatient(patientId)
+        fun createRoute(patientId: String, visitId: String) = Route.SendPatient(patientId, visitId)
     }
 
     data object StartVisit : PatientNavigable {

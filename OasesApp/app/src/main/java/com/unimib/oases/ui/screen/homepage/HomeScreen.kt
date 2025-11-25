@@ -27,6 +27,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.unimib.oases.data.local.model.Role
+import com.unimib.oases.domain.model.PatientAndVisitIds
 import com.unimib.oases.ui.components.patients.PatientsWithVisitInfoList
 import com.unimib.oases.ui.components.search.SearchBar
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
@@ -82,8 +83,8 @@ private fun HomeContent(
         active = false
     }
 
-    val onPatientItemClick = { patientId: String ->
-        onEvent(HomeScreenEvent.PatientItemClicked(patientId))
+    val onPatientItemClick = { ids: PatientAndVisitIds ->
+        onEvent(HomeScreenEvent.PatientItemClicked(ids))
     }
 
     val userRole by authViewModel.userRole.collectAsState()

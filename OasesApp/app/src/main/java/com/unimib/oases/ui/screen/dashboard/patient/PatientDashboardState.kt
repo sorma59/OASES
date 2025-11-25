@@ -1,10 +1,11 @@
 package com.unimib.oases.ui.screen.dashboard.patient
 
-import com.unimib.oases.domain.model.Patient
+import com.unimib.oases.domain.model.PatientWithVisitInfo
 
 data class PatientDashboardState(
     val patientId: String,
-    val patient: Patient? = null,
+    val visitId: String,
+    val patientWithVisitInfo: PatientWithVisitInfo? = null,
     val actions: List<PatientDashboardAction> = PatientDashboardAction.entries,
 
     val toastMessage: String? = null,

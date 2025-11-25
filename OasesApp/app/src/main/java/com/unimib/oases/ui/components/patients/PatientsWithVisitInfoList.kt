@@ -15,6 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.unimib.oases.domain.model.PatientAndVisitIds
 import com.unimib.oases.domain.model.PatientWithVisitInfo
 import com.unimib.oases.ui.components.card.PatientCard
 import com.unimib.oases.ui.components.util.CenteredText
@@ -24,7 +25,7 @@ import com.unimib.oases.ui.components.util.SmallGrayText
 fun PatientsWithVisitInfoList(
     modifier: Modifier = Modifier,
     patientsWithVisitInfo: List<PatientWithVisitInfo> = emptyList(),
-    onItemClick: (String) -> Unit = {},
+    onItemClick: (PatientAndVisitIds) -> Unit = {},
     title: String = "Patient List",
     noPatientsMessage: String = "No patients found."
 ) {
@@ -62,8 +63,8 @@ fun PatientsWithVisitInfoList(
                             isRevealed = false,
                             onExpanded = {},
                             actions = {},
-                            onCardClick = { patientId ->
-                                onItemClick(patientId)
+                            onCardClick = { ids ->
+                                onItemClick(ids)
                             },
                         )
                     }

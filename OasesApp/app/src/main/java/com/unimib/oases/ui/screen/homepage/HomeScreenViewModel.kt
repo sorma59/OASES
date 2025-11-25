@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.usecase.GetPatientsWithVisitInfoUseCase
-import com.unimib.oases.domain.usecase.PatientUseCase
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.util.Resource
@@ -21,7 +20,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
-    private val useCases: PatientUseCase,
     private val getPatientsWithVisitInfoUseCase: GetPatientsWithVisitInfoUseCase,
     @param:IoDispatcher private val dispatcher: CoroutineDispatcher,
 ): ViewModel() {
@@ -71,7 +69,7 @@ class HomeScreenViewModel @Inject constructor(
                 viewModelScope.launch {
                     navigationEventsChannel.send(
                         NavigationEvent.Navigate(
-                            Route.PatientDashboard(event.patientId)
+                            Route.PatientDashboard(event.ids.patientId, event.ids.visitId)
                         )
                     )
                 }

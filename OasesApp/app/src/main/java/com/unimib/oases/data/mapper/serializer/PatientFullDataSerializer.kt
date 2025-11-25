@@ -13,23 +13,21 @@ object PatientFullDataSerializer {
         val patientByteArray = PatientSerializer.serialize(patientFullData.patientDetails)
         val diseaseBytesList = patientFullData.patientDiseases.map { serialize(it) }
         val vitalSignBytesList = patientFullData.vitalSigns.map { serialize(it) }
-        val visitByteArray = patientFullData.visit?.let {
-            VisitSerializer.serialize(it)
-        }
+        val visitByteArray = VisitSerializer.serialize(patientFullData.visit)
         val triageByteArray = patientFullData.triageEvaluation?.let {
             TriageEvaluationSerializer.serialize(it)
         }
         val malnutritionScreeningBytes = patientFullData.malnutritionScreening?.let {
             MalnutritionScreeningSerializer.serialize(it)
         }
-        val complaintSummariesListBytes = patientFullData.complaintsSummaries.map{ComplaintSummarySerializer.serialize(it)}
+        val complaintSummariesListBytes = patientFullData.complaintsSummaries.map{ ComplaintSummarySerializer.serialize(it)}
 
         val totalSize =
             4 + patientByteArray.size +
             4 + diseaseBytesList.sumOf { 4 + it.size } +
-            1 + (visitByteArray?.let {4 + it.size} ?: 0) +
+            4 + visitByteArray.size +
             4 + vitalSignBytesList.sumOf { 4 + it.size } +
-            1 + (triageByteArray?.let { 4 + it.size} ?: 0) +
+            1 + (triageByteArray?.let { 4 + it.size } ?: 0) +
             1 + (malnutritionScreeningBytes?.let { 4 + it.size } ?: 0) +
             4 + complaintSummariesListBytes.sumOf { 4 + it.size }
 
@@ -82,7 +80,9 @@ object PatientFullDataSerializer {
         }
 
         // Visit
-        val visit = buffer.readNullable(VisitSerializer::deserialize)
+        val visitSize = buffer.int
+        val visitBytes = ByteArray(visitSize).also { buffer.get(it) }
+        val visit = VisitSerializer.deserialize(visitBytes)
 
         // Vitals
         val vitalCount = buffer.int

@@ -15,15 +15,23 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.unimib.oases.domain.model.Patient
+import com.unimib.oases.domain.model.PatientStatus
+import com.unimib.oases.domain.model.PatientWithVisitInfo
+import com.unimib.oases.domain.model.TriageCode
+import com.unimib.oases.domain.model.Visit
 import com.unimib.oases.ui.components.util.CenteredTextInBox
 import com.unimib.oases.ui.components.util.TitleText
+import com.unimib.oases.ui.screen.nurse_assessment.demographics.Sex
 import com.unimib.oases.util.StringFormatHelper.getAgeWithSuffix
+import java.time.LocalTime
 
 @Composable
 fun PatientItem(
-    patient: Patient?,
+    patientWithVisitInfo: PatientWithVisitInfo?,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
     errorText: String = "No patient info",
@@ -31,10 +39,10 @@ fun PatientItem(
 ){
 
     Card(
-        onClick = {onClick()},
+        onClick = onClick,
         shape = RoundedCornerShape(20.dp),
         modifier = modifier
-            .height(80.dp)
+            .height(100.dp)
             .padding(vertical = 2.dp),
         colors = CardDefaults.cardColors()
             .copy(containerColor = MaterialTheme.colorScheme.primary),
@@ -46,7 +54,7 @@ fun PatientItem(
                 color = MaterialTheme.colorScheme.onPrimary
             )
 
-        else if (patient == null)
+        else if (patientWithVisitInfo == null)
             CenteredTextInBox(
                 text = errorText,
                 color = MaterialTheme.colorScheme.errorContainer
@@ -54,48 +62,72 @@ fun PatientItem(
 
         else{
 
-            val ageString = getAgeWithSuffix(patient.ageInMonths)
+            val ageString = getAgeWithSuffix(patientWithVisitInfo.patient.ageInMonths)
 
-            Row(
+            Column(
                 modifier = Modifier
                     .padding(horizontal = 8.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                    .fillMaxHeight(),
+                verticalArrangement = Arrangement.SpaceBetween
             ){
-                Column(
+                Row(
                     modifier = Modifier
-                        .fillMaxHeight()
-                        .padding(horizontal = 8.dp),
-                    verticalArrangement = Arrangement.SpaceBetween
+                        .fillMaxWidth()
+                        .padding(4.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
+                    TitleText(patientWithVisitInfo.patient.name + ", " + ageString, color = MaterialTheme.colorScheme.onPrimary)
 
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
-                    ){
-                        TitleText(patient.name + ", " + ageString, color = MaterialTheme.colorScheme.onPrimary)
-                    }
+                    RoomAndCodeText(patientWithVisitInfo.visit)
+                }
 
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .padding(horizontal = 2.dp)
-                            .fillMaxWidth()
-                    ){
-                        Text(patient.publicId, color = MaterialTheme.colorScheme.onPrimary)
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .fillMaxWidth()
+                ){
+                    Text(patientWithVisitInfo.patient.publicId, color = MaterialTheme.colorScheme.onPrimary)
 
-                        //TODO(undo comment when PatientWithVisitInfoEntity exists)
-//                        Text(
-//                            text = patient.status.displayValue,
-//                            color = MaterialTheme.colorScheme.onPrimary,
-//                            textAlign = TextAlign.End,
-//                        )
-                    }
+                    Text(
+                        text = patientWithVisitInfo.visit.patientStatus.displayValue,
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        textAlign = TextAlign.End,
+                    )
                 }
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun PatientItemPreview(){
+    PatientItem(
+        patientWithVisitInfo = PatientWithVisitInfo(
+            patient = Patient(
+                id = "1",
+                name = "John Doe",
+                ageInMonths = 40 * 12,
+                publicId = "P12345",
+                birthDate = "",
+                sex = Sex.MALE,
+                village = "",
+                parish = "",
+                subCounty = "",
+                district = "",
+                nextOfKin = "",
+                contact = ""
+            ),
+            visit = Visit(
+                "3",
+                patientId = "1",
+                patientStatus = PatientStatus.WAITING_FOR_VISIT,
+                triageCode = TriageCode.RED,
+                roomName = "Emergency Room",
+                arrivalTime = LocalTime.now()
+            )
+        )
+    )
 }

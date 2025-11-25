@@ -4,13 +4,14 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.repository.PatientRepository
+import com.unimib.oases.domain.repository.VisitRepository
 import com.unimib.oases.domain.usecase.ConfigPatientDashboardActionsUseCase
-import com.unimib.oases.domain.usecase.GetCurrentVisitUseCase
 import com.unimib.oases.ui.navigation.NavigationEvent
+import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.util.Outcome
-import com.unimib.oases.util.Resource
 import com.unimib.oases.util.firstSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -20,7 +21,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -28,9 +28,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PatientDashboardViewModel @Inject constructor(
+    private val visitRepository: VisitRepository,
     private val patientRepository: PatientRepository,
     private val configurePatientDashboardActionsUseCase: ConfigPatientDashboardActionsUseCase,
-    private val getCurrentVisitUseCase: GetCurrentVisitUseCase,
     savedStateHandle: SavedStateHandle,
     @param:IoDispatcher private val dispatcher: CoroutineDispatcher
 ): ViewModel(){
@@ -52,9 +52,12 @@ class PatientDashboardViewModel @Inject constructor(
 
     private val mainContext = dispatcher + errorHandler
 
+    private val args = savedStateHandle.toRoute<Route.PatientDashboard>()
+
     private val _state = MutableStateFlow(
         PatientDashboardState(
-            patientId = savedStateHandle["patientId"]!!,
+            patientId = args.patientId,
+            visitId = args.visitId,
             actions = emptyList(),
         )
     )
@@ -73,7 +76,7 @@ class PatientDashboardViewModel @Inject constructor(
     private fun refresh() {
         viewModelScope.launch(mainContext) {
             _state.update { it.copy(isLoading = true, error = null) }
-            getPatientData()
+            getPatientAndVisitData()
             getButtons()
             _state.update { it.copy(isLoading = false) }
         }
@@ -86,21 +89,11 @@ class PatientDashboardViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getPatientData() {
-
-        val resource = patientRepository.getPatientById(_state.value.patientId).first {
-            it is Resource.Success || it is Resource.Error
-        }
-
-        when (resource) {
-            is Resource.Success -> {
-                _state.update { it.copy(patient = resource.data) }
-            }
-            is Resource.Error -> {
-                _state.update { it.copy(error = resource.message) }
-            }
-            else -> Unit
-        }
+    private suspend fun getPatientAndVisitData() {
+        val patientWithVisitInfo = visitRepository
+            .getVisitWithPatientInfo(state.value.visitId)
+            .firstSuccess()
+        _state.update { it.copy(patientWithVisitInfo = patientWithVisitInfo) }
     }
 
 
@@ -122,37 +115,36 @@ class PatientDashboardViewModel @Inject constructor(
                         }
 
                         is PatientDashboardAction.Triage -> {
-                            val visitId = getCurrentVisitUseCase(state.value.patientId)
-                                .firstSuccess()
-                                .id
                             navigationEventsChannel.send(
                                 NavigationEvent.Navigate(
                                     event.action.createRoute(
                                         state.value.patientId,
-                                        visitId
+                                        state.value.visitId
                                     )
                                 )
                             )
                         }
 
                         is PatientDashboardAction.MalnutritionScreening -> {
-                            try {
-                                val visitId = getCurrentVisitUseCase(state.value.patientId)
-                                    .firstSuccess()
-                                    .id
-
-                                navigationEventsChannel.send(
-                                    NavigationEvent.Navigate(
-                                        event.action.createRoute(
-                                            state.value.patientId,
-                                            visitId
-                                        )
+                            navigationEventsChannel.send(
+                                NavigationEvent.Navigate(
+                                    event.action.createRoute(
+                                        state.value.patientId,
+                                        state.value.visitId
                                     )
                                 )
-                            } catch (_: NoSuchElementException){
-                                throw NoSuchElementException("Malnutrition screening can only be performed after the triage")
-                            }
+                            )
+                        }
 
+                        is PatientDashboardAction.Send -> {
+                            navigationEventsChannel.send(
+                                NavigationEvent.Navigate(
+                                    event.action.createRoute(
+                                        state.value.patientId,
+                                        state.value.visitId
+                                    )
+                                )
+                            )
                         }
 
                         PatientDashboardAction.Delete -> {
@@ -162,9 +154,9 @@ class PatientDashboardViewModel @Inject constructor(
                 }
             }
             PatientDashboardEvent.PatientItemClicked -> {
-                if (_state.value.patient == null) {
+                if (_state.value.patientWithVisitInfo == null) {
                     viewModelScope.launch(mainContext){
-                        getPatientData()
+                        getPatientAndVisitData()
                     }
                 }
             }
