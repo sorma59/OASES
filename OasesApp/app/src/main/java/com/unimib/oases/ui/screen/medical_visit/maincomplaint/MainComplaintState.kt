@@ -60,6 +60,10 @@ data class MainComplaintState(
                 .filterIsInstance<ComplaintQuestionWithImmediateTreatment>()
                 .filter { it.shouldShowTreatment(symptoms) }
                 .map { it.treatment}
+
+    val shouldShowGenerateTestsButton: Boolean
+        get() = detailsQuestions.isNotEmpty()
+                && detailsQuestionsToShow == detailsQuestions.size
 }
 
 data class ImmediateTreatmentQuestionState(
