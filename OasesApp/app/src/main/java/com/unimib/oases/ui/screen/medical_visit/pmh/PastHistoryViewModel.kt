@@ -32,7 +32,7 @@ class PastHistoryViewModel @Inject constructor(
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ): ViewModel() {
 
-    private var errorHandler = CoroutineExceptionHandler { _, e ->
+    private val errorHandler = CoroutineExceptionHandler { _, e ->
         e.printStackTrace()
         _state.value = _state.value.copy(
             error = e.message,

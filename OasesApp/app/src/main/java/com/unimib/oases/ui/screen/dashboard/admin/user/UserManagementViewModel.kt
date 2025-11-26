@@ -31,7 +31,7 @@ class UserManagementViewModel @Inject constructor(
     val state: StateFlow<UserManagementState> = _state
 
     private var undoUser: User? = null
-    private var errorHandler = CoroutineExceptionHandler { _, e ->
+    private val errorHandler = CoroutineExceptionHandler { _, e ->
         e.printStackTrace()
         _state.update{
             it.copy(

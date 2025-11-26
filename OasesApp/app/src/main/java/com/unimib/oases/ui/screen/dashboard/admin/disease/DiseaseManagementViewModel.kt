@@ -31,7 +31,7 @@ class DiseaseManagementViewModel @Inject constructor(
     val state: StateFlow<DiseaseManagementState> = _state
 
     private var undoDisease: Disease? = null
-    private var errorHandler = CoroutineExceptionHandler { _, e ->
+    private val errorHandler = CoroutineExceptionHandler { _, e ->
         e.printStackTrace()
         _state.update{
             it.copy(

@@ -28,7 +28,7 @@ class RoomsManagementViewModel @Inject constructor(
     val state: StateFlow<RoomManagementState> = _state
 
     private var undoRoom: Room? = null
-    private var errorHandler = CoroutineExceptionHandler { _, e ->
+    private val errorHandler = CoroutineExceptionHandler { _, e ->
         e.printStackTrace()
         _state.update{
             _state.value.copy(

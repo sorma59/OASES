@@ -31,7 +31,7 @@ class VitalSignManagementViewModel @Inject constructor(
     val state: StateFlow<VitalSignManagementState> = _state
 
     private var undoVitalSign: VitalSign? = null
-    private var errorHandler = CoroutineExceptionHandler { _, e ->
+    private val errorHandler = CoroutineExceptionHandler { _, e ->
         e.printStackTrace()
         _state.update{
             _state.value.copy(

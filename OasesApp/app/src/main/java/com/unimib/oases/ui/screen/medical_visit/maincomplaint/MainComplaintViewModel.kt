@@ -58,7 +58,7 @@ class MainComplaintViewModel @Inject constructor(
     private val triageEvaluationRepository: TriageEvaluationRepository
 ): ViewModel() {
 
-    private var errorHandler = CoroutineExceptionHandler { _, e ->
+    private val errorHandler = CoroutineExceptionHandler { _, e ->
         e.printStackTrace()
         _state.update{
             it.copy(

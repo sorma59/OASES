@@ -34,7 +34,7 @@ class PatientDetailsViewModel @Inject constructor(
     @param:IoDispatcher private val dispatcher: CoroutineDispatcher
 ): ViewModel() {
 
-    private var errorHandler = CoroutineExceptionHandler { _, e ->
+    private val errorHandler = CoroutineExceptionHandler { _, e ->
         e.printStackTrace()
         _state.update{
             _state.value.copy(
