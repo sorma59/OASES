@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.MedicalServices
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -64,17 +63,12 @@ fun PatientDetailsScreen(
 
         state.patient?.let {
             PatientDetails(it)
-//          EditButton(
-//              onClick = { viewModel.onEvent(PatientDetailsEvent.OnEdit) },
-//              contentDescription = "Edit patient details"
-//          ) // Top Right
+        } ?: Box(Modifier.fillMaxSize()) {
+            RetryButton(
+                error = "Failed to load patient data",
+                onClick = { viewModel.onEvent(PatientDetailsEvent.OnRetryPatientDetails) },
+            )
         }
-            ?: Box(Modifier.fillMaxSize()) {
-                RetryButton(
-                    error = "Failed to load patient data",
-                    onClick = { viewModel.onEvent(PatientDetailsEvent.OnRetryPatientDetails) },
-                )
-            }
 
         MainComplaintsDetails(state, viewModel)
     }
@@ -295,25 +289,6 @@ private fun PatientDetails(patient: Patient) {
                 text = patient.nextOfKin,
                 fontSize = 14.sp
             )
-        }
-
-        Spacer(Modifier.height(16.dp))
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.Outlined.MedicalServices,
-                contentDescription = "Next of kin"
-            )
-
-            Spacer(Modifier.width(6.dp))
-
-            //TODO(undo comment when PatientWithVisitInfoEntity exists)
-//            Text(
-//                text = patient.status.displayValue,
-//                fontSize = 14.sp
-//            )
         }
     }
 }

@@ -3,6 +3,7 @@ package com.unimib.oases.ui.screen.medical_visit.maincomplaint
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.model.complaint.ComplaintId
 import com.unimib.oases.domain.model.complaint.ComplaintQuestion
@@ -22,6 +23,7 @@ import com.unimib.oases.domain.usecase.SubmitMedicalVisitPartOneUseCase
 import com.unimib.oases.domain.usecase.TranslateLatestVitalSignsToSymptomsUseCase
 import com.unimib.oases.domain.usecase.TranslateTriageSymptomIdsToSymptomsUseCase
 import com.unimib.oases.ui.navigation.NavigationEvent
+import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.util.Outcome
 import com.unimib.oases.util.firstNullableSuccess
 import com.unimib.oases.util.firstSuccess
@@ -67,10 +69,12 @@ class MainComplaintViewModel @Inject constructor(
         }
     }
 
+    private val args = savedStateHandle.toRoute<Route.MainComplaint>()
+
     private val _state = MutableStateFlow(
         MainComplaintState(
-            patientId = savedStateHandle["patientId"]!!,
-            complaintId = savedStateHandle["complaintId"]!!
+            patientId = args.patientId,
+            complaintId = args.mainComplaintId
         )
     )
     val state: StateFlow<MainComplaintState> = _state.asStateFlow()

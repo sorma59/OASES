@@ -5,7 +5,7 @@ import com.unimib.oases.domain.model.PatientDisease
 import com.unimib.oases.domain.model.SexSpecificity
 
 data class PastHistoryState (
-    val receivedId: String,
+    val patientId: String,
     val diseases: List<PatientDiseaseState> = emptyList(),
     val sex: SexSpecificity = SexSpecificity.ALL,
     val age: AgeSpecificity = AgeSpecificity.ALL,
@@ -30,7 +30,7 @@ fun PastHistoryState.toPatientDiseases(): List<PatientDisease> {
         if (it.isDiagnosed != null) {
             list.add(
                 PatientDisease(
-                    patientId = this.receivedId,
+                    patientId = this.patientId,
                     diseaseName = it.disease,
                     isDiagnosed = it.isDiagnosed,
                     additionalInfo = it.additionalInfo,

@@ -3,12 +3,14 @@ package com.unimib.oases.ui.screen.dashboard.patient.view
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.domain.usecase.GetCurrentVisitMainComplaintUseCase
 import com.unimib.oases.domain.usecase.GetCurrentVisitUseCase
 import com.unimib.oases.domain.usecase.GetPatientChronicDiseasesUseCase
 import com.unimib.oases.ui.navigation.NavigationEvent
+import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.util.Resource
 import com.unimib.oases.util.firstNullableSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -43,8 +45,10 @@ class PatientDetailsViewModel @Inject constructor(
         }
     }
 
+    private val args = savedStateHandle.toRoute< Route.ViewPatientDetails>()
+
     private val _state = MutableStateFlow(
-        PatientDetailsState(patientId = savedStateHandle["patientId"]!!)
+        PatientDetailsState(patientId = args.patientId)
     )
     val state: StateFlow<PatientDetailsState> = _state.asStateFlow()
 

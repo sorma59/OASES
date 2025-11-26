@@ -3,11 +3,13 @@ package com.unimib.oases.ui.screen.medical_visit.pmh
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.usecase.DiseaseUseCase
 import com.unimib.oases.domain.usecase.GetPatientChronicDiseasesUseCase
 import com.unimib.oases.domain.usecase.SavePastMedicalHistoryUseCase
 import com.unimib.oases.ui.navigation.NavigationEvent
+import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.util.Outcome
 import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,8 +42,10 @@ class PastHistoryViewModel @Inject constructor(
         )
     }
 
+    private val args = savedStateHandle.toRoute<Route.PastMedicalHistory>()
+
     private val _state = MutableStateFlow(PastHistoryState(
-        receivedId = savedStateHandle["patientId"]!!
+        patientId = args.patientId
     ))
     val state: StateFlow<PastHistoryState> = _state.asStateFlow()
 
@@ -100,7 +104,7 @@ class PastHistoryViewModel @Inject constructor(
     private suspend fun loadPatientDiseases() {
         _state.update { it.copy(isLoading = true) }
 
-        val patientId = _state.value.receivedId
+        val patientId = _state.value.patientId
 
         try {
             val patientDiseases = getPatientChronicDiseasesUseCase(patientId)
