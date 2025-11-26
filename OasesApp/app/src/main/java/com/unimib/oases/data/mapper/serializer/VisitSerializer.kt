@@ -4,6 +4,7 @@ import android.util.Log
 import com.unimib.oases.domain.model.PatientStatus
 import com.unimib.oases.domain.model.TriageCode
 import com.unimib.oases.domain.model.Visit
+import com.unimib.oases.util.DateAndTimeUtils
 import java.nio.ByteBuffer
 import java.time.LocalDate
 import java.time.LocalTime
@@ -81,7 +82,7 @@ object VisitSerializer {
             patientId = "patientId",
             triageCode = TriageCode.GREEN,
             roomName = "aaaa",
-            date = LocalDate.now(),
+            date = DateAndTimeUtils.getCurrentDate(),
             description = "description"
         )
         Log.d("VisitSerializer", "Original: $original")

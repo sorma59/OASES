@@ -1,11 +1,12 @@
 package com.unimib.oases.util
 
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.Period
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 
-object DateTimeFormatter {
+object DateAndTimeUtils {
 
     val hoursAndMinutesFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
@@ -13,11 +14,11 @@ object DateTimeFormatter {
      * Calculates age based on a birth date string.
      *
      * @param birthDateString The birth date as a String.
-     * @param formatter The DateTimeFormatter to parse the birthDateString.
+     * @param formatter The DateAndTimeUtils to parse the birthDateString.
      *                  Defaults to ISO_LOCAL_DATE (yyyy-MM-dd).
      * @return The age in years, or null if the birthDateString is invalid or cannot be parsed.
      */
-    fun calculateAgeInMonths(birthDateString: String, date: LocalDate = LocalDate.now(), formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")): Int? {
+    fun calculateAgeInMonths(birthDateString: String, date: LocalDate = getCurrentDate(), formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")): Int? {
         return try {
             val birthDate = LocalDate.parse(birthDateString, formatter)
             val period = Period.between(birthDate, date)
@@ -36,8 +37,16 @@ object DateTimeFormatter {
     fun calculateBirthDate(ageInMonths: Int, formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")): String? {
         if (ageInMonths < 0)
             return null
-        val currentDate = LocalDate.now()
+        val currentDate = getCurrentDate()
         val birthDate = currentDate.minusMonths(ageInMonths.toLong())
         return birthDate.format(formatter)
+    }
+
+    fun getCurrentDate(): LocalDate {
+        return LocalDate.now()
+    }
+
+    fun getCurrentTime(): LocalTime {
+        return LocalTime.now()
     }
 }

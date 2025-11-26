@@ -1,5 +1,6 @@
 package com.unimib.oases.domain.model
 
+import com.unimib.oases.util.DateAndTimeUtils
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.UUID
@@ -10,8 +11,8 @@ data class Visit(
     val triageCode: TriageCode = TriageCode.NONE,
     val patientStatus: PatientStatus = PatientStatus.WAITING_FOR_TRIAGE,
     val roomName: String? = null,
-    val arrivalTime: LocalTime = LocalTime.now(),
-    val date: LocalDate = LocalDate.now(),
+    val arrivalTime: LocalTime = DateAndTimeUtils.getCurrentTime(),
+    val date: LocalDate = DateAndTimeUtils.getCurrentDate(),
     val description: String = ""
 )
 

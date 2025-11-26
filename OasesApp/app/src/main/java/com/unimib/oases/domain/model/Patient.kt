@@ -17,10 +17,6 @@ data class Patient(
     val district: String,
     val nextOfKin: String,
     val contact: String,
-//    val status: PatientStatus,
-//    val code: TriageCode,
-//    val roomName: String,
-//    val arrivalTime: LocalDateTime = LocalDateTime.now(),
     val image: ByteArray? = null
 )
 

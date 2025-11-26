@@ -26,8 +26,8 @@ import com.unimib.oases.domain.model.Visit
 import com.unimib.oases.ui.components.util.CenteredTextInBox
 import com.unimib.oases.ui.components.util.TitleText
 import com.unimib.oases.ui.screen.nurse_assessment.demographics.Sex
+import com.unimib.oases.util.DateAndTimeUtils
 import com.unimib.oases.util.StringFormatHelper.getAgeWithSuffix
-import java.time.LocalTime
 
 @Composable
 fun PatientItem(
@@ -126,7 +126,7 @@ fun PatientItemPreview(){
                 patientStatus = PatientStatus.WAITING_FOR_VISIT,
                 triageCode = TriageCode.RED,
                 roomName = "Emergency Room",
-                arrivalTime = LocalTime.now()
+                arrivalTime = DateAndTimeUtils.getCurrentTime()
             )
         )
     )

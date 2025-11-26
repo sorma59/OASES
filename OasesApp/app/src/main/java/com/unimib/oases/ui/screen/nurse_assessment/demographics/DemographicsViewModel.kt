@@ -15,7 +15,7 @@ import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.ui.screen.nurse_assessment.PatientRegistrationScreensUiMode
 import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreenViewModel.Companion.DEMOGRAPHICS_COMPLETED_KEY
-import com.unimib.oases.util.DateTimeFormatter
+import com.unimib.oases.util.DateAndTimeUtils
 import com.unimib.oases.util.Outcome
 import com.unimib.oases.util.firstSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -151,7 +151,7 @@ class DemographicsViewModel @Inject constructor(
                 }
             }
             is DemographicsEvent.BirthDateChanged -> {
-                val newAgeInMonths = DateTimeFormatter.calculateAgeInMonths(event.birthDate)
+                val newAgeInMonths = DateAndTimeUtils.calculateAgeInMonths(event.birthDate)
                 _state.update {
                     it.editingState?.let { editing ->
                         it.copy(
@@ -171,7 +171,7 @@ class DemographicsViewModel @Inject constructor(
                 }
             }
             is DemographicsEvent.AgeChanged -> {
-                val newBirthDate = DateTimeFormatter.calculateBirthDate(event.ageInMonths)
+                val newBirthDate = DateAndTimeUtils.calculateBirthDate(event.ageInMonths)
                 _state.update {
                     it.editingState?.let { editing ->
                         it.copy(

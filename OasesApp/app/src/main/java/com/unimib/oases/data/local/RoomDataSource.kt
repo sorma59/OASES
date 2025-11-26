@@ -74,7 +74,7 @@ class RoomDataSource @Inject constructor(
     }
 
     fun getPatientsWithVisitInfo(): Flow<List<PatientWithVisitInfoEntity>> {
-        return patientDao.getPatientsWithLatestVisitInfo()
+        return patientDao.getPatientsWithTodaysVisitInfo()
     }
 
     fun getPatientById(id: String): Flow<PatientEntity?> {
@@ -211,7 +211,7 @@ class RoomDataSource @Inject constructor(
     }
 
     fun getVisitWithPatientInfo(visitId: String): Flow<PatientWithVisitInfoEntity> {
-        return visitDao.getVisitWithPatientInfo(visitId)
+        return visitDao.getTodaysVisitWithPatientInfo(visitId)
     }
 
     fun getCurrentVisit(patientId: String): Flow<VisitEntity?> {

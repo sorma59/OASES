@@ -50,10 +50,9 @@ import com.unimib.oases.domain.model.Visit
 import com.unimib.oases.ui.components.patients.RoomAndCodeText
 import com.unimib.oases.ui.screen.nurse_assessment.demographics.Sex
 import com.unimib.oases.ui.theme.OasesTheme
-import com.unimib.oases.util.DateTimeFormatter
+import com.unimib.oases.util.DateAndTimeUtils
 import com.unimib.oases.util.StringFormatHelper.getAgeWithSuffix
 import kotlinx.coroutines.launch
-import java.time.LocalTime
 import kotlin.math.roundToInt
 
 @Composable
@@ -221,7 +220,7 @@ fun PatientCard(
 
                 Row(modifier = Modifier.fillMaxWidth().padding(end = 10.dp), horizontalArrangement = Arrangement.End){
                     Text(
-                        text = patientWithVisitInfo.visit.arrivalTime.format(DateTimeFormatter.hoursAndMinutesFormatter),
+                        text = patientWithVisitInfo.visit.arrivalTime.format(DateAndTimeUtils.hoursAndMinutesFormatter),
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.surface,
                         fontWeight = FontWeight.Normal,
@@ -266,7 +265,7 @@ fun PatientCardPreview() {
                     patientStatus = PatientStatus.WAITING_FOR_VISIT,
                     triageCode = TriageCode.RED,
                     roomName = "Emergency Room",
-                    arrivalTime = LocalTime.now()
+                    arrivalTime = DateAndTimeUtils.getCurrentTime()
                 )
             ),
             onCardClick = {}

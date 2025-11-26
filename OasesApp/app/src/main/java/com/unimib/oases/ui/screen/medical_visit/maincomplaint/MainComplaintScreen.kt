@@ -103,7 +103,7 @@ private fun MainComplaintContent(
     val shouldShowGenerateTestsButton by remember {
         derivedStateOf {
             state.detailsQuestions.isNotEmpty()
-                    && state.detailsQuestionsToShow == state.detailsQuestions.size
+            && state.detailsQuestionsToShow == state.detailsQuestions.size
         }
     }
 

@@ -6,8 +6,8 @@ import androidx.room.Upsert
 import com.unimib.oases.data.local.TableNames
 import com.unimib.oases.data.local.model.VisitEntity
 import com.unimib.oases.data.local.model.relation.PatientWithVisitInfoEntity
+import com.unimib.oases.util.DateAndTimeUtils
 import kotlinx.coroutines.flow.Flow
-import java.time.LocalDate
 
 @Dao
 interface VisitDao {
@@ -51,11 +51,11 @@ interface VisitDao {
             ${TableNames.PATIENT} p
         INNER JOIN
             ${TableNames.VISIT} v ON p.id = v.patient_id
-        WHERE v.id = :visitId
+        WHERE v.id = :visitId AND v.date = :today
     """)
-    fun getVisitWithPatientInfo(visitId: String): Flow<PatientWithVisitInfoEntity>
+    fun getTodaysVisitWithPatientInfo(visitId: String, today: String = DateAndTimeUtils.getCurrentDate().toString()): Flow<PatientWithVisitInfoEntity>
 
     @Query("SELECT * FROM " + TableNames.VISIT + " WHERE patient_id = :patientId AND date = :today LIMIT 1")
-    fun getCurrentVisit(patientId: String, today: String = LocalDate.now().toString()): Flow<VisitEntity?>
+    fun getCurrentVisit(patientId: String, today: String = DateAndTimeUtils.getCurrentDate().toString()): Flow<VisitEntity?>
 
 }
