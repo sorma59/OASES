@@ -40,41 +40,29 @@ object PatientSerializer {
 
         buffer.putInt(patient.ageInMonths)
 
-        buffer.putInt(idBytes.size)
-        buffer.put(idBytes)
+        buffer.putBytes(idBytes)
 
-        buffer.putInt(publicIdBytes.size)
-        buffer.put(publicIdBytes)
+        buffer.putBytes(publicIdBytes)
 
-        buffer.putInt(nameBytes.size)
-        buffer.put(nameBytes)
+        buffer.putBytes(nameBytes)
 
-        buffer.putInt(birthDateBytes.size)
-        buffer.put(birthDateBytes)
+        buffer.putBytes(birthDateBytes)
 
-        buffer.putInt(sexBytes.size)
-        buffer.put(sexBytes)
+        buffer.putBytes(sexBytes)
 
-        buffer.putInt(villageBytes.size)
-        buffer.put(villageBytes)
+        buffer.putBytes(villageBytes)
 
-        buffer.putInt(parishBytes.size)
-        buffer.put(parishBytes)
+        buffer.putBytes(parishBytes)
 
-        buffer.putInt(subCountyBytes.size)
-        buffer.put(subCountyBytes)
+        buffer.putBytes(subCountyBytes)
 
-        buffer.putInt(districtBytes.size)
-        buffer.put(districtBytes)
+        buffer.putBytes(districtBytes)
 
-        buffer.putInt(nextOfKinBytes.size)
-        buffer.put(nextOfKinBytes)
+        buffer.putBytes(nextOfKinBytes)
 
-        buffer.putInt(contactBytes.size)
-        buffer.put(contactBytes)
+        buffer.putBytes(contactBytes)
 
-        buffer.putInt(imageBytes.size)
-        buffer.put(imageBytes)
+        buffer.putBytes(imageBytes)
 
         return buffer.array()
     }

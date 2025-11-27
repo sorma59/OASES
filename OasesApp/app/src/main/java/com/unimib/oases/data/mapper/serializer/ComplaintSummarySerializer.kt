@@ -9,8 +9,8 @@ object ComplaintSummarySerializer {
     fun serialize(complaintSummary: ComplaintSummary): ByteArray {
         val visitIdBytes = complaintSummary.visitId.toByteArray(Charsets.UTF_8)
         val complaintIdBytes = complaintSummary.complaintId.toByteArray(Charsets.UTF_8)
-        val algorithmsQuestionsAndAnswersBytes = complaintSummary.algorithmsQuestionsAndAnswers.map{
-            it.map{
+        val algorithmsQuestionsAndAnswersBytes = complaintSummary.algorithmsQuestionsAndAnswers.map { list ->
+            list.map{
                 QuestionAndAnswerSerializer.serialize(it)
             }
         }
@@ -31,47 +31,39 @@ object ComplaintSummarySerializer {
                     4 + additionalTestsBytes.size
         )
 
-        buffer.putInt(visitIdBytes.size)
-        buffer.put(visitIdBytes)
+        buffer.putBytes(visitIdBytes)
 
-        buffer.putInt(complaintIdBytes.size)
-        buffer.put(complaintIdBytes)
+        buffer.putBytes(complaintIdBytes)
 
         buffer.putInt(algorithmsQuestionsAndAnswersBytes.size)
-        algorithmsQuestionsAndAnswersBytes.forEach {
-            buffer.putInt(it.size)
-            it.forEach {
-                buffer.putInt(it.size)
-                buffer.put(it)
+        algorithmsQuestionsAndAnswersBytes.forEach { list ->
+            buffer.putInt(list.size)
+            list.forEach {
+                buffer.putBytes(it)
             }
         }
 
         buffer.putInt(symptomsBytes.size)
         symptomsBytes.forEach {
-            buffer.putInt(it.size)
-            buffer.put(it)
+            buffer.putBytes(it)
         }
 
         buffer.putInt(testsBytes.size)
         testsBytes.forEach {
-            buffer.putInt(it.size)
-            buffer.put(it)
+            buffer.putBytes(it)
         }
 
         buffer.putInt(immediateTreatmentsBytes.size)
         immediateTreatmentsBytes.forEach {
-            buffer.putInt(it.size)
-            buffer.put(it)
+            buffer.putBytes(it)
         }
 
         buffer.putInt(supportiveTherapiesTextsBytes.size)
         supportiveTherapiesTextsBytes.forEach {
-            buffer.putInt(it.size)
-            buffer.put(it)
+            buffer.putBytes(it)
         }
 
-        buffer.putInt(additionalTestsBytes.size)
-        buffer.put(additionalTestsBytes)
+        buffer.putBytes(additionalTestsBytes)
 
         return buffer.array()
     }
@@ -140,10 +132,12 @@ object ComplaintSummarySerializer {
     }
 
     //-----------------------------------
-    fun test(complaintSummary: ComplaintSummary) {
+    fun testComplaintSummarySerializer(complaintSummary: ComplaintSummary) {
         val bytes = serialize(complaintSummary)
         val recovered = deserialize(bytes)
+        val areEqual = complaintSummary === recovered
         Log.d("Prova", "Original: $complaintSummary")
         Log.d("Prova", "Recovered: $recovered")
+        Log.d("Prova", "areEqual: $areEqual")
     }
 }

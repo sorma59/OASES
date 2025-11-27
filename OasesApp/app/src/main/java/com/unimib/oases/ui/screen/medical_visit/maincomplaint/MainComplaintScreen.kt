@@ -98,13 +98,6 @@ private fun MainComplaintContent(
         onEvent(MainComplaintEvent.GenerateTestsPressed)
     }
 
-//    val shouldShowGenerateTestsButton by remember {
-//        derivedStateOf {
-//            state.detailsQuestions.isNotEmpty()
-//            && state.detailsQuestionsToShow == state.detailsQuestions.size
-//        }
-//    }
-
     val onSubmit = { onEvent(MainComplaintEvent.SubmitPressed) }
 
     state.error?.let {

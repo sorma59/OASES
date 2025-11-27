@@ -22,20 +22,15 @@ object PatientDiseaseSerializer {
                 4 + additionalInfoBytes.size
         ).order(ByteOrder.BIG_ENDIAN)
 
-        buffer.putInt(patientIdBytes.size)
-        buffer.put(patientIdBytes)
+        buffer.putBytes(patientIdBytes)
 
-        buffer.putInt(diseaseNameBytes.size)
-        buffer.put(diseaseNameBytes)
+        buffer.putBytes(diseaseNameBytes)
 
-        buffer.putInt(isDiagnosedBytes.size)
-        buffer.put(isDiagnosedBytes)
+        buffer.putBytes(isDiagnosedBytes)
 
-        buffer.putInt(diagnosisDateBytes.size)
-        buffer.put(diagnosisDateBytes)
+        buffer.putBytes(diagnosisDateBytes)
 
-        buffer.putInt(additionalInfoBytes.size)
-        buffer.put(additionalInfoBytes)
+        buffer.putBytes(additionalInfoBytes)
 
         return buffer.array()
     }

@@ -12,8 +12,7 @@ object SymptomSerializer {
             .allocate(4 + idBytes.size)
             .order(ByteOrder.BIG_ENDIAN)
 
-        buffer.putInt(idBytes.size)
-        buffer.put(idBytes)
+        buffer.putBytes(idBytes)
 
         return buffer.array()
     }

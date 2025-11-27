@@ -17,11 +17,9 @@ object LabelledTestSerializer {
             )
             .order(ByteOrder.BIG_ENDIAN)
 
-        buffer.putInt(testIdBytes.size)
-        buffer.put(testIdBytes)
+        buffer.putBytes(testIdBytes)
 
-        buffer.putInt(labelBytes.size)
-        buffer.put(labelBytes)
+        buffer.putBytes(labelBytes)
 
         return buffer.array()
     }

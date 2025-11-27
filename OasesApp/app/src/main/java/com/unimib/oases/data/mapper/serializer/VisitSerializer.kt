@@ -32,21 +32,21 @@ object VisitSerializer {
             4 + descriptionBytes.size
         )
 
-        buffer.putData(idBytes)
+        buffer.putBytes(idBytes)
 
-        buffer.putData(patientIdBytes)
+        buffer.putBytes(patientIdBytes)
 
-        buffer.putData(triageCodeBytes)
+        buffer.putBytes(triageCodeBytes)
 
-        buffer.putData(patientStatusBytes)
+        buffer.putBytes(patientStatusBytes)
 
         buffer.putNullableBytes(roomNameBytes)
 
-        buffer.putData(arrivalTimeBytes)
+        buffer.putBytes(arrivalTimeBytes)
 
-        buffer.putData(dateBytes)
+        buffer.putBytes(dateBytes)
 
-        buffer.putData(descriptionBytes)
+        buffer.putBytes(descriptionBytes)
 
         return buffer.array()
     }

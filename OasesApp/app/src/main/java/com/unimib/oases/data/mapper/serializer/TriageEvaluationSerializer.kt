@@ -18,14 +18,11 @@ object TriageEvaluationSerializer {
             4 + yellowSymptomIdsBytes.size
         ).order(ByteOrder.BIG_ENDIAN)
 
-        buffer.putInt(visitIdBytes.size)
-        buffer.put(visitIdBytes)
+        buffer.putBytes(visitIdBytes)
 
-        buffer.putInt(redSymptomIdsBytes.size)
-        buffer.put(redSymptomIdsBytes)
+        buffer.putBytes(redSymptomIdsBytes)
 
-        buffer.putInt(yellowSymptomIdsBytes.size)
-        buffer.put(yellowSymptomIdsBytes)
+        buffer.putBytes(yellowSymptomIdsBytes)
 
         return buffer.array()
     }

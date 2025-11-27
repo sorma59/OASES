@@ -13,8 +13,7 @@ object ImmediateTreatmentSerializer {
             .allocate(4 + textBytes.size)
             .order(ByteOrder.BIG_ENDIAN)
 
-        buffer.putInt(textBytes.size)
-        buffer.put(textBytes)
+        buffer.putBytes(textBytes)
 
         return buffer.array()
     }

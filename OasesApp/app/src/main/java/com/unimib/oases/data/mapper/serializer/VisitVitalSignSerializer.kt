@@ -20,17 +20,13 @@ object VisitVitalSignSerializer {
             4 + valueBytes.size
         ).order(ByteOrder.BIG_ENDIAN)
 
-        buffer.putInt(visitIdBytes.size)
-        buffer.put(visitIdBytes)
+        buffer.putBytes(visitIdBytes)
 
-        buffer.putInt(vitalSignNameBytes.size)
-        buffer.put(vitalSignNameBytes)
+        buffer.putBytes(vitalSignNameBytes)
 
-        buffer.putInt(timestampBytes.size)
-        buffer.put(timestampBytes)
+        buffer.putBytes(timestampBytes)
 
-        buffer.putInt(valueBytes.size)
-        buffer.put(valueBytes)
+        buffer.putBytes(valueBytes)
 
         return buffer.array()
     }
@@ -53,16 +49,16 @@ object VisitVitalSignSerializer {
     }
 
     // ----------------Testing--------------------
-    fun test() {
+    fun testVisitVitalSignSerializer() {
         val original = VisitVitalSign(
             visitId = "id",
             vitalSignName = "vital sign",
             timestamp = "timestamp",
             value = 5.0
         )
-        Log.d("VisitVitalSignSerializer", "Original: $original")
+        Log.d("Prova: VisitVitalSignSerializer", "Original: $original")
         val bytes = serialize(original)
         val recovered = deserialize(bytes)
-        Log.d("VisitVitalSignSerializer", "Recovered: $recovered")
+        Log.d("Prova: VisitVitalSignSerializer", "Recovered: $recovered")
     }
 }

@@ -20,17 +20,13 @@ object MalnutritionScreeningSerializer {
             4 + muacBytes.size
         ).order(ByteOrder.BIG_ENDIAN)
 
-        buffer.putInt(visitIdBytes.size)
-        buffer.put(visitIdBytes)
+        buffer.putBytes(visitIdBytes)
 
-        buffer.putInt(weightBytes.size)
-        buffer.put(weightBytes)
+        buffer.putBytes(weightBytes)
 
-        buffer.putInt(heightBytes.size)
-        buffer.put(heightBytes)
+        buffer.putBytes(heightBytes)
 
-        buffer.putInt(muacBytes.size)
-        buffer.put(muacBytes)
+        buffer.putBytes(muacBytes)
 
         return buffer.array()
     }

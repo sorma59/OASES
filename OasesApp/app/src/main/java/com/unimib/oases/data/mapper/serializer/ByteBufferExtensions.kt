@@ -25,7 +25,7 @@ fun ByteBuffer.readString(): String {
     return String(bytes, StandardCharsets.UTF_8)
 }
 
-fun ByteBuffer.putData(bytes: ByteArray) {
+fun ByteBuffer.putBytes(bytes: ByteArray) {
     this.putInt(bytes.size)
     this.put(bytes)
 }
@@ -34,7 +34,7 @@ fun ByteBuffer.putData(bytes: ByteArray) {
 fun ByteBuffer.putNullableBytes(bytes: ByteArray?) {
     if (bytes != null) {
         this.put(1.toByte()) // Presence flag
-        this.putData(bytes)
+        this.putBytes(bytes)
     } else {
         this.put(0.toByte()) // Absence flag
     }

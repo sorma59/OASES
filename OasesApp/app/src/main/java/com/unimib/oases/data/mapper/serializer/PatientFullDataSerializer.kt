@@ -33,21 +33,18 @@ object PatientFullDataSerializer {
 
         val buffer = ByteBuffer.allocate(totalSize).order(ByteOrder.BIG_ENDIAN)
 
-        buffer.putInt(patientByteArray.size)
-        buffer.put(patientByteArray)
+        buffer.putBytes(patientByteArray)
 
         buffer.putInt(diseaseBytesList.size)
         diseaseBytesList.forEach {
-            buffer.putInt(it.size)
-            buffer.put(it)
+            buffer.putBytes(it)
         }
 
         buffer.putNullable(visitByteArray)
 
         buffer.putInt(vitalSignBytesList.size)
         vitalSignBytesList.forEach {
-            buffer.putInt(it.size)
-            buffer.put(it)
+            buffer.putBytes(it)
         }
 
         buffer.putNullable(triageByteArray)
@@ -56,8 +53,7 @@ object PatientFullDataSerializer {
 
         buffer.putInt(complaintSummariesListBytes.size)
         complaintSummariesListBytes.forEach {
-            buffer.putInt(it.size)
-            buffer.put(it)
+            buffer.putBytes(it)
         }
 
         return buffer.array()

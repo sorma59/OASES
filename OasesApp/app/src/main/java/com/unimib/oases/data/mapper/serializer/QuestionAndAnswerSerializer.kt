@@ -15,11 +15,9 @@ object QuestionAndAnswerSerializer {
                     4 + answerBytes.size
         ).order(ByteOrder.BIG_ENDIAN)
 
-        buffer.putInt(questionBytes.size)
-        buffer.put(questionBytes)
+        buffer.putBytes(questionBytes)
 
-        buffer.putInt(answerBytes.size)
-        buffer.put(answerBytes)
+        buffer.putBytes(answerBytes)
 
         return buffer.array()
     }
