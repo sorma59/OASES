@@ -123,7 +123,6 @@ class TriageViewModel @Inject constructor(
 
     private suspend fun getCurrentVisitData() {
         val visit = getCurrentVisitUseCase(state.value.patientId)
-            .firstSuccess()
         _state.update {
             it.copy(
                 visit = visit,

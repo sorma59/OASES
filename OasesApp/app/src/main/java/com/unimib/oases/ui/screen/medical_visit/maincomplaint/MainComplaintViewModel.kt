@@ -25,7 +25,6 @@ import com.unimib.oases.domain.usecase.TranslateTriageSymptomIdsToSymptomsUseCas
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.util.Outcome
-import com.unimib.oases.util.firstNullableSuccess
 import com.unimib.oases.util.firstSuccess
 import com.unimib.oases.util.toggle
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -223,20 +222,19 @@ class MainComplaintViewModel @Inject constructor(
     private suspend fun getTriageData(){
         try {
 
-            val visit = getCurrentVisitUseCase(state.value.patientId).firstNullableSuccess()
+            val visit = getCurrentVisitUseCase(state.value.patientId)
 
-            visit?.let {
-                val triageEvaluation = triageEvaluationRepository
-                    .getTriageEvaluation(visit.id)
-                    .firstSuccess()
+            val triageEvaluation = triageEvaluationRepository
+                .getTriageEvaluation(visit.id)
+                .firstSuccess()
 
-                val ids = triageEvaluation.redSymptomIds + triageEvaluation.yellowSymptomIds
-                _state.update {
-                    it.copy(
-                        symptoms = it.symptoms + translateTriageSymptomIdsToSymptomsUseCase(ids)
-                    )
-                }
+            val ids = triageEvaluation.redSymptomIds + triageEvaluation.yellowSymptomIds
+            _state.update {
+                it.copy(
+                    symptoms = it.symptoms + translateTriageSymptomIdsToSymptomsUseCase(ids)
+                )
             }
+
         } catch (e: Exception) {
             _state.update { it.copy(error = e.message) }
         } finally {

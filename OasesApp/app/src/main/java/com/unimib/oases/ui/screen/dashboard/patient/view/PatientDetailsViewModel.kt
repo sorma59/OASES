@@ -12,7 +12,6 @@ import com.unimib.oases.domain.usecase.GetPatientChronicDiseasesUseCase
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.util.Resource
-import com.unimib.oases.util.firstNullableSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -128,7 +127,7 @@ class PatientDetailsViewModel @Inject constructor(
 
     private suspend fun getCurrentVisit() {
         try {
-            val visit = getCurrentVisitUseCase(_state.value.patientId).firstNullableSuccess()
+            val visit = getCurrentVisitUseCase(_state.value.patientId)
             _state.update { it.copy(currentVisit = visit) }
         } catch (e: Exception) {
             _state.update { it.copy(currentVisitRelatedError = e.message) }

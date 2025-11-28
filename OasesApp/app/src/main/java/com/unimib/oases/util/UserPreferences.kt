@@ -16,7 +16,7 @@ class UserPreferences @Inject constructor(@ApplicationContext context: Context) 
     private val gson = Gson()
 
     fun saveUser(user: User) {
-        prefs.edit() { putString("user", gson.toJson(user)) }
+        prefs.edit { putString("user", gson.toJson(user)) }
     }
 
     fun getUser(): User? {
@@ -25,6 +25,6 @@ class UserPreferences @Inject constructor(@ApplicationContext context: Context) 
     }
 
     fun clear() {
-        prefs.edit() { clear() }
+        prefs.edit { clear() }
     }
 }

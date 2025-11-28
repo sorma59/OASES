@@ -42,7 +42,7 @@ class RetrievePatientFullDataUseCase @Inject constructor(
 
                     // Current visit
                     val visitDeferred = async {
-                        getCurrentVisitUseCase(patientId).firstSuccess()
+                        getCurrentVisitUseCase(patientId)
                     }
 
                     // Patient's PMH

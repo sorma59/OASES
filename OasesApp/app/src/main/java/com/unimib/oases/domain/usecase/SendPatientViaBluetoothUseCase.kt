@@ -34,7 +34,6 @@ class SendPatientViaBluetoothUseCase @Inject constructor(
 
                             val patientFullDataResource = retrievePatientFullDataUseCase(patientId)
 
-
                             if (patientFullDataResource is Resource.NotFound)
                                 throw Exception(patientFullDataResource.message)
                             if (patientFullDataResource is Resource.Error)

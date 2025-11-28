@@ -2,7 +2,6 @@ package com.unimib.oases.domain.usecase
 
 import com.unimib.oases.domain.model.ComplaintSummary
 import com.unimib.oases.ui.screen.medical_visit.maincomplaint.MainComplaintState
-import com.unimib.oases.util.firstNullableSuccess
 import javax.inject.Inject
 
 class BuildComplaintSummaryFromStateUseCase @Inject constructor(
@@ -16,11 +15,7 @@ class BuildComplaintSummaryFromStateUseCase @Inject constructor(
         }
         check(state.supportiveTherapies != null)
 
-        val visit = getCurrentVisitUseCase(state.patientId).firstNullableSuccess()
-
-        check(visit != null){
-            "This patient does not have an open visit"
-        }
+        val visit = getCurrentVisitUseCase(state.patientId)
 
         return ComplaintSummary(
             visitId = visit.id,

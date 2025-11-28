@@ -82,7 +82,7 @@ class PatientDashboardViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getButtons() {
+    private fun getButtons() {
         val actions = configurePatientDashboardActionsUseCase(_state.value.patientId)
         _state.update {
             it.copy(actions = actions)

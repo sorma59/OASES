@@ -12,7 +12,6 @@ import com.unimib.oases.domain.usecase.VisitVitalSignsUseCase
 import com.unimib.oases.domain.usecase.VitalSignUseCase
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Route
-import com.unimib.oases.util.firstNullableSuccess
 import com.unimib.oases.util.firstSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -85,10 +84,9 @@ class VitalSignsViewModel @Inject constructor(
         viewModelScope.launch(coroutineContext) {
             _state.update { it.copy(error = null, isLoading = true) }
             loadVitalSigns()
-            getCurrentVisit(state.value.patientId)?.let {
+            val visit = getCurrentVisitUseCase(state.value.patientId)
                 if (state.value.error == null)
-                    loadVisitVitalSigns(it.id)
-            }
+                    loadVisitVitalSigns(visit.id)
             _state.update { it.copy(isLoading = false) }
         }
     }
@@ -102,33 +100,10 @@ class VitalSignsViewModel @Inject constructor(
         }
         _state.update {
             it.copy(
-                vitalSigns = newStates, // Set the list, don't append if it's initial load
+                vitalSigns = newStates
             )
         }
     }
-
-    // Rooms
-
-//    private fun refreshRooms(){
-//        viewModelScope.launch(roomsContext) {
-//            updateRoomState { it.copy(error = null, isLoading = true) }
-//            loadRooms()
-//            updateRoomState { it.copy(isLoading = false) }
-//        }
-//    }
-
-//    private suspend fun loadRooms(){
-//        val rooms = roomUseCase
-//            .getRooms()
-//            .firstSuccess()
-//        updateRoomState {
-//            it.copy(
-//                rooms = rooms, // Set the list, don't append if it's initial load
-//                currentRoom = Room(state.value.demographicsState.patient.room),
-//                currentTriageCode = state.value.triageState.triageCode.name,
-//            )
-//        }
-//    }
 
     private suspend fun loadVisitVitalSigns(visitId: String) {
 
@@ -165,7 +140,4 @@ class VitalSignsViewModel @Inject constructor(
     }
 
     fun getPrecisionFor(name: String) = getVitalSignPrecisionUseCase(name)
-
-    suspend fun getCurrentVisit(patientId: String) = getCurrentVisitUseCase(patientId).firstNullableSuccess()
-
 }
