@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 
 @Composable
 fun DeleteButton(
+    text: String = "Delete",
     onDelete: () -> Unit,
     modifier: Modifier = Modifier
 ){
@@ -28,6 +29,6 @@ fun DeleteButton(
             contentDescription = "Delete"
         )
 
-        Text("Delete")
+        Text(text)
     }
 }

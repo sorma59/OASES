@@ -5,6 +5,8 @@ sealed class PatientDashboardEvent {
     data object PatientItemClicked: PatientDashboardEvent()
 
     data object PatientDeletionConfirmed: PatientDashboardEvent()
+
+    data object PatientDeletionCancelled: PatientDashboardEvent()
     data object OnBack: PatientDashboardEvent()
     data object Refresh: PatientDashboardEvent()
 }

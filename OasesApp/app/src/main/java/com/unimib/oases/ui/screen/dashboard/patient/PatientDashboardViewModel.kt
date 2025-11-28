@@ -66,9 +66,6 @@ class PatientDashboardViewModel @Inject constructor(
     private val navigationEventsChannel = Channel<NavigationEvent>()
     val navigationEvents = navigationEventsChannel.receiveAsFlow()
 
-    private val uiEventsChannel = Channel<UiEvent>()
-    val uiEvents = uiEventsChannel.receiveAsFlow()
-
     init {
         refresh()
     }
@@ -96,63 +93,29 @@ class PatientDashboardViewModel @Inject constructor(
         _state.update { it.copy(patientWithVisitInfo = patientWithVisitInfo) }
     }
 
+    private fun dismissDialog() {
+        _state.update {
+            it.copy(
+                showAlertDialog = false,
+                deletionState = DeletionState()
+            )
+        }
+    }
+
+    private fun updateDeletionState(
+        update: (DeletionState) -> DeletionState
+    ) {
+        _state.update {
+            it.copy(
+                deletionState = update(it.deletionState)
+            )
+        }
+    }
 
     fun onEvent(event: PatientDashboardEvent){
 
         when (event){
-            is PatientDashboardEvent.ActionButtonClicked -> {
-                viewModelScope.launch(mainContext) {
-                    // The enum's createRoute function cleanly separates navigation from other actions.
-                    when (event.action) {
-                        is PatientDashboardAction.PatientNavigable -> {
-                            navigationEventsChannel.send(
-                                NavigationEvent.Navigate(
-                                    event.action.createRoute(
-                                        state.value.patientId
-                                    )
-                                )
-                            )
-                        }
-
-                        is PatientDashboardAction.Triage -> {
-                            navigationEventsChannel.send(
-                                NavigationEvent.Navigate(
-                                    event.action.createRoute(
-                                        state.value.patientId,
-                                        state.value.visitId
-                                    )
-                                )
-                            )
-                        }
-
-                        is PatientDashboardAction.MalnutritionScreening -> {
-                            navigationEventsChannel.send(
-                                NavigationEvent.Navigate(
-                                    event.action.createRoute(
-                                        state.value.patientId,
-                                        state.value.visitId
-                                    )
-                                )
-                            )
-                        }
-
-                        is PatientDashboardAction.Send -> {
-                            navigationEventsChannel.send(
-                                NavigationEvent.Navigate(
-                                    event.action.createRoute(
-                                        state.value.patientId,
-                                        state.value.visitId
-                                    )
-                                )
-                            )
-                        }
-
-                        PatientDashboardAction.Delete -> {
-                            uiEventsChannel.send(UiEvent.ShowDialog)
-                        }
-                    }
-                }
-            }
+            is PatientDashboardEvent.ActionButtonClicked -> handleActionButtonClick(event.action)
             PatientDashboardEvent.PatientItemClicked -> {
                 if (_state.value.patientWithVisitInfo == null) {
                     viewModelScope.launch(mainContext){
@@ -161,20 +124,9 @@ class PatientDashboardViewModel @Inject constructor(
                 }
             }
 
-            PatientDashboardEvent.PatientDeletionConfirmed -> {
-                viewModelScope.launch(mainContext) {
+            PatientDashboardEvent.PatientDeletionConfirmed -> deletePatient()
 
-                    val result = patientRepository.deletePatientById(_state.value.patientId)
-
-                    if (result is Outcome.Success){
-                        uiEventsChannel.send(UiEvent.HideDialog)
-                        _state.update { it.copy(toastMessage = "Patient successfully deleted") }
-                        navigationEventsChannel.send(NavigationEvent.NavigateBack)
-                    }
-                    else if (result is Outcome.Error)
-                        _state.update { it.copy(toastMessage = "Patient deletion failed") }
-                }
-            }
+            PatientDashboardEvent.PatientDeletionCancelled -> dismissDialog()
 
             PatientDashboardEvent.OnBack -> {
                 viewModelScope.launch(mainContext){
@@ -182,15 +134,96 @@ class PatientDashboardViewModel @Inject constructor(
                 }
             }
 
-            PatientDashboardEvent.Refresh -> {
-                refresh()
-            }
+            PatientDashboardEvent.Refresh -> refresh()
         }
-
     }
 
-    sealed class UiEvent {
-        data object ShowDialog: UiEvent()
-        data object HideDialog: UiEvent()
+    private fun handleActionButtonClick(
+        action: PatientDashboardAction,
+    ) {
+        viewModelScope.launch(mainContext) {
+            when (action) {
+                is PatientDashboardAction.PatientNavigable -> {
+                    navigationEventsChannel.send(
+                        NavigationEvent.Navigate(
+                            action.createRoute(
+                                state.value.patientId
+                            )
+                        )
+                    )
+                }
+
+                is PatientDashboardAction.Triage -> {
+                    navigationEventsChannel.send(
+                        NavigationEvent.Navigate(
+                            action.createRoute(
+                                state.value.patientId,
+                                state.value.visitId
+                            )
+                        )
+                    )
+                }
+
+                is PatientDashboardAction.MalnutritionScreening -> {
+                    navigationEventsChannel.send(
+                        NavigationEvent.Navigate(
+                            action.createRoute(
+                                state.value.patientId,
+                                state.value.visitId
+                            )
+                        )
+                    )
+                }
+
+                is PatientDashboardAction.Send -> {
+                    navigationEventsChannel.send(
+                        NavigationEvent.Navigate(
+                            action.createRoute(
+                                state.value.patientId,
+                                state.value.visitId
+                            )
+                        )
+                    )
+                }
+
+                PatientDashboardAction.Delete -> {
+                    _state.update {
+                        it.copy(
+                            showAlertDialog = true
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun deletePatient() {
+        viewModelScope.launch(mainContext) {
+
+            updateDeletionState {
+                it.copy(
+                    error = null,
+                    isLoading = true
+                )
+            }
+
+            val result = patientRepository.deletePatientById(state.value.patientId)
+
+            if (result is Outcome.Success) {
+                _state.update {
+                    it.copy(
+                        showAlertDialog = false,
+                        toastMessage = "Patient successfully deleted"
+                    )
+                }
+                navigationEventsChannel.send(NavigationEvent.NavigateBack)
+            } else if (result is Outcome.Error)
+                updateDeletionState {
+                    it.copy(
+                        isLoading = false,
+                        error = "Patient deletion failed"
+                    )
+                }
+        }
     }
 }

@@ -26,9 +26,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -55,8 +52,6 @@ fun PatientDashboardScreen(
 
     val state by viewModel.state.collectAsState()
 
-    var showAlertDialog by remember { mutableStateOf(false) }
-
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
@@ -72,30 +67,24 @@ fun PatientDashboardScreen(
         )
     }
 
-    LaunchedEffect(Unit) {
-        viewModel.uiEvents.collect {
-            showAlertDialog = when(it){
-                PatientDashboardViewModel.UiEvent.ShowDialog -> {
-                    true
-                }
-
-                PatientDashboardViewModel.UiEvent.HideDialog -> {
-                    false
-                }
-            }
-        }
-    }
-
     LaunchedEffect(state.toastMessage) {
         state.toastMessage?.let {
             ToastUtils.showToast(context, it)
         }
     }
 
+    PatientDashboardContent(state, viewModel::onEvent)
+}
+
+@Composable
+private fun PatientDashboardContent(
+    state: PatientDashboardState,
+    onEvent: (PatientDashboardEvent) -> Unit
+) {
     state.error?.let {
         RetryButton(
             it,
-            onClick = { viewModel.onEvent(PatientDashboardEvent.Refresh) }
+            onClick = { onEvent(PatientDashboardEvent.Refresh) }
         )
     } ?: if (state.isLoading)
         CustomCircularProgressIndicator()
@@ -114,7 +103,7 @@ fun PatientDashboardScreen(
 
                 PatientItem(
                     patientWithVisitInfo = state.patientWithVisitInfo,
-                    onClick = { viewModel.onEvent(PatientDashboardEvent.PatientItemClicked) },
+                    onClick = { onEvent(PatientDashboardEvent.PatientItemClicked) },
                     errorText = "Could not load patient info, tap to retry",
                     isLoading = state.isLoading
                 )
@@ -136,7 +125,7 @@ fun PatientDashboardScreen(
 
                             IconButton(
                                 onClick = {
-                                    viewModel.onEvent(
+                                    onEvent(
                                         PatientDashboardEvent.ActionButtonClicked(
                                             action
                                         )
@@ -161,19 +150,25 @@ fun PatientDashboardScreen(
         }
     }
 
-    if (showAlertDialog) {
+    if (state.showAlertDialog) {
         AlertDialog(
-            onDismissRequest = { showAlertDialog = false },
+            onDismissRequest = { onEvent(PatientDashboardEvent.PatientDeletionCancelled) },
             title = {
                 Text(text = "Confirm deletion of ${state.patientWithVisitInfo?.patient?.name}")
             },
             text = {
-                Text(text = "Are you sure you want to delete this patient? All the records related to this patient will be deleted.")
-            },
+                if (state.isLoading)
+                    CustomCircularProgressIndicator()
+                else
+                    state.deletionState.error?.let {
+                        Text(it)
+                    } ?: Text("Are you sure you want to delete this patient? All the records related to this patient will be deleted.")
+           },
             confirmButton = {
                 DeleteButton(
+                    text = if (state.deletionState.error == null) "Delete" else "Retry",
                     onDelete = {
-                        viewModel.onEvent(
+                        onEvent(
                             PatientDashboardEvent.PatientDeletionConfirmed
                         )
                     }
@@ -181,7 +176,7 @@ fun PatientDashboardScreen(
             },
             dismissButton = {
                 DismissButton(
-                    onDismiss = { showAlertDialog = false },
+                    onDismiss = { onEvent(PatientDashboardEvent.PatientDeletionCancelled) },
                     colors = ButtonDefaults.outlinedButtonColors(
                         contentColor = MaterialTheme.colorScheme.onBackground,
                     )
