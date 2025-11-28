@@ -20,7 +20,7 @@ object PatientFullDataSerializer {
         val malnutritionScreeningBytes = patientFullData.malnutritionScreening?.let {
             MalnutritionScreeningSerializer.serialize(it)
         }
-        val complaintSummariesListBytes = patientFullData.complaintsSummaries.map{ ComplaintSummarySerializer.serialize(it)}
+        val complaintSummariesListBytes = patientFullData.complaintsSummaries.map { ComplaintSummarySerializer.serialize(it)}
 
         val totalSize =
             4 + patientByteArray.size +
@@ -40,7 +40,7 @@ object PatientFullDataSerializer {
             buffer.putBytes(it)
         }
 
-        buffer.putNullable(visitByteArray)
+        buffer.putBytes(visitByteArray)
 
         buffer.putInt(vitalSignBytesList.size)
         vitalSignBytesList.forEach {
