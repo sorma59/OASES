@@ -53,7 +53,7 @@ class TriageViewModel @Inject constructor(
     private val getCurrentVisitUseCase: GetCurrentVisitUseCase,
     savedStateHandle: SavedStateHandle,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
-    ): ViewModel() {
+): ViewModel() {
 
     private val errorHandler = CoroutineExceptionHandler { _, e ->
         e.printStackTrace()
@@ -264,7 +264,6 @@ class TriageViewModel @Inject constructor(
 
     fun refresh() {
         viewModelScope.launch(coroutineContext) {
-            _state.update { it.copy(error = null, isLoading = true) }
             if (state.value.uiMode is PatientRegistrationScreensUiMode.Wizard)
                 loadVisit(state.value.visitId)
             else{
