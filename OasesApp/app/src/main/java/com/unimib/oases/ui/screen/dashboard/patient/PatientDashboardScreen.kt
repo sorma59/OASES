@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -60,13 +61,6 @@ fun PatientDashboardScreen(
         }
     }
 
-    LaunchedEffect(context) {
-        // Refresh button and patient info every time the screen appears
-        viewModel.onEvent(
-            PatientDashboardEvent.Refresh
-        )
-    }
-
     LaunchedEffect(state.toastMessage) {
         state.toastMessage?.let {
             ToastUtils.showToast(context, it)
@@ -81,11 +75,11 @@ private fun PatientDashboardContent(
     state: PatientDashboardState,
     onEvent: (PatientDashboardEvent) -> Unit
 ) {
+
     state.error?.let {
-        RetryButton(
-            it,
-            onClick = { onEvent(PatientDashboardEvent.Refresh) }
-        )
+        RetryButton(it) {
+            onEvent(PatientDashboardEvent.Refresh)
+        }
     } ?: if (state.isLoading)
         CustomCircularProgressIndicator()
     else {
@@ -101,12 +95,7 @@ private fun PatientDashboardContent(
                 verticalArrangement = Arrangement.spacedBy(64.dp)
             ) {
 
-                PatientItem(
-                    patientWithVisitInfo = state.patientWithVisitInfo,
-                    onClick = { onEvent(PatientDashboardEvent.PatientItemClicked) },
-                    errorText = "Could not load patient info, tap to retry",
-                    isLoading = state.isLoading
-                )
+                PatientItem(state.patientWithVisitInfo)
 
                 Column(
                     verticalArrangement = Arrangement.spacedBy(30.dp),
@@ -114,33 +103,26 @@ private fun PatientDashboardContent(
                 ) {
                     for (action in state.actions) {
 
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
 
                             Text(
                                 text = action.text,
-                                fontSize = 30.sp
+                                textAlign = TextAlign.End,
+                                fontSize = 30.sp,
+                                modifier = Modifier.weight(1f, fill = false)
                             )
 
                             Spacer(Modifier.width(4.dp))
 
-                            IconButton(
-                                onClick = {
-                                    onEvent(
-                                        PatientDashboardEvent.ActionButtonClicked(
-                                            action
-                                        )
-                                    )
-                                },
-                                colors = IconButtonDefaults.iconButtonColors(
-                                    containerColor = action.buttonColor(),
-                                    contentColor = action.buttonTintColor()
-                                ),
-                                modifier = Modifier.size(Dp(ButtonDefaults.IconSize.value * 4f))
+                            ActionButton(
+                                action
                             ) {
-                                Icon(
-                                    imageVector = action.icon,
-                                    contentDescription = action.contentDescription,
-                                    modifier = Modifier.size(Dp(ButtonDefaults.IconSize.value * 2f))
+                                onEvent(
+                                    PatientDashboardEvent.ActionButtonClicked(
+                                        action
+                                    )
                                 )
                             }
                         }
@@ -157,7 +139,7 @@ private fun PatientDashboardContent(
                 Text(text = "Confirm deletion of ${state.patientWithVisitInfo?.patient?.name}")
             },
             text = {
-                if (state.isLoading)
+                if (state.deletionState.isLoading)
                     CustomCircularProgressIndicator()
                 else
                     state.deletionState.error?.let {
@@ -182,6 +164,27 @@ private fun PatientDashboardContent(
                     )
                 )
             }
+        )
+    }
+}
+
+@Composable
+fun ActionButton(
+    action: PatientDashboardAction,
+    onClick: () -> Unit
+) {
+    IconButton(
+        onClick = onClick,
+        colors = IconButtonDefaults.iconButtonColors(
+            containerColor = action.buttonColor(),
+            contentColor = action.buttonTintColor()
+        ),
+        modifier = Modifier.size(Dp(ButtonDefaults.IconSize.value * 4f))
+    ) {
+        Icon(
+            imageVector = action.icon,
+            contentDescription = action.contentDescription,
+            modifier = Modifier.size(Dp(ButtonDefaults.IconSize.value * 2f))
         )
     }
 }

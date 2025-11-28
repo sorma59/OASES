@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.unimib.oases.di.IoDispatcher
+import com.unimib.oases.di.MainDispatcher
+import com.unimib.oases.domain.model.PatientWithVisitInfo
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.domain.repository.VisitRepository
 import com.unimib.oases.domain.usecase.ConfigPatientDashboardActionsUseCase
@@ -16,7 +18,6 @@ import com.unimib.oases.util.firstSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,7 +33,8 @@ class PatientDashboardViewModel @Inject constructor(
     private val patientRepository: PatientRepository,
     private val configurePatientDashboardActionsUseCase: ConfigPatientDashboardActionsUseCase,
     savedStateHandle: SavedStateHandle,
-    @param:IoDispatcher private val dispatcher: CoroutineDispatcher
+    @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    @param:MainDispatcher private val mainDispatcher: CoroutineDispatcher
 ): ViewModel(){
 
     private val errorHandler = CoroutineExceptionHandler { _, e ->
@@ -40,7 +42,7 @@ class PatientDashboardViewModel @Inject constructor(
         Log.e("ViewModelError", "Coroutine exception", e)
 
         // Safely update on Main (Must when doing UI work other than updating state)
-        viewModelScope.launch(Dispatchers.Main) {
+        viewModelScope.launch(mainDispatcher) {
             _state.update {
                 it.copy(
                     error = e.message ?: "An unexpected error occurred",
@@ -50,7 +52,7 @@ class PatientDashboardViewModel @Inject constructor(
         }
     }
 
-    private val mainContext = dispatcher + errorHandler
+    private val mainContext = ioDispatcher + errorHandler
 
     private val args = savedStateHandle.toRoute<Route.PatientDashboard>()
 
@@ -67,30 +69,35 @@ class PatientDashboardViewModel @Inject constructor(
     val navigationEvents = navigationEventsChannel.receiveAsFlow()
 
     init {
-        refresh()
+        viewModelScope.launch(mainContext) { refresh() }
     }
 
-    private fun refresh() {
-        viewModelScope.launch(mainContext) {
-            _state.update { it.copy(isLoading = true, error = null) }
-            getPatientAndVisitData()
-            getButtons()
-            _state.update { it.copy(isLoading = false) }
-        }
-    }
-
-    private fun getButtons() {
-        val actions = configurePatientDashboardActionsUseCase(_state.value.patientId)
+    private suspend fun refresh() {
         _state.update {
-            it.copy(actions = actions)
+            it.copy(
+                isLoading = true,
+                error = null
+            )
+        }
+        val patientWithVisitInfo = getPatientAndVisitData()
+        val buttons = getButtons()
+        _state.update {
+            it.copy(
+                isLoading = false,
+                patientWithVisitInfo = patientWithVisitInfo,
+                actions = buttons
+            )
         }
     }
 
-    private suspend fun getPatientAndVisitData() {
-        val patientWithVisitInfo = visitRepository
+    private fun getButtons(): List<PatientDashboardAction> {
+        return configurePatientDashboardActionsUseCase(_state.value.patientId)
+    }
+
+    private suspend fun getPatientAndVisitData(): PatientWithVisitInfo {
+        return visitRepository
             .getVisitWithPatientInfo(state.value.visitId)
             .firstSuccess()
-        _state.update { it.copy(patientWithVisitInfo = patientWithVisitInfo) }
     }
 
     private fun dismissDialog() {
@@ -112,29 +119,24 @@ class PatientDashboardViewModel @Inject constructor(
         }
     }
 
-    fun onEvent(event: PatientDashboardEvent){
+    fun onEvent(event: PatientDashboardEvent) {
 
-        when (event){
+        when (event) {
             is PatientDashboardEvent.ActionButtonClicked -> handleActionButtonClick(event.action)
-            PatientDashboardEvent.PatientItemClicked -> {
-                if (_state.value.patientWithVisitInfo == null) {
-                    viewModelScope.launch(mainContext){
-                        getPatientAndVisitData()
-                    }
-                }
-            }
 
             PatientDashboardEvent.PatientDeletionConfirmed -> deletePatient()
 
             PatientDashboardEvent.PatientDeletionCancelled -> dismissDialog()
 
             PatientDashboardEvent.OnBack -> {
-                viewModelScope.launch(mainContext){
+                viewModelScope.launch(mainContext) {
                     navigationEventsChannel.send(NavigationEvent.NavigateBack)
                 }
             }
 
-            PatientDashboardEvent.Refresh -> refresh()
+            PatientDashboardEvent.Refresh -> {
+                viewModelScope.launch(mainContext) { refresh() }
+            }
         }
     }
 
