@@ -53,47 +53,6 @@ fun MainScaffold(
 
     val hasPermissions by bluetoothManager.hasPermissions.collectAsState()
 
-//    var currentRoute: Route by remember { mutableStateOf(startDestination) }
-
-    // Create a single Json instance for decoding route arguments
-//    val json = remember {
-//        Json {
-//            ignoreUnknownKeys = true
-//            encodeDefaults = true
-//        }
-//    }
-//
-//    // Cache serializers for all known Route subclasses
-//    val routeSerializers = remember {
-//        Route::class.sealedSubclasses
-//            .mapNotNull { subclass ->
-//                subclass.simpleName?.let { routeName ->
-//                    subclass.serializerOrNull()?.let { serializer ->
-//                        routeName to serializer
-//                    }
-//                }
-//            }
-//            .toMap()
-//    }
-//
-//    // Listen for route changes and decode automatically
-//    LaunchedEffect(navBackStackEntry) {
-//
-//        val destinationRoute = navBackStackEntry?.destination?.route ?: return@LaunchedEffect
-//
-//        // Find a matching serializer by name prefix
-//        val serializerEntry = routeSerializers.entries.find { (name, _) ->
-//            destinationRoute.startsWith(name)
-//        } ?: return@LaunchedEffect
-//
-//        val serializer = serializerEntry.value
-//        Log.d("Prova", "about to change the current Route: $currentRoute")
-//        currentRoute = run {
-//            json.decodeFromString(serializer, destinationRoute)
-//        }
-//        Log.d("Prova", "changed the current Route: $currentRoute")
-//    }
-
     BluetoothPermissionHandler(
         context = context,
         onPermissionGranted = {
@@ -101,8 +60,6 @@ fun MainScaffold(
             bluetoothManager.initialize()
         }
     )
-
-
 
     if (!hasPermissions)
         NoPermissionMessage(context, bluetoothManager)
@@ -151,15 +108,6 @@ fun MainScaffold(
             }
         }
     }
-
-//    LaunchedEffect(Unit) {
-//        appViewModel.uiEvents.collect { uiEvent ->
-//            when (uiEvent) {
-//                is UiEvent.Toast -> ToastUtils.showToast(context, uiEvent.message)
-//                is UiEvent.Dialog -> showDialog(uiEvent.message)
-//            }
-//        }
-//    }
 
     // Collect global navigation/UI events
     LaunchedEffect(Unit) {

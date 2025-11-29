@@ -25,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -99,7 +100,7 @@ fun BluetoothPermissionRationaleDialog(
 ) {
     PermissionRationaleDialog(
         title = "Bluetooth Permission Needed",
-        text = "${R.string.app_name} needs Bluetooth permissions to find and connect to devices. Please grant them to continue.",
+        text = "${stringResource(R.string.app_name)} needs Bluetooth permissions to find and connect to devices. Please grant them to continue.",
         onDismiss = onDismiss,
         onConfirm = onConfirm
     )

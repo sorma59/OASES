@@ -37,6 +37,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.BufferedWriter
@@ -165,7 +166,7 @@ class BluetoothCustomManager @Inject constructor(
     // ------------------------State management------------------------------
 
     private fun updateDiscoveryStatus(isDiscovering: Boolean) {
-        _isDiscovering.value = isDiscovering
+        _isDiscovering.update { isDiscovering }
     }
 
     private fun updateDiscoverabilityEndingTime(time: Int) {
@@ -173,7 +174,7 @@ class BluetoothCustomManager @Inject constructor(
     }
 
     private fun updateToastMessage(message: String){
-        _toastMessage.value = message
+        _toastMessage.update { message }
     }
 
     fun toastShown(){
@@ -181,23 +182,25 @@ class BluetoothCustomManager @Inject constructor(
     }
 
     private fun updateSnackbarMessage(message: String){
-        _snackbarMessage.value = message
+        _snackbarMessage.update { message }
     }
 
     private fun setConnectionSocket(socket: BluetoothSocket?){
-        connectionSocket.value = socket
+        connectionSocket.update { socket }
     }
 
     private fun updatePairingResult(result: String){
-        _pairingResult.value = result
+        _pairingResult.update { result }
     }
 
     private fun updateRemainingTime(remainingTime: String?){
-        _remainingTime.value = remainingTime
+        _remainingTime.update { remainingTime }
     }
 
     fun updatePermissions() {
-        _hasPermissions.value = PermissionHelper.hasBluetoothPermissions()
+        _hasPermissions.update {
+            PermissionHelper.hasBluetoothPermissions()
+        }
     }
 
     @SuppressLint("MissingPermission")
@@ -206,22 +209,22 @@ class BluetoothCustomManager @Inject constructor(
             onEnabled = {
                 val pairedDevices = bluetoothAdapter?.bondedDevices
                 if (pairedDevices != null)
-                    _pairedDevices.value = pairedDevices.toList()
+                    _pairedDevices.update { pairedDevices.toList() }
             }
         )
     }
 
     private fun emptyPairedDevices(){
-        _pairedDevices.value = emptyList()
+        _pairedDevices.update { emptyList() }
     }
 
     private fun emptyDiscoveredDevices() {
-        _discoveredDevices.value = emptyList()
+        _discoveredDevices.update { emptyList() }
     }
 
     private fun addDiscoveredDevice(device: BluetoothDevice){
-        if (!_discoveredDevices.value.contains(device))
-            _discoveredDevices.value += device
+        if (!discoveredDevices.value.contains(device))
+            _discoveredDevices.update { it + device }
     }
 
     // -----------------------Receiver handlers----------------------------------
