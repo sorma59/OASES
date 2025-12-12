@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.PriorityHigh
 import androidx.compose.material.icons.filled.Straighten
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -140,7 +141,7 @@ private fun PatientDashboardContent(
             },
             text = {
                 if (state.deletionState.isLoading)
-                    CustomCircularProgressIndicator()
+                    CircularProgressIndicator()
                 else
                     state.deletionState.error?.let {
                         Text(it)

@@ -40,7 +40,7 @@ fun DateSelectorWithTodayButton(
             if (selectedDate.isNotBlank()) {
                 dateFormat.parse(selectedDate)?.time
             } else null
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             null
         }
     } ?: System.currentTimeMillis()

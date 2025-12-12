@@ -35,6 +35,7 @@ import com.unimib.oases.ui.components.util.OutlinedDropdown
 import com.unimib.oases.ui.components.util.button.BottomButtons
 import com.unimib.oases.ui.components.util.button.RetryButton
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
+import com.unimib.oases.ui.components.util.circularprogressindicator.RowedCircularProgressIndicator
 import com.unimib.oases.ui.screen.nurse_assessment.PatientRegistrationScreensUiMode
 import com.unimib.oases.ui.screen.root.AppViewModel
 import com.unimib.oases.util.reactToKeyboardAppearance
@@ -283,7 +284,7 @@ private fun DemographicsEditing(
                         Text("Error: $error")
                     } ?:
                     if (it.savingState.isLoading)
-                        CustomCircularProgressIndicator()
+                        RowedCircularProgressIndicator()
                     else
                         Text(text = "Do you want to save the patient to the database?")
                 },

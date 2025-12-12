@@ -306,9 +306,7 @@ class DemographicsViewModel @Inject constructor(
                     }
             }
 
-            DemographicsEvent.Retry -> {
-                refreshPatientInfo()
-            }
+            DemographicsEvent.Retry -> refreshPatientInfo()
 
             DemographicsEvent.ConfirmDialog -> {
                 setSavingStateToLoading()
@@ -319,13 +317,7 @@ class DemographicsViewModel @Inject constructor(
                         handleStandaloneDialogConfirmation()
                 }
             }
-            DemographicsEvent.DismissDialog -> {
-                _state.update {
-                    it.copy(
-                        showAlertDialog = false,
-                    )
-                }
-            }
+            DemographicsEvent.DismissDialog -> dismissDialog()
             DemographicsEvent.EditButtonPressed -> enterEditMode()
         }
     }
@@ -370,10 +362,22 @@ class DemographicsViewModel @Inject constructor(
         val result = savePatientDataUseCase(patientData)
         if (result is Outcome.Success) {
             saveEdits(result.data)
+            dismissDialog()
             goBackToViewMode()
         }
         else
             showSavingError()
+    }
+
+    private fun dismissDialog() {
+        _state.update {
+            it.copy(
+                showAlertDialog = false,
+                editingState = it.editingState!!.copy(
+                    savingState = SavingState()
+                )
+            )
+        }
     }
 
     private suspend fun navigateBackWithResult(result: PatientAndVisitIds?) {
