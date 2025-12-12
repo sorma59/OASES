@@ -25,11 +25,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.unimib.oases.ui.components.form.AgeInputField
-import com.unimib.oases.ui.components.form.DateSelector
+import com.unimib.oases.ui.components.form.DateSelectorWithTodayButton
 import com.unimib.oases.ui.components.util.AnimatedLabelOutlinedTextField
 import com.unimib.oases.ui.components.util.FadeOverlay
 import com.unimib.oases.ui.components.util.OutlinedDropdown
@@ -123,8 +122,6 @@ private fun DemographicsEditing(
         { onEvent(DemographicsEvent.ConfirmDialog) }
     }
 
-    val context = LocalContext.current
-
     val scrollState = rememberScrollState()
 
     @Composable
@@ -136,10 +133,9 @@ private fun DemographicsEditing(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            DateSelector(
+            DateSelectorWithTodayButton(
                 selectedDate = data.birthDate,
                 onDateSelected = onBirthDateChange,
-                context = context,
                 labelText = "Date of Birth",
                 isError = errors.birthDateError != null,
                 modifier = Modifier.weight(1f)

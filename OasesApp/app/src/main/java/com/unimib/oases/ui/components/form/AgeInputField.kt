@@ -45,10 +45,10 @@ fun AgeInputField(
 
     OutlinedTextField(
         value = inputText,
-        onValueChange = {
-            if (it.length <= 3 && it.all { it.isDigit() }){ // Update only if all characters are digits
-                inputText = it
-                val raw = it.toIntOrNull()
+        onValueChange = { newAge ->
+            if (newAge.length <= 3 && newAge.all { it.isDigit() }){ // Update only if all characters are digits
+                inputText = newAge
+                val raw = newAge.toIntOrNull()
                 if (raw != null) {
                     onAgeChange(if (isMonths) raw else raw * 12)
                 }

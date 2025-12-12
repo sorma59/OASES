@@ -22,9 +22,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.unimib.oases.ui.components.form.DateSelector
+import com.unimib.oases.ui.components.form.DateSelectorWithTodayButton
 import com.unimib.oases.ui.components.util.AnimatedLabelOutlinedTextField
 import com.unimib.oases.ui.components.util.button.BottomButtons
 import com.unimib.oases.ui.components.util.button.RetryButton
@@ -58,13 +59,13 @@ fun PastHistoryScreen(
         }
     }
 
-    PastHistoryContent(state, viewModel, readOnly)
+    PastHistoryContent(state, viewModel::onEvent, readOnly)
 }
 
 @Composable
 private fun PastHistoryContent(
     state: PastHistoryState,
-    viewModel: PastHistoryViewModel,
+    onEvent: (PastHistoryEvent) -> Unit,
     readOnly: Boolean
 ) {
     Column(
@@ -77,22 +78,22 @@ private fun PastHistoryContent(
             state.error?.let {
                 RetryButton(
                     error = it,
-                    onClick = { viewModel.onEvent(PastHistoryEvent.Retry) }
+                    onClick = { onEvent(PastHistoryEvent.Retry) }
                 )
             } ?: if (state.isLoading) {
                 CustomCircularProgressIndicator()
             } else {
                 ChronicConditionsForm(
                     state = state,
-                    onEvent = viewModel::onEvent,
+                    onEvent = onEvent,
                     readOnly = readOnly
                 )
             }
         }
 
         BottomButtons(
-            onCancel = { viewModel.onEvent(PastHistoryEvent.Cancel) },
-            onConfirm = { viewModel.onEvent(PastHistoryEvent.Save) }
+            onCancel = { onEvent(PastHistoryEvent.Cancel) },
+            onConfirm = { onEvent(PastHistoryEvent.Save) }
         )
     }
 }
@@ -106,8 +107,7 @@ fun RadioButtonsInputWithDateAndText(
     onDateChange: (String) -> Unit,
     additionalInfo: String,
     onAdditionalInfoChange: (String) -> Unit,
-    readOnly: Boolean = false,
-    onReadOnlyClick: () -> Unit = {}
+    readOnly: Boolean = false
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -118,16 +118,16 @@ fun RadioButtonsInputWithDateAndText(
         ) {
             Text(
                 text = label,
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(1f)
             )
             Spacer(modifier = Modifier.width(8.dp))
             RadioButton( // "Yes" button
                 selected = isDiagnosed == true,
-                onClick = { if (!readOnly) onSelected(true) else onReadOnlyClick()},
+                onClick = { if (!readOnly) onSelected(true)}
             )
             RadioButton( // "No"  button
                 selected = isDiagnosed == false,
-                onClick = { if (!readOnly) onSelected(false) else onReadOnlyClick()},
+                onClick = { if (!readOnly) onSelected(false) }
             )
         }
 
@@ -135,20 +135,17 @@ fun RadioButtonsInputWithDateAndText(
             Column(
                 modifier = Modifier.padding(horizontal = 16.dp),
             ) {
-                DateSelector(
+                DateSelectorWithTodayButton(
                     selectedDate = date,
                     onDateSelected = { onDateChange(it) },
-                    context = LocalContext.current,
-                    readOnly = readOnly,
-                    onReadOnlyClick = onReadOnlyClick
+                    readOnly = readOnly
                 )
 
                 AnimatedLabelOutlinedTextField(
                     value = additionalInfo,
                     onValueChange = { onAdditionalInfoChange(it) },
                     labelText = "Additional Info",
-                    readOnly = readOnly,
-                    onClick = if (readOnly) onReadOnlyClick else null
+                    readOnly = readOnly
                 )
             }
         }
@@ -223,14 +220,41 @@ fun ChronicConditionsForm(
                             )
                         )
                     },
-                    readOnly = readOnly,
-                    onReadOnlyClick = {
-                        onEvent(PastHistoryEvent.NurseClicked)
-                    }
+                    readOnly = readOnly
                 )
             }
 
             Spacer(modifier = Modifier.height(60.dp)) // Adds breathing room before bottom buttons
         }
     }
+}
+
+@Preview
+@Composable
+fun PastHistoryPreview() {
+    PastHistoryContent(
+        PastHistoryState(
+            patientId = "",
+            diseases = listOf(
+                PatientDiseaseState(
+                    disease = "Disease 1",
+                    isDiagnosed = true
+                ),
+                PatientDiseaseState(
+                    disease = "Disease 2",
+                    isDiagnosed = true
+                ),
+                PatientDiseaseState(
+                    disease = "Disease 3",
+                    isDiagnosed = true
+                ),
+                PatientDiseaseState(
+                    disease = "Disease 4",
+                    isDiagnosed = true
+                )
+            )
+        ),
+        onEvent = {},
+        readOnly = false,
+    )
 }
