@@ -1,5 +1,6 @@
 package com.unimib.oases.domain.model
 
+import androidx.compose.ui.graphics.Color
 import com.unimib.oases.util.DateAndTimeUtils
 import java.time.LocalDate
 import java.time.LocalTime
@@ -20,5 +21,11 @@ enum class TriageCode{
     RED,
     YELLOW,
     GREEN,
-    NONE
+    NONE;
+    fun getColor() = when(this) {
+        RED -> Color.Red
+        YELLOW -> Color.Yellow
+        GREEN -> Color.Green
+        NONE -> Color.Gray
+    }
 }
