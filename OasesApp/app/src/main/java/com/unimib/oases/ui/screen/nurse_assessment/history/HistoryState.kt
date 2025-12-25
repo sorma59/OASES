@@ -19,10 +19,6 @@ data class PastMedicalHistoryState(
     val error: String? = null
 )
 
-data class EditingState(
-    val diseases: List<PatientDiseaseState> = emptyList()
-)
-
 data class PatientDiseaseState(
     val disease: String,
     val isDiagnosed: Boolean? = null, // null means not answered

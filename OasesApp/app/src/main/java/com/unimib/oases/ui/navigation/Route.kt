@@ -51,8 +51,6 @@ sealed class Route {
     @Serializable
     data class ViewPatientDetails(val patientId: String): Route()
     @Serializable
-    data class PastMedicalHistory(val patientId: String) : Route()
-    @Serializable
     data class MainComplaint(
         val patientId: String,
         val mainComplaintId: String

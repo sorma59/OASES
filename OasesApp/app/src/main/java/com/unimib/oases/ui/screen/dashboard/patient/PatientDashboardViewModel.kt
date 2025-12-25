@@ -177,16 +177,6 @@ class PatientDashboardViewModel @Inject constructor(
                     )
                 }
 
-                is PatientDashboardAction.History -> {
-                    navigationEventsChannel.send(
-                        NavigationEvent.Navigate(
-                            action.createRoute(
-                                state.value.patientId
-                            )
-                        )
-                    )
-                }
-
                 is PatientDashboardAction.Send -> {
                     navigationEventsChannel.send(
                         NavigationEvent.Navigate(

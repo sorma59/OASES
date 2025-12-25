@@ -29,7 +29,7 @@ class AuthManager @Inject constructor(
         .map { it?.role }
         .stateIn(
             scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
-            started = SharingStarted.Companion.Eagerly,
+            started = SharingStarted.Eagerly,
             initialValue = null
         )
 
