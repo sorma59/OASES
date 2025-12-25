@@ -9,6 +9,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -17,7 +18,7 @@ fun CustomCircularProgressIndicator(
 ){
     Box(
         modifier = Modifier
-            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f))
+            .background(MaterialTheme.colorScheme.background.copy(alpha = 0.7f))
             .clickable(onClick = {})
             .fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -29,4 +30,10 @@ fun CustomCircularProgressIndicator(
             modifier = modifier
         )
     }
+}
+
+@Preview
+@Composable
+fun CustomCircularProgressIndicatorPreview() {
+    CustomCircularProgressIndicator()
 }

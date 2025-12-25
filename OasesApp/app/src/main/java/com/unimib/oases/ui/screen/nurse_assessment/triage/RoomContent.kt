@@ -41,13 +41,6 @@ fun RoomContent(
 ) {
     // Initial Retry moved to TriageViewModel's init
 
-    val codeColor = when (state.editingState!!.triageData.triageCode) {
-        TriageCode.GREEN -> Color.Green // Green
-        TriageCode.RED -> Color.Red     // Red
-        TriageCode.YELLOW -> Color.Yellow // Yellow
-        TriageCode.NONE -> throw Exception("The triage code cannot be \"none\" here")
-    }
-
     Box{
         Column(modifier = Modifier.padding(30.dp)){
 
@@ -62,7 +55,7 @@ fun RoomContent(
                     imageVector = Icons.Default.Circle,
                     contentDescription = "Triage code",
                     modifier = Modifier.size(20.dp),
-                    tint = codeColor
+                    tint = state.triageData.triageCode.getColor()
                 )
             }
 

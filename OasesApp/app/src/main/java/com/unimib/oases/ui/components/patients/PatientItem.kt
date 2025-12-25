@@ -44,14 +44,18 @@ fun PatientItem(
         modifier = modifier
             .height(100.dp)
             .padding(vertical = 2.dp),
-        colors = CardDefaults.cardColors()
-            .copy(containerColor = MaterialTheme.colorScheme.primary),
+        colors = CardDefaults
+            .cardColors()
+            .copy(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+            ),
     ){
 
         if (isLoading)
             CenteredTextInBox(
                 text = "Loading...",
-                color = MaterialTheme.colorScheme.onPrimary
+                color = MaterialTheme.colorScheme.onPrimaryContainer
             )
 
         else if (patientWithVisitInfo == null)
@@ -76,7 +80,7 @@ fun PatientItem(
                         .padding(4.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    TitleText(patientWithVisitInfo.patient.name + ", " + ageString, color = MaterialTheme.colorScheme.onPrimary)
+                    TitleText(patientWithVisitInfo.patient.name + ", " + ageString, color = MaterialTheme.colorScheme.onPrimaryContainer)
 
                     RoomAndCodeText(patientWithVisitInfo.visit)
                 }
@@ -88,11 +92,11 @@ fun PatientItem(
                         .padding(4.dp)
                         .fillMaxWidth()
                 ){
-                    Text(patientWithVisitInfo.patient.publicId, color = MaterialTheme.colorScheme.onPrimary)
+                    Text(patientWithVisitInfo.patient.publicId, color = MaterialTheme.colorScheme.onPrimaryContainer)
 
                     Text(
                         text = patientWithVisitInfo.visit.patientStatus.displayValue,
-                        color = MaterialTheme.colorScheme.onPrimary,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
                         textAlign = TextAlign.End,
                     )
                 }

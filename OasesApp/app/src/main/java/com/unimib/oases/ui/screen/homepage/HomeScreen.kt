@@ -11,7 +11,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -112,29 +111,25 @@ private fun HomeContent(
                     .fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp)
                 ) {
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 12.dp, horizontal = 12.dp)
-                    ) {
-                        SearchBar(
-                            query = searchText,
-                            onQueryChange = onQueryChange,
-                            onSearch = onSearch,
-                            active = active,
-                            onActiveChange = { active = it },
-                            searchHistory = listState,
-                            onHistoryItemClick = {
-                                onQueryChange(it)
-                                onSearch()
-                            }
-                        )
-                    }
+                    SearchBar(
+                        query = searchText,
+                        onQueryChange = onQueryChange,
+                        onSearch = onSearch,
+                        active = active,
+                        onActiveChange = { active = it },
+                        searchHistory = listState,
+                        onHistoryItemClick = {
+                            onQueryChange(it)
+                            onSearch()
+                        }
+                    )
                 }
+
                 if (state.isLoading) {
                     CustomCircularProgressIndicator()
                 } else if (state.patientsWithVisitInfo.isNotEmpty()) {
@@ -152,10 +147,10 @@ private fun HomeContent(
                 FloatingActionButton(
                     onClick = { onEvent(HomeScreenEvent.AddButtonClicked) },
                     modifier = Modifier.padding(30.dp),
-                    containerColor = MaterialTheme.colorScheme.primary
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 ) {
                     Icon(
-                        tint = MaterialTheme.colorScheme.surface,
                         imageVector = Icons.Default.Add,
                         contentDescription = "Add a patient",
                     )

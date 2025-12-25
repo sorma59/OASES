@@ -97,8 +97,7 @@ fun PatientCard(
             modifier = Modifier
                 .onSizeChanged {
                     contextMenuWidth = it.width.toFloat()
-                }
-                .background(color = MaterialTheme.colorScheme.primary),
+                },
             verticalAlignment = Alignment.CenterVertically,
 
             ) {
@@ -139,8 +138,12 @@ fun PatientCard(
                         }
                     )
                 },
-            colors = CardDefaults.cardColors()
-                .copy(containerColor = MaterialTheme.colorScheme.primary),
+            colors = CardDefaults
+                .cardColors()
+                .copy(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                ),
         ) {
 
             Column(
@@ -163,7 +166,6 @@ fun PatientCard(
                     Text(
                         text = patientWithVisitInfo.patient.name + ", ",
                         style = MaterialTheme.typography.displayMedium,
-                        color = MaterialTheme.colorScheme.surface,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 0.sp,
                         overflow = TextOverflow.Ellipsis,
@@ -172,7 +174,6 @@ fun PatientCard(
                     Text(
                         text = ageString,
                         style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.surface,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 0.sp,
                         overflow = TextOverflow.Ellipsis,
@@ -194,7 +195,6 @@ fun PatientCard(
                         Text(
                             text = patientWithVisitInfo.patient.publicId,
                             style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.surface,
                             fontWeight = FontWeight.Medium,
                             letterSpacing = 0.sp,
                             overflow = TextOverflow.Ellipsis,
@@ -206,7 +206,6 @@ fun PatientCard(
                         Text(
                             text = patientWithVisitInfo.visit.patientStatus.displayValue,
                             style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.surface,
                             fontWeight = FontWeight.Medium,
                             letterSpacing = 0.sp,
                             overflow = TextOverflow.Ellipsis,
@@ -222,7 +221,6 @@ fun PatientCard(
                     Text(
                         text = patientWithVisitInfo.visit.arrivalTime.format(DateAndTimeUtils.hoursAndMinutesFormatter),
                         style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.surface,
                         fontWeight = FontWeight.Normal,
                         overflow = TextOverflow.Ellipsis,
                         maxLines = 1
