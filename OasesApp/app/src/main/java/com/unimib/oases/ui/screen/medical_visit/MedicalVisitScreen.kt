@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -54,28 +53,8 @@ private fun MedicalVisitContent(
     ) {
         Spacer(Modifier.height(64.dp))
 
-        HorizontalDivider()
-
-        TitleText("View or edit PMH")
-
-        PastMedicalHistoryBox(state.patientId, appViewModel)
-
-        HorizontalDivider()
-
         MainComplaintsGrid(state.patientId, appViewModel)
     }
-}
-
-@Composable
-private fun PastMedicalHistoryBox(
-    patientId: String,
-    appViewModel: AppViewModel
-){
-    BoxButton(
-        label = "Past Medical History",
-        destination = Route.PastMedicalHistory(patientId),
-        appViewModel
-    )
 }
 
 @Composable

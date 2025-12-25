@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.MedicalServices
 import androidx.compose.material.icons.filled.PersonSearch
 import androidx.compose.material.icons.filled.PriorityHigh
@@ -202,6 +203,7 @@ sealed interface PatientDashboardAction {
                 Demographics,
                 Triage,
                 MalnutritionScreening,
+                History,
                 Send,
                 StartVisit,
                 Delete
@@ -256,6 +258,15 @@ sealed interface PatientDashboardAction {
         fun createRoute(patientId: String, visitId: String) = Route.MalnutritionScreening(
             patientId, visitId
         )
+    }
+
+    data object History: PatientNavigable {
+        override val text = "History"
+        override val icon = Icons.Default.History
+        override val contentDescription = "History"
+        override val roles = Role.entries
+
+        override fun createRoute(patientId: String) = Route.History(patientId)
     }
 
     data object Send : Navigable {

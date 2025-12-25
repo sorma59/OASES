@@ -32,11 +32,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.unimib.oases.domain.model.Room
 import com.unimib.oases.domain.model.TriageCode
-import com.unimib.oases.ui.screen.nurse_assessment.PatientRegistrationScreensUiMode
 
 @Composable
 fun RoomContent(
-    state: TriageState,
+    state: EditingState,
     onEvent: (TriageEvent) -> Unit,
 ) {
     // Initial Retry moved to TriageViewModel's init
@@ -65,7 +64,7 @@ fun RoomContent(
                 verticalArrangement = Arrangement.spacedBy(10.dp),
                 maxItemsInEachRow = 2
             ) {
-                state.editingState.roomsState.rooms.forEach { room ->
+                state.roomsState.rooms.forEach { room ->
                     RoomCard(
                         room = room,
                         modifier = Modifier
@@ -74,7 +73,7 @@ fun RoomContent(
                             .clickable {
                                 onEvent(TriageEvent.RoomClicked(room))
                             },
-                        isSelected = state.editingState.triageData.selectedRoom == room
+                        isSelected = state.triageData.selectedRoom == room
                     )
                 }
             }
@@ -134,10 +133,19 @@ fun RoomCard(
 @Composable
 fun RoomScreenPreview() {
     RoomContent(
-        TriageState(
-            patientId = "",
-            visitId = "",
-            uiMode = PatientRegistrationScreensUiMode.Standalone()
+        EditingState(
+            triageConfig = TriageConfig(
+                redOptions = emptyList(),
+                yellowOptions = emptyList()
+            ),
+            triageData = TriageData(
+                selectedReds = setOf("aaaaaaaaaaaaaaa"),
+                selectedYellows = setOf("aaaa", "vvvvv", "aaaa", "dadad"),
+                triageCode = TriageCode.GREEN,
+                selectedRoom = null
+            ),
+            roomsState = RoomsState(),
+            tabStack = emptyList()
         ),
         onEvent = {},
     )

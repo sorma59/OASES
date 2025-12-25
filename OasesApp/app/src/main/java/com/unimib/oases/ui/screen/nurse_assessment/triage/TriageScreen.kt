@@ -115,7 +115,7 @@ private fun TriageContent(
                                 getPrecisionFor
                             )
 
-                            TriageTab.ROOM -> RoomContent(state, onEvent)
+                            TriageTab.ROOM -> RoomContent(state.editingState, onEvent)
                         }
                     }
 

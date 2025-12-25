@@ -8,16 +8,18 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.unimib.oases.domain.model.Visit
 import com.unimib.oases.ui.components.card.VisitCard
 import com.unimib.oases.ui.components.util.CenteredTextInBox
 import com.unimib.oases.ui.components.util.button.RetryButton
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
+import com.unimib.oases.ui.screen.nurse_assessment.history.HistoryEvent
+import com.unimib.oases.ui.screen.nurse_assessment.history.PastVisitsState
+import com.unimib.oases.ui.screen.nurse_assessment.history.VisitState
 
 @Composable
 fun VisitHistoryContent(
-    state: VisitHistoryState,
-    onEvent: (VisitHistoryEvent) -> Unit,
+    state: PastVisitsState,
+    onEvent: (HistoryEvent) -> Unit,
 ) {
 
     Column(
@@ -27,7 +29,7 @@ fun VisitHistoryContent(
         if (state.error != null)
             RetryButton(
                 error = state.error,
-                onClick = { onEvent(VisitHistoryEvent.Retry) }
+                onClick = { onEvent(HistoryEvent.ReloadPastVisits) }
             )
         else if (state.isLoading)
             CustomCircularProgressIndicator()
@@ -38,7 +40,7 @@ fun VisitHistoryContent(
 }
 
 @Composable
-fun VisitHistoryList(visits: List<Visit>) {
+fun VisitHistoryList(visits: List<VisitState>) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,

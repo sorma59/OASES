@@ -33,6 +33,10 @@ sealed class Route {
         val isWizardMode: Boolean = false
     ) : Route()
     @Serializable
+    data class History(
+        val patientId: String
+    ): Route()
+    @Serializable
     data class SendPatient(
         val patientId: String,
         val visitId: String

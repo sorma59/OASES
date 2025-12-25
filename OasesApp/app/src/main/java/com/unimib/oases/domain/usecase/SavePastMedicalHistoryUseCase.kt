@@ -1,8 +1,8 @@
 package com.unimib.oases.domain.usecase
 
+import com.unimib.oases.domain.model.PatientDisease
 import com.unimib.oases.domain.repository.PatientDiseaseRepository
-import com.unimib.oases.ui.screen.medical_visit.pmh.PastHistoryState
-import com.unimib.oases.ui.screen.medical_visit.pmh.toPatientDiseases
+import com.unimib.oases.ui.screen.nurse_assessment.history.PatientDiseaseState
 import com.unimib.oases.util.Outcome
 import javax.inject.Inject
 
@@ -10,12 +10,26 @@ class SavePastMedicalHistoryUseCase @Inject constructor(
     private val patientDiseaseRepository: PatientDiseaseRepository
 ) {
 
-    suspend operator fun invoke(state: PastHistoryState): Outcome<Unit> {
+    suspend operator fun invoke(diseasesStates: List<PatientDiseaseState>, patientId: String): Outcome<Unit> {
         return try {
-            val patientDiseases = state.toPatientDiseases()
+            val patientDiseases = diseasesStates.toPatientDiseases(patientId)
             return patientDiseaseRepository.addPatientDiseases(patientDiseases)
         } catch (e: Exception) {
             Outcome.Error(e.message ?: "Unexpected error")
+        }
+    }
+
+    private fun List<PatientDiseaseState>.toPatientDiseases(patientId: String): List<PatientDisease> {
+        return this.mapNotNull {
+            it.isDiagnosed?.let { isDiagnosed ->
+                PatientDisease(
+                    patientId = patientId,
+                    diseaseName = it.disease,
+                    isDiagnosed = isDiagnosed,
+                    diagnosisDate = it.date,
+                    additionalInfo = it.additionalInfo,
+                )
+            }
         }
     }
 }

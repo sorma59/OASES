@@ -30,12 +30,12 @@ import com.unimib.oases.util.StringFormatHelper.getAgeWithSuffix
 @Composable
 fun DemographicsSummary(
     state: DemographicsState,
-    onEvent: (DemographicsEvent) -> Unit
+    onEvent: (DemographicsEvent) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        modifier = modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         // Add padding inside the card to give the content some breathing room.
         Column(modifier = Modifier.padding(16.dp)) {

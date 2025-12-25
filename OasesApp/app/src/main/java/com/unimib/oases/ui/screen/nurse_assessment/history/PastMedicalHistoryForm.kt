@@ -1,4 +1,4 @@
-package com.unimib.oases.ui.screen.medical_visit.pmh
+package com.unimib.oases.ui.screen.nurse_assessment.history
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,57 +16,21 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.unimib.oases.ui.components.form.DateSelectorWithTodayButton
 import com.unimib.oases.ui.components.util.AnimatedLabelOutlinedTextField
 import com.unimib.oases.ui.components.util.button.BottomButtons
 import com.unimib.oases.ui.components.util.button.RetryButton
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
-import com.unimib.oases.ui.screen.root.AppViewModel
-import com.unimib.oases.ui.util.ToastUtils
 import com.unimib.oases.util.reactToKeyboardAppearance
 
 @Composable
-fun PastHistoryScreen(
-    appViewModel: AppViewModel,
-    readOnly: Boolean = false
-) {
-
-    val viewModel: PastHistoryViewModel = hiltViewModel()
-
-    val state by viewModel.state.collectAsState()
-
-    val context = LocalContext.current
-
-    LaunchedEffect(state.toastMessage) {
-        state.toastMessage?.let { message ->
-            ToastUtils.showToast(context, message)
-        }
-        viewModel.onEvent(PastHistoryEvent.ToastShown)
-    }
-
-    LaunchedEffect(Unit) {
-        viewModel.navigationEvents.collect {
-            appViewModel.onNavEvent(it)
-        }
-    }
-
-    PastHistoryContent(state, viewModel::onEvent, readOnly)
-}
-
-@Composable
-private fun PastHistoryContent(
-    state: PastHistoryState,
-    onEvent: (PastHistoryEvent) -> Unit,
-    readOnly: Boolean
+fun PastMedicalHistoryFormContent(
+    state: PastMedicalHistoryState,
+    onEvent: (HistoryEvent) -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -78,22 +42,21 @@ private fun PastHistoryContent(
             state.error?.let {
                 RetryButton(
                     error = it,
-                    onClick = { onEvent(PastHistoryEvent.Retry) }
+                    onClick = { onEvent(HistoryEvent.ReloadPastVisits) }
                 )
             } ?: if (state.isLoading) {
                 CustomCircularProgressIndicator()
             } else {
                 ChronicConditionsForm(
                     state = state,
-                    onEvent = onEvent,
-                    readOnly = readOnly
+                    onEvent = onEvent
                 )
             }
         }
 
         BottomButtons(
-            onCancel = { onEvent(PastHistoryEvent.Cancel) },
-            onConfirm = { onEvent(PastHistoryEvent.Save) }
+            onCancel = { onEvent(HistoryEvent.Cancel) },
+            onConfirm = { onEvent(HistoryEvent.Save) }
         )
     }
 }
@@ -154,10 +117,9 @@ fun RadioButtonsInputWithDateAndText(
 
 @Composable
 fun ChronicConditionsForm(
-    state: PastHistoryState,
-    onEvent: (PastHistoryEvent) -> Unit,
-    modifier: Modifier = Modifier,
-    readOnly: Boolean = false
+    state: PastMedicalHistoryState,
+    onEvent: (HistoryEvent) -> Unit,
+    modifier: Modifier = Modifier
 ){
 
     val scrollState = rememberScrollState()
@@ -190,13 +152,13 @@ fun ChronicConditionsForm(
                 .verticalScroll(scrollState)
                 .reactToKeyboardAppearance()
         ) {
-            for (disease in state.diseases) {
+            for (disease in state.editingDiseases) {
                 RadioButtonsInputWithDateAndText(
                     label = disease.disease,
                     isDiagnosed = disease.isDiagnosed,
                     onSelected = { isDiagnosed ->
                         onEvent(
-                            PastHistoryEvent.RadioButtonClicked(
+                            HistoryEvent.RadioButtonClicked(
                                 disease.disease,
                                 isDiagnosed
                             )
@@ -205,7 +167,7 @@ fun ChronicConditionsForm(
                     date = disease.date,
                     onDateChange = {
                         onEvent(
-                            PastHistoryEvent.DateChanged(
+                            HistoryEvent.DateChanged(
                                 disease.disease,
                                 it
                             )
@@ -214,13 +176,12 @@ fun ChronicConditionsForm(
                     additionalInfo = disease.additionalInfo,
                     onAdditionalInfoChange = {
                         onEvent(
-                            PastHistoryEvent.AdditionalInfoChanged(
+                            HistoryEvent.AdditionalInfoChanged(
                                 disease.disease,
                                 it
                             )
                         )
-                    },
-                    readOnly = readOnly
+                    }
                 )
             }
 
@@ -231,10 +192,9 @@ fun ChronicConditionsForm(
 
 @Preview
 @Composable
-fun PastHistoryPreview() {
-    PastHistoryContent(
-        PastHistoryState(
-            patientId = "",
+fun PastMedicalHistoryFormPreview() {
+    PastMedicalHistoryFormContent(
+        PastMedicalHistoryState(
             diseases = listOf(
                 PatientDiseaseState(
                     disease = "Disease 1",
@@ -254,7 +214,6 @@ fun PastHistoryPreview() {
                 )
             )
         ),
-        onEvent = {},
-        readOnly = false,
+        onEvent = {}
     )
 }

@@ -19,20 +19,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.unimib.oases.domain.model.TriageCode
-import com.unimib.oases.domain.model.Visit
+import com.unimib.oases.ui.screen.nurse_assessment.history.VisitState
 
 @Composable
-fun VisitCard(visit: Visit) {
-    val statusColor = when (visit.triageCode) {
-        TriageCode.GREEN -> Color.Green
-        TriageCode.YELLOW -> Color.Yellow
-        TriageCode.RED -> Color.Red
-        TriageCode.NONE -> Color.Gray
-    }
+fun VisitCard(visit: VisitState) {
     val textColor = MaterialTheme.colorScheme.onPrimaryContainer
     val cardBackgroundColor = MaterialTheme.colorScheme.primaryContainer
 
@@ -67,7 +59,7 @@ fun VisitCard(visit: Visit) {
                 Icon(
                     imageVector = Icons.Filled.Circle,
                     contentDescription = "Visit Triage Code",
-                    tint = statusColor,
+                    tint = visit.triageCode,
                     modifier = Modifier.size(16.dp)
                 )
             }

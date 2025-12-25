@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unimib.oases.data.local.model.Role
 import com.unimib.oases.data.local.model.User
+import com.unimib.oases.domain.auth.AuthManager
 import com.unimib.oases.domain.usecase.AuthenticateUserUseCase
 import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel

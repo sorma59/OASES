@@ -1,4 +1,4 @@
-package com.unimib.oases.ui.screen.login
+package com.unimib.oases.domain.auth
 
 import com.unimib.oases.data.local.model.Role
 import com.unimib.oases.data.local.model.User
@@ -29,7 +29,7 @@ class AuthManager @Inject constructor(
         .map { it?.role }
         .stateIn(
             scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
-            started = SharingStarted.Eagerly,
+            started = SharingStarted.Companion.Eagerly,
             initialValue = null
         )
 
