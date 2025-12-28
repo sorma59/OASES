@@ -1,6 +1,5 @@
 package com.unimib.oases.ui.screen.nurse_assessment.history
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -40,7 +39,6 @@ fun VisitHistoryContent(
 fun VisitHistoryList(visits: List<VisitState>) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         if (visits.isNotEmpty()) {
