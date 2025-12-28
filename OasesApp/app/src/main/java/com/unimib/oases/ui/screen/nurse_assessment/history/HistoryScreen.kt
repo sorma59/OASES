@@ -73,7 +73,7 @@ private fun HistoryContent(
             }
 
             HistoryScreenTab.PAST_VISITS -> {
-                VisitHistoryContent(state.pastVisitsState) { }
+                VisitHistoryContent(state.pastVisitsState, onEvent)
             }
         }
     }
