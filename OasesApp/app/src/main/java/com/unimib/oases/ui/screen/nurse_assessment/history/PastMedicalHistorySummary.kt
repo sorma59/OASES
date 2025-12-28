@@ -8,7 +8,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Circle
+import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -32,8 +33,11 @@ fun PastHistorySummary(
     onEvent: (HistoryEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // Filter the list to get only the diseases that have been diagnosed.
-    val diagnosedDiseases = state.diseases.filter { it.isDiagnosed == true }
+    // --- CHANGE 1: Update the filter logic ---
+    // Show diseases that have been explicitly answered (not null).
+    val answeredDiseases = state.diseases
+        .filter { it.isDiagnosed != null }
+        .sortedByDescending { it.isDiagnosed }
 
     OasesCard(modifier = modifier.fillMaxWidth()) {
         Column(
@@ -65,20 +69,21 @@ fun PastHistorySummary(
             Spacer(modifier = Modifier.height(8.dp))
 
             // --- Content ---
-            if (diagnosedDiseases.isNotEmpty()) {
-                // If there are diagnosed diseases, list them.
+            if (answeredDiseases.isNotEmpty()) {
+                // If there are answered diseases, list them.
                 Column(
                     modifier = Modifier.padding(horizontal = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    diagnosedDiseases.forEach { disease ->
+                    answeredDiseases.forEach { disease ->
                         DiagnosedDiseaseItem(disease = disease)
                     }
                 }
             } else {
-                // If no diseases are diagnosed, show a placeholder message.
+                // --- CHANGE 2: Update the empty state text ---
+                // If no diseases have been answered, show a different placeholder.
                 Text(
-                    text = "No chronic conditions reported.",
+                    text = "No Past Medical History has been recorded.",
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -89,18 +94,24 @@ fun PastHistorySummary(
 }
 
 /**
- * A sub-composable to display a single diagnosed disease item.
+ * A sub-composable to display a single answered disease item,
+ * showing if it was diagnosed or not.
  */
 @Composable
 private fun DiagnosedDiseaseItem(disease: PatientDiseaseState) {
+    // --- CHANGE 3: Make the item visually distinct based on diagnosis status ---
+    val icon = if (disease.isDiagnosed == true) Icons.Default.CheckCircle else Icons.Default.Cancel
+    val iconColor = if (disease.isDiagnosed == true) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+    val textAlpha = if (disease.isDiagnosed == true) 1f else 0.7f // Make "No" entries slightly faded
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Icon(
-            imageVector = Icons.Default.Circle,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.secondary,
+            imageVector = icon,
+            contentDescription = if (disease.isDiagnosed == true) "Diagnosed" else "Not Diagnosed",
+            tint = iconColor.copy(alpha = textAlpha),
             modifier = Modifier.padding(top = 4.dp)
         )
         Column {
@@ -109,23 +120,24 @@ private fun DiagnosedDiseaseItem(disease: PatientDiseaseState) {
                 Text(
                     text = disease.disease,
                     style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = textAlpha)
                 )
-                // Show the date only if it's not blank
-                if (disease.date.isNotBlank()) {
+                // Show the date only if it was diagnosed and the date is not blank
+                if (disease.isDiagnosed == true && disease.date.isNotBlank()) {
                     Text(
                         text = " (Diagnosed: ${disease.date})",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = textAlpha)
                     )
                 }
             }
             // Additional Info
-            if (disease.additionalInfo.isNotBlank()) {
+            if (disease.isDiagnosed == true && disease.additionalInfo.isNotBlank()) {
                 Text(
                     text = disease.additionalInfo,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = textAlpha)
                 )
             }
         }
@@ -133,7 +145,7 @@ private fun DiagnosedDiseaseItem(disease: PatientDiseaseState) {
 }
 
 // =====================================================================================
-// Previews
+// Previews (Also updated to reflect the new logic)
 // =====================================================================================
 
 @Preview(showBackground = true)
@@ -156,7 +168,11 @@ private fun PastHistorySummaryPreview() {
                 ),
                 PatientDiseaseState(
                     disease = "Diabetes",
-                    isDiagnosed = false // This one should not appear
+                    isDiagnosed = false // This one WILL now appear
+                ),
+                PatientDiseaseState(
+                    disease = "Allergies",
+                    isDiagnosed = null // This one will NOT appear
                 )
             )
         ),
@@ -170,7 +186,7 @@ private fun PastHistorySummaryEmptyPreview() {
     PastHistorySummary(
         state = PastMedicalHistoryState(
             diseases = listOf(
-                PatientDiseaseState(disease = "Hypertension", isDiagnosed = false),
+                PatientDiseaseState(disease = "Hypertension", isDiagnosed = null),
                 PatientDiseaseState(disease = "Asthma", isDiagnosed = null)
             )
         ),
