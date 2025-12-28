@@ -2,7 +2,6 @@ package com.unimib.oases.ui.components.tab
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MultiChoiceSegmentedButtonRow
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -39,25 +38,27 @@ fun <T> TabSwitcher(
         modifier = modifier.fillMaxWidth()
     ) {
         tabs.forEach { tab ->
+            val checked = (tab == selectedTab)
+            val fontSize = if (checked) 22.sp else 20.sp
             SegmentedButton(
                 // Determine if the current tab in the loop is the selected one.
-                checked = (tab == selectedTab),
+                checked = checked,
                 // The onCheckedChange lambda provides a boolean, but we want to know *which*
                 // tab was clicked, so we call onTabSelected with the 'tab' from the loop.
                 onCheckedChange = { onTabSelected(tab) },
                 // Use custom colors to make the selected tab more prominent.
-                colors = SegmentedButtonDefaults.colors(
-                    activeContainerColor = MaterialTheme.colorScheme.primary,
-                    activeContentColor = MaterialTheme.colorScheme.onPrimary,
-                    inactiveContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    inactiveContentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                ),
+//                colors = SegmentedButtonDefaults.colors(
+//                    activeContainerColor = MaterialTheme.colorScheme.primary,
+//                    activeContentColor = MaterialTheme.colorScheme.onPrimary,
+//                    inactiveContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+//                    inactiveContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+//                ),
                 icon = { },
                 // Set the shape for each button in the row.
                 shape = SegmentedButtonDefaults.baseShape
             ) {
                 // Use the provided lambda to get the title for the current tab.
-                Text(text = getTabTitle(tab), fontSize = 20.sp)
+                Text(text = getTabTitle(tab), fontSize = fontSize)
             }
         }
     }
