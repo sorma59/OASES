@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -23,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.unimib.oases.ui.components.card.OasesCard
 
 /**
  * A composable to display a summary of the patient's diagnosed chronic diseases.
@@ -36,13 +35,8 @@ fun PastHistorySummary(
     // Filter the list to get only the diseases that have been diagnosed.
     val diagnosedDiseases = state.diseases.filter { it.isDiagnosed == true }
 
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-            contentColor = MaterialTheme.colorScheme.onSurface
-        )
+    OasesCard(
+        modifier = modifier.fillMaxWidth()
     ) {
         Column(
             modifier = Modifier.padding(vertical = 16.dp)

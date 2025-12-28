@@ -18,26 +18,36 @@ val errorLight = Color(0xFFBA1A1A)
 val onErrorLight = Color(0xFFFFFFFF)
 val errorContainerLight = Color(0xFFFFDAD6)
 val onErrorContainerLight = Color(0xFF93000A)
-val backgroundLight = Color(0xFFF8F9FC)
+// A slightly off-white background to make pure white elements pop.
+val backgroundLight = Color(0xFFF7F8FA)
 val onBackgroundLight = Color(0xFF191C1E)
-val surfaceLight = Color(0xFFE9E9EE)
+val surfaceLight = Color(0xFFF7F8FA)
+// The main surface on which other elements are drawn.
 val onSurfaceLight = Color(0xFF191C1E)
-val surfaceVariantLight = Color(0xFFDCE3EA)
-val onSurfaceVariantLight = Color(0xFF40484D)
+// A subtle variant for elements like text field backgrounds or chips. Slightly darker than background.
+val surfaceVariantLight = Color(0xFFE0E2E6)
+// The text/icon color for components on top of 'surfaceVariant'.
+val onSurfaceVariantLight = Color(0xFF44474B)
 val outlineLight = Color(0xFF70787E)
 val outlineVariantLight = Color(0xFFC0C7CE)
 val scrimLight = Color(0xFF000000)
 val inverseSurfaceLight = Color(0xFF2E3133)
 val inverseOnSurfaceLight = Color(0xFFEFF1F4)
 val inversePrimaryLight = Color(0xFF8FCEF4)
-val surfaceDimLight = Color(0xFFD8DADD)
-val surfaceBrightLight = Color(0xFFF8F9FC)
+// A dimmer surface for scrims or other specific scenarios.
+val surfaceDimLight = Color(0xFFD9DADB)
+// A bright surface, usually pure white.
+val surfaceBrightLight = Color(0xFFFFFFFF)
+// The "lowest" emphasis container, pure white. This is great for default cards.
 val surfaceContainerLowestLight = Color(0xFFFFFFFF)
-val surfaceContainerLowLight = Color(0xFFF2F4F7)
-val surfaceContainerLight = Color(0xFFECEEF1)
-val surfaceContainerHighLight = Color(0xFFE7E8EB)
-val surfaceContainerHighestLight = Color(0xFFE1E2E5)
-
+// A container with very low emphasis, just a hint of color.
+val surfaceContainerLowLight = Color(0xFFF0F2F5) // A very light, clean blue-gray
+// The default container, a clear step up from the background but less bright than lowest.
+val surfaceContainerLight = Color(0xFFEAECEF)
+// A container with more emphasis, noticeably more color but still light.
+val surfaceContainerHighLight = Color(0xFFE4E6E9)
+// The highest emphasis container. Distinct, but still a bright, clean gray.
+val surfaceContainerHighestLight = Color(0xFFDEE0E3) // <--- CORRECTED
 val primaryLightMediumContrast = Color(0xFF003B52)
 val onPrimaryLightMediumContrast = Color(0xFFFFFFFF)
 val primaryContainerLightMediumContrast = Color(0xFF307495)

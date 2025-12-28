@@ -13,8 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -33,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import com.unimib.oases.domain.model.Room
 import com.unimib.oases.domain.model.TriageCode
 import com.unimib.oases.domain.model.symptom.Symptom.Companion.symptoms
+import com.unimib.oases.ui.components.card.OasesCard
 import com.unimib.oases.ui.components.util.button.StartButton
 import com.unimib.oases.ui.screen.nurse_assessment.PatientRegistrationScreensUiMode
 
@@ -72,11 +71,7 @@ private fun TriageCard(
         }
     }
 
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-    ) {
+    OasesCard(modifier = modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {

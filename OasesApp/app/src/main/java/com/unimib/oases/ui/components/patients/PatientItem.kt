@@ -50,6 +50,7 @@ fun PatientItem(
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                 contentColor = MaterialTheme.colorScheme.onPrimaryContainer
             ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ){
 
         if (isLoading)

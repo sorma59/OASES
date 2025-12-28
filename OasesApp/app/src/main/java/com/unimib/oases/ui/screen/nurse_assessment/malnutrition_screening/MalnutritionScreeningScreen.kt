@@ -20,12 +20,11 @@ import androidx.compose.material.icons.filled.MonitorWeight
 import androidx.compose.material.icons.filled.SquareFoot
 import androidx.compose.material.icons.filled.Straighten
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -43,6 +42,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.unimib.oases.domain.model.MuacCategory
+import com.unimib.oases.ui.components.card.OasesCard
 import com.unimib.oases.ui.components.util.AnimatedLabelOutlinedTextField
 import com.unimib.oases.ui.components.util.button.BottomButtons
 import com.unimib.oases.ui.components.util.button.RetryButton
@@ -81,7 +81,7 @@ fun MalnutritionScreeningContent(
             onClick = { onEvent(MalnutritionScreeningEvent.Retry) }
         )
     } ?: if (state.uiMode is PatientRegistrationScreensUiMode.Standalone && !state.uiMode.isEditing)
-        MalnutritionSummary(state, onEvent)
+        MalnutritionSummary(state, onEvent, Modifier.padding(16.dp))
     else {
         MalnutritionEditing(state, onEvent)
     }
@@ -123,7 +123,7 @@ fun MalnutritionSummary(
 ) {
     
     state.storedData?.let {
-        MalnutritionScreeningCard(it, onEvent, modifier)
+        MalnutritionScreeningSummary(it, onEvent, modifier)
     } ?: StartButton(
         "Malnutrition screening is yet to be performed",
         onClick = { onEvent(MalnutritionScreeningEvent.CreateButtonPressed) }
@@ -131,18 +131,18 @@ fun MalnutritionSummary(
 }
 
 @Composable
-private fun MalnutritionScreeningCard(
+private fun MalnutritionScreeningSummary(
     data: MalnutritionScreeningData,
     onEvent: (MalnutritionScreeningEvent) -> Unit,
     modifier: Modifier
 ) {
     val decimalFormat = remember { DecimalFormat("#.#") }
 
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-    ) {
+    val listItemColors = ListItemDefaults.colors(
+        containerColor = MaterialTheme.colorScheme.surfaceContainerLowest
+    )
+
+    OasesCard(modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier.padding(vertical = 16.dp)
         ) {
@@ -168,7 +168,7 @@ private fun MalnutritionScreeningCard(
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
-            HorizontalDivider()
+            HorizontalDivider(Modifier.padding(horizontal = 16.dp))
 
             // --- Weight, Height, BMI ---
             ListItem(
@@ -186,7 +186,8 @@ private fun MalnutritionScreeningCard(
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold
                     )
-                }
+                },
+                colors = listItemColors
             )
 
             ListItem(
@@ -204,7 +205,8 @@ private fun MalnutritionScreeningCard(
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold
                     )
-                }
+                },
+                colors = listItemColors
             )
 
             ListItem(
@@ -221,10 +223,11 @@ private fun MalnutritionScreeningCard(
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold
                     )
-                }
+                },
+                colors = listItemColors
             )
 
-            HorizontalDivider()
+            HorizontalDivider(Modifier.padding(horizontal = 16.dp))
             Spacer(modifier = Modifier.height(8.dp))
 
             // --- MUAC Section ---
