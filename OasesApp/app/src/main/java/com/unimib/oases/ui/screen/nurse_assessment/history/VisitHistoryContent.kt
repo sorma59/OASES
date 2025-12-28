@@ -1,4 +1,4 @@
-package com.unimib.oases.ui.screen.nurse_assessment.visit_history
+package com.unimib.oases.ui.screen.nurse_assessment.history
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,9 +12,6 @@ import com.unimib.oases.ui.components.card.VisitCard
 import com.unimib.oases.ui.components.util.CenteredTextInBox
 import com.unimib.oases.ui.components.util.button.RetryButton
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
-import com.unimib.oases.ui.screen.nurse_assessment.history.HistoryEvent
-import com.unimib.oases.ui.screen.nurse_assessment.history.PastVisitsState
-import com.unimib.oases.ui.screen.nurse_assessment.history.VisitState
 
 @Composable
 fun VisitHistoryContent(
