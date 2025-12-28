@@ -39,15 +39,13 @@ val surfaceDimLight = Color(0xFFD9DADB)
 // A bright surface, usually pure white.
 val surfaceBrightLight = Color(0xFFFFFFFF)
 // The "lowest" emphasis container, pure white. This is great for default cards.
-val surfaceContainerLowestLight = Color(0xFFFFFFFF)
-// A container with very low emphasis, just a hint of color.
-val surfaceContainerLowLight = Color(0xFFF0F2F5) // A very light, clean blue-gray
-// The default container, a clear step up from the background but less bright than lowest.
-val surfaceContainerLight = Color(0xFFEAECEF)
-// A container with more emphasis, noticeably more color but still light.
-val surfaceContainerHighLight = Color(0xFFE4E6E9)
-// The highest emphasis container. Distinct, but still a bright, clean gray.
-val surfaceContainerHighestLight = Color(0xFFDEE0E3) // <--- CORRECTED
+// --- Light Theme Container Progression (Highest is now Brightest) ---
+val surfaceContainerLowestLight = Color(0xFFF0F2F5)      // Darkest of the light containers
+val surfaceContainerLowLight = Color(0xFFEAECEF)
+val surfaceContainerLight = Color(0xFFE4E6E9)
+val surfaceContainerHighLight = Color(0xFFDEE0E3)
+val surfaceContainerHighestLight = Color(0xFFFFFFFF) // Brightest: Pure white.
+
 val primaryLightMediumContrast = Color(0xFF003B52)
 val onPrimaryLightMediumContrast = Color(0xFFFFFFFF)
 val primaryContainerLightMediumContrast = Color(0xFF307495)
@@ -140,25 +138,31 @@ val onErrorContainerDark = Color(0xFFFFFFFF)
 //val onErrorDark = Color(0xFF690005)
 //val errorContainerDark = Color(0xFF93000A)
 //val onErrorContainerDark = Color(0xFFFFDAD6)
-val backgroundDark = Color(0xFF111416)
-val onBackgroundDark = Color(0xFFE1E2E5)
-val surfaceDark = Color(0xFF171C1E)
-val onSurfaceDark = Color(0xFFE1E2E5)
-val surfaceVariantDark = Color(0xFF40484D)
-val onSurfaceVariantDark = Color(0xFFC0C7CE)
-val outlineDark = Color(0xFF8A9298)
-val outlineVariantDark = Color(0xFF40484D)
+// --- Dark Theme Surfaces: Brighter-is-closer, representative palette ---
+
+val backgroundDark = Color(0xFF121212) // Deep dark background
+val onBackgroundDark = Color(0xFFE6E6E6)
+val surfaceDark = Color(0xFF121212)
+val onSurfaceDark = Color(0xFFE6E6E6)
+val surfaceVariantDark = Color(0xFF444444)
+val onSurfaceVariantDark = Color(0xFFCACACA)
+val outlineDark = Color(0xFF8E8E8E)
+val outlineVariantDark = Color(0xFF444444)
 val scrimDark = Color(0xFF000000)
-val inverseSurfaceDark = Color(0xFFE1E2E5)
-val inverseOnSurfaceDark = Color(0xFF2E3133)
+val inverseSurfaceDark = Color(0xFFE6E6E6)
+val inverseOnSurfaceDark = Color(0xFF121212)
 val inversePrimaryDark = Color(0xFF1C6586)
-val surfaceDimDark = Color(0xFF111416)
-val surfaceBrightDark = Color(0xFF373A3C)
-val surfaceContainerLowestDark = Color(0xFF0B0F11)
-val surfaceContainerLowDark = Color(0xFF191C1E)
-val surfaceContainerDark = Color(0xFF1D2022)
-val surfaceContainerHighDark = Color(0xFF272A2D)
-val surfaceContainerHighestDark = Color(0xFF323538)
+val surfaceDimDark = Color(0xFF121212)
+val surfaceBrightDark = Color(0xFF383838)
+
+// --- Dark Theme Container Progression (Highest is now #202020) ---
+// This progression steps down from your chosen 'highest' color.
+val surfaceContainerLowestDark = Color(0xFF151515)      // Darkest: Just above the #121212 background.
+val surfaceContainerLowDark = Color(0xFF181818)
+val surfaceContainerDark = Color(0xFF1B1B1B)
+val surfaceContainerHighDark = Color(0xFF1D1D1D)
+val surfaceContainerHighestDark = Color(0xFF202020)       // Brightest: Your defined anchor point.
+
 
 val primaryDarkMediumContrast = Color(0xFFB6E2FF)
 val onPrimaryDarkMediumContrast = Color(0xFF00293A)

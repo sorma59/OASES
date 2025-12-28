@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -24,16 +25,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.unimib.oases.ui.components.card.OasesCard
-import com.unimib.oases.ui.screen.nurse_assessment.PatientRegistrationScreensUiMode
 import com.unimib.oases.util.StringFormatHelper.getAgeWithSuffix
 
 @Composable
 fun DemographicsSummary(
-    state: DemographicsState,
+    demographics: PatientData,
     onEvent: (DemographicsEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    OasesCard(modifier) {
+    OasesCard(modifier.fillMaxWidth()) {
         // Add padding inside the card to give the content some breathing room.
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
@@ -46,14 +46,14 @@ fun DemographicsSummary(
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(
-                        text = state.storedData.name,
+                        text = demographics.name,
                         fontSize = 24.sp,
                         // Suggestion: Making the name bold helps it stand out as the primary info.
                         fontWeight = FontWeight.Bold,
                     )
 
                     Text(
-                        text = state.storedData.sexOption.displayName,
+                        text = demographics.sexOption.displayName,
                         fontSize = 16.sp,
                         color = MaterialTheme.colorScheme.outline
                     )
@@ -75,7 +75,7 @@ fun DemographicsSummary(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                val age = getAgeWithSuffix(state.storedData.ageInMonths)
+                val age = getAgeWithSuffix(demographics.ageInMonths)
 
                 Text(
                     text = age,
@@ -83,7 +83,7 @@ fun DemographicsSummary(
                 )
 
                 Text(
-                    text = "(${state.storedData.birthDate})",
+                    text = "(${demographics.birthDate})",
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.outline
                 )
@@ -92,14 +92,14 @@ fun DemographicsSummary(
             Spacer(Modifier.height(12.dp))
 
             val location = listOfNotNull(
-                state.storedData.village.takeIf { it.isNotBlank() },
-                state.storedData.parish.takeIf { it.isNotBlank() },
-                state.storedData.subCounty.takeIf { it.isNotBlank() },
-                state.storedData.district.takeIf { it.isNotBlank() }
+                demographics.village.takeIf { it.isNotBlank() },
+                demographics.parish.takeIf { it.isNotBlank() },
+                demographics.subCounty.takeIf { it.isNotBlank() },
+                demographics.district.takeIf { it.isNotBlank() }
             ).joinToString(", ")
 
             Text(
-                text = state.storedData.contact,
+                text = demographics.contact,
                 fontSize = 14.sp
             )
 
@@ -140,7 +140,7 @@ fun DemographicsSummary(
                 Spacer(Modifier.width(6.dp))
 
                 Text(
-                    text = state.storedData.nextOfKin,
+                    text = demographics.nextOfKin,
                     fontSize = 14.sp
                 )
             }
@@ -156,21 +156,18 @@ fun DemographicsSummary(
 @Composable
 private fun DemographicsSummaryFullPreview() {
     DemographicsSummary(
-        state = DemographicsState(
-            storedData = PatientData(
-                id = "patient123",
-                name = "Ettore Zini",
-                birthDate = "22/10/1998",
-                ageInMonths = 310, // Approx 25 years
-                sexOption = SexOption.fromSex(Sex.MALE),
-                village = "Kampala",
-                parish = "Central",
-                subCounty = "Kawempe",
-                district = "Kampala",
-                nextOfKin = "Jane Doe (Mother)",
-                contact = "+256 777 123456"
-            ),
-            uiMode = PatientRegistrationScreensUiMode.Standalone(isEditing = false)
+        demographics = PatientData(
+            id = "patient123",
+            name = "Ettore Zini",
+            birthDate = "22/10/1998",
+            ageInMonths = 310, // Approx 25 years
+            sexOption = SexOption.fromSex(Sex.MALE),
+            village = "Kampala",
+            parish = "Central",
+            subCounty = "Kawempe",
+            district = "Kampala",
+            nextOfKin = "Jane Doe (Mother)",
+            contact = "+256 777 123456"
         ),
         onEvent = {} // In a preview, the event handler can be empty
     )
@@ -180,21 +177,18 @@ private fun DemographicsSummaryFullPreview() {
 @Composable
 private fun DemographicsSummaryPartialPreview() {
     DemographicsSummary(
-        state = DemographicsState(
-            storedData = PatientData(
-                id = "patient456",
-                name = "Alice Smith",
-                birthDate = "10/05/2021",
-                ageInMonths = 37, // Approx 3 years
-                sexOption = SexOption.fromSex(Sex.FEMALE),
-                village = "", // Empty village
-                parish = "West",
-                subCounty = "Makindye",
-                district = "Kampala",
-                nextOfKin = "Robert Smith (Father)",
-                contact = "" // Empty contact
-            ),
-            uiMode = PatientRegistrationScreensUiMode.Standalone(isEditing = false)
+        demographics = PatientData(
+            id = "patient456",
+            name = "Alice Smith",
+            birthDate = "10/05/2021",
+            ageInMonths = 37, // Approx 3 years
+            sexOption = SexOption.fromSex(Sex.FEMALE),
+            village = "", // Empty village
+            parish = "West",
+            subCounty = "Makindye",
+            district = "Kampala",
+            nextOfKin = "Robert Smith (Father)",
+            contact = "" // Empty contact
         ),
         onEvent = {}
     )

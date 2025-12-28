@@ -35,9 +35,7 @@ fun PastHistorySummary(
     // Filter the list to get only the diseases that have been diagnosed.
     val diagnosedDiseases = state.diseases.filter { it.isDiagnosed == true }
 
-    OasesCard(
-        modifier = modifier.fillMaxWidth()
-    ) {
+    OasesCard(modifier = modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier.padding(vertical = 16.dp)
         ) {

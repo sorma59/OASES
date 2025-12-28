@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.MonitorWeight
 import androidx.compose.material.icons.filled.SquareFoot
 import androidx.compose.material.icons.filled.Straighten
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -139,10 +140,13 @@ private fun MalnutritionScreeningSummary(
     val decimalFormat = remember { DecimalFormat("#.#") }
 
     val listItemColors = ListItemDefaults.colors(
-        containerColor = MaterialTheme.colorScheme.surfaceContainerLowest
+        containerColor = CardDefaults.cardColors().containerColor
     )
 
-    OasesCard(modifier.fillMaxWidth()) {
+    OasesCard(
+        modifier.fillMaxWidth(),
+        shape = CardDefaults.elevatedShape
+    ) {
         Column(
             modifier = Modifier.padding(vertical = 16.dp)
         ) {

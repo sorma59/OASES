@@ -71,7 +71,7 @@ fun DemographicsContent(
         CustomCircularProgressIndicator()
     else {
         if (state.uiMode is PatientRegistrationScreensUiMode.Standalone && !state.uiMode.isEditing)
-            DemographicsSummary(state, onEvent, Modifier.padding(16.dp))
+            DemographicsSummary(state.storedData, onEvent, Modifier.padding(16.dp))
         else {
             DemographicsEditing(state, onEvent)
         }
