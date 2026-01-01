@@ -14,6 +14,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.unimib.oases.ui.components.tab.TabSwitcher
+import com.unimib.oases.ui.components.util.button.RetryButton
+import com.unimib.oases.ui.components.util.button.StartButton
+import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 import com.unimib.oases.ui.screen.root.AppViewModel
 import com.unimib.oases.ui.util.ToastUtils
 
@@ -44,6 +47,42 @@ private fun HistoryContent(
     onEvent: (HistoryEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
+
+    @Composable
+    fun GetPastMedicalHistoryContent() {
+
+        state.pastMedicalHistoryState.error?.let {
+            RetryButton(
+                error = it,
+                onClick = { onEvent(HistoryEvent.ReloadPastMedicalHistory) }
+            )
+        } ?: if (state.pastMedicalHistoryState.isLoading) {
+            CustomCircularProgressIndicator()
+        } else {
+            when (state.pastMedicalHistoryState.mode) {
+                is PmhMode.View -> {
+                    if (state.pastMedicalHistoryState.isPastMedicalHistoryPresent)
+                        PastHistorySummary(
+                            state.pastMedicalHistoryState.mode.diseases,
+                            onEvent,
+                            Modifier.padding(16.dp)
+                        )
+                    else
+                        StartButton(
+                            "No Past Medical History is present, create one"
+                        ) {
+                            onEvent(HistoryEvent.CreateButtonClicked)
+                        }
+                }
+
+                is PmhMode.Edit -> PastMedicalHistoryFormContent(
+                    state.pastMedicalHistoryState.mode.editingDiseases,
+                    onEvent
+                )
+            }
+        }
+    }
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxSize()
@@ -62,14 +101,7 @@ private fun HistoryContent(
 
         when (state.selectedTab) {
             HistoryScreenTab.PAST_MEDICAL_HISTORY -> {
-                if (state.pastMedicalHistoryState.isEditing)
-                    PastMedicalHistoryFormContent(state.pastMedicalHistoryState, onEvent)
-                else
-                    PastHistorySummary(
-                        state.pastMedicalHistoryState,
-                        onEvent,
-                        Modifier.padding(16.dp)
-                    )
+                GetPastMedicalHistoryContent()
             }
 
             HistoryScreenTab.PAST_VISITS -> {

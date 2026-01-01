@@ -12,12 +12,32 @@ data class HistoryState(
 )
 
 data class PastMedicalHistoryState(
-    val isEditing: Boolean = false,
-    val diseases: List<PatientDiseaseState> = emptyList(),
-    val editingDiseases: List<PatientDiseaseState> = emptyList(),
+    // 1. The 'mode' property replaces 'isEditing' and 'editingDiseases'.
+    //    It defaults to the View mode with an empty list.
+    val mode: PmhMode = PmhMode.View(diseases = emptyList()),
     val isLoading: Boolean = true,
     val error: String? = null
-)
+) {
+    // 2. This computed property can now get the data directly from the mode.
+    val isPastMedicalHistoryPresent: Boolean
+        get() = mode is PmhMode.View && mode.diseases.mapNotNull{it.isDiagnosed}.isNotEmpty()
+}
+
+// 3. Define the sealed interface for the different modes.
+sealed interface PmhMode {
+    /**
+     * Represents the view-only state, holding the final displayed data.
+     */
+    data class View(val diseases: List<PatientDiseaseState>) : PmhMode
+
+    /**
+     * Represents the editing state, holding the data currently being edited in the form.
+     */
+    data class Edit(
+        val originalDiseases: List<PatientDiseaseState>,
+        val editingDiseases: List<PatientDiseaseState> = originalDiseases
+    ) : PmhMode
+}
 
 data class PatientDiseaseState(
     val disease: String,

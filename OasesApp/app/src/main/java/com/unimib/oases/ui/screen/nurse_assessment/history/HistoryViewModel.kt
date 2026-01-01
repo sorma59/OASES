@@ -79,7 +79,14 @@ class HistoryViewModel @Inject constructor(
             val diseases = getChronicDiseasesInfo(state.value.patientId)
             updatePastMedicalHistoryState {
                 it.copy(
-                    diseases = diseases,
+                    mode = when (it.mode) {
+                        is PmhMode.View -> {
+                            PmhMode.View(diseases = diseases)
+                        }
+                        is PmhMode.Edit -> {
+                            PmhMode.Edit(originalDiseases = diseases)
+                        }
+                    },
                     isLoading = false
                 )
             }
@@ -89,20 +96,18 @@ class HistoryViewModel @Inject constructor(
     fun onEvent(event: HistoryEvent) {
         when (event) {
             is HistoryEvent.TabSelected -> {
-                _state.update {
-                    it.copy(
-                        selectedTab = event.tab
-                    )
-                }
+                _state.update { it.copy(selectedTab = event.tab) }
             }
 
             HistoryEvent.EditButtonPressed -> {
                 if (authManager.getCurrentRole() == Role.DOCTOR) {
-                    updatePastMedicalHistoryState {
-                        it.copy(
-                            isEditing = true,
-                            editingDiseases = it.diseases
-                        )
+                    val currentMode = state.value.pastMedicalHistoryState.mode
+                    if (currentMode is PmhMode.View) {
+                        updatePastMedicalHistoryState {
+                            it.copy(
+                                mode = PmhMode.Edit(currentMode.diseases)
+                            )
+                        }
                     }
                 } else {
                     _state.update {
@@ -117,17 +122,17 @@ class HistoryViewModel @Inject constructor(
                 loadPastVisits()
             }
 
+            HistoryEvent.ReloadPastMedicalHistory -> {
+                loadChronicDiseases()
+            }
+
             HistoryEvent.ToastShown -> {
-                _state.update {
-                    it.copy(
-                        toastMessage = null
-                    )
-                }
+                _state.update { it.copy(toastMessage = null) }
             }
 
             is HistoryEvent.RadioButtonClicked -> {
-                updatePastMedicalHistoryState {
-                    val diseases = it.diseases.map { diseaseState ->
+                updatePmhEditState {
+                    val diseases = it.editingDiseases.map { diseaseState ->
                         if (diseaseState.disease == event.disease)
                             diseaseState.copy(isDiagnosed = event.isDiagnosed)
                         else
@@ -140,56 +145,15 @@ class HistoryViewModel @Inject constructor(
             }
 
             HistoryEvent.Cancel -> {
-                updatePastMedicalHistoryState {
-                    it.copy(
-                        isEditing = false
-                    )
-                }
+                goBackToViewMode()
             }
 
             HistoryEvent.Save -> {
-                updatePastMedicalHistoryState {
-                    it.copy(
-                        isLoading = true
-                    )
-                }
-
-                val diseasesToSave = state.value.pastMedicalHistoryState.editingDiseases
-
-                viewModelScope.launch(pastMedicalHistoryContext){
-                    val outcome = savePastMedicalHistoryUseCase(
-                        diseasesStates = diseasesToSave,
-                        patientId = state.value.patientId
-                    )
-                    when (outcome) {
-                        is Outcome.Error -> {
-                            _state.update {
-                                it.copy(
-                                    toastMessage = "Saving failed",
-                                )
-                            }
-                        }
-                        is Outcome.Success -> {
-                            updatePastMedicalHistoryState {
-                                it.copy(
-                                    diseases = diseasesToSave,
-                                    isEditing = false
-                                )
-                            }
-                        }
-                        else -> Unit
-                    }
-
-                    updatePastMedicalHistoryState {
-                        it.copy(
-                            isLoading = false
-                        )
-                    }
-                }
+                savePastMedicalHistory()
             }
 
             is HistoryEvent.AdditionalInfoChanged -> {
-                updatePastMedicalHistoryState {
+                updatePmhEditState {
                     val diseases = it.editingDiseases.map { diseaseState ->
                         if (diseaseState.disease == event.disease)
                             diseaseState.copy(additionalInfo = event.additionalInfo)
@@ -202,7 +166,7 @@ class HistoryViewModel @Inject constructor(
                 }
             }
             is HistoryEvent.DateChanged -> {
-                updatePastMedicalHistoryState {
+                updatePmhEditState {
                     val diseases = it.editingDiseases.map { diseaseState ->
                         if (diseaseState.disease == event.disease)
                             diseaseState.copy(date = event.date)
@@ -214,6 +178,58 @@ class HistoryViewModel @Inject constructor(
                     )
                 }
             }
+
+            HistoryEvent.CreateButtonClicked -> {
+                val currentMode = state.value.pastMedicalHistoryState.mode
+                if (currentMode !is PmhMode.View) return // Safety check
+                updatePastMedicalHistoryState {
+                    it.copy(
+                        mode = PmhMode.Edit(currentMode.diseases)
+                    )
+                }
+            }
+        }
+    }
+
+    private fun goBackToViewMode() {
+        val currentMode = state.value.pastMedicalHistoryState.mode
+        if (currentMode !is PmhMode.Edit) return // Safety check
+        updatePastMedicalHistoryState {
+            it.copy(
+                mode = PmhMode.View(currentMode.originalDiseases)
+            )
+        }
+    }
+
+    private fun savePastMedicalHistory() {
+        val currentMode = state.value.pastMedicalHistoryState.mode
+        if (currentMode !is PmhMode.Edit) return // Safety check
+
+        val diseasesToSave = currentMode.editingDiseases
+
+        updatePastMedicalHistoryState { it.copy(isLoading = true) }
+
+        viewModelScope.launch(pastMedicalHistoryContext) {
+            val outcome = savePastMedicalHistoryUseCase(
+                diseasesStates = diseasesToSave,
+                patientId = state.value.patientId
+            )
+            when (outcome) {
+                is Outcome.Error -> {
+                    _state.update { it.copy(toastMessage = "Saving failed") }
+                }
+
+                is Outcome.Success -> {
+                    // Switch back to View mode with the newly saved data
+                    updatePastMedicalHistoryState {
+                        it.copy(mode = PmhMode.View(diseases = diseasesToSave))
+                    }
+                }
+
+                else -> Unit
+            }
+
+            updatePastMedicalHistoryState { it.copy(isLoading = false) }
         }
     }
 
@@ -234,6 +250,20 @@ class HistoryViewModel @Inject constructor(
             it.copy(
                 pastMedicalHistoryState = update(it.pastMedicalHistoryState)
             )
+        }
+    }
+
+    /**
+     * A helper function that safely updates the PMH state only if it's currently in Edit mode.
+     */
+    private fun updatePmhEditState(update: (PmhMode.Edit) -> PmhMode.Edit) {
+        updatePastMedicalHistoryState { currentState ->
+            if (currentState.mode is PmhMode.Edit) {
+                currentState.copy(mode = update(currentState.mode))
+            } else {
+                // If not in edit mode, do nothing. This prevents illegal state changes.
+                currentState
+            }
         }
     }
 

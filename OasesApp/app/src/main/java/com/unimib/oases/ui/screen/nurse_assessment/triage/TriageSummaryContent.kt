@@ -44,9 +44,10 @@ fun TriageSummaryContent(
 
     if (state.storedData == null){
         StartButton(
-            text = "Triage yet to be performed",
-            onClick = { onEvent(TriageEvent.CreateButtonPressed) }
-        )
+            text = "Triage yet to be performed"
+        ) {
+            onEvent(TriageEvent.CreateButtonPressed)
+        }
     }
     else {
         TriageCard(state.storedData, onEvent, modifier)

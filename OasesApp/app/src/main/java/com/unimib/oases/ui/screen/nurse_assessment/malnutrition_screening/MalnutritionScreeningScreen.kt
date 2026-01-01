@@ -106,9 +106,11 @@ fun MalnutritionSummary(
     state.storedData?.let {
         MalnutritionScreeningSummary(it, onEvent, modifier)
     } ?: StartButton(
-        "Malnutrition screening is yet to be performed",
-        onClick = { onEvent(MalnutritionScreeningEvent.CreateButtonPressed) }
-    )        
+        "Malnutrition screening is yet to be performed"
+    ) {
+        onEvent(MalnutritionScreeningEvent.CreateButtonPressed)
+    }
+
 }
 
 

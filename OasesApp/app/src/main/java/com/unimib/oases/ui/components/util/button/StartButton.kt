@@ -12,8 +12,8 @@ import androidx.compose.ui.Modifier
 @Composable
 fun StartButton(
     text: String,
-    onClick: () -> Unit,
-    label: String = "Start"
+    label: String = "Start",
+    onClick: () -> Unit
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),

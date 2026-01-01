@@ -23,13 +23,11 @@ import androidx.compose.ui.unit.dp
 import com.unimib.oases.ui.components.form.DateSelectorWithTodayButton
 import com.unimib.oases.ui.components.util.AnimatedLabelOutlinedTextField
 import com.unimib.oases.ui.components.util.button.BottomButtons
-import com.unimib.oases.ui.components.util.button.RetryButton
-import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 import com.unimib.oases.util.reactToKeyboardAppearance
 
 @Composable
 fun PastMedicalHistoryFormContent(
-    state: PastMedicalHistoryState,
+    diseases: List<PatientDiseaseState>,
     onEvent: (HistoryEvent) -> Unit
 ) {
     Column(
@@ -39,19 +37,10 @@ fun PastMedicalHistoryFormContent(
     ) {
 
         Box(Modifier.weight(1f)) {
-            state.error?.let {
-                RetryButton(
-                    error = it,
-                    onClick = { onEvent(HistoryEvent.ReloadPastVisits) }
-                )
-            } ?: if (state.isLoading) {
-                CustomCircularProgressIndicator()
-            } else {
-                ChronicConditionsForm(
-                    state = state,
-                    onEvent = onEvent
-                )
-            }
+            ChronicConditionsForm(
+                diseases = diseases,
+                onEvent = onEvent
+            )
         }
 
         BottomButtons(
@@ -117,7 +106,7 @@ fun RadioButtonsInputWithDateAndText(
 
 @Composable
 fun ChronicConditionsForm(
-    state: PastMedicalHistoryState,
+    diseases: List<PatientDiseaseState>,
     onEvent: (HistoryEvent) -> Unit,
     modifier: Modifier = Modifier
 ){
@@ -152,7 +141,7 @@ fun ChronicConditionsForm(
                 .verticalScroll(scrollState)
                 .reactToKeyboardAppearance()
         ) {
-            for (disease in state.editingDiseases) {
+            for (disease in diseases) {
                 RadioButtonsInputWithDateAndText(
                     label = disease.disease,
                     isDiagnosed = disease.isDiagnosed,
@@ -194,24 +183,22 @@ fun ChronicConditionsForm(
 @Composable
 fun PastMedicalHistoryFormPreview() {
     PastMedicalHistoryFormContent(
-        PastMedicalHistoryState(
-            diseases = listOf(
-                PatientDiseaseState(
-                    disease = "Disease 1",
-                    isDiagnosed = true
-                ),
-                PatientDiseaseState(
-                    disease = "Disease 2",
-                    isDiagnosed = true
-                ),
-                PatientDiseaseState(
-                    disease = "Disease 3",
-                    isDiagnosed = true
-                ),
-                PatientDiseaseState(
-                    disease = "Disease 4",
-                    isDiagnosed = true
-                )
+        listOf(
+            PatientDiseaseState(
+                disease = "Disease 1",
+                isDiagnosed = true
+            ),
+            PatientDiseaseState(
+                disease = "Disease 2",
+                isDiagnosed = true
+            ),
+            PatientDiseaseState(
+                disease = "Disease 3",
+                isDiagnosed = true
+            ),
+            PatientDiseaseState(
+                disease = "Disease 4",
+                isDiagnosed = true
             )
         ),
         onEvent = {}

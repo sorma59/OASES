@@ -29,13 +29,11 @@ import com.unimib.oases.ui.components.card.OasesCard
  */
 @Composable
 fun PastHistorySummary(
-    state: PastMedicalHistoryState,
+    diseases: List<PatientDiseaseState>,
     onEvent: (HistoryEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // --- CHANGE 1: Update the filter logic ---
-    // Show diseases that have been explicitly answered (not null).
-    val answeredDiseases = state.diseases
+    val answeredDiseases = diseases
         .filter { it.isDiagnosed != null }
         .sortedByDescending { it.isDiagnosed }
 
@@ -69,25 +67,13 @@ fun PastHistorySummary(
             Spacer(modifier = Modifier.height(8.dp))
 
             // --- Content ---
-            if (answeredDiseases.isNotEmpty()) {
-                // If there are answered diseases, list them.
-                Column(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    answeredDiseases.forEach { disease ->
-                        DiagnosedDiseaseItem(disease = disease)
-                    }
+            Column(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                answeredDiseases.forEach { disease ->
+                    DiagnosedDiseaseItem(disease = disease)
                 }
-            } else {
-                // --- CHANGE 2: Update the empty state text ---
-                // If no diseases have been answered, show a different placeholder.
-                Text(
-                    text = "No Past Medical History has been recorded.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
             }
         }
     }
@@ -99,7 +85,6 @@ fun PastHistorySummary(
  */
 @Composable
 private fun DiagnosedDiseaseItem(disease: PatientDiseaseState) {
-    // --- CHANGE 3: Make the item visually distinct based on diagnosis status ---
     val icon = if (disease.isDiagnosed == true) Icons.Default.CheckCircle else Icons.Default.Cancel
     val iconColor = if (disease.isDiagnosed == true) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
     val textAlpha = if (disease.isDiagnosed == true) 1f else 0.7f // Make "No" entries slightly faded
@@ -152,28 +137,26 @@ private fun DiagnosedDiseaseItem(disease: PatientDiseaseState) {
 @Composable
 private fun PastHistorySummaryPreview() {
     PastHistorySummary(
-        state = PastMedicalHistoryState(
-            diseases = listOf(
-                PatientDiseaseState(
-                    disease = "Hypertension",
-                    isDiagnosed = true,
-                    date = "15/03/2021",
-                    additionalInfo = "Controlled with medication."
-                ),
-                PatientDiseaseState(
-                    disease = "Asthma",
-                    isDiagnosed = true,
-                    date = "01/01/2010",
-                    additionalInfo = ""
-                ),
-                PatientDiseaseState(
-                    disease = "Diabetes",
-                    isDiagnosed = false // This one WILL now appear
-                ),
-                PatientDiseaseState(
-                    disease = "Allergies",
-                    isDiagnosed = null // This one will NOT appear
-                )
+        diseases = listOf(
+            PatientDiseaseState(
+                disease = "Hypertension",
+                isDiagnosed = true,
+                date = "15/03/2021",
+                additionalInfo = "Controlled with medication."
+            ),
+            PatientDiseaseState(
+                disease = "Asthma",
+                isDiagnosed = true,
+                date = "01/01/2010",
+                additionalInfo = ""
+            ),
+            PatientDiseaseState(
+                disease = "Diabetes",
+                isDiagnosed = false // This one WILL now appear
+            ),
+            PatientDiseaseState(
+                disease = "Allergies",
+                isDiagnosed = null // This one will NOT appear
             )
         ),
         onEvent = {}
@@ -184,11 +167,9 @@ private fun PastHistorySummaryPreview() {
 @Composable
 private fun PastHistorySummaryEmptyPreview() {
     PastHistorySummary(
-        state = PastMedicalHistoryState(
-            diseases = listOf(
-                PatientDiseaseState(disease = "Hypertension", isDiagnosed = null),
-                PatientDiseaseState(disease = "Asthma", isDiagnosed = null)
-            )
+        diseases = listOf(
+            PatientDiseaseState(disease = "Hypertension", isDiagnosed = null),
+            PatientDiseaseState(disease = "Asthma", isDiagnosed = null)
         ),
         onEvent = {}
     )
