@@ -4,12 +4,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.unimib.oases.ui.components.card.VisitCard
+import com.unimib.oases.ui.components.timeline.TimelineNode
 import com.unimib.oases.ui.components.util.CenteredTextInBox
 import com.unimib.oases.ui.components.util.button.RetryButton
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
@@ -47,9 +48,16 @@ fun VisitHistoryList(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         if (visits.isNotEmpty()) {
-            items(visits) { visit ->
-                VisitCard(visit = visit)
+            if (visits.size == 1) {
+                item { VisitCard(visits[0]) }
             }
+            else
+                itemsIndexed(visits) { index, visit ->
+                    TimelineNode(
+                        isFirstNode = index == 0,
+                        isLastNode = index == visits.size - 1
+                    ) { VisitCard(visit) }
+                }
         }
         else
             item {

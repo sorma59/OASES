@@ -8,6 +8,7 @@ import com.unimib.oases.domain.model.complaint.LabelledTest
 import com.unimib.oases.domain.model.complaint.SupportiveTherapyText
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.time.LocalDate
 
 object Converters {
 
@@ -70,4 +71,14 @@ object Converters {
     fun fromStringToSupportiveTherapyTextList(string: String): List<SupportiveTherapyText> {
         return if (string.isBlank()) emptyList() else string.split("_").map{ SupportiveTherapyText("G$it") }
     }
+
+    @TypeConverter
+    fun fromLocalDate(date: LocalDate?): String? =
+        date?.toString() // ISO-8601 (yyyy-MM-dd)
+
+    @TypeConverter
+    fun toLocalDate(value: String?): LocalDate? =
+        value?.let { LocalDate.parse(it) }
+
+
 }

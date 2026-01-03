@@ -1,6 +1,7 @@
 package com.unimib.oases.ui.screen.nurse_assessment.history
 
 import androidx.compose.ui.graphics.Color
+import com.unimib.oases.domain.model.PatientStatus
 
 data class HistoryState(
     val patientId: String,
@@ -55,7 +56,8 @@ data class PastVisitsState(
 data class VisitState(
     val visitId: String,
     val date: String,
-    val triageCode: Color
+    val triageCode: Color,
+    val status: PatientStatus
 )
 
 enum class HistoryScreenTab(val title: String) {

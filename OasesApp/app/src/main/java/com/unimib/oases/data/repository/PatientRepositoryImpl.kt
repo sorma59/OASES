@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onStart
+import java.time.LocalDate
 import javax.inject.Inject
 
 class PatientRepositoryImpl @Inject constructor(
@@ -128,8 +129,8 @@ class PatientRepositoryImpl @Inject constructor(
             }
     }
 
-    override fun getPatientsWithVisitInfo(): Flow<Resource<List<PatientWithVisitInfo>>>  = flow {
-        roomDataSource.getPatientsWithVisitInfo()
+    override fun getPatientsAndVisitsOn(date: LocalDate): Flow<Resource<List<PatientWithVisitInfo>>>  = flow {
+        roomDataSource.getPatientsAndVisitsOn(date)
             .onStart {
                 emit(Resource.Loading())
             }

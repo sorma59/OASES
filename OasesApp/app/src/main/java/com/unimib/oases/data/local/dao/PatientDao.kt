@@ -7,8 +7,8 @@ import androidx.room.Upsert
 import com.unimib.oases.data.local.TableNames
 import com.unimib.oases.data.local.model.PatientEntity
 import com.unimib.oases.data.local.model.relation.PatientWithVisitInfoEntity
-import com.unimib.oases.util.DateAndTimeUtils
 import kotlinx.coroutines.flow.Flow
+import java.time.LocalDate
 
 @Dao
 interface PatientDao {
@@ -57,11 +57,11 @@ interface PatientDao {
             -- It compares a time string with a date string.
             -- It should be based on the latest arrivalTime for that day or the latest visit entry.
             -- Corrected logic to find the latest visit based on arrival_time:
-            v.date = :today
+            v.date = :date
         ORDER BY
             v.arrival_time DESC
     """)
-    fun getPatientsWithTodaysVisitInfo(today: String = DateAndTimeUtils.getCurrentDate().toString()): Flow<List<PatientWithVisitInfoEntity>>
+    fun getPatientsAndVisitsOn(date: LocalDate): Flow<List<PatientWithVisitInfoEntity>>
 
 //    @Query("UPDATE " + TableNames.PATIENT + " SET status = :triageState WHERE id = :patientId")
 //    fun updateTriageState(patientId: String, triageState: String)
