@@ -14,6 +14,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.unimib.oases.ui.components.tab.TabSwitcher
+import com.unimib.oases.ui.components.util.CenteredText
 import com.unimib.oases.ui.components.util.button.RetryButton
 import com.unimib.oases.ui.components.util.button.StartButton
 import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
@@ -37,7 +38,13 @@ fun HistoryScreen(
         }
     }
 
-    HistoryContent(state, viewModel::onEvent, Modifier.padding(16.dp))
+    HistoryContent(
+        state,
+        viewModel::onEvent,
+        viewModel::shouldShowCreateButton,
+        viewModel::shouldShowEditButton,
+        Modifier.padding(16.dp)
+    )
 
 }
 
@@ -45,6 +52,8 @@ fun HistoryScreen(
 private fun HistoryContent(
     state: HistoryState,
     onEvent: (HistoryEvent) -> Unit,
+    shouldShowCreateButton: () -> Boolean,
+    shouldShowEditButton: () -> Boolean,
     modifier: Modifier = Modifier
 ) {
 
@@ -65,14 +74,19 @@ private fun HistoryContent(
                         PastHistorySummary(
                             state.pastMedicalHistoryState.mode.diseases,
                             onEvent,
+                            shouldShowEditButton,
                             Modifier.padding(16.dp)
                         )
-                    else
-                        StartButton(
-                            "No Past Medical History is present, create one"
-                        ) {
-                            onEvent(HistoryEvent.CreateButtonClicked)
-                        }
+                    else {
+                        if (shouldShowCreateButton())
+                            StartButton(
+                                "No Past Medical History is present, create one"
+                            ) {
+                                onEvent(HistoryEvent.CreateButtonClicked)
+                            }
+                        else
+                            CenteredText("No Past Medical History is present, a doctor can create one")
+                    }
                 }
 
                 is PmhMode.Edit -> PastMedicalHistoryFormContent(

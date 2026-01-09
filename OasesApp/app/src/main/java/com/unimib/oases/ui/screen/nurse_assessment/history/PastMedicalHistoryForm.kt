@@ -18,8 +18,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.unimib.oases.ui.components.form.DateSelectorWithTodayButton
 import com.unimib.oases.ui.components.util.AnimatedLabelOutlinedTextField
 import com.unimib.oases.ui.components.util.button.BottomButtons
@@ -124,12 +126,20 @@ fun ChronicConditionsForm(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth(),
         ){
+            val fontSize = 18.sp
+            val fontWeight = FontWeight.ExtraBold
             Text(
                 text = "Is the patient affected by the following disease?",
+                fontWeight = fontWeight,
+                fontSize = fontSize,
                 modifier = Modifier.weight(1f)
             )
 
-            Text("  Yes    No  ")
+            Text(
+                text = "  Yes    No  ",
+                fontWeight = fontWeight,
+                fontSize = fontSize
+            )
         }
 
         HorizontalDivider()

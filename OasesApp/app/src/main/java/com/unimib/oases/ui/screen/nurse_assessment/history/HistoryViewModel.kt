@@ -1,5 +1,7 @@
 package com.unimib.oases.ui.screen.nurse_assessment.history
 
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -60,6 +62,10 @@ class HistoryViewModel @Inject constructor(
 
     val args = savedStateHandle.toRoute<Route.History>()
 
+    val isDoctor by derivedStateOf {
+        authManager.getCurrentRole() == Role.DOCTOR
+    }
+
     private val _state = MutableStateFlow(
         HistoryState(
             patientId = args.patientId,
@@ -100,19 +106,11 @@ class HistoryViewModel @Inject constructor(
             }
 
             HistoryEvent.EditButtonPressed -> {
-                if (authManager.getCurrentRole() == Role.DOCTOR) {
-                    val currentMode = state.value.pastMedicalHistoryState.mode
-                    if (currentMode is PmhMode.View) {
-                        updatePastMedicalHistoryState {
-                            it.copy(
-                                mode = PmhMode.Edit(currentMode.diseases)
-                            )
-                        }
-                    }
-                } else {
-                    _state.update {
+                val currentMode = state.value.pastMedicalHistoryState.mode
+                if (currentMode is PmhMode.View) {
+                    updatePastMedicalHistoryState {
                         it.copy(
-                            toastMessage = "Only doctors can edit the PMH"
+                            mode = PmhMode.Edit(currentMode.diseases)
                         )
                     }
                 }
@@ -190,6 +188,10 @@ class HistoryViewModel @Inject constructor(
             }
         }
     }
+
+    fun shouldShowCreateButton() = isDoctor
+
+    fun shouldShowEditButton() = isDoctor
 
     private fun goBackToViewMode() {
         val currentMode = state.value.pastMedicalHistoryState.mode
