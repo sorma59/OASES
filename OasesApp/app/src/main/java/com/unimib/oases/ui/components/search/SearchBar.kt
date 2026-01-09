@@ -85,7 +85,7 @@ fun SearchBar(
         onExpandedChange = onActiveChange,
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(10.dp),
-        colors = SearchBarDefaults.colors(MaterialTheme.colorScheme.surfaceContainer),
+        colors = SearchBarDefaults.colors(MaterialTheme.colorScheme.surfaceContainerHighest),
         tonalElevation = SearchBarDefaults.TonalElevation,
         shadowElevation = 5.dp
     ) {
