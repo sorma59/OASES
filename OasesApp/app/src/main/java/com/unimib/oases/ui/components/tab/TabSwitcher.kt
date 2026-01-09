@@ -1,9 +1,9 @@
 package com.unimib.oases.ui.components.tab
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MultiChoiceSegmentedButtonRow
@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.unimib.oases.ui.components.card.OasesCard
 import com.unimib.oases.ui.screen.nurse_assessment.history.HistoryScreenTab
 
 /**
@@ -45,36 +46,38 @@ fun <T> TabSwitcher(
 ) {
     // The MultiChoiceSegmentedButtonRow is perfect for creating a group of connected buttons.
     // We use it in a "single choice" mode by only ever having one item in the `checked` list.
-    MultiChoiceSegmentedButtonRow(
-        modifier = modifier
-            .background(
-                color = MaterialTheme.colorScheme.surfaceContainerHighest,
-                shape = SegmentedButtonDefaults.baseShape
-            )
-            .fillMaxWidth()
-            .padding(4.dp)
-    ) {
-        tabs.forEach { tab ->
-            val checked = (tab == selectedTab)
-            val fontSize = if (checked) 22.sp else 20.sp
-            SegmentedButton(
-                // Determine if the current tab in the loop is the selected one.
-                checked = checked,
-                // The onCheckedChange lambda provides a boolean, but we want to know *which*
-                // tab was clicked, so we call onTabSelected with the 'tab' from the loop.
-                onCheckedChange = { onTabSelected(tab) },
-                icon = { },
-                colors = SegmentedButtonDefaults.colors(
-                    inactiveContainerColor = Color.Transparent,
-                    activeContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                    activeContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                ),
-                border = BorderStroke(0.dp, Color.Transparent),
-                // Set the shape for each button in the row.
-                shape = SegmentedButtonDefaults.baseShape
-            ) {
-                // Use the provided lambda to get the title for the current tab.
-                Text(text = getTabTitle(tab), fontSize = fontSize)
+    OasesCard(
+        modifier = modifier,
+        shape = SegmentedButtonDefaults.baseShape,
+        elevation = CardDefaults.cardElevation(2.dp)
+    ){
+        MultiChoiceSegmentedButtonRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 2.dp, horizontal = 4.dp)
+        ) {
+            tabs.forEach { tab ->
+                val checked = (tab == selectedTab)
+                val fontSize = if (checked) 22.sp else 20.sp
+                SegmentedButton(
+                    // Determine if the current tab in the loop is the selected one.
+                    checked = checked,
+                    // The onCheckedChange lambda provides a boolean, but we want to know *which*
+                    // tab was clicked, so we call onTabSelected with the 'tab' from the loop.
+                    onCheckedChange = { onTabSelected(tab) },
+                    icon = { },
+                    colors = SegmentedButtonDefaults.colors(
+                        inactiveContainerColor = Color.Transparent,
+                        activeContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                        activeContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    ),
+                    border = BorderStroke(0.dp, Color.Transparent),
+                    // Set the shape for each button in the row.
+                    shape = SegmentedButtonDefaults.baseShape
+                ) {
+                    // Use the provided lambda to get the title for the current tab.
+                    Text(text = getTabTitle(tab), fontSize = fontSize)
+                }
             }
         }
     }

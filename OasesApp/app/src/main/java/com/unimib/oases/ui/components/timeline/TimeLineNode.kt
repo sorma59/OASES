@@ -145,7 +145,6 @@ private fun TimelinePreview() {
                 isFirstNode = index == 0,
                 isLastNode = index == visits.size - 1
             ) {
-                // This is the content you want to show for each event
                 VisitCard(visit)
             }
         }
