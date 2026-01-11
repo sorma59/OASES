@@ -20,7 +20,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.unimib.oases.domain.model.NumericPrecision
 import com.unimib.oases.ui.components.util.button.BottomButtons
 import com.unimib.oases.ui.components.util.button.RetryButton
-import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
+import com.unimib.oases.ui.components.util.loading.LoadingOverlay
 import com.unimib.oases.ui.screen.nurse_assessment.PatientRegistrationScreensUiMode
 import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.VitalSignsContent
 import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.VitalSignsEvent
@@ -60,6 +60,8 @@ fun TriageScreen(appViewModel: AppViewModel) {
         vitalSignsViewModel.onEvent(VitalSignsEvent.Retry)
     }
 
+    LoadingOverlay(state.isLoading)
+
     TriageContent(
         state,
         viewModel::onEvent,
@@ -93,13 +95,10 @@ private fun TriageContent(
             error = it,
             onClick = { onEvent(TriageEvent.Retry) }
         )
-    } ?: if (state.isLoading)
-        CustomCircularProgressIndicator()
+    } ?: if (state.uiMode is PatientRegistrationScreensUiMode.Standalone && !state.uiMode.isEditing)
+        TriageSummaryContent(state, onEvent, Modifier.padding(16.dp))  // View mode
     else {
-        if (state.uiMode is PatientRegistrationScreensUiMode.Standalone && !state.uiMode.isEditing)
-        // View mode
-            TriageSummaryContent(state, onEvent, Modifier.padding(16.dp))
-        else {
+        state.editingState?.let { editingState ->
             Box {
                 Column(
                     verticalArrangement = Arrangement.SpaceBetween,
@@ -108,7 +107,7 @@ private fun TriageContent(
                     Box(
                         Modifier.weight(1f)
                     ) {
-                        when (state.editingState!!.currentTab) {
+                        when (editingState.currentTab) {
                             TriageTab.REDS -> RedCodeContent(state, onEvent)
                             TriageTab.YELLOWS -> YellowCodeContent(state, onEvent)
                             TriageTab.VITAL_SIGNS -> VitalSignsContent(
@@ -117,15 +116,15 @@ private fun TriageContent(
                                 getPrecisionFor
                             )
 
-                            TriageTab.ROOM -> RoomContent(state.editingState, onEvent)
+                            TriageTab.ROOM -> RoomContent(editingState, onEvent)
                         }
                     }
 
                     BottomButtons(
                         onCancel = { onEvent(TriageEvent.BackButtonPressed) },
                         onConfirm = { onEvent(TriageEvent.NextButtonPressed) },
-                        cancelButtonText = state.editingState!!.cancelButtonText,
-                        confirmButtonText = state.editingState.nextButtonText,
+                        cancelButtonText = editingState.cancelButtonText,
+                        confirmButtonText = editingState.nextButtonText,
                     )
                 }
 
@@ -136,18 +135,13 @@ private fun TriageContent(
                             Text("Confirm triage data saving")
                         },
                         text = {
-                            state.savingState.error?.let {
-                                Text("Error: $it")
-                            } ?: if (state.savingState.isLoading)
-                                CustomCircularProgressIndicator()
-                            else
-                                Text(text = "Do you want to save the triage data to the database?")
+                            Text(text = "Do you want to save the triage data to the database?")
                         },
                         confirmButton = {
                             TextButton(
                                 onClick = onConfirm
                             ) {
-                                Text(if (state.savingState.error == null) "Confirm" else "Retry")
+                                Text("Confirm")
                             }
                         },
                         dismissButton = {

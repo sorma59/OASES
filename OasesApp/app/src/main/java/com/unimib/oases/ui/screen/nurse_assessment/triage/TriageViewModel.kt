@@ -193,14 +193,16 @@ class TriageViewModel @Inject constructor(
             TriageEvent.BackButtonPressed -> onBack()
 
             TriageEvent.ConfirmDialog -> {
-                setSavingStateToLoading()
-                viewModelScope.launch {
-                    if (state.value.uiMode is PatientRegistrationScreensUiMode.Wizard)
-                        handleWizardDialogConfirmation()
-                    else
-                        handleStandaloneDialogConfirmation()
+                _state.update {
+                    it.copy(
+                        isLoading = true,
+                        showAlertDialog = false
+                    )
                 }
+                saveTriage()
             }
+
+            TriageEvent.RetrySaving -> saveTriage()
 
             TriageEvent.DismissDialog -> {
                 _state.update {
@@ -220,14 +222,23 @@ class TriageViewModel @Inject constructor(
         }
     }
 
-    private suspend fun handleWizardDialogConfirmation() {
+    private fun saveTriage() {
+        viewModelScope.launch {
+            when (state.value.uiMode) {
+                is PatientRegistrationScreensUiMode.Wizard -> saveTriageFromWizard()
+                is PatientRegistrationScreensUiMode.Standalone -> saveTriageFromStandalone()
+            }
+        }
+    }
+
+    private suspend fun saveTriageFromWizard() {
         if (saveTriageDataUseCase(state.value) is Outcome.Success)
             goBackToWizard()
         else
             showSavingError()
     }
 
-    private suspend fun handleStandaloneDialogConfirmation() {
+    private suspend fun saveTriageFromStandalone() {
         if (saveTriageDataUseCase(state.value) is Outcome.Success){
             saveEdits()
             goBackToViewMode()
@@ -239,17 +250,9 @@ class TriageViewModel @Inject constructor(
     private fun showSavingError(error: String? = null) {
         _state.update {
             it.copy(
-                savingState = it.savingState.copy(
-                    error = error ?: "Save unsuccessful, try again",
-                    isLoading = false
-                )
+                isLoading = false,
+                savingError = error ?: "Save unsuccessful, try again"
             )
-        }
-    }
-
-    private fun setSavingStateToLoading() {
-        _state.update {
-            it.copy(savingState = it.savingState.copy(isLoading = true, error = null))
         }
     }
 
@@ -314,7 +317,7 @@ class TriageViewModel @Inject constructor(
             "Symptom $fieldId not found in the triage symptoms map"
         }
         if (symptom.isComputed)
-            _state.update { it.copy(toastMessage = "Be aware: this field is computed") }
+            _state.update { it.copy(toastMessage = "Be aware: this field was computed") }
         toggleField(fieldId)
     }
 
@@ -405,15 +408,17 @@ class TriageViewModel @Inject constructor(
         }
     }
 
-    private fun onBack(){
-        if (state.value.editingState!!.tabStack.size == 1) {
+    private fun onBack() {
+        val currentState = state.value.editingState ?: return
+
+        if (currentState.tabStack.size <= 1) {
             goBack()
-        }
-        else {
+        } else {
             _state.update {
+                // Use the captured currentState to avoid !! and ensure consistency
                 it.copy(
-                    editingState = it.editingState!!.copy(
-                        tabStack = it.editingState.tabStack.dropLast(1)
+                    editingState = currentState.copy(
+                        tabStack = currentState.tabStack.dropLast(1)
                     )
                 )
             }
@@ -441,35 +446,14 @@ class TriageViewModel @Inject constructor(
         concludeTriage(true)
     }
 
-//    private fun onNext(){
-//        if (state.value.currentStep == state.value.tabs.lastIndex)
-//            concludeTriage()
-//        else if(state.value.symptomsWereToggledSinceLastUpdate)
-//            updateTriageCode()
-//            if (state.value.triageCode in setOf(TriageCode.RED, TriageCode.YELLOW) )
-//                goToRoomSelection()
-//    }
-
     private fun concludeTriage(result: Boolean){
         viewModelScope.launch{ navigateBackWithResult(result) }
     }
 
-//    private fun TriageEvaluation.toState(): TriageState {
-//        return TriageState(
-//            patientId = patient,
-//            uiMode = TODO(),
-//            patient = TODO(),
-//            currentStep = TODO(),
-//            selectedReds = redSymptomIds.toSet(),
-//            selectedYellows = yellowSymptomIds.toSet(),
-//            symptomsWereToggledSinceLastUpdate = true,
-//            isLoading = false,
-//        )
-//    }
-
     private fun saveEdits() {
         _state.update {
             it.copy(
+                isLoading = false,
                 storedData = it.editingState!!.triageData
             )
         }

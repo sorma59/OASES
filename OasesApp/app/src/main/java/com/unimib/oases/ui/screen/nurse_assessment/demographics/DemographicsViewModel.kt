@@ -15,6 +15,7 @@ import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.ui.screen.nurse_assessment.PatientRegistrationScreensUiMode
 import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreenViewModel.Companion.DEMOGRAPHICS_COMPLETED_KEY
+import com.unimib.oases.ui.util.snackbar.SnackbarData
 import com.unimib.oases.util.DateAndTimeUtils
 import com.unimib.oases.util.Outcome
 import com.unimib.oases.util.firstSuccess
@@ -71,6 +72,9 @@ class DemographicsViewModel @Inject constructor(
 
     private val navigationEventsChannel = Channel<NavigationEvent>()
     val navigationEvents = navigationEventsChannel.receiveAsFlow()
+
+    private val snackbarEventsChannel = Channel<SnackbarData>()
+    val snackbarEvents = snackbarEventsChannel.receiveAsFlow()
 
     init {
         if (state.value.uiMode is PatientRegistrationScreensUiMode.Standalone)
@@ -309,61 +313,60 @@ class DemographicsViewModel @Inject constructor(
             DemographicsEvent.Retry -> refreshPatientInfo()
 
             DemographicsEvent.ConfirmDialog -> {
-                setSavingStateToLoading()
-                viewModelScope.launch {
-                    if (state.value.uiMode is PatientRegistrationScreensUiMode.Wizard)
-                        handleWizardDialogConfirmation()
-                    else
-                        handleStandaloneDialogConfirmation()
-                }
+                dismissDialog()
+                savePatient()
             }
             DemographicsEvent.DismissDialog -> dismissDialog()
             DemographicsEvent.EditButtonPressed -> enterEditMode()
         }
     }
 
-    private fun setSavingStateToLoading() {
-        _state.update {
-            it.copy(
-                editingState = it.editingState!!.copy(
-                    savingState = it.editingState.savingState.copy(
-                        isLoading = true,
-                        error = null
-                    )
-                )
-            )
+    private fun savePatient() {
+        _state.update { it.copy(isLoading = true) }
+        viewModelScope.launch {
+            if (state.value.uiMode is PatientRegistrationScreensUiMode.Wizard)
+                savePatientFromWizard()
+            else
+                savePatientFromStandalone()
         }
     }
 
-    private suspend fun handleWizardDialogConfirmation() {
+    private suspend fun savePatientFromWizard() {
         val patientData = state.value.editingState!!.patientData
         val result = savePatientDataAndCreateVisitUseCase(patientData)
+        stopLoading()
         if (result is Outcome.Success)
             goBackToWizard(result.data)
         else
             showSavingError()
     }
 
-    private fun showSavingError(error: String? = null) {
-        _state.update {
-            it.copy(
-                editingState = it.editingState!!.copy(
-                    savingState = it.editingState.savingState.copy(
-                        error = error ?: "Save unsuccessful, try again",
-                        isLoading = false
-                    )
-                )
+    private suspend fun showSavingError(error: String? = null) {
+        snackbarEventsChannel.send(
+            SnackbarData(
+                message = error ?: "Save unsuccessful, try again",
+                actionLabel = "Try again",
+                onAction = { savePatient() }
             )
-        }
+        )
     }
 
-    private suspend fun handleStandaloneDialogConfirmation() {
+    private suspend fun showSavingSuccess() {
+        snackbarEventsChannel.send(
+            SnackbarData(
+                message = "Patient saved successfully",
+            )
+        )
+    }
+
+    private suspend fun savePatientFromStandalone() {
         val patientData = state.value.editingState!!.patientData
         val result = savePatientDataUseCase(patientData)
+        stopLoading()
         if (result is Outcome.Success) {
             saveEdits(result.data)
-            dismissDialog()
             goBackToViewMode()
+            showSavingSuccess()
         }
         else
             showSavingError()
@@ -371,12 +374,7 @@ class DemographicsViewModel @Inject constructor(
 
     private fun dismissDialog() {
         _state.update {
-            it.copy(
-                showAlertDialog = false,
-                editingState = it.editingState!!.copy(
-                    savingState = SavingState()
-                )
-            )
+            it.copy(showAlertDialog = false)
         }
     }
 
@@ -436,4 +434,6 @@ class DemographicsViewModel @Inject constructor(
             )
         }
     }
+
+    private fun stopLoading() = _state.update { it.copy(isLoading = false) }
 }

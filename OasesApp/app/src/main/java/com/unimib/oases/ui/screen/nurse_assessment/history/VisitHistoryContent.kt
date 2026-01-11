@@ -13,7 +13,6 @@ import com.unimib.oases.ui.components.card.VisitCard
 import com.unimib.oases.ui.components.timeline.TimelineNode
 import com.unimib.oases.ui.components.util.CenteredTextInBox
 import com.unimib.oases.ui.components.util.button.RetryButton
-import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 
 @Composable
 fun VisitHistoryContent(
@@ -30,8 +29,6 @@ fun VisitHistoryContent(
                 error = state.error,
                 onClick = { onEvent(HistoryEvent.ReloadPastVisits) }
             )
-        else if (state.isLoading)
-            CustomCircularProgressIndicator()
         else
             VisitHistoryList(state.visits, Modifier.padding(16.dp))
     }

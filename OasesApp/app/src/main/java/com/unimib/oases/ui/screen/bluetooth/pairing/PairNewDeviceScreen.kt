@@ -27,7 +27,7 @@ import androidx.navigation.NavController
 import com.unimib.oases.ui.components.bluetooth.devices.DeviceList
 import com.unimib.oases.ui.components.util.CenteredText
 import com.unimib.oases.ui.components.util.button.BottomButtons
-import com.unimib.oases.ui.components.util.circularprogressindicator.SmallCircularProgressIndicator
+import com.unimib.oases.ui.components.util.loading.SmallCircularProgressIndicator
 import com.unimib.oases.ui.util.ToastUtils
 
 @Composable

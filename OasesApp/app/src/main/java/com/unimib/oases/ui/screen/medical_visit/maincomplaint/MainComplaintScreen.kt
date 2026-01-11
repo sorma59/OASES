@@ -38,7 +38,7 @@ import com.unimib.oases.ui.components.input.LabeledCheckbox
 import com.unimib.oases.ui.components.input.LabeledRadioButton
 import com.unimib.oases.ui.components.util.TitleText
 import com.unimib.oases.ui.components.util.button.RetryButton
-import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
+import com.unimib.oases.ui.components.util.loading.LoadingOverlay
 import com.unimib.oases.ui.screen.medical_visit.maincomplaint.MainComplaintEvent.SymptomSelected
 import com.unimib.oases.ui.screen.root.AppViewModel
 import com.unimib.oases.ui.util.ToastUtils
@@ -68,6 +68,8 @@ fun MainComplaintScreen(
         }
         viewModel.onEvent(MainComplaintEvent.ToastShown)
     }
+
+    LoadingOverlay(state.isLoading)
 
     MainComplaintContent(state, { additionalTestsText }, viewModel::onEvent)
 }
@@ -109,50 +111,47 @@ private fun MainComplaintContent(
                 onClick = { onEvent(MainComplaintEvent.RetryButtonClicked) }
             )
         }
-    } ?: if (state.isLoading)
-        CustomCircularProgressIndicator()
-    else
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp)
-                .verticalScroll(scrollState),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
-        ) {
+    } ?: Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp)
+            .verticalScroll(scrollState),
+        verticalArrangement = Arrangement.spacedBy(24.dp)
+    ) {
 
-            TitleText("Ask these questions:")
+        TitleText("Ask these questions:")
 
-            ImmediateTreatmentQuestions(state, onEvent)
+        ImmediateTreatmentQuestions(state, onEvent)
 
-            DetailsQuestions(
+        DetailsQuestions(
+            state,
+            onEvent
+        )
+
+        GenerateTestsButton(
+            onGenerateTestsPressed,
+            state.shouldShowGenerateTestsButton
+        )
+
+        state.complaint?.let {
+            Tests(
                 state,
-                onEvent
+                isChecked,
+                onCheckedChange,
+                additionalTestsText,
+                onAdditionalTestsChanged
             )
 
-            GenerateTestsButton(
-                onGenerateTestsPressed,
-                state.shouldShowGenerateTestsButton
-            )
-
-            state.complaint?.let {
-                Tests(
-                    state,
-                    isChecked,
-                    onCheckedChange,
-                    additionalTestsText,
-                    onAdditionalTestsChanged
-                )
-
-                SupportiveTherapies(state)
-            }
-
-            SubmitButton(
-                onSubmit,
-                state.shouldShowSubmitButton
-            )
-
-            Spacer(Modifier.height(256.dp))
+            SupportiveTherapies(state)
         }
+
+        SubmitButton(
+            onSubmit,
+            state.shouldShowSubmitButton
+        )
+
+        Spacer(Modifier.height(256.dp))
+    }
 }
 
 @Composable

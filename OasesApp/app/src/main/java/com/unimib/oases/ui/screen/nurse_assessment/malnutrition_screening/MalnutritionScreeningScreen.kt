@@ -28,7 +28,6 @@ import com.unimib.oases.ui.components.util.AnimatedLabelOutlinedTextField
 import com.unimib.oases.ui.components.util.button.BottomButtons
 import com.unimib.oases.ui.components.util.button.RetryButton
 import com.unimib.oases.ui.components.util.button.StartButton
-import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
 import com.unimib.oases.ui.screen.nurse_assessment.PatientRegistrationScreensUiMode
 import com.unimib.oases.ui.screen.root.AppViewModel
 import com.unimib.oases.util.reactToKeyboardAppearance
@@ -210,10 +209,7 @@ fun MalnutritionEditing(
                 text = {
                     state.savingState.error?.let { error ->
                         Text("Error: $error")
-                    } ?: if (state.savingState.isLoading)
-                        CustomCircularProgressIndicator()
-                    else
-                        Text(text = "Do you want to save the malnutrition data to the database?")
+                    } ?: Text(text = "Do you want to save the malnutrition data to the database?")
                 },
                 confirmButton = {
                     TextButton(

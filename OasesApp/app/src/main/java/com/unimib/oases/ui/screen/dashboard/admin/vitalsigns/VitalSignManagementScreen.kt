@@ -44,7 +44,7 @@ import com.unimib.oases.domain.model.NumericPrecision
 import com.unimib.oases.domain.model.VitalSign
 import com.unimib.oases.ui.components.util.button.DeleteButton
 import com.unimib.oases.ui.components.util.button.DismissButton
-import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
+import com.unimib.oases.ui.components.util.loading.LoadingOverlay
 import com.unimib.oases.ui.util.ToastUtils
 import kotlinx.coroutines.launch
 
@@ -54,6 +54,8 @@ fun VitalSignManagementScreen() {
     val vitalSignsManagementViewModel: VitalSignManagementViewModel = hiltViewModel()
 
     val state by vitalSignsManagementViewModel.state.collectAsState()
+
+    LoadingOverlay(state.isLoading)
 
     VitalSignManagementContent(state, vitalSignsManagementViewModel::onEvent)
 }
@@ -243,32 +245,27 @@ private fun VitalSignManagementContent(
                         .padding(vertical = 8.dp)
                 )
 
-
-                if (state.isLoading) {
-                    CustomCircularProgressIndicator()
-                } else {
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                    ) {
-                        items(state.vitalSigns.size) { i ->
-                            val vitalSign = state.vitalSigns[i]
-                            VitalSignListItem(
-                                vitalSign = vitalSign,
-                                onDelete = {
-                                    vitalSignToDelete = vitalSign
-                                    showDeletionDialog = true
-                                },
-                                onClick = {
-                                    onEvent(
-                                        VitalSignManagementEvent.Click(
-                                            vitalSign
-                                        )
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                ) {
+                    items(state.vitalSigns.size) { i ->
+                        val vitalSign = state.vitalSigns[i]
+                        VitalSignListItem(
+                            vitalSign = vitalSign,
+                            onDelete = {
+                                vitalSignToDelete = vitalSign
+                                showDeletionDialog = true
+                            },
+                            onClick = {
+                                onEvent(
+                                    VitalSignManagementEvent.Click(
+                                        vitalSign
                                     )
-                                }
-                            )
-                        }
+                                )
+                            }
+                        )
                     }
                 }
             }

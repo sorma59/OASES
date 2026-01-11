@@ -1,4 +1,4 @@
-package com.unimib.oases.ui.components.util.circularprogressindicator
+package com.unimib.oases.ui.components.util.loading
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator

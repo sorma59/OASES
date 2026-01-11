@@ -1,4 +1,4 @@
-package com.unimib.oases.ui.util
+package com.unimib.oases.ui.util.snackbar
 
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState

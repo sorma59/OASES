@@ -48,7 +48,7 @@ import com.unimib.oases.data.local.model.Role
 import com.unimib.oases.data.local.model.User
 import com.unimib.oases.ui.components.util.button.DeleteButton
 import com.unimib.oases.ui.components.util.button.DismissButton
-import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
+import com.unimib.oases.ui.components.util.loading.LoadingOverlay
 import com.unimib.oases.ui.util.ToastUtils
 import kotlinx.coroutines.launch
 
@@ -59,6 +59,8 @@ fun UserManagementScreen() {
     val userManagementViewModel: UserManagementViewModel = hiltViewModel()
 
     val state by userManagementViewModel.state.collectAsState()
+
+    LoadingOverlay(state.isLoading)
 
     UserManagementContent(state, userManagementViewModel::onEvent)
 }
@@ -287,31 +289,27 @@ private fun UserManagementContent(
                         .padding(vertical = 8.dp)
                 )
 
-                if (state.isLoading) {
-                    CustomCircularProgressIndicator()
-                } else {
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                    ) {
-                        items(state.users.size) { i ->
-                            val user = state.users[i]
-                            UserListItem(
-                                user = user,
-                                onDelete = {
-                                    userToDelete = user
-                                    showDeletionDialog = true
-                                },
-                                onClick = {
-                                    onEvent(
-                                        UserManagementEvent.UserClicked(
-                                            user
-                                        )
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                ) {
+                    items(state.users.size) { i ->
+                        val user = state.users[i]
+                        UserListItem(
+                            user = user,
+                            onDelete = {
+                                userToDelete = user
+                                showDeletionDialog = true
+                            },
+                            onClick = {
+                                onEvent(
+                                    UserManagementEvent.UserClicked(
+                                        user
                                     )
-                                }
-                            )
-                        }
+                                )
+                            }
+                        )
                     }
                 }
             }

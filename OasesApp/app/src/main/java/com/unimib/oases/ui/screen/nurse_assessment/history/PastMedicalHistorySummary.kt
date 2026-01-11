@@ -83,7 +83,7 @@ fun PastHistorySummary(
                     DiagnosedDiseaseItem(
                         disease = disease
                     )
-                    wasPreviousDiseaseDiagnosed = disease.isDiagnosed
+                    wasPreviousDiseaseDiagnosed = (disease.isDiagnosed == true)
                 }
             }
         }

@@ -20,7 +20,7 @@ import com.unimib.oases.domain.model.NumericPrecision
 import com.unimib.oases.ui.components.util.AnimatedLabelOutlinedTextField
 import com.unimib.oases.ui.components.util.FadeOverlay
 import com.unimib.oases.ui.components.util.button.RetryButton
-import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
+import com.unimib.oases.ui.components.util.loading.LoadingOverlay
 import com.unimib.oases.ui.screen.root.AppViewModel
 
 @Composable
@@ -37,6 +37,8 @@ fun VitalSignsScreen(
             appViewModel.onNavEvent(it)
         }
     }
+
+    LoadingOverlay(state.isLoading)
 
     VitalSignsContent(state, viewModel::onEvent, viewModel::getPrecisionFor)
 }
@@ -58,35 +60,31 @@ fun VitalSignsContent(
                     onEvent(VitalSignsEvent.Retry)
                 }
             )
-        } ?: if (state.isLoading) {
-            CustomCircularProgressIndicator()
-        } else {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(scrollState)
-                    .padding(16.dp)
-            ) {
+        } ?: Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(scrollState)
+                .padding(16.dp)
+        ) {
 
-                for (vitalSign in state.vitalSigns) {
-                    AnimatedLabelOutlinedTextField(
-                        value = vitalSign.value,
-                        onValueChange = {
-                            onEvent(
-                                VitalSignsEvent.ValueChanged(
-                                    vitalSign.name,
-                                    it
-                                )
+            for (vitalSign in state.vitalSigns) {
+                AnimatedLabelOutlinedTextField(
+                    value = vitalSign.value,
+                    onValueChange = {
+                        onEvent(
+                            VitalSignsEvent.ValueChanged(
+                                vitalSign.name,
+                                it
                             )
-                        },
-                        labelText = vitalSign.name + " (" + vitalSign.acronym + ", " + vitalSign.unit + ")",
-                        isError = vitalSign.error != null,
-                        isInteger = getPrecisionFor(vitalSign.name) == NumericPrecision.INTEGER,
-                        isDouble = getPrecisionFor(vitalSign.name) == NumericPrecision.FLOAT
-                    )
+                        )
+                    },
+                    labelText = vitalSign.name + " (" + vitalSign.acronym + ", " + vitalSign.unit + ")",
+                    isError = vitalSign.error != null,
+                    isInteger = getPrecisionFor(vitalSign.name) == NumericPrecision.INTEGER,
+                    isDouble = getPrecisionFor(vitalSign.name) == NumericPrecision.FLOAT
+                )
 
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
+                Spacer(modifier = Modifier.height(16.dp))
             }
         }
 

@@ -18,8 +18,7 @@ data class DemographicsState(
 
 data class EditingState(
     val patientData: PatientData,
-    val formErrors: FormErrors = FormErrors(),
-    val savingState: SavingState = SavingState()
+    val formErrors: FormErrors = FormErrors()
 )
 
 data class FormErrors(
@@ -44,8 +43,3 @@ data class PatientData(
     val age: Int
         get() = ageInMonths / 12
 }
-
-data class SavingState(
-    val isLoading: Boolean = false,
-    val error: String? = null
-)

@@ -29,7 +29,7 @@ import com.unimib.oases.data.local.model.Role
 import com.unimib.oases.domain.model.PatientAndVisitIds
 import com.unimib.oases.ui.components.patients.PatientsWithVisitInfoList
 import com.unimib.oases.ui.components.search.SearchBar
-import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
+import com.unimib.oases.ui.components.util.loading.LoadingOverlay
 import com.unimib.oases.ui.screen.login.AuthViewModel
 import com.unimib.oases.ui.screen.root.AppViewModel
 import com.unimib.oases.ui.util.ToastUtils
@@ -58,6 +58,8 @@ fun HomeScreen(
         }
         homeScreenViewModel.onToastMessageShown()
     }
+
+    LoadingOverlay(state.isLoading)
 
     HomeContent(state, homeScreenViewModel::onEvent, authViewModel)
 }
@@ -130,9 +132,7 @@ private fun HomeContent(
                     )
                 }
 
-                if (state.isLoading) {
-                    CustomCircularProgressIndicator()
-                } else if (state.patientsWithVisitInfo.isNotEmpty()) {
+                if (state.patientsWithVisitInfo.isNotEmpty()) {
                     PatientsWithVisitInfoList(
                         patientsWithVisitInfo = filteredItems,
                         onItemClick = onPatientItemClick

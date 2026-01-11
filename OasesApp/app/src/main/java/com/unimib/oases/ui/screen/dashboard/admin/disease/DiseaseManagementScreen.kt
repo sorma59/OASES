@@ -42,7 +42,7 @@ import com.unimib.oases.domain.model.SexSpecificity
 import com.unimib.oases.ui.components.util.OutlinedDropdown
 import com.unimib.oases.ui.components.util.button.DeleteButton
 import com.unimib.oases.ui.components.util.button.DismissButton
-import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
+import com.unimib.oases.ui.components.util.loading.LoadingOverlay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -51,6 +51,8 @@ fun DiseaseManagementScreen() {
     val diseaseManagementViewModel: DiseaseManagementViewModel = hiltViewModel()
 
     val state by diseaseManagementViewModel.state.collectAsState()
+
+    LoadingOverlay(state.isLoading)
 
     DiseaseManagementContent(state, diseaseManagementViewModel::onEvent)
 }
@@ -177,32 +179,27 @@ private fun DiseaseManagementContent(
                         .padding(vertical = 8.dp)
                 )
 
-
-                if (state.isLoading) {
-                    CustomCircularProgressIndicator()
-                } else {
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                    ) {
-                        items(state.diseases.size) { i ->
-                            val disease = state.diseases[i]
-                            DiseaseListItem(
-                                disease = disease,
-                                onDelete = {
-                                    diseaseToDelete = disease
-                                    showDeletionDialog = true
-                                },
-                                onClick = {
-                                    onEvent(
-                                        DiseaseManagementEvent.Click(
-                                            disease
-                                        )
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                ) {
+                    items(state.diseases.size) { i ->
+                        val disease = state.diseases[i]
+                        DiseaseListItem(
+                            disease = disease,
+                            onDelete = {
+                                diseaseToDelete = disease
+                                showDeletionDialog = true
+                            },
+                            onClick = {
+                                onEvent(
+                                    DiseaseManagementEvent.Click(
+                                        disease
                                     )
-                                }
-                            )
-                        }
+                                )
+                            }
+                        )
                     }
                 }
             }

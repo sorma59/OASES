@@ -39,7 +39,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.unimib.oases.domain.model.Room
 import com.unimib.oases.ui.components.util.button.DeleteButton
 import com.unimib.oases.ui.components.util.button.DismissButton
-import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
+import com.unimib.oases.ui.components.util.loading.LoadingOverlay
 import kotlinx.coroutines.launch
 
 
@@ -49,6 +49,8 @@ fun RoomsManagementScreen() {
     val roomManagementViewModel: RoomsManagementViewModel = hiltViewModel()
 
     val state by roomManagementViewModel.state.collectAsState()
+
+    LoadingOverlay(state.isLoading)
 
     RoomsManagementContent(state, roomManagementViewModel::onEvent)
 }
@@ -152,28 +154,23 @@ private fun RoomsManagementContent(
                         .padding(vertical = 8.dp)
                 )
 
-
-                if (state.isLoading) {
-                    CustomCircularProgressIndicator()
-                } else {
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                    ) {
-                        items(state.rooms.size) { i ->
-                            val room = state.rooms[i]
-                            RoomListItem(
-                                room = room,
-                                onDelete = {
-                                    roomToDelete = room
-                                    showDeletionDialog = true
-                                },
-                                onClick = {
-                                    onEvent(RoomsManagementEvent.Click(room))
-                                }
-                            )
-                        }
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                ) {
+                    items(state.rooms.size) { i ->
+                        val room = state.rooms[i]
+                        RoomListItem(
+                            room = room,
+                            onDelete = {
+                                roomToDelete = room
+                                showDeletionDialog = true
+                            },
+                            onClick = {
+                                onEvent(RoomsManagementEvent.Click(room))
+                            }
+                        )
                     }
                 }
             }

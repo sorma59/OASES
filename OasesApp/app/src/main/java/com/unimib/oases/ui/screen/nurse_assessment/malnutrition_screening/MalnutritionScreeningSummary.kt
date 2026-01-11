@@ -68,7 +68,8 @@ fun MalnutritionScreeningSummary(
                 )
 
                 IconButton(
-                    onClick = { onEvent(MalnutritionScreeningEvent.EditButtonPressed) }
+                    onClick = { onEvent(MalnutritionScreeningEvent.EditButtonPressed) },
+                    modifier = Modifier.padding(end = 16.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Edit,
@@ -175,7 +176,8 @@ private fun MuacResult(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.weight(1f)
         ) {
             Icon(Icons.Default.Straighten, contentDescription = "MUAC")
             Text("MUAC (Mid-Upper Arm Circumference)")

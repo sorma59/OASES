@@ -8,6 +8,7 @@ import com.unimib.oases.domain.model.BluetoothEvent
 import com.unimib.oases.ui.components.scaffold.UiEvent
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Route
+import com.unimib.oases.ui.util.snackbar.SnackbarData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -78,6 +79,14 @@ class AppViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             _uiEvents.emit(UiEvent.ShowSnackbar(message, actionLabel, onAction))
+        }
+    }
+
+    fun showSnackbar(
+        snackbar: SnackbarData
+    ) {
+        viewModelScope.launch {
+            _uiEvents.emit(UiEvent.ShowSnackbar(snackbar.message, snackbar.actionLabel, snackbar.onAction))
         }
     }
 

@@ -8,6 +8,7 @@ import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.triageSympt
 import com.unimib.oases.domain.repository.VisitRepository
 import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageState
 import com.unimib.oases.util.Outcome
+import kotlinx.coroutines.delay
 import javax.inject.Inject
 
 class SaveTriageDataUseCase @Inject constructor(
@@ -15,6 +16,7 @@ class SaveTriageDataUseCase @Inject constructor(
 ) {
 
     suspend operator fun invoke(state: TriageState): Outcome<Unit> {
+        delay(3000)
 
         val visit = state.visit!!.copy(
             triageCode = state.editingState!!.triageData.triageCode,

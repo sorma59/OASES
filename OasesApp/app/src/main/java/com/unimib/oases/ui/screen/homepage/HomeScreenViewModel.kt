@@ -1,5 +1,6 @@
 package com.unimib.oases.ui.screen.homepage
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unimib.oases.di.IoDispatcher
@@ -84,6 +85,7 @@ class HomeScreenViewModel @Inject constructor(
 
             getPatientsWithVisitInfoUseCase()
                 .collect { resource ->
+                    Log.d("Prova", "${resource.javaClass}")
                     when (resource) {
                         is Resource.Loading -> {
                             _state.update{
@@ -94,6 +96,7 @@ class HomeScreenViewModel @Inject constructor(
                         }
 
                         is Resource.Success -> {
+                            Log.d("Prova", "${resource.data}")
                             _state.update{
                                 _state.value.copy(
                                     patientsWithVisitInfo = resource.data,

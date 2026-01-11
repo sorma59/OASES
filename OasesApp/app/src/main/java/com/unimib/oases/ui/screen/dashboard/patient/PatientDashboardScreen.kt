@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Delete
@@ -18,7 +20,6 @@ import androidx.compose.material.icons.filled.PriorityHigh
 import androidx.compose.material.icons.filled.Straighten
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -42,7 +43,7 @@ import com.unimib.oases.ui.components.patients.PatientItem
 import com.unimib.oases.ui.components.util.button.DeleteButton
 import com.unimib.oases.ui.components.util.button.DismissButton
 import com.unimib.oases.ui.components.util.button.RetryButton
-import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
+import com.unimib.oases.ui.components.util.loading.LoadingOverlay
 import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.ui.screen.root.AppViewModel
 import com.unimib.oases.ui.util.ToastUtils
@@ -69,6 +70,8 @@ fun PatientDashboardScreen(
         }
     }
 
+    LoadingOverlay(state.isLoading)
+
     PatientDashboardContent(state, viewModel::onEvent)
 }
 
@@ -78,56 +81,50 @@ private fun PatientDashboardContent(
     onEvent: (PatientDashboardEvent) -> Unit
 ) {
 
+    val scrollState = rememberScrollState()
+
     state.error?.let {
         RetryButton(it) {
             onEvent(PatientDashboardEvent.Refresh)
         }
-    } ?: if (state.isLoading)
-        CustomCircularProgressIndicator()
-    else {
+    } ?: Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(32.dp)
+            .verticalScroll(scrollState),
+        horizontalAlignment = Alignment.End,
+        verticalArrangement = Arrangement.spacedBy(64.dp)
+    ) {
+
+        PatientItem(state.patientWithVisitInfo)
+
         Column(
-            modifier = Modifier.fillMaxSize()
+            verticalArrangement = Arrangement.spacedBy(30.dp),
+            horizontalAlignment = Alignment.End
         ) {
+            for (action in state.actions) {
 
-            Column(
-                modifier = Modifier
-                    .padding(32.dp)
-                    .fillMaxSize(),
-                horizontalAlignment = Alignment.End,
-                verticalArrangement = Arrangement.spacedBy(64.dp)
-            ) {
-
-                PatientItem(state.patientWithVisitInfo)
-
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(30.dp),
-                    horizontalAlignment = Alignment.End
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    for (action in state.actions) {
 
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
+                    Text(
+                        text = action.text,
+                        textAlign = TextAlign.End,
+                        fontSize = 30.sp,
+                        modifier = Modifier.weight(1f, fill = false)
+                    )
 
-                            Text(
-                                text = action.text,
-                                textAlign = TextAlign.End,
-                                fontSize = 30.sp,
-                                modifier = Modifier.weight(1f, fill = false)
-                            )
+                    Spacer(Modifier.width(4.dp))
 
-                            Spacer(Modifier.width(4.dp))
-
-                            ActionButton(
+                    ActionButton(
+                        action
+                    ) {
+                        onEvent(
+                            PatientDashboardEvent.ActionButtonClicked(
                                 action
-                            ) {
-                                onEvent(
-                                    PatientDashboardEvent.ActionButtonClicked(
-                                        action
-                                    )
-                                )
-                            }
-                        }
+                            )
+                        )
                     }
                 }
             }
@@ -141,12 +138,9 @@ private fun PatientDashboardContent(
                 Text(text = "Confirm deletion of ${state.patientWithVisitInfo?.patient?.name}")
             },
             text = {
-                if (state.deletionState.isLoading)
-                    CircularProgressIndicator()
-                else
-                    state.deletionState.error?.let {
-                        Text(it)
-                    } ?: Text("Are you sure you want to delete this patient? All the records related to this patient will be deleted.")
+               state.deletionState.error?.let {
+                    Text(it)
+                } ?: Text("Are you sure you want to delete this patient? All the records related to this patient will be deleted.")
            },
             confirmButton = {
                 DeleteButton(

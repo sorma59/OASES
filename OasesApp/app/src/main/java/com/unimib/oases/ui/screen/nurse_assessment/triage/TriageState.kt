@@ -55,14 +55,6 @@ data class RoomsState (
     val error: String? = null
 )
 
-/**
- * Holds the state related to the save operation.
- */
-data class SavingState(
-    val isLoading: Boolean = false,
-    val error: String? = null
-)
-
 data class TriageState(
     // --- Core Identifiers (Always present) ---
     val patientId: String,
@@ -82,100 +74,12 @@ data class TriageState(
     // This is nullable: it only exists when the UI mode is Wizard.
     val editingState: EditingState? = null,
 
-    val savingState: SavingState = SavingState()
+    val savingError: String? = null
 )
 
-//data class TriageState(
-//
-//    val patientId: String,
-//
-//    val visitId: String?,
-//
-//    val initialUiMode: PatientRegistrationScreensUiMode, // Initial, used to know where to navigate back to
-//    val uiMode: PatientRegistrationScreensUiMode = initialUiMode, // actual SSOT, change this
-//
-//    val patient: Patient? = null,
-//
-//    val visit: Visit? = null,
-//
-//    val currentStep: Int = 0,
-//
-//    val triageConfig: TriageConfig? = null,
-//
-//    val selectedReds: Set<String> = emptySet(),
-//    val selectedYellows: Set<String> = emptySet(),
-//
-//    val triageCode: TriageCode = TriageCode.GREEN,
-//
-//    val roomsState: RoomsState = RoomsState(),
-//
-//    val tabStack: List<TriageTab> = listOf(TriageTab.REDS),
-//
-//    val savingState: SavingState = SavingState(),
-//
-//    val showAlertDialog: Boolean = false,
-//
-//    val editingState: EditingState = EditingState(
-//        selectedReds,
-//        selectedYellows,
-//        roomsState.selectedRoom
-//    ),
-//
-//    val isLoading: Boolean = false,
-//    val error: String? = null,
-//    val toastMessage: String? = null,
-//    val loaded: Boolean = true
-//) {
-//    val nextButtonText: String
-//        get() = if (nextTab() == null) "Save" else "Next"
-//
-//    val cancelButtonText: String
-//        get() = if (tabStack.size == 1) "Cancel" else "Back"
-//
-//    val currentTab: TriageTab
-//        get() = tabStack[tabStack.lastIndex]
-//
-//    fun nextTab(): TriageTab? {
-//        return when (currentTab) {
-//            TriageTab.REDS -> {
-//                if (triageCode == TriageCode.RED)
-//                    TriageTab.ROOM
-//                else
-//                    TriageTab.YELLOWS
-//            }
-//            TriageTab.YELLOWS -> {
-//                if (triageCode == TriageCode.YELLOW)
-//                    TriageTab.ROOM
-//                else
-//                    TriageTab.VITAL_SIGNS
-//            }
-//            TriageTab.VITAL_SIGNS -> TriageTab.ROOM
-//            TriageTab.ROOM -> null // null since this is the last tab
-//        }
-//    }
-//}
-//
-//data class RoomsState (
-//    val rooms: List<Room> = emptyList(),
-//    val selectedRoom: Room? = null,
-//    val isLoading: Boolean = false,
-//    val error: String? = null
-//)
-//
 enum class TriageTab(val title: String){
     REDS("Red code"),
     YELLOWS("Yellow code"),
     VITAL_SIGNS("Vital signs"),
     ROOM("Room selection")
 }
-//
-//data class SavingState(
-//    val isLoading: Boolean = false,
-//    val error: String? = null
-//)
-//
-//data class EditingState(
-//    val selectedReds: Set<String>,
-//    val selectedYellows: Set<String>,
-//    val selectedRoom: Room?
-//)

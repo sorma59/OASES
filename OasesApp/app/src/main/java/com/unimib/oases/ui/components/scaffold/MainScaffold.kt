@@ -28,8 +28,8 @@ import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.ui.screen.login.AuthViewModel
 import com.unimib.oases.ui.screen.root.AppViewModel
-import com.unimib.oases.ui.util.SnackbarController
 import com.unimib.oases.ui.util.ToastUtils
+import com.unimib.oases.ui.util.snackbar.SnackbarController
 import kotlinx.coroutines.launch
 import kotlinx.serialization.InternalSerializationApi
 

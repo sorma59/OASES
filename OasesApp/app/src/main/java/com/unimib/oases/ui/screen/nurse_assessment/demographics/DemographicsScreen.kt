@@ -34,8 +34,7 @@ import com.unimib.oases.ui.components.util.FadeOverlay
 import com.unimib.oases.ui.components.util.OutlinedDropdown
 import com.unimib.oases.ui.components.util.button.BottomButtons
 import com.unimib.oases.ui.components.util.button.RetryButton
-import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
-import com.unimib.oases.ui.components.util.circularprogressindicator.RowedCircularProgressIndicator
+import com.unimib.oases.ui.components.util.loading.LoadingOverlay
 import com.unimib.oases.ui.screen.nurse_assessment.PatientRegistrationScreensUiMode
 import com.unimib.oases.ui.screen.root.AppViewModel
 import com.unimib.oases.util.reactToKeyboardAppearance
@@ -53,6 +52,14 @@ fun DemographicsScreen(appViewModel: AppViewModel){
         }
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.snackbarEvents.collect {
+            appViewModel.showSnackbar(it)
+        }
+    }
+
+    LoadingOverlay(state.isLoading)
+
     DemographicsContent(state, viewModel::onEvent)
 }
 
@@ -67,15 +74,10 @@ fun DemographicsContent(
             error = it,
             onClick = { onEvent(DemographicsEvent.Retry) }
         )
-    } ?: if (state.isLoading)
-        CustomCircularProgressIndicator()
-    else {
-        if (state.uiMode is PatientRegistrationScreensUiMode.Standalone && !state.uiMode.isEditing)
-            DemographicsSummary(state.storedData, onEvent, Modifier.padding(16.dp))
-        else {
-            DemographicsEditing(state, onEvent)
-        }
-    }
+    } ?: if (state.uiMode is PatientRegistrationScreensUiMode.Standalone && !state.uiMode.isEditing)
+        DemographicsSummary(state.storedData, onEvent, Modifier.padding(16.dp))
+    else
+        DemographicsEditing(state, onEvent)
 }
 
 @Composable
@@ -279,20 +281,12 @@ private fun DemographicsEditing(
                 title = {
                     Text(text = "Confirm patient saving")
                 },
-                text = {
-                    it.savingState.error?.let { error ->
-                        Text("Error: $error")
-                    } ?:
-                    if (it.savingState.isLoading)
-                        RowedCircularProgressIndicator()
-                    else
-                        Text(text = "Do you want to save the patient to the database?")
-                },
+                text = { Text(text = "Do you want to save the patient to the database?") },
                 confirmButton = {
                     TextButton(
                         onClick = onConfirm
                     ) {
-                        Text(if (it.savingState.error == null) "Confirm" else "Retry")
+                        Text("Confirm")
                     }
                 },
                 dismissButton = {

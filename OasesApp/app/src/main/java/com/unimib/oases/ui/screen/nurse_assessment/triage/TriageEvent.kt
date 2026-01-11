@@ -20,4 +20,6 @@ sealed class TriageEvent {
 
     data object ConfirmDialog: TriageEvent()
     data object DismissDialog: TriageEvent()
+
+    data object RetrySaving: TriageEvent()
 }

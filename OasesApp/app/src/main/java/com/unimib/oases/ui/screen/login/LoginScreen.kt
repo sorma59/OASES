@@ -37,7 +37,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
+import com.unimib.oases.ui.components.util.CenteredText
+import com.unimib.oases.ui.components.util.loading.LoadingOverlay
 import com.unimib.oases.ui.util.ToastUtils
 import com.unimib.oases.util.AuthStrings
 
@@ -48,6 +49,8 @@ fun LoginScreen(
 ) {
 
     val state = authViewModel.loginState.collectAsState()
+
+    LoadingOverlay(state.value is AuthState.Loading)
 
     LoginContent(state, modifier, authViewModel::authenticate)
 }
@@ -100,9 +103,9 @@ private fun LoginContent(
 
         when (state.value) {
 
-            AuthState.Loading -> CustomCircularProgressIndicator()
+            AuthState.Loading -> CenteredText("Logging you in")
 
-            else -> { // Idle or Error
+            AuthState.Idle, is AuthState.Error -> { // Idle or Error
                 Row {
                     Column {
                         OutlinedTextField(

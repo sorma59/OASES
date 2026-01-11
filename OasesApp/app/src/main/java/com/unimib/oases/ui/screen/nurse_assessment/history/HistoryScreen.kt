@@ -17,7 +17,7 @@ import com.unimib.oases.ui.components.tab.TabSwitcher
 import com.unimib.oases.ui.components.util.CenteredText
 import com.unimib.oases.ui.components.util.button.RetryButton
 import com.unimib.oases.ui.components.util.button.StartButton
-import com.unimib.oases.ui.components.util.circularprogressindicator.CustomCircularProgressIndicator
+import com.unimib.oases.ui.components.util.loading.LoadingOverlay
 import com.unimib.oases.ui.screen.root.AppViewModel
 import com.unimib.oases.ui.util.ToastUtils
 
@@ -37,6 +37,8 @@ fun HistoryScreen(
             ToastUtils.showToast(context, it)
         }
     }
+
+    LoadingOverlay(state.pastMedicalHistoryState.isLoading || state.pastVisitsState.isLoading)
 
     HistoryContent(
         state,
@@ -65,35 +67,31 @@ private fun HistoryContent(
                 error = it,
                 onClick = { onEvent(HistoryEvent.ReloadPastMedicalHistory) }
             )
-        } ?: if (state.pastMedicalHistoryState.isLoading) {
-            CustomCircularProgressIndicator()
-        } else {
-            when (state.pastMedicalHistoryState.mode) {
-                is PmhMode.View -> {
-                    if (state.pastMedicalHistoryState.isPastMedicalHistoryPresent)
-                        PastHistorySummary(
-                            state.pastMedicalHistoryState.mode.diseases,
-                            onEvent,
-                            shouldShowEditButton,
-                            Modifier.padding(16.dp)
-                        )
-                    else {
-                        if (shouldShowCreateButton())
-                            StartButton(
-                                "No Past Medical History is present, create one"
-                            ) {
-                                onEvent(HistoryEvent.CreateButtonClicked)
-                            }
-                        else
-                            CenteredText("No Past Medical History is present, a doctor can create one")
-                    }
+        } ?: when (state.pastMedicalHistoryState.mode) {
+            is PmhMode.View -> {
+                if (state.pastMedicalHistoryState.isPastMedicalHistoryPresent)
+                    PastHistorySummary(
+                        state.pastMedicalHistoryState.mode.diseases,
+                        onEvent,
+                        shouldShowEditButton,
+                        Modifier.padding(16.dp)
+                    )
+                else {
+                    if (shouldShowCreateButton())
+                        StartButton(
+                            "No Past Medical History is present, create one"
+                        ) {
+                            onEvent(HistoryEvent.CreateButtonClicked)
+                        }
+                    else
+                        CenteredText("No Past Medical History is present, a doctor can create one")
                 }
-
-                is PmhMode.Edit -> PastMedicalHistoryFormContent(
-                    state.pastMedicalHistoryState.mode.editingDiseases,
-                    onEvent
-                )
             }
+
+            is PmhMode.Edit -> PastMedicalHistoryFormContent(
+                state.pastMedicalHistoryState.mode.editingDiseases,
+                onEvent
+            )
         }
     }
 
