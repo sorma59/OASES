@@ -28,6 +28,7 @@ import com.unimib.oases.data.local.model.VisitVitalSignEntity
 import com.unimib.oases.data.local.model.VitalSignEntity
 import com.unimib.oases.data.local.model.relation.PatientWithVisitInfoEntity
 import kotlinx.coroutines.flow.Flow
+import java.time.LocalDate
 import javax.inject.Inject
 
 class RoomDataSource @Inject constructor(
@@ -73,8 +74,8 @@ class RoomDataSource @Inject constructor(
         return patientDao.getPatients()
     }
 
-    fun getPatientsWithVisitInfo(): Flow<List<PatientWithVisitInfoEntity>> {
-        return patientDao.getPatientsWithTodaysVisitInfo()
+    fun getPatientsAndVisitsOn(date: LocalDate): Flow<List<PatientWithVisitInfoEntity>> {
+        return patientDao.getPatientsAndVisitsOn(date)
     }
 
     fun getPatientById(id: String): Flow<PatientEntity?> {

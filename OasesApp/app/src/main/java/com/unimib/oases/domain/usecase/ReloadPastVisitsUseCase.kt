@@ -21,7 +21,8 @@ class ReloadPastVisitsUseCase @Inject constructor(
             VisitState(
                 visitId = it.id,
                 date = it.date.toString(),
-                triageCode = it.triageCode.getColor()
+                triageCode = it.triageCode.getColor(),
+                status = it.patientStatus
             )
         }
     }

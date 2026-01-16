@@ -1,15 +1,27 @@
 package com.unimib.oases.ui.components.tab
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MultiChoiceSegmentedButtonRow
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.unimib.oases.ui.components.card.OasesCard
+import com.unimib.oases.ui.screen.nurse_assessment.history.HistoryScreenTab
 
 /**
  * A generic, reusable tab switcher built with Material3's SegmentedButton.
@@ -34,31 +46,35 @@ fun <T> TabSwitcher(
 ) {
     // The MultiChoiceSegmentedButtonRow is perfect for creating a group of connected buttons.
     // We use it in a "single choice" mode by only ever having one item in the `checked` list.
-    MultiChoiceSegmentedButtonRow(
-        modifier = modifier.fillMaxWidth()
-    ) {
-        tabs.forEach { tab ->
-            val checked = (tab == selectedTab)
-            val fontSize = if (checked) 22.sp else 20.sp
-            SegmentedButton(
-                // Determine if the current tab in the loop is the selected one.
-                checked = checked,
-                // The onCheckedChange lambda provides a boolean, but we want to know *which*
-                // tab was clicked, so we call onTabSelected with the 'tab' from the loop.
-                onCheckedChange = { onTabSelected(tab) },
-                // Use custom colors to make the selected tab more prominent.
-//                colors = SegmentedButtonDefaults.colors(
-//                    activeContainerColor = MaterialTheme.colorScheme.primary,
-//                    activeContentColor = MaterialTheme.colorScheme.onPrimary,
-//                    inactiveContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-//                    inactiveContentColor = MaterialTheme.colorScheme.onSurfaceVariant
-//                ),
-                icon = { },
-                // Set the shape for each button in the row.
-                shape = SegmentedButtonDefaults.baseShape
-            ) {
-                // Use the provided lambda to get the title for the current tab.
-                Text(text = getTabTitle(tab), fontSize = fontSize)
+    OasesCard(
+        modifier = modifier,
+        shape = SegmentedButtonDefaults.baseShape,
+        elevation = CardDefaults.cardElevation(2.dp)
+    ){
+        MultiChoiceSegmentedButtonRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 1.dp, horizontal = 4.dp)
+        ) {
+            tabs.forEach { tab ->
+                val checked = (tab == selectedTab)
+                SegmentedButton(
+                    checked = checked,
+                    // The onCheckedChange lambda provides a boolean, but we want to know *which*
+                    // tab was clicked, so we call onTabSelected with the 'tab' from the loop.
+                    onCheckedChange = { onTabSelected(tab) },
+                    icon = { },
+                    colors = SegmentedButtonDefaults.colors(
+                        inactiveContainerColor = Color.Transparent,
+                        activeContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                        activeContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    ),
+                    border = BorderStroke(0.dp, Color.Transparent),
+                    shape = SegmentedButtonDefaults.baseShape
+                ) {
+                    // Use the provided lambda to get the title for the current tab.
+                    Text(text = getTabTitle(tab), fontSize = 20.sp)
+                }
             }
         }
     }
@@ -68,25 +84,16 @@ fun <T> TabSwitcher(
 // Example Usage and Preview
 // =====================================================================================
 
-// Let's define a sample enum to demonstrate how to use the TabSwitcher.
-private enum class SampleTab(val title: String) {
-    DETAILS("Details"),
-    HISTORY("History"),
-    SETTINGS("Settings")
-}
-
 @Preview(showBackground = true)
 @Composable
 private fun TabSwitcherPreview() {
-    // In a real app, you would use `remember { mutableStateOf(...) }`
-    // to manage the selected tab state.
-    val tabs = SampleTab.entries
-    val selectedTab = SampleTab.HISTORY
+    val tabs = HistoryScreenTab.entries
+    var selectedTab by remember { mutableStateOf(HistoryScreenTab.PAST_MEDICAL_HISTORY) }
 
     TabSwitcher(
         tabs = tabs,
         selectedTab = selectedTab,
-        onTabSelected = { /* In a real app, you'd update your state here */ },
+        onTabSelected = { selectedTab = it },
         getTabTitle = { tab -> tab.title }
     )
 }

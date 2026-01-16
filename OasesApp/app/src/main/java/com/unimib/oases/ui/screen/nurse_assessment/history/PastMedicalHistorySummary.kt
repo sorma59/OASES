@@ -31,6 +31,7 @@ import com.unimib.oases.ui.components.card.OasesCard
 fun PastHistorySummary(
     diseases: List<PatientDiseaseState>,
     onEvent: (HistoryEvent) -> Unit,
+    shouldShowEditButton: () -> Boolean,
     modifier: Modifier = Modifier
 ) {
     val answeredDiseases = diseases
@@ -53,13 +54,16 @@ fun PastHistorySummary(
                     modifier = Modifier.padding(horizontal = 16.dp)
                 )
 
-                IconButton(
-                    onClick = { onEvent(HistoryEvent.EditButtonPressed) }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = "Edit past medical history"
-                    )
+                if (shouldShowEditButton()) {
+                    IconButton(
+                        onClick = { onEvent(HistoryEvent.EditButtonPressed) },
+                        modifier = Modifier.padding(end = 16.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = "Edit past medical history"
+                        )
+                    }
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
@@ -71,8 +75,15 @@ fun PastHistorySummary(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+                var wasPreviousDiseaseDiagnosed: Boolean? = null
                 answeredDiseases.forEach { disease ->
-                    DiagnosedDiseaseItem(disease = disease)
+                    if ((disease.isDiagnosed == true) != (wasPreviousDiseaseDiagnosed))
+                        // This is the first non-diagnosed disease, add some breathing room
+                        Spacer(Modifier.height(4.dp))
+                    DiagnosedDiseaseItem(
+                        disease = disease
+                    )
+                    wasPreviousDiseaseDiagnosed = disease.isDiagnosed
                 }
             }
         }
@@ -84,10 +95,11 @@ fun PastHistorySummary(
  * showing if it was diagnosed or not.
  */
 @Composable
-private fun DiagnosedDiseaseItem(disease: PatientDiseaseState) {
+private fun DiagnosedDiseaseItem(
+    disease: PatientDiseaseState
+) {
     val icon = if (disease.isDiagnosed == true) Icons.Default.CheckCircle else Icons.Default.Cancel
     val iconColor = if (disease.isDiagnosed == true) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
-    val textAlpha = if (disease.isDiagnosed == true) 1f else 0.7f // Make "No" entries slightly faded
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -96,7 +108,7 @@ private fun DiagnosedDiseaseItem(disease: PatientDiseaseState) {
         Icon(
             imageVector = icon,
             contentDescription = if (disease.isDiagnosed == true) "Diagnosed" else "Not Diagnosed",
-            tint = iconColor.copy(alpha = textAlpha),
+            tint = iconColor,
             modifier = Modifier.padding(top = 4.dp)
         )
         Column {
@@ -106,14 +118,14 @@ private fun DiagnosedDiseaseItem(disease: PatientDiseaseState) {
                     text = disease.disease,
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = textAlpha)
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 // Show the date only if it was diagnosed and the date is not blank
                 if (disease.isDiagnosed == true && disease.date.isNotBlank()) {
                     Text(
                         text = " (Diagnosed: ${disease.date})",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = textAlpha)
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
@@ -122,7 +134,7 @@ private fun DiagnosedDiseaseItem(disease: PatientDiseaseState) {
                 Text(
                     text = disease.additionalInfo,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = textAlpha)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
@@ -159,7 +171,8 @@ private fun PastHistorySummaryPreview() {
                 isDiagnosed = null // This one will NOT appear
             )
         ),
-        onEvent = {}
+        onEvent = {},
+        shouldShowEditButton = { true }
     )
 }
 
@@ -171,6 +184,7 @@ private fun PastHistorySummaryEmptyPreview() {
             PatientDiseaseState(disease = "Hypertension", isDiagnosed = null),
             PatientDiseaseState(disease = "Asthma", isDiagnosed = null)
         ),
-        onEvent = {}
+        onEvent = {},
+        shouldShowEditButton = { true }
     )
 }
