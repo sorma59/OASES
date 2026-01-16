@@ -89,7 +89,8 @@ dependencies {
 //    implementation(libs.firebase.database.ktx)
 //    implementation(libs.firebase.firestore)
     implementation(libs.androidx.material3.window.size.class1.android)
-    implementation("org.jetbrains.kotlin:kotlin-reflect") // For serializing Routes in MainScaffold
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation(libs.androidx.compose.runtime) // For serializing Routes in MainScaffold
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -141,4 +142,7 @@ dependencies {
     implementation(libs.jbcrypt) // For BCrypt hashing
     implementation(libs.gson) // For converting object to Json
 //    kapt(libs.hilt.android.compiler.v250)
+
+    implementation("com.seanproctor:datatable-material3:0.11.6")
+
 }
