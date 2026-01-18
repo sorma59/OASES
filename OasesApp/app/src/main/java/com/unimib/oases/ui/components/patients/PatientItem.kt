@@ -131,7 +131,8 @@ fun PatientItemPreview(){
                 patientStatus = PatientStatus.WAITING_FOR_VISIT,
                 triageCode = TriageCode.RED,
                 roomName = "Emergency Room",
-                arrivalTime = DateAndTimeUtils.getCurrentTime()
+                arrivalTime = DateAndTimeUtils.getCurrentTime(),
+                date = DateAndTimeUtils.getCurrentDate()
             )
         )
     )

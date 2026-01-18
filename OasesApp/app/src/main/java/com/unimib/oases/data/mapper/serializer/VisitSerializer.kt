@@ -83,7 +83,8 @@ object VisitSerializer {
             triageCode = TriageCode.GREEN,
             roomName = "aaaa",
             date = DateAndTimeUtils.getCurrentDate(),
-            description = "description"
+            description = "description",
+            arrivalTime = LocalTime.now(),
         )
         Log.d("VisitSerializer", "Original: $original")
         val bytes = serialize(original)
