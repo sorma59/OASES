@@ -14,12 +14,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.unimib.oases.domain.model.NumericPrecision
 import com.unimib.oases.ui.components.util.button.BottomButtons
 import com.unimib.oases.ui.components.util.button.RetryButton
+import com.unimib.oases.ui.components.util.effect.HandleNavigationEvents
+import com.unimib.oases.ui.components.util.effect.HandleUiEvents
 import com.unimib.oases.ui.components.util.loading.LoadingOverlay
 import com.unimib.oases.ui.screen.nurse_assessment.PatientRegistrationScreensUiMode
 import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.VitalSignsContent
@@ -27,7 +28,6 @@ import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.VitalSignsEvent
 import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.VitalSignsState
 import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.VitalSignsViewModel
 import com.unimib.oases.ui.screen.root.AppViewModel
-import com.unimib.oases.ui.util.ToastUtils
 import com.unimib.oases.util.reactToKeyboardAppearance
 
 @Composable
@@ -41,20 +41,9 @@ fun TriageScreen(appViewModel: AppViewModel) {
 
     val vitalSignsState by vitalSignsViewModel.state.collectAsState()
 
-    val context = LocalContext.current
+    HandleNavigationEvents(viewModel.navigationEvents, appViewModel)
 
-    LaunchedEffect(state.toastMessage) {
-        state.toastMessage?.let {
-            ToastUtils.showToast(context, it)
-            viewModel.onEvent(TriageEvent.ToastShown)
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        viewModel.navigationEvents.collect {
-            appViewModel.onNavEvent(it)
-        }
-    }
+    HandleUiEvents(viewModel.uiEvents, appViewModel)
 
     LaunchedEffect(Unit) {
         vitalSignsViewModel.onEvent(VitalSignsEvent.Retry)

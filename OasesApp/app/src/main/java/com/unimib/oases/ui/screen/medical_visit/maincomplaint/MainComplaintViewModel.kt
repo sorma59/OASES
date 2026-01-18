@@ -330,8 +330,6 @@ class MainComplaintViewModel @Inject constructor(
                             patientRepository.addPatient(state.value.patient!!)
                             navigationEventsChannel.send(NavigationEvent.NavigateBack)
                         }
-
-                        else -> Unit
                     }
                 }
             }

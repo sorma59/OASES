@@ -10,6 +10,7 @@ import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageState
 import com.unimib.oases.util.Outcome
 import kotlinx.coroutines.delay
 import javax.inject.Inject
+import kotlin.random.Random
 
 class SaveTriageDataUseCase @Inject constructor(
     private val visitRepository: VisitRepository
@@ -17,6 +18,9 @@ class SaveTriageDataUseCase @Inject constructor(
 
     suspend operator fun invoke(state: TriageState): Outcome<Unit> {
         delay(3000)
+
+        if (Random.nextBoolean())
+            return Outcome.Error("MOCK ERROR")
 
         val visit = state.visit!!.copy(
             triageCode = state.editingState!!.triageData.triageCode,

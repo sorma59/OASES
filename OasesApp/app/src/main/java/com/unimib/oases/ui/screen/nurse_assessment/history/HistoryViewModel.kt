@@ -227,8 +227,6 @@ class HistoryViewModel @Inject constructor(
                         it.copy(mode = PmhMode.View(diseases = diseasesToSave))
                     }
                 }
-
-                else -> Unit
             }
 
             updatePastMedicalHistoryState { it.copy(isLoading = false) }

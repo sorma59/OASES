@@ -15,10 +15,13 @@ import com.unimib.oases.domain.usecase.ConfigTriageUseCase
 import com.unimib.oases.domain.usecase.EvaluateTriageCodeUseCase
 import com.unimib.oases.domain.usecase.GetCurrentVisitUseCase
 import com.unimib.oases.domain.usecase.SaveTriageDataUseCase
+import com.unimib.oases.ui.components.scaffold.UiEvent
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.ui.screen.nurse_assessment.PatientRegistrationScreensUiMode
 import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreenViewModel.Companion.STEP_COMPLETED_KEY
+import com.unimib.oases.ui.util.snackbar.SnackbarData
+import com.unimib.oases.ui.util.snackbar.SnackbarType
 import com.unimib.oases.util.Outcome
 import com.unimib.oases.util.firstNullableSuccess
 import com.unimib.oases.util.firstSuccess
@@ -100,6 +103,9 @@ class TriageViewModel @Inject constructor(
     private val navigationEventsChannel = Channel<NavigationEvent>()
     val navigationEvents = navigationEventsChannel.receiveAsFlow()
 
+    private val uiEventsChannel = Channel<UiEvent>()
+    val uiEvents = uiEventsChannel.receiveAsFlow()
+
     init {
         viewModelScope.launch(coroutineContext) {
             getPatientData()
@@ -174,12 +180,6 @@ class TriageViewModel @Inject constructor(
                 }
             }
 
-            is TriageEvent.ToastShown -> {
-                _state.update {
-                    it.copy(toastMessage = null)
-                }
-            }
-
             is TriageEvent.Retry -> {
 
             }
@@ -189,6 +189,8 @@ class TriageViewModel @Inject constructor(
             TriageEvent.CreateButtonPressed -> enterEditMode()
 
             TriageEvent.NextButtonPressed -> onNext()
+
+            TriageEvent.ReattemptSaving -> onNext()
 
             TriageEvent.BackButtonPressed -> onBack()
 
@@ -208,14 +210,6 @@ class TriageViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         showAlertDialog = false,
-                    )
-                }
-            }
-
-            TriageEvent.ToastShown -> {
-                _state.update {
-                    it.copy(
-                        toastMessage = null
                     )
                 }
             }
@@ -251,7 +245,20 @@ class TriageViewModel @Inject constructor(
         _state.update {
             it.copy(
                 isLoading = false,
-                savingError = error ?: "Save unsuccessful, try again"
+            )
+        }
+
+        viewModelScope.launch(coroutineContext) {
+            uiEventsChannel.send(
+                UiEvent.ShowSnackbar(
+                    SnackbarData(
+                        message = error ?: "Save unsuccessful, try again",
+                        type = SnackbarType.ERROR,
+                        actionLabel = "Try again",
+                    ) {
+                        onEvent(TriageEvent.ReattemptSaving)
+                    }
+                )
             )
         }
     }
@@ -316,8 +323,13 @@ class TriageViewModel @Inject constructor(
         check (symptom != null) {
             "Symptom $fieldId not found in the triage symptoms map"
         }
-        if (symptom.isComputed)
-            _state.update { it.copy(toastMessage = "Be aware: this field was computed") }
+        if (symptom.isComputed) {
+            viewModelScope.launch {
+                uiEventsChannel.send(
+                    UiEvent.ShowToast("Be aware: this field was computed")
+                )
+            }
+        }
         toggleField(fieldId)
     }
 
@@ -386,11 +398,14 @@ class TriageViewModel @Inject constructor(
         viewModelScope.launch(coroutineContext) {
             if (nextTab == null)
                 if (state.value.editingState!!.triageData.selectedRoom == null)
-                    _state.update {
-                        it.copy(
-                            toastMessage = "Select a room"
+                    uiEventsChannel.send(
+                        UiEvent.ShowSnackbar(
+                            SnackbarData(
+                                message = "Select a room",
+                                type = SnackbarType.ERROR
+                            )
                         )
-                    }
+                    )
                 else
                     _state.update {
                         it.copy(

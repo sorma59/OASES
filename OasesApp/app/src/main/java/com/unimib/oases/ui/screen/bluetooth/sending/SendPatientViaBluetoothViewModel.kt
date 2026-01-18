@@ -106,7 +106,6 @@ class SendPatientViaBluetoothViewModel @Inject constructor(
                 is Outcome.Error -> {
                     updatePatientSendingState { it.copy(result = "Failed to send patient: ${outcome.message}") }
                 }
-                else -> Unit
             }
             updatePatientSendingState { it.copy(isLoading = false) }
         }

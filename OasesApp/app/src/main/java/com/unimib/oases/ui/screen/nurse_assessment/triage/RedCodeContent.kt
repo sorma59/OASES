@@ -21,7 +21,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
@@ -32,7 +31,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.unimib.oases.domain.model.symptom.TriageSymptom
@@ -40,7 +38,6 @@ import com.unimib.oases.ui.components.input.LabeledCheckbox
 import com.unimib.oases.ui.components.util.FadeOverlay
 import com.unimib.oases.ui.components.util.ShowMoreArrow
 import com.unimib.oases.ui.components.util.button.RetryButton
-import com.unimib.oases.ui.util.ToastUtils
 import kotlinx.coroutines.launch
 
 @Composable
@@ -52,8 +49,6 @@ fun RedCodeContent(
     val scrollState = rememberScrollState()
 
     val coroutineScope = rememberCoroutineScope()
-
-    val context = LocalContext.current
 
     var pregnancyRowScrollTargetY by remember { mutableFloatStateOf(0f) }
 
@@ -76,14 +71,6 @@ fun RedCodeContent(
             }
         }
     }
-
-    LaunchedEffect(state.toastMessage) {
-        if (state.toastMessage != null) {
-            ToastUtils.showToast(context, state.toastMessage)
-            onEvent(TriageEvent.ToastShown)
-        }
-    }
-
 
     Column(
         modifier = Modifier

@@ -28,9 +28,6 @@ class SaveUserUseCase @Inject constructor(
             is Outcome.Success -> {
                 SaveUserUseCaseResult.Success
             }
-            else -> {
-                SaveUserUseCaseResult.UnknownError
-            }
         }
     }
 

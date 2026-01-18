@@ -1,5 +1,6 @@
 package com.unimib.oases.ui.screen.root
 
+import androidx.compose.material3.SnackbarDuration
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unimib.oases.bluetooth.BluetoothCustomManager
@@ -79,12 +80,21 @@ class AppViewModel @Inject constructor(
         message: String,
         type: SnackbarType,
         actionLabel: String? = null,
+        withDismissAction: Boolean = true,
+        duration: SnackbarDuration = SnackbarDuration.Short,
         onAction: (() -> Unit)? = null
     ) {
         viewModelScope.launch {
             _uiEvents.emit(
                 UiEvent.ShowSnackbar(
-                    SnackbarData(message, type, actionLabel, onAction)
+                    SnackbarData(
+                        message,
+                        type,
+                        actionLabel,
+                        withDismissAction,
+                        duration,
+                        onAction
+                    )
                 )
             )
         }

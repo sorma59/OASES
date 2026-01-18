@@ -30,9 +30,6 @@ class SaveVitalSignUseCase @Inject constructor(
             is Outcome.Success -> {
                 SaveVitalSignUseCaseResult.Success
             }
-            else -> {
-                SaveVitalSignUseCaseResult.UnknownError
-            }
         }
     }
 

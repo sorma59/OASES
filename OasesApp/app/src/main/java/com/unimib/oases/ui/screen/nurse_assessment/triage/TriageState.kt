@@ -63,7 +63,6 @@ data class TriageState(
     // --- High-Level UI State ---
     val isLoading: Boolean = true, // For initial screen data load
     val error: String? = null,
-    val toastMessage: String? = null,
     val showAlertDialog: Boolean = false,
     // --- Domain Data ---
     val patient: Patient? = null,
@@ -73,8 +72,6 @@ data class TriageState(
     // --- Sub-States for Different UI Concerns ---
     // This is nullable: it only exists when the UI mode is Wizard.
     val editingState: EditingState? = null,
-
-    val savingError: String? = null
 )
 
 enum class TriageTab(val title: String){
