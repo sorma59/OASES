@@ -13,7 +13,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -28,6 +27,7 @@ import com.unimib.oases.ui.components.util.AnimatedLabelOutlinedTextField
 import com.unimib.oases.ui.components.util.button.BottomButtons
 import com.unimib.oases.ui.components.util.button.RetryButton
 import com.unimib.oases.ui.components.util.button.StartButton
+import com.unimib.oases.ui.components.util.effect.HandleNavigationEvents
 import com.unimib.oases.ui.screen.nurse_assessment.PatientRegistrationScreensUiMode
 import com.unimib.oases.ui.screen.root.AppViewModel
 import com.unimib.oases.util.reactToKeyboardAppearance
@@ -41,11 +41,7 @@ fun MalnutritionScreeningScreen(
 
     val state by viewModel.state.collectAsState()
 
-    LaunchedEffect(Unit) {
-        viewModel.navigationEvents.collect {
-            appViewModel.onNavEvent(it)
-        }
-    }
+    HandleNavigationEvents(viewModel.navigationEvents, appViewModel)
 
     MalnutritionScreeningContent(state, viewModel::onEvent)
 }

@@ -31,6 +31,7 @@ import com.unimib.oases.data.local.model.Role
 import com.unimib.oases.domain.model.PatientAndVisitIds
 import com.unimib.oases.ui.components.patients.PatientsWithVisitInfoList
 import com.unimib.oases.ui.components.search.SearchBar
+import com.unimib.oases.ui.components.util.effect.HandleNavigationEvents
 import com.unimib.oases.ui.components.util.loading.LoadingOverlay
 import com.unimib.oases.ui.screen.login.AuthViewModel
 import com.unimib.oases.ui.screen.root.AppViewModel
@@ -42,28 +43,24 @@ fun HomeScreen(
     appViewModel: AppViewModel,
 ) {
 
-    val homeScreenViewModel: HomeScreenViewModel = hiltViewModel()
+    val viewModel: HomeScreenViewModel = hiltViewModel()
 
-    val state by homeScreenViewModel.state.collectAsState()
+    val state by viewModel.state.collectAsState()
 
     val context = LocalContext.current
 
-    LaunchedEffect(Unit) {
-        homeScreenViewModel.navigationEvents.collect {
-            appViewModel.onNavEvent(it)
-        }
-    }
+    HandleNavigationEvents(viewModel.navigationEvents, appViewModel)
 
     LaunchedEffect(state.toastMessage) {
         state.toastMessage?.let { message ->
             ToastUtils.showToast(context, message)
         }
-        homeScreenViewModel.onToastMessageShown()
+        viewModel.onToastMessageShown()
     }
 
     LoadingOverlay(state.isLoading)
 
-    HomeContent(state, homeScreenViewModel::onEvent, authViewModel)
+    HomeContent(state, viewModel::onEvent, authViewModel)
 }
 
 @Composable

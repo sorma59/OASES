@@ -34,6 +34,7 @@ import com.unimib.oases.ui.components.util.FadeOverlay
 import com.unimib.oases.ui.components.util.OutlinedDropdown
 import com.unimib.oases.ui.components.util.button.BottomButtons
 import com.unimib.oases.ui.components.util.button.RetryButton
+import com.unimib.oases.ui.components.util.effect.HandleNavigationEvents
 import com.unimib.oases.ui.components.util.loading.LoadingOverlay
 import com.unimib.oases.ui.screen.nurse_assessment.PatientRegistrationScreensUiMode
 import com.unimib.oases.ui.screen.root.AppViewModel
@@ -46,11 +47,7 @@ fun DemographicsScreen(appViewModel: AppViewModel){
     
     val state by viewModel.state.collectAsState()
 
-    LaunchedEffect(Unit) {
-        viewModel.navigationEvents.collect {
-            appViewModel.onNavEvent(it)
-        }
-    }
+    HandleNavigationEvents(viewModel.navigationEvents, appViewModel)
 
     LaunchedEffect(Unit) {
         viewModel.snackbarEvents.collect {

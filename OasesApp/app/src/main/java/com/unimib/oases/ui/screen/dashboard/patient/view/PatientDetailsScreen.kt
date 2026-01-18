@@ -18,7 +18,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -33,6 +32,7 @@ import com.unimib.oases.domain.model.complaint.ComplaintId
 import com.unimib.oases.ui.components.util.CenteredText
 import com.unimib.oases.ui.components.util.TitleText
 import com.unimib.oases.ui.components.util.button.RetryButton
+import com.unimib.oases.ui.components.util.effect.HandleNavigationEvents
 import com.unimib.oases.ui.screen.root.AppViewModel
 import com.unimib.oases.util.StringFormatHelper.getAgeWithSuffix
 
@@ -47,11 +47,7 @@ fun PatientDetailsScreen(
 
     val scrollState = rememberScrollState()
 
-    LaunchedEffect(Unit) {
-        viewModel.navigationEvents.collect {
-            appViewModel.onNavEvent(it)
-        }
-    }
+    HandleNavigationEvents(viewModel.navigationEvents, appViewModel)
 
     Column(
         verticalArrangement = Arrangement.spacedBy(32.dp),

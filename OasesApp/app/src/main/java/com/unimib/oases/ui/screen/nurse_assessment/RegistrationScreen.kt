@@ -21,6 +21,7 @@ import androidx.navigation.NavController
 import com.unimib.oases.domain.model.PatientAndVisitIds
 import com.unimib.oases.ui.components.util.button.BottomButtons
 import com.unimib.oases.ui.components.util.button.RetryButton
+import com.unimib.oases.ui.components.util.effect.HandleNavigationEvents
 import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreenViewModel.Companion.DEMOGRAPHICS_COMPLETED_KEY
 import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreenViewModel.Companion.STEP_COMPLETED_KEY
@@ -37,15 +38,11 @@ fun RegistrationScreen(
     navController: NavController
 ) {
 
-    val registrationScreenViewModel: RegistrationScreenViewModel = hiltViewModel()
+    val viewModel: RegistrationScreenViewModel = hiltViewModel()
 
-    val state by registrationScreenViewModel.state.collectAsState()
+    val state by viewModel.state.collectAsState()
 
-    LaunchedEffect(Unit) {
-        registrationScreenViewModel.navigationEvents.collect {
-            appViewModel.onNavEvent(it)
-        }
-    }
+    HandleNavigationEvents(viewModel.navigationEvents, appViewModel)
 
     LaunchedEffect(navController.currentBackStackEntry) {
         navController.currentBackStackEntry
@@ -54,7 +51,7 @@ fun RegistrationScreen(
             ?.asFlow()
             ?.collect { completed ->
                 if (completed) {
-                    registrationScreenViewModel.onEvent(RegistrationEvent.StepCompleted)
+                    viewModel.onEvent(RegistrationEvent.StepCompleted)
                     navController.currentBackStackEntry
                         ?.savedStateHandle
                         // IMPORTANT: Reset the value in the SavedStateHandle so this
@@ -71,7 +68,7 @@ fun RegistrationScreen(
             ?.asFlow()
             ?.collect { ids ->
                 ids?.let {
-                    registrationScreenViewModel.onEvent(
+                    viewModel.onEvent(
                         RegistrationEvent.PatientAndVisitCreated(
                             it.patientId, it.visitId
                         )
@@ -86,9 +83,9 @@ fun RegistrationScreen(
 
     RegistrationContent(
         state,
-        registrationScreenViewModel::onEvent,
-        registrationScreenViewModel::onNext,
-        registrationScreenViewModel::onBack
+        viewModel::onEvent,
+        viewModel::onNext,
+        viewModel::onBack
     )
 }
 

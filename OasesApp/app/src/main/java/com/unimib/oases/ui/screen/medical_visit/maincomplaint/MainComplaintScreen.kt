@@ -38,6 +38,7 @@ import com.unimib.oases.ui.components.input.LabeledCheckbox
 import com.unimib.oases.ui.components.input.LabeledRadioButton
 import com.unimib.oases.ui.components.util.TitleText
 import com.unimib.oases.ui.components.util.button.RetryButton
+import com.unimib.oases.ui.components.util.effect.HandleNavigationEvents
 import com.unimib.oases.ui.components.util.loading.LoadingOverlay
 import com.unimib.oases.ui.screen.medical_visit.maincomplaint.MainComplaintEvent.SymptomSelected
 import com.unimib.oases.ui.screen.root.AppViewModel
@@ -56,11 +57,7 @@ fun MainComplaintScreen(
 
     val context = LocalContext.current
 
-    LaunchedEffect(Unit) {
-        viewModel.navigationEvents.collect {
-            appViewModel.onNavEvent(it)
-        }
-    }
+    HandleNavigationEvents(viewModel.navigationEvents, appViewModel)
 
     LaunchedEffect(state.toastMessage){
         state.toastMessage?.let {
