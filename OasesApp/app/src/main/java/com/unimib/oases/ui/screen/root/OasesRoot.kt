@@ -8,6 +8,7 @@ import com.unimib.oases.bluetooth.BluetoothCustomManager
 import com.unimib.oases.data.local.model.Role
 import com.unimib.oases.ui.components.scaffold.LoginScaffold
 import com.unimib.oases.ui.components.scaffold.MainScaffold
+import com.unimib.oases.ui.components.util.loading.LoadingOverlay
 import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.ui.screen.login.AuthViewModel
 
@@ -16,19 +17,21 @@ fun OasesRoot(
     bluetoothCustomManager: BluetoothCustomManager,
     authViewModel: AuthViewModel = hiltViewModel()
 ) {
-    val role by authViewModel.userRole.collectAsState()
-
     val isAuthenticated by authViewModel.isAuthenticated.collectAsState()
+
+    val role by authViewModel.userRole.collectAsState()
 
     when (isAuthenticated){
         true -> {
+            role?.let {
 
-            val startDestination = when (role!!) {
-                Role.ADMIN -> Route.AdminDashboard
-                Role.DOCTOR, Role.NURSE -> Route.Home
-            }
+                val startDestination = when (it) {
+                    Role.ADMIN -> Route.AdminDashboard
+                    Role.DOCTOR, Role.NURSE -> Route.Home
+                }
 
-            MainScaffold(startDestination, bluetoothCustomManager, authViewModel)
+                MainScaffold(startDestination, bluetoothCustomManager, authViewModel)
+            } ?: LoadingOverlay(true)
         }
         else -> LoginScaffold(authViewModel)
     }
