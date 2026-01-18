@@ -207,15 +207,13 @@ fun MalnutritionEditing(
                     Text(text = "Confirm malnutrition data saving")
                 },
                 text = {
-                    state.savingState.error?.let { error ->
-                        Text("Error: $error")
-                    } ?: Text(text = "Do you want to save the malnutrition data to the database?")
+                    Text(text = "Do you want to save the malnutrition data to the database?")
                 },
                 confirmButton = {
                     TextButton(
                         onClick = onConfirm
                     ) {
-                        Text(if (state.savingState.error == null) "Confirm" else "Retry")
+                        Text("Confirm" )
                     }
                 },
                 dismissButton = {

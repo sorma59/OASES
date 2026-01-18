@@ -16,6 +16,7 @@ import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.ui.screen.nurse_assessment.PatientRegistrationScreensUiMode
 import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreenViewModel.Companion.DEMOGRAPHICS_COMPLETED_KEY
 import com.unimib.oases.ui.util.snackbar.SnackbarData
+import com.unimib.oases.ui.util.snackbar.SnackbarType
 import com.unimib.oases.util.DateAndTimeUtils
 import com.unimib.oases.util.Outcome
 import com.unimib.oases.util.firstSuccess
@@ -345,6 +346,7 @@ class DemographicsViewModel @Inject constructor(
         snackbarEventsChannel.send(
             SnackbarData(
                 message = error ?: "Save unsuccessful, try again",
+                type = SnackbarType.ERROR,
                 actionLabel = "Try again",
                 onAction = { savePatient() }
             )
@@ -355,6 +357,7 @@ class DemographicsViewModel @Inject constructor(
         snackbarEventsChannel.send(
             SnackbarData(
                 message = "Patient saved successfully",
+                type = SnackbarType.SUCCESS
             )
         )
     }

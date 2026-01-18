@@ -9,6 +9,7 @@ import com.unimib.oases.ui.components.scaffold.UiEvent
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.ui.util.snackbar.SnackbarData
+import com.unimib.oases.ui.util.snackbar.SnackbarType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -40,6 +41,7 @@ class AppViewModel @Inject constructor(
                     is BluetoothEvent.PatientReceived -> {
                         showSnackbar(
                             message = "${event.patientFullData.patientDetails.name} was successfully sent to this device",
+                            type = SnackbarType.SUCCESS,
                             actionLabel = "View",
                             onAction = {
                                 navigateTo(
@@ -54,7 +56,8 @@ class AppViewModel @Inject constructor(
 
                     is BluetoothEvent.ErrorWhileReceivingPatient -> {
                         showSnackbar(
-                            message = event.errorMessage
+                            message = event.errorMessage,
+                            type = SnackbarType.ERROR
                         )
                     }
                 }
@@ -74,13 +77,14 @@ class AppViewModel @Inject constructor(
 
     fun showSnackbar(
         message: String,
+        type: SnackbarType,
         actionLabel: String? = null,
         onAction: (() -> Unit)? = null
     ) {
         viewModelScope.launch {
             _uiEvents.emit(
                 UiEvent.ShowSnackbar(
-                    SnackbarData(message, actionLabel, onAction)
+                    SnackbarData(message, type, actionLabel, onAction)
                 )
             )
         }

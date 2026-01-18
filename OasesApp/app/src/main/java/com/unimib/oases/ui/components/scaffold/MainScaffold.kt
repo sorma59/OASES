@@ -4,7 +4,9 @@ import android.util.Log
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberDrawerState
@@ -30,6 +32,7 @@ import com.unimib.oases.ui.screen.root.AppViewModel
 import com.unimib.oases.ui.util.ToastUtils
 import com.unimib.oases.ui.util.snackbar.SnackbarController
 import com.unimib.oases.ui.util.snackbar.SnackbarData
+import com.unimib.oases.ui.util.snackbar.SnackbarType
 import kotlinx.coroutines.launch
 
 @Composable
@@ -89,7 +92,40 @@ fun MainScaffold(
                     )
 
                 },
-                snackbarHost = { SnackbarHost(snackbarHostState) }
+                snackbarHost = {
+                    SnackbarHost(snackbarHostState) { data ->
+
+                        // Determine colors based on the type set in the controller
+                        val type = SnackbarController.currentType
+
+                        val containerColor = when (type) {
+                            SnackbarType.SUCCESS -> MaterialTheme.colorScheme.primaryContainer // Green
+                            SnackbarType.ERROR -> MaterialTheme.colorScheme.errorContainer
+                            SnackbarType.INFO -> MaterialTheme.colorScheme.surface
+                        }
+
+                        val contentColor = when (type) {
+                            SnackbarType.SUCCESS -> MaterialTheme.colorScheme.onPrimaryContainer
+                            SnackbarType.ERROR -> MaterialTheme.colorScheme.onErrorContainer
+                            SnackbarType.INFO -> MaterialTheme.colorScheme.onSurface
+                        }
+
+                        val dismissActionContentColor = when (type) {
+                            SnackbarType.SUCCESS -> MaterialTheme.colorScheme.onPrimaryContainer
+                            SnackbarType.ERROR -> MaterialTheme.colorScheme.onErrorContainer
+                            SnackbarType.INFO -> MaterialTheme.colorScheme.onSurface
+                        }
+
+                        Snackbar(
+                            snackbarData = data,
+                            containerColor = containerColor,
+                            contentColor = contentColor,
+                            actionColor = contentColor, // Make the button match text
+                            dismissActionContentColor = contentColor,
+                            shape = MaterialTheme.shapes.medium
+                        )
+                    }
+                }
             ) { padding ->
 
                 AppNavigation(
@@ -135,6 +171,7 @@ fun MainScaffold(
                     is UiEvent.ShowToast -> ToastUtils.showToast(navController.context, event.message)
                     is UiEvent.ShowSnackbar -> SnackbarController.showMessage(
                         event.snackbarData.message,
+                        event.snackbarData.type,
                         event.snackbarData.actionLabel,
                         event.snackbarData.onAction
                     )

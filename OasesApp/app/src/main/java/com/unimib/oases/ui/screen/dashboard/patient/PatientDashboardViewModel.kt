@@ -15,6 +15,7 @@ import com.unimib.oases.ui.components.scaffold.UiEvent
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.ui.util.snackbar.SnackbarData
+import com.unimib.oases.ui.util.snackbar.SnackbarType
 import com.unimib.oases.util.Outcome
 import com.unimib.oases.util.firstSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -233,7 +234,10 @@ class PatientDashboardViewModel @Inject constructor(
                 is Outcome.Success -> {
                     uiEventsChannel.send(
                         UiEvent.ShowSnackbar(
-                            SnackbarData("Patient successfully deleted")
+                            SnackbarData(
+                                message = "Patient successfully deleted",
+                                type = SnackbarType.SUCCESS
+                            )
                         )
                     )
                     navigationEventsChannel.send(NavigationEvent.NavigateBack)
@@ -244,6 +248,7 @@ class PatientDashboardViewModel @Inject constructor(
                         UiEvent.ShowSnackbar(
                             SnackbarData(
                                 message = "Patient deletion failed",
+                                type = SnackbarType.ERROR,
                                 actionLabel = "Try again"
                             ) {
                                 onEvent(PatientDashboardEvent.ReattemptPatientDeletion)
