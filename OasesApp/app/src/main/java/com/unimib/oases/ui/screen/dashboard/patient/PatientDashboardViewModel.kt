@@ -11,8 +11,10 @@ import com.unimib.oases.domain.model.PatientWithVisitInfo
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.domain.repository.VisitRepository
 import com.unimib.oases.domain.usecase.ConfigPatientDashboardActionsUseCase
+import com.unimib.oases.ui.components.scaffold.UiEvent
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Route
+import com.unimib.oases.ui.util.snackbar.SnackbarData
 import com.unimib.oases.util.Outcome
 import com.unimib.oases.util.firstSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -38,7 +40,6 @@ class PatientDashboardViewModel @Inject constructor(
 ): ViewModel(){
 
     private val errorHandler = CoroutineExceptionHandler { _, e ->
-        // Log the error
         Log.e("ViewModelError", "Coroutine exception", e)
 
         // Safely update on Main (Must when doing UI work other than updating state)
@@ -52,7 +53,23 @@ class PatientDashboardViewModel @Inject constructor(
         }
     }
 
+    private val deletionErrorHandler = CoroutineExceptionHandler { _, e ->
+        Log.e("ViewModelError", "Coroutine exception while deleting patient:", e)
+
+        // Safely update on Main (Must when doing UI work other than updating state)
+        viewModelScope.launch(mainDispatcher) {
+            _state.update {
+                it.copy(
+                    deletionError = e.message ?: "An unexpected error occurred",
+                    isLoading = false
+                )
+            }
+        }
+    }
+
     private val mainContext = ioDispatcher + errorHandler
+
+    private val deletionContext = ioDispatcher + deletionErrorHandler
 
     private val args = savedStateHandle.toRoute<Route.PatientDashboard>()
 
@@ -67,6 +84,9 @@ class PatientDashboardViewModel @Inject constructor(
 
     private val navigationEventsChannel = Channel<NavigationEvent>()
     val navigationEvents = navigationEventsChannel.receiveAsFlow()
+
+    private val uiEventsChannel = Channel<UiEvent>()
+    val uiEvents = uiEventsChannel.receiveAsFlow()
 
     init {
         viewModelScope.launch(mainContext) { refresh() }
@@ -103,18 +123,7 @@ class PatientDashboardViewModel @Inject constructor(
     private fun dismissDialog() {
         _state.update {
             it.copy(
-                showAlertDialog = false,
-                deletionState = DeletionState()
-            )
-        }
-    }
-
-    private fun updateDeletionState(
-        update: (DeletionState) -> DeletionState
-    ) {
-        _state.update {
-            it.copy(
-                deletionState = update(it.deletionState)
+                showAlertDialog = false
             )
         }
     }
@@ -124,7 +133,12 @@ class PatientDashboardViewModel @Inject constructor(
         when (event) {
             is PatientDashboardEvent.ActionButtonClicked -> handleActionButtonClick(event.action)
 
-            PatientDashboardEvent.PatientDeletionConfirmed -> deletePatient()
+            PatientDashboardEvent.PatientDeletionConfirmed -> {
+                dismissDialog()
+                deletePatient()
+            }
+
+            PatientDashboardEvent.ReattemptPatientDeletion -> deletePatient()
 
             PatientDashboardEvent.PatientDeletionCancelled -> dismissDialog()
 
@@ -200,32 +214,54 @@ class PatientDashboardViewModel @Inject constructor(
     }
 
     private fun deletePatient() {
-        viewModelScope.launch(mainContext) {
+        viewModelScope.launch(deletionContext) {
 
-            updateDeletionState {
+            _state.update {
                 it.copy(
-                    error = null,
-                    isLoading = true
+                    isLoading = true,
+                    deletionError = null
                 )
             }
 
             val result = patientRepository.deletePatientById(state.value.patientId)
 
-            if (result is Outcome.Success) {
-                _state.update {
-                    it.copy(
-                        showAlertDialog = false,
-                        toastMessage = "Patient successfully deleted"
+            _state.update {
+                it.copy(isLoading = false)
+            }
+
+            when (result) {
+                is Outcome.Success -> {
+                    uiEventsChannel.send(
+                        UiEvent.ShowSnackbar(
+                            SnackbarData("Patient successfully deleted")
+                        )
+                    )
+                    navigationEventsChannel.send(NavigationEvent.NavigateBack)
+                }
+
+                is Outcome.Error -> {
+                    uiEventsChannel.send(
+                        UiEvent.ShowSnackbar(
+                            SnackbarData(
+                                message = "Patient deletion failed",
+                                actionLabel = "Try again"
+                            ) {
+                                onEvent(PatientDashboardEvent.ReattemptPatientDeletion)
+                            }
+                        )
                     )
                 }
-                navigationEventsChannel.send(NavigationEvent.NavigateBack)
-            } else if (result is Outcome.Error)
-                updateDeletionState {
-                    it.copy(
-                        isLoading = false,
-                        error = "Patient deletion failed"
-                    )
-                }
+            }
         }
     }
 }
+
+//when (result) {
+//    is Outcome.Success -> it.copy(
+//    toastMessage = "Patient successfully deleted"
+//    )
+//
+//    is Outcome.Error -> it.copy(
+//    deletionError = "Patient deletion failed"
+//    )
+//}

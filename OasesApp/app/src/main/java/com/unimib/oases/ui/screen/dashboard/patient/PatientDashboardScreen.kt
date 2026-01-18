@@ -32,7 +32,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -40,13 +39,13 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.unimib.oases.data.local.model.Role
 import com.unimib.oases.ui.components.patients.PatientItem
+import com.unimib.oases.ui.components.scaffold.UiEvent
 import com.unimib.oases.ui.components.util.button.DeleteButton
 import com.unimib.oases.ui.components.util.button.DismissButton
 import com.unimib.oases.ui.components.util.button.RetryButton
 import com.unimib.oases.ui.components.util.loading.LoadingOverlay
 import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.ui.screen.root.AppViewModel
-import com.unimib.oases.ui.util.ToastUtils
 
 @Composable
 fun PatientDashboardScreen(
@@ -56,17 +55,18 @@ fun PatientDashboardScreen(
 
     val state by viewModel.state.collectAsState()
 
-    val context = LocalContext.current
-
     LaunchedEffect(Unit) {
         viewModel.navigationEvents.collect {
             appViewModel.onNavEvent(it)
         }
     }
 
-    LaunchedEffect(state.toastMessage) {
-        state.toastMessage?.let {
-            ToastUtils.showToast(context, it)
+    LaunchedEffect(Unit) {
+        viewModel.uiEvents.collect {
+            when (it) {
+                is UiEvent.ShowSnackbar -> appViewModel.showSnackbar(it.snackbarData)
+                is UiEvent.ShowToast -> appViewModel.showToast(it.message)
+            }
         }
     }
 
@@ -138,13 +138,11 @@ private fun PatientDashboardContent(
                 Text(text = "Confirm deletion of ${state.patientWithVisitInfo?.patient?.name}")
             },
             text = {
-               state.deletionState.error?.let {
-                    Text(it)
-                } ?: Text("Are you sure you want to delete this patient? All the records related to this patient will be deleted.")
+               Text("Are you sure you want to delete this patient? All the records related to this patient will be deleted.")
            },
             confirmButton = {
                 DeleteButton(
-                    text = if (state.deletionState.error == null) "Delete" else "Retry",
+                    text = "Delete",
                     onDelete = {
                         onEvent(
                             PatientDashboardEvent.PatientDeletionConfirmed

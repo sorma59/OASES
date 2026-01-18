@@ -12,10 +12,5 @@ data class PatientDashboardState(
     val toastMessage: String? = null,
     val isLoading: Boolean = false,
     val error: String? = null,
-    val deletionState: DeletionState = DeletionState()
-)
-
-data class DeletionState(
-    val isLoading: Boolean = false,
-    val error: String? = null
+    val deletionError: String? = null
 )

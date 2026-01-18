@@ -78,7 +78,11 @@ class AppViewModel @Inject constructor(
         onAction: (() -> Unit)? = null
     ) {
         viewModelScope.launch {
-            _uiEvents.emit(UiEvent.ShowSnackbar(message, actionLabel, onAction))
+            _uiEvents.emit(
+                UiEvent.ShowSnackbar(
+                    SnackbarData(message, actionLabel, onAction)
+                )
+            )
         }
     }
 
@@ -86,7 +90,13 @@ class AppViewModel @Inject constructor(
         snackbar: SnackbarData
     ) {
         viewModelScope.launch {
-            _uiEvents.emit(UiEvent.ShowSnackbar(snackbar.message, snackbar.actionLabel, snackbar.onAction))
+            _uiEvents.emit(UiEvent.ShowSnackbar(snackbar))
+        }
+    }
+
+    fun showToast(message: String) {
+        viewModelScope.launch {
+            _uiEvents.emit(UiEvent.ShowToast(message))
         }
     }
 

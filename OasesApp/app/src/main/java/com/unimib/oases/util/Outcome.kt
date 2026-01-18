@@ -6,7 +6,7 @@ package com.unimib.oases.util
  * operations, such as database queries, but not readings, for that view [Resource] .
  */
 sealed class Outcome<out T> {
-    object Loading : Outcome<Nothing>()
+//    object Loading : Outcome<Nothing>()
     data class Success<out T>(val data: T): Outcome<T>()
     data class Error(val message: String): Outcome<Nothing>()
 }

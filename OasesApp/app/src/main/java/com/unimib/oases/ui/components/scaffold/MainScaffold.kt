@@ -1,6 +1,5 @@
 package com.unimib.oases.ui.components.scaffold
 
-import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
@@ -30,10 +29,9 @@ import com.unimib.oases.ui.screen.login.AuthViewModel
 import com.unimib.oases.ui.screen.root.AppViewModel
 import com.unimib.oases.ui.util.ToastUtils
 import com.unimib.oases.ui.util.snackbar.SnackbarController
+import com.unimib.oases.ui.util.snackbar.SnackbarData
 import kotlinx.coroutines.launch
-import kotlinx.serialization.InternalSerializationApi
 
-@OptIn(InternalSerializationApi::class)
 @Composable
 fun MainScaffold(
     startDestination: Route,
@@ -65,9 +63,7 @@ fun MainScaffold(
         NoPermissionMessage(context, bluetoothManager)
     else {
 
-        NotificationPermissionHandler(
-            context = context,
-        )
+        NotificationPermissionHandler(context)
 
         LaunchedEffect(Unit) {
             SnackbarController.setHostState(snackbarHostState)
@@ -138,9 +134,9 @@ fun MainScaffold(
                 when (event) {
                     is UiEvent.ShowToast -> ToastUtils.showToast(navController.context, event.message)
                     is UiEvent.ShowSnackbar -> SnackbarController.showMessage(
-                        event.message,
-                        event.actionLabel,
-                        event.onAction
+                        event.snackbarData.message,
+                        event.snackbarData.actionLabel,
+                        event.snackbarData.onAction
                     )
                 }
             }
@@ -149,10 +145,6 @@ fun MainScaffold(
 }
 
 sealed class UiEvent {
-    data class ShowToast(val message: String, val context: Context): UiEvent()
-    data class ShowSnackbar(
-        val message: String,
-        val actionLabel: String? = null,
-        val onAction: (() -> Unit)? = null
-    ): UiEvent()
+    data class ShowToast(val message: String): UiEvent()
+    data class ShowSnackbar(val snackbarData: SnackbarData): UiEvent()
 }
