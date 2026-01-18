@@ -56,7 +56,9 @@ data class MalnutritionScreeningState(
     else
         null,
 
-    val savingState: SavingState = SavingState()
+    val savingState: SavingState = SavingState(),
+
+    val savingError: String? = null
 )
 
 data class MuacState(

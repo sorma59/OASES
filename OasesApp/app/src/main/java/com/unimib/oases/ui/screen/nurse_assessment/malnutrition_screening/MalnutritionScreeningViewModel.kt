@@ -9,10 +9,13 @@ import com.unimib.oases.domain.model.MalnutritionScreening
 import com.unimib.oases.domain.repository.MalnutritionScreeningRepository
 import com.unimib.oases.domain.usecase.ValidateMalnutritionScreeningFormUseCase
 import com.unimib.oases.domain.usecase.toFormErrors
+import com.unimib.oases.ui.components.scaffold.UiEvent
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.ui.screen.nurse_assessment.PatientRegistrationScreensUiMode
 import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreenViewModel.Companion.STEP_COMPLETED_KEY
+import com.unimib.oases.ui.util.snackbar.SnackbarData
+import com.unimib.oases.ui.util.snackbar.SnackbarType
 import com.unimib.oases.util.Outcome
 import com.unimib.oases.util.debounce
 import com.unimib.oases.util.firstNullableSuccess
@@ -66,6 +69,9 @@ class MalnutritionScreeningViewModel @Inject constructor(
 
     private val navigationEventsChannel = Channel<NavigationEvent>()
     val navigationEvents = navigationEventsChannel.receiveAsFlow()
+
+    private val uiEventsChannel = Channel<UiEvent>()
+    val uiEvents = uiEventsChannel.receiveAsFlow()
 
     init {
         viewModelScope.launch(mainContext) {
@@ -146,38 +152,14 @@ class MalnutritionScreeningViewModel @Inject constructor(
 
             MalnutritionScreeningEvent.CreateButtonPressed -> startMalnutritionScreening()
 
-            MalnutritionScreeningEvent.NextButtonPressed -> {
-                if (validateForm())
-                    _state.update {
-                        it.copy(showAlertDialog = true)
-                    }
-            }
+            MalnutritionScreeningEvent.NextButtonPressed -> validateAndShowDialog()
+
+            MalnutritionScreeningEvent.ReattemptSaving -> validateAndShowDialog()
+
             MalnutritionScreeningEvent.BackButtonPressed -> onCancel()
-            MalnutritionScreeningEvent.ConfirmDialog -> {
-                _state.update {
-                    it.copy( savingState = it.savingState.copy(isLoading = true, error = null) )
-                }
-                viewModelScope.launch {
-                    if (saveMalnutritionScreeningData()) {
-                        _state.update {
-                            it.copy(
-                                showAlertDialog = false,
-                                savingState = it.savingState.copy(isLoading = false)
-                            )
-                        }
-                        goBack(true)
-                    }
-                    else
-                        _state.update {
-                            it.copy(
-                                savingState = it.savingState.copy(
-                                    error = "Save unsuccessful, try again",
-                                    isLoading = false
-                                )
-                            )
-                        }
-                }
-            }
+
+            MalnutritionScreeningEvent.ConfirmDialog -> saveMalnutritionScreening()
+
             MalnutritionScreeningEvent.DismissDialog -> {
                 _state.update {
                     it.copy(
@@ -189,6 +171,54 @@ class MalnutritionScreeningViewModel @Inject constructor(
                 refreshMalnutritionScreening(state.value.visitId)
             }
         }
+    }
+
+    private fun saveMalnutritionScreening() {
+        _state.update {
+            it.copy(
+                isLoading = true,
+                savingError = null,
+                showAlertDialog = false
+            )
+        }
+        viewModelScope.launch {
+            if (saveMalnutritionScreeningData()) {
+                uiEventsChannel.send(
+                    UiEvent.ShowSnackbar(
+                        SnackbarData(
+                            message = "Data saved successfully",
+                            type = SnackbarType.SUCCESS
+                        )
+                    )
+                )
+                _state.update {
+                    it.copy(isLoading = false)
+                }
+                goBack(true)
+            } else {
+                uiEventsChannel.send(
+                    UiEvent.ShowSnackbar(
+                        SnackbarData(
+                            message = "Save unsuccessful, try again",
+                            type = SnackbarType.ERROR,
+                            actionLabel = "Try again"
+                        ) {
+                            onEvent(MalnutritionScreeningEvent.ReattemptSaving)
+                        }
+                    )
+                )
+                _state.update {
+                    it.copy(isLoading = false)
+                }
+            }
+        }
+    }
+
+    private fun validateAndShowDialog() {
+        if (validateForm())
+            _state.update {
+                it.copy(showAlertDialog = true)
+            }
     }
 
     private suspend fun navigateBackWithResult(result: Boolean) {

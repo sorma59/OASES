@@ -9,6 +9,7 @@ sealed class MalnutritionScreeningEvent {
     data object CreateButtonPressed: MalnutritionScreeningEvent()
     data object BackButtonPressed: MalnutritionScreeningEvent()
     data object NextButtonPressed: MalnutritionScreeningEvent()
+    data object ReattemptSaving: MalnutritionScreeningEvent()
 
     data object ConfirmDialog: MalnutritionScreeningEvent()
     data object DismissDialog: MalnutritionScreeningEvent()

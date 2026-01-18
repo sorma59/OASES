@@ -28,6 +28,7 @@ import com.unimib.oases.ui.components.util.button.BottomButtons
 import com.unimib.oases.ui.components.util.button.RetryButton
 import com.unimib.oases.ui.components.util.button.StartButton
 import com.unimib.oases.ui.components.util.effect.HandleNavigationEvents
+import com.unimib.oases.ui.components.util.effect.HandleUiEvents
 import com.unimib.oases.ui.screen.nurse_assessment.PatientRegistrationScreensUiMode
 import com.unimib.oases.ui.screen.root.AppViewModel
 import com.unimib.oases.util.reactToKeyboardAppearance
@@ -42,6 +43,8 @@ fun MalnutritionScreeningScreen(
     val state by viewModel.state.collectAsState()
 
     HandleNavigationEvents(viewModel.navigationEvents, appViewModel)
+
+    HandleUiEvents(viewModel.uiEvents, appViewModel)
 
     MalnutritionScreeningContent(state, viewModel::onEvent)
 }
@@ -66,18 +69,10 @@ fun MalnutritionScreeningContent(
 @Composable
 fun MuacColorIndicator(muacCategory: MuacCategory?){
     val color: Color = when (muacCategory) {
-        MuacCategory.NORMAL -> {
-            Color.Green
-        }
-        MuacCategory.MODERATE -> {
-            Color.Yellow
-        }
-        MuacCategory.SEVERE -> {
-            Color.Red
-        }
-        null -> {
-            Color.Gray
-        }
+        MuacCategory.SEVERE -> Color.Red
+        MuacCategory.MODERATE -> Color(0xFFE6A200) // Amber
+        MuacCategory.NORMAL -> Color(0xFF2E7D32) // Dark Green
+        null -> Color.Gray
     }
 
     Spacer(

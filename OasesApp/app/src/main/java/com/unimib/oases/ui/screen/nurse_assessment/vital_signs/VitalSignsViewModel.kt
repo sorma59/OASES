@@ -85,8 +85,8 @@ class VitalSignsViewModel @Inject constructor(
             _state.update { it.copy(error = null, isLoading = true) }
             loadVitalSigns()
             val visit = getCurrentVisitUseCase(state.value.patientId)
-                if (state.value.error == null)
-                    loadVisitVitalSigns(visit.id)
+            if (state.value.error == null)
+                loadVisitVitalSigns(visit.id)
             _state.update { it.copy(isLoading = false) }
         }
     }
