@@ -260,13 +260,3 @@ class PatientDashboardViewModel @Inject constructor(
         }
     }
 }
-
-//when (result) {
-//    is Outcome.Success -> it.copy(
-//    toastMessage = "Patient successfully deleted"
-//    )
-//
-//    is Outcome.Error -> it.copy(
-//    deletionError = "Patient deletion failed"
-//    )
-//}

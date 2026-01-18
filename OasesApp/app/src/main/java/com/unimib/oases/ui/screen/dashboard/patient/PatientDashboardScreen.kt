@@ -26,7 +26,6 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -39,10 +38,11 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.unimib.oases.data.local.model.Role
 import com.unimib.oases.ui.components.patients.PatientItem
-import com.unimib.oases.ui.components.scaffold.UiEvent
 import com.unimib.oases.ui.components.util.button.DeleteButton
 import com.unimib.oases.ui.components.util.button.DismissButton
 import com.unimib.oases.ui.components.util.button.RetryButton
+import com.unimib.oases.ui.components.util.effect.HandleNavigationEvents
+import com.unimib.oases.ui.components.util.effect.HandleUiEvents
 import com.unimib.oases.ui.components.util.loading.LoadingOverlay
 import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.ui.screen.root.AppViewModel
@@ -55,20 +55,9 @@ fun PatientDashboardScreen(
 
     val state by viewModel.state.collectAsState()
 
-    LaunchedEffect(Unit) {
-        viewModel.navigationEvents.collect {
-            appViewModel.onNavEvent(it)
-        }
-    }
+    HandleNavigationEvents(viewModel.navigationEvents, appViewModel)
 
-    LaunchedEffect(Unit) {
-        viewModel.uiEvents.collect {
-            when (it) {
-                is UiEvent.ShowSnackbar -> appViewModel.showSnackbar(it.snackbarData)
-                is UiEvent.ShowToast -> appViewModel.showToast(it.message)
-            }
-        }
-    }
+    HandleUiEvents(viewModel.uiEvents, appViewModel)
 
     LoadingOverlay(state.isLoading)
 
