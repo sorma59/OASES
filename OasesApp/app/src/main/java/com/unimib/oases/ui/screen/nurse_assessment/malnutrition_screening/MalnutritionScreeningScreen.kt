@@ -29,6 +29,7 @@ import com.unimib.oases.ui.components.util.button.RetryButton
 import com.unimib.oases.ui.components.util.button.StartButton
 import com.unimib.oases.ui.components.util.effect.HandleNavigationEvents
 import com.unimib.oases.ui.components.util.effect.HandleUiEvents
+import com.unimib.oases.ui.components.util.loading.LoadingOverlay
 import com.unimib.oases.ui.screen.nurse_assessment.PatientRegistrationScreensUiMode
 import com.unimib.oases.ui.screen.root.AppViewModel
 import com.unimib.oases.util.reactToKeyboardAppearance
@@ -45,6 +46,8 @@ fun MalnutritionScreeningScreen(
     HandleNavigationEvents(viewModel.navigationEvents, appViewModel)
 
     HandleUiEvents(viewModel.uiEvents, appViewModel)
+
+    LoadingOverlay(state.isLoading)
 
     MalnutritionScreeningContent(state, viewModel::onEvent)
 }

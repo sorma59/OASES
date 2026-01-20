@@ -23,6 +23,7 @@ import com.unimib.oases.ui.screen.medical_visit.maincomplaint.MainComplaintScree
 import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreen
 import com.unimib.oases.ui.screen.nurse_assessment.demographics.DemographicsScreen
 import com.unimib.oases.ui.screen.nurse_assessment.history.HistoryScreen
+import com.unimib.oases.ui.screen.nurse_assessment.intake.InitialIntakeScreen
 import com.unimib.oases.ui.screen.nurse_assessment.malnutrition_screening.MalnutritionScreeningScreen
 import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageScreen
 import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.VitalSignsScreen
@@ -64,6 +65,10 @@ fun AppNavigation(
 
         composable<Route.Home> {
             HomeScreen(authViewModel, appViewModel)
+        }
+
+        composable<Route.InitialIntake> {
+            InitialIntakeScreen(appViewModel)
         }
 
         composable<Route.PatientRegistration>(

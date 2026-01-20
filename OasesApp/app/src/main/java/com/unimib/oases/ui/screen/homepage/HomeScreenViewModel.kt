@@ -52,7 +52,7 @@ class HomeScreenViewModel @Inject constructor(
                 viewModelScope.launch {
                     navigationEventsChannel.send(
                         NavigationEvent.Navigate(
-                            Route.PatientRegistration
+                            Route.InitialIntake
                         )
                     )
                 }

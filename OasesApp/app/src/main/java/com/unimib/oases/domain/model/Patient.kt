@@ -18,7 +18,10 @@ data class Patient(
     val nextOfKin: String,
     val contact: String,
     val image: ByteArray? = null
-)
+) {
+    val age: Int
+        get() = ageInMonths / 12
+}
 
 /**
  * Represents the different states a patient can be in during their hospital visit.

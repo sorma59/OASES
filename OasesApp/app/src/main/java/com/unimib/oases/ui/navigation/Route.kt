@@ -4,8 +4,14 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed class Route {
     // --- Routes with specific Top App Bar types ---
+
+    /**
+     * when adding a new Route make sure to add its title and type to the map in [com.unimib.oases.ui.components.scaffold.titlesAndTypesByClass]
+     */
     @Serializable
     data object Home: Route()
+    @Serializable
+    data object InitialIntake: Route()
     @Serializable
     data object AdminDashboard: Route()
     @Serializable

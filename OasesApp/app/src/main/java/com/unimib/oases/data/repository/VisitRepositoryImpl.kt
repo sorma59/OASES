@@ -20,10 +20,10 @@ class VisitRepositoryImpl @Inject constructor(
     private val roomDataSource: RoomDataSource,
 ): VisitRepository {
 
-    override suspend fun addVisit(visit: Visit): Outcome<Unit> {
+    override suspend fun addVisit(visit: Visit): Outcome<String> {
         return try {
             roomDataSource.insertVisit(visit.toEntity())
-            Outcome.Success(Unit)
+            Outcome.Success(visit.id)
         } catch (e: Exception) {
             Log.e("VisitRepository", "Error adding visit: ${e.message}")
             Outcome.Error(e.message ?: "An error occurred")

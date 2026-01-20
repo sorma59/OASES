@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface VisitRepository {
 
-    suspend fun addVisit(visit: Visit): Outcome<Unit>
+    suspend fun addVisit(visit: Visit): Outcome<String>
 
     suspend fun insertTriageEvaluationAndUpdateVisit(visit: Visit, triageEvaluation: TriageEvaluation): Outcome<Unit>
 

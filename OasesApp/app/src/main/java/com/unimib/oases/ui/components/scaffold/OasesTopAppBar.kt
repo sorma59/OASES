@@ -41,6 +41,7 @@ fun NavDestination?.getTitleAndType(): Pair<String, OasesTopAppBarType>? {
 
 val titlesAndTypesByClass: Map<KClass<out Route>, Pair<String, OasesTopAppBarType>> = buildMap {
     put(Route.Home::class, "OASES" to OasesTopAppBarType.MENU)
+    put(Route.InitialIntake::class, "New Visit" to OasesTopAppBarType.BACK)
     put(Route.AdminDashboard::class, "Admin Panel" to OasesTopAppBarType.MENU)
     put(Route.PatientRegistration::class, "Patient Registration" to OasesTopAppBarType.BACK)
     put(Route.Demographics::class, "Demographics" to OasesTopAppBarType.BACK)

@@ -110,12 +110,6 @@ fun MainScaffold(
                             SnackbarType.INFO -> MaterialTheme.colorScheme.onSurface
                         }
 
-                        val dismissActionContentColor = when (type) {
-                            SnackbarType.SUCCESS -> MaterialTheme.colorScheme.onPrimaryContainer
-                            SnackbarType.ERROR -> MaterialTheme.colorScheme.onErrorContainer
-                            SnackbarType.INFO -> MaterialTheme.colorScheme.onSurface
-                        }
-
                         Snackbar(
                             snackbarData = data,
                             containerColor = containerColor,
@@ -147,6 +141,10 @@ fun MainScaffold(
             appViewModel.navEvents.collect { event ->
                 when (event) {
                     is NavigationEvent.Navigate -> navController.navigate(event.route)
+                    is NavigationEvent.PopAndNavigate -> {
+                        navController.popBackStack()
+                        navController.navigate(event.route)
+                    }
                     NavigationEvent.NavigateBack -> navController.popBackStack()
                     is NavigationEvent.NavigateBackWithResult<*> -> {
 

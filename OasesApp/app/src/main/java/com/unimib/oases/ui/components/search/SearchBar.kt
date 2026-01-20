@@ -36,9 +36,11 @@ fun SearchBar(
     active: Boolean,
     onActiveChange: (Boolean) -> Unit,
     searchHistory: List<String>,
-    onHistoryItemClick: (String) -> Unit
+    onHistoryItemClick: (String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     DockedSearchBar(
+        modifier = modifier,
         inputField = {
             SearchBarDefaults.InputField(
                 query = query,
@@ -83,7 +85,6 @@ fun SearchBar(
         },
         expanded = searchHistory.isNotEmpty() && active,
         onExpandedChange = onActiveChange,
-        modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(10.dp),
         colors = SearchBarDefaults.colors(MaterialTheme.colorScheme.surfaceContainerHighest),
         tonalElevation = SearchBarDefaults.TonalElevation,

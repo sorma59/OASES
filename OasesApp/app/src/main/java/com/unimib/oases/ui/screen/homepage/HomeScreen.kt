@@ -2,7 +2,6 @@ package com.unimib.oases.ui.screen.homepage
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -89,8 +88,7 @@ private fun HomeContent(
     ) {
 
         Column(
-            modifier = Modifier
-                .fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -100,24 +98,22 @@ private fun HomeContent(
                     .fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Row(
+
+                SearchBar(
+                    query = searchText,
+                    onQueryChange = onQueryChange,
+                    onSearch = onSearch,
+                    active = active,
+                    onActiveChange = { active = it },
+                    searchHistory = listState,
+                    onHistoryItemClick = {
+                        onQueryChange(it)
+                        onSearch()
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(12.dp)
-                ) {
-                    SearchBar(
-                        query = searchText,
-                        onQueryChange = onQueryChange,
-                        onSearch = onSearch,
-                        active = active,
-                        onActiveChange = { active = it },
-                        searchHistory = listState,
-                        onHistoryItemClick = {
-                            onQueryChange(it)
-                            onSearch()
-                        }
-                    )
-                }
+                )
 
                 if (state.patientsWithVisitInfo.isNotEmpty()) {
                     PatientsWithVisitInfoList(
