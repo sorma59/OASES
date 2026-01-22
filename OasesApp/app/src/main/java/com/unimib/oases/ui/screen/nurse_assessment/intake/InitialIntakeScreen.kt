@@ -3,6 +3,7 @@ package com.unimib.oases.ui.screen.nurse_assessment.intake
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -33,6 +34,7 @@ import com.unimib.oases.ui.components.util.effect.HandleUiEvents
 import com.unimib.oases.ui.components.util.loading.LoadingOverlay
 import com.unimib.oases.ui.screen.root.AppViewModel
 import com.unimib.oases.util.StringFormatHelper
+import com.unimib.oases.util.StringFormatHelper.formatDate
 
 @Composable
 fun InitialIntakeScreen(
@@ -48,18 +50,19 @@ fun InitialIntakeScreen(
 
     LoadingOverlay(state.isReturn && state.isLoading)
 
-    InitialIntakeContent(state, viewModel::onEvent)
+    InitialIntakeContent(state, viewModel::onEvent, Modifier.fillMaxSize())
 }
 
 @Composable
 private fun InitialIntakeContent(
     state: InitialIntakeState,
-    onEvent: (InitialIntakeEvent) -> Unit
+    onEvent: (InitialIntakeEvent) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     if (state.isReturn)
-        PatientsListContent(state, onEvent)
+        PatientsListContent(state, onEvent, modifier)
     else
-        NewOrReturnContent(onEvent)
+        NewOrReturnContent(onEvent, modifier)
 }
 
 @Composable
@@ -136,6 +139,9 @@ private fun PatientsListContent(
                     },
                     DataColumn(Alignment.Center) {
                         Text(color = MaterialTheme.colorScheme.surface, text = "Village")
+                    },
+                    DataColumn(Alignment.Center) {
+                        Text(color = MaterialTheme.colorScheme.surface, text = "Last time here")
                     }
                 )
             ) {
@@ -158,7 +164,7 @@ private fun PatientsListContent(
                         }
 
                         cell {
-                            Text(getAgeString(patient), textAlign = TextAlign.Center)
+                            Text(getAgeString(patient.patient), textAlign = TextAlign.Center)
                         }
 
                         cell {
@@ -167,6 +173,10 @@ private fun PatientsListContent(
 
                         cell {
                             Text(patient.village)
+                        }
+
+                        cell {
+                            Text(formatDate(patient.lastVisitDate))
                         }
                     }
                 }
@@ -177,15 +187,19 @@ private fun PatientsListContent(
 }
 
 @Composable
-private fun NewOrReturnContent(onEvent: (InitialIntakeEvent) -> Unit) {
+private fun NewOrReturnContent(
+    onEvent: (InitialIntakeEvent) -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
+        modifier = modifier
     ) {
 
         CenteredText(
             "Add a patient",
-            fontSize = 20.sp
+            fontSize = 22.sp
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -195,7 +209,7 @@ private fun NewOrReturnContent(onEvent: (InitialIntakeEvent) -> Unit) {
             fontSize = 20.sp
         )
 
-        Spacer(Modifier.height(64.dp))
+        Spacer(Modifier.height(128.dp))
 
         BottomButtons(
             onCancel = { onEvent(InitialIntakeEvent.NewButtonClicked) },

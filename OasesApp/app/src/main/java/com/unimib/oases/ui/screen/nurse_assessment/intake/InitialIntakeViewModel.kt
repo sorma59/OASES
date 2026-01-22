@@ -63,7 +63,7 @@ class InitialIntakeViewModel @Inject constructor(
             InitialIntakeEvent.NewButtonClicked -> {
                 viewModelScope.launch {
                     navigationEventsChannel.send(
-                        NavigationEvent.Navigate(
+                        NavigationEvent.PopAndNavigate(
                             Route.PatientRegistration
                         )
                     )
@@ -125,7 +125,7 @@ class InitialIntakeViewModel @Inject constructor(
     fun getPatients() {
         viewModelScope.launch(coroutineContext) {
 
-            patientRepository.getPatients()
+            patientRepository.getPatientsWithLastVisitDate()
                 .collect { resource ->
                     when (resource) {
                         is Resource.Loading -> {

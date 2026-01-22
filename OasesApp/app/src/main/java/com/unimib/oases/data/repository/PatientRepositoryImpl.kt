@@ -6,6 +6,7 @@ import com.unimib.oases.data.mapper.toDomain
 import com.unimib.oases.data.mapper.toEntity
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.domain.model.PatientAndVisitIds
+import com.unimib.oases.domain.model.PatientWithLastVisitDate
 import com.unimib.oases.domain.model.PatientWithVisitInfo
 import com.unimib.oases.domain.model.Visit
 import com.unimib.oases.domain.repository.PatientRepository
@@ -122,6 +123,24 @@ class PatientRepositoryImpl @Inject constructor(
             .collect { entities ->
                 val patients = entities
                     .asReversed()
+                    .map { entity ->
+                        entity.toDomain()
+                    }
+                emit(Resource.Success(patients))
+            }
+    }
+
+    override fun getPatientsWithLastVisitDate(): Flow<Resource<List<PatientWithLastVisitDate>>> = flow {
+        roomDataSource.getPatientsWithLastVisitDate()
+            .onStart {
+                emit(Resource.Loading())
+            }
+            .catch {
+                Log.e("PatientRepositoryImpl", "Error getting patients with last visit date: ${it.message}")
+                emit(Resource.Error(it.localizedMessage ?: "Unknown error occurred"))
+            }
+            .collect { entities ->
+                val patients = entities
                     .map { entity ->
                         entity.toDomain()
                     }

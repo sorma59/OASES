@@ -6,6 +6,7 @@ import androidx.room.Query
 import androidx.room.Upsert
 import com.unimib.oases.data.local.TableNames
 import com.unimib.oases.data.local.model.PatientEntity
+import com.unimib.oases.data.local.model.relation.PatientWithLastVisitDateEntity
 import com.unimib.oases.data.local.model.relation.PatientWithVisitInfoEntity
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
@@ -23,6 +24,15 @@ interface PatientDao {
 
     @Query("SELECT * FROM " + TableNames.PATIENT)
     fun getPatients(): Flow<List<PatientEntity>>
+
+    @Query("""
+    SELECT p.*, MAX(v.date) as lastVisitDate 
+    FROM patients p 
+    INNER JOIN visits v ON p.id = v.patient_id -- INNER is correct as long as patients are created along visits
+    GROUP BY p.id
+    ORDER BY lastVisitDate DESC
+""")
+    fun getPatientsWithLastVisitDate(): Flow<List<PatientWithLastVisitDateEntity>>
 
     // Query for home screen
     @Query("""

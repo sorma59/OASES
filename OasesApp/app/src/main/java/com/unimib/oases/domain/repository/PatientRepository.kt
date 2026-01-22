@@ -2,6 +2,7 @@ package com.unimib.oases.domain.repository
 
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.domain.model.PatientAndVisitIds
+import com.unimib.oases.domain.model.PatientWithLastVisitDate
 import com.unimib.oases.domain.model.PatientWithVisitInfo
 import com.unimib.oases.domain.model.Visit
 import com.unimib.oases.util.Outcome
@@ -18,6 +19,7 @@ interface PatientRepository {
     fun getPatientById(patientId: String): Flow<Resource<Patient>>
 //    suspend fun updateTriageState(patient: Patient, triageState: String): Resource<Unit>
     fun getPatients(): Flow<Resource<List<Patient>>>
+    fun getPatientsWithLastVisitDate(): Flow<Resource<List<PatientWithLastVisitDate>>>
     fun getPatientsAndVisitsOn(date: LocalDate): Flow<Resource<List<PatientWithVisitInfo>>>
     fun doOnlineTasks()
     fun doOfflineTasks()
