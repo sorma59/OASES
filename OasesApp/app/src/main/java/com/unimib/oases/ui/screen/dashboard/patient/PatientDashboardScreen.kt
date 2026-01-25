@@ -185,8 +185,8 @@ sealed interface PatientDashboardAction {
                 Triage,
                 MalnutritionScreening,
                 History,
-                Send,
                 StartVisit,
+                Send,
                 Delete
             )
         }
