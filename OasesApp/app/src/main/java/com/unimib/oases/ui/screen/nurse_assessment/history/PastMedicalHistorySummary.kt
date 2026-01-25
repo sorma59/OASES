@@ -39,7 +39,7 @@ fun PastHistorySummary(
 
     OasesCard(modifier = modifier.fillMaxWidth()) {
         Column(
-            modifier = Modifier.padding(vertical = 16.dp)
+            modifier = Modifier.padding(16.dp)
         ) {
             // --- Title ---
             Row(
@@ -49,14 +49,12 @@ fun PastHistorySummary(
             ){
                 Text(
                     text = "Past Medical History Summary",
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    style = MaterialTheme.typography.titleMedium
                 )
 
                 if (shouldShowEditButton()) {
                     IconButton(
-                        onClick = { onEvent(HistoryEvent.EditButtonPressed) },
-                        modifier = Modifier.padding(end = 16.dp)
+                        onClick = { onEvent(HistoryEvent.EditButtonPressed) }
                     ) {
                         Icon(
                             imageVector = Icons.Default.Edit,
@@ -70,15 +68,18 @@ fun PastHistorySummary(
             Spacer(modifier = Modifier.height(8.dp))
 
             // --- Content ---
-            Column(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                diagnosedDiseases.forEach { disease ->
-                    DiagnosedDiseaseItem(
-                        disease = disease
-                    )
+            if (diagnosedDiseases.isNotEmpty()) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    diagnosedDiseases.forEach { disease ->
+                        DiagnosedDiseaseItem(
+                            disease = disease
+                        )
+                    }
                 }
+            } else {
+                Text("No known chronic diseases")
             }
         }
     }

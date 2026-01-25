@@ -11,7 +11,10 @@ sealed class HistoryEvent {
     data object Save: HistoryEvent()
     data object Cancel: HistoryEvent()
 
-    data object ToastShown: HistoryEvent()
+    data object ReattemptSaving: HistoryEvent()
+
+    data class UndoMarkingAllAsNos(val previousDiseases: List<PatientDiseaseState>): HistoryEvent()
+
     data object ReloadPastVisits: HistoryEvent()
 
     data object ReloadPastMedicalHistory: HistoryEvent()

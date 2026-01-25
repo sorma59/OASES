@@ -8,8 +8,7 @@ data class HistoryState(
     val selectedTab: HistoryScreenTab,
     val tabs: List<HistoryScreenTab>,
     val pastMedicalHistoryState: PastMedicalHistoryState = PastMedicalHistoryState(),
-    val pastVisitsState: PastVisitsState = PastVisitsState(),
-    val toastMessage: String? = null
+    val pastVisitsState: PastVisitsState = PastVisitsState()
 )
 
 data class PastMedicalHistoryState(
@@ -22,6 +21,9 @@ data class PastMedicalHistoryState(
     // 2. This computed property can now get the data directly from the mode.
     val isPastMedicalHistoryPresent: Boolean
         get() = mode is PmhMode.View && mode.diseases.mapNotNull{it.isDiagnosed}.isNotEmpty()
+
+    val canSave: Boolean
+        get() = mode is PmhMode.Edit && mode.hasAnyBeenFilledIn
 }
 
 // 3. Define the sealed interface for the different modes.
@@ -40,6 +42,9 @@ sealed interface PmhMode {
     ) : PmhMode {
         val areAllSetToNo: Boolean
             get() = editingDiseases.all{ it.isDiagnosed == false}
+
+        val hasAnyBeenFilledIn: Boolean
+            get() = editingDiseases.any { it.isDiagnosed != null }
     }
 }
 

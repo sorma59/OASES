@@ -12,13 +12,19 @@ import com.unimib.oases.domain.auth.AuthManager
 import com.unimib.oases.domain.usecase.GetChronicDiseasesInfo
 import com.unimib.oases.domain.usecase.ReloadPastVisitsUseCase
 import com.unimib.oases.domain.usecase.SavePastMedicalHistoryUseCase
+import com.unimib.oases.ui.components.scaffold.UiEvent
+import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Route
+import com.unimib.oases.ui.util.snackbar.SnackbarData
+import com.unimib.oases.ui.util.snackbar.SnackbarType
 import com.unimib.oases.util.Outcome
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -75,6 +81,12 @@ class HistoryViewModel @Inject constructor(
     )
     val state = _state.asStateFlow()
 
+    private val navigationEventsChannel = Channel<NavigationEvent>()
+    val navigationEvents = navigationEventsChannel.receiveAsFlow()
+
+    private val uiEventsChannel = Channel<UiEvent>()
+    val uiEvents = uiEventsChannel.receiveAsFlow()
+
     init {
         loadChronicDiseases()
         loadPastVisits()
@@ -118,6 +130,7 @@ class HistoryViewModel @Inject constructor(
 
             HistoryEvent.DenyAllClicked -> {
                 updatePmhEditState {
+                    showMarkedAllAsNosSnackbar(it.editingDiseases)
                     it.copy(
                         editingDiseases = it.editingDiseases.map { diseaseState ->
                             diseaseState.copy(
@@ -134,10 +147,6 @@ class HistoryViewModel @Inject constructor(
 
             HistoryEvent.ReloadPastMedicalHistory -> {
                 loadChronicDiseases()
-            }
-
-            HistoryEvent.ToastShown -> {
-                _state.update { it.copy(toastMessage = null) }
             }
 
             is HistoryEvent.RadioButtonClicked -> {
@@ -159,7 +168,10 @@ class HistoryViewModel @Inject constructor(
             }
 
             HistoryEvent.Save -> {
-                savePastMedicalHistory()
+                if (_state.value.pastMedicalHistoryState.canSave)
+                    savePastMedicalHistory()
+                else
+                    showCannotSaveError()
             }
 
             is HistoryEvent.AdditionalInfoChanged -> {
@@ -198,6 +210,18 @@ class HistoryViewModel @Inject constructor(
                     )
                 }
             }
+
+            HistoryEvent.ReattemptSaving -> {
+                onEvent(HistoryEvent.Save)
+            }
+
+            is HistoryEvent.UndoMarkingAllAsNos -> {
+                updatePmhEditState {
+                    it.copy(
+                        editingDiseases = event.previousDiseases
+                    )
+                }
+            }
         }
     }
 
@@ -230,7 +254,7 @@ class HistoryViewModel @Inject constructor(
             )
             when (outcome) {
                 is Outcome.Error -> {
-                    _state.update { it.copy(toastMessage = "Saving failed") }
+                    showSavingError()
                 }
 
                 is Outcome.Success -> {
@@ -254,6 +278,55 @@ class HistoryViewModel @Inject constructor(
                     isLoading = false
                 )
             }
+        }
+    }
+
+    private fun showCannotSaveError() {
+        viewModelScope.launch(pastMedicalHistoryContext) {
+            uiEventsChannel.send(
+                UiEvent.ShowSnackbar(
+                    SnackbarData(
+                        message = "At least one disease needs to have an answer",
+                        type = SnackbarType.ERROR
+                    )
+                )
+            )
+        }
+    }
+
+    private fun showSavingError(error: String? = null) {
+        updatePastMedicalHistoryState {
+            it.copy(isLoading = false)
+        }
+
+        viewModelScope.launch(pastMedicalHistoryContext) {
+            uiEventsChannel.send(
+                UiEvent.ShowSnackbar(
+                    SnackbarData(
+                        message = error ?: "Save unsuccessful, try again",
+                        type = SnackbarType.ERROR,
+                        actionLabel = "Try again",
+                    ) {
+                        onEvent(HistoryEvent.ReattemptSaving)
+                    }
+                )
+            )
+        }
+    }
+
+    private fun showMarkedAllAsNosSnackbar(diseasesBeforeDenyingAll: List<PatientDiseaseState>) {
+        viewModelScope.launch(pastMedicalHistoryContext) {
+            uiEventsChannel.send(
+                UiEvent.ShowSnackbar(
+                    SnackbarData(
+                        message = "All chronic diseases set no",
+                        type = SnackbarType.INFO,
+                        actionLabel = "Undo",
+                    ) {
+                        onEvent(HistoryEvent.UndoMarkingAllAsNos(diseasesBeforeDenyingAll))
+                    }
+                )
+            )
         }
     }
 

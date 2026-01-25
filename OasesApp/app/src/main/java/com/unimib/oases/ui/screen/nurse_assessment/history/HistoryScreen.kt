@@ -5,21 +5,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.unimib.oases.ui.components.tab.TabSwitcher
 import com.unimib.oases.ui.components.util.CenteredText
 import com.unimib.oases.ui.components.util.button.RetryButton
 import com.unimib.oases.ui.components.util.button.StartButton
+import com.unimib.oases.ui.components.util.effect.HandleNavigationEvents
+import com.unimib.oases.ui.components.util.effect.HandleUiEvents
 import com.unimib.oases.ui.components.util.loading.LoadingOverlay
 import com.unimib.oases.ui.screen.root.AppViewModel
-import com.unimib.oases.ui.util.ToastUtils
 
 @Composable
 fun HistoryScreen(
@@ -30,13 +29,9 @@ fun HistoryScreen(
 
     val state by viewModel.state.collectAsState()
 
-    val context = LocalContext.current
+    HandleNavigationEvents(viewModel.navigationEvents, appViewModel)
 
-    LaunchedEffect(state.toastMessage) {
-        state.toastMessage?.let {
-            ToastUtils.showToast(context, it)
-        }
-    }
+    HandleUiEvents(viewModel.uiEvents, appViewModel)
 
     LoadingOverlay(state.pastMedicalHistoryState.isLoading || state.pastVisitsState.isLoading)
 

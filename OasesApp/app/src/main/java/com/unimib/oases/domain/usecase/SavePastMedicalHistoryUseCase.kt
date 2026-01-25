@@ -5,12 +5,14 @@ import com.unimib.oases.domain.repository.PatientDiseaseRepository
 import com.unimib.oases.ui.screen.nurse_assessment.history.PatientDiseaseState
 import com.unimib.oases.util.Outcome
 import javax.inject.Inject
+import kotlin.random.Random
 
 class SavePastMedicalHistoryUseCase @Inject constructor(
     private val patientDiseaseRepository: PatientDiseaseRepository
 ) {
 
     suspend operator fun invoke(diseasesStates: List<PatientDiseaseState>, patientId: String): Outcome<Unit> {
+        if (Random.nextBoolean()) return Outcome.Error("MOCK ERROR")
         return try {
             val patientDiseases = diseasesStates.toPatientDiseases(patientId)
             return patientDiseaseRepository.addPatientDiseases(patientDiseases)

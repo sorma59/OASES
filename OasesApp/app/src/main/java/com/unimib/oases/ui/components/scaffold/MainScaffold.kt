@@ -98,26 +98,7 @@ fun MainScaffold(
                         // Determine colors based on the type set in the controller
                         val type = SnackbarController.currentType
 
-                        val containerColor = when (type) {
-                            SnackbarType.SUCCESS -> MaterialTheme.colorScheme.primaryContainer // Green
-                            SnackbarType.ERROR -> MaterialTheme.colorScheme.errorContainer
-                            SnackbarType.INFO -> MaterialTheme.colorScheme.surface
-                        }
-
-                        val contentColor = when (type) {
-                            SnackbarType.SUCCESS -> MaterialTheme.colorScheme.onPrimaryContainer
-                            SnackbarType.ERROR -> MaterialTheme.colorScheme.onErrorContainer
-                            SnackbarType.INFO -> MaterialTheme.colorScheme.onSurface
-                        }
-
-                        Snackbar(
-                            snackbarData = data,
-                            containerColor = containerColor,
-                            contentColor = contentColor,
-                            actionColor = contentColor, // Make the button match text
-                            dismissActionContentColor = contentColor,
-                            shape = MaterialTheme.shapes.medium
-                        )
+                        GenerateSnackbar(type, data)
                     }
                 }
             ) { padding ->
@@ -175,6 +156,47 @@ fun MainScaffold(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun GenerateSnackbar(
+    type: SnackbarType,
+    data: androidx.compose.material3.SnackbarData
+) {
+    when (type) {
+        SnackbarType.INFO -> {
+            Snackbar(
+                snackbarData = data,
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.onSurface,
+                actionColor = MaterialTheme.colorScheme.primary,
+                dismissActionContentColor = MaterialTheme.colorScheme.onSurface,
+                shape = MaterialTheme.shapes.medium
+            )
+        }
+
+        SnackbarType.SUCCESS -> {
+            Snackbar(
+                snackbarData = data,
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                actionColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                dismissActionContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                shape = MaterialTheme.shapes.medium
+            )
+        }
+
+        SnackbarType.ERROR -> {
+            Snackbar(
+                snackbarData = data,
+                containerColor = MaterialTheme.colorScheme.errorContainer,
+                contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                actionColor = MaterialTheme.colorScheme.onErrorContainer,
+                dismissActionContentColor = MaterialTheme.colorScheme.onErrorContainer,
+                shape = MaterialTheme.shapes.medium
+            )
         }
     }
 }
