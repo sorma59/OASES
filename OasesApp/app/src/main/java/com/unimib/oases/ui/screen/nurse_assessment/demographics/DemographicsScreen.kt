@@ -19,7 +19,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -35,6 +34,7 @@ import com.unimib.oases.ui.components.util.OutlinedDropdown
 import com.unimib.oases.ui.components.util.button.BottomButtons
 import com.unimib.oases.ui.components.util.button.RetryButton
 import com.unimib.oases.ui.components.util.effect.HandleNavigationEvents
+import com.unimib.oases.ui.components.util.effect.HandleUiEvents
 import com.unimib.oases.ui.components.util.loading.LoadingOverlay
 import com.unimib.oases.ui.screen.nurse_assessment.PatientRegistrationScreensUiMode
 import com.unimib.oases.ui.screen.root.AppViewModel
@@ -49,11 +49,7 @@ fun DemographicsScreen(appViewModel: AppViewModel){
 
     HandleNavigationEvents(viewModel.navigationEvents, appViewModel)
 
-    LaunchedEffect(Unit) {
-        viewModel.snackbarEvents.collect {
-            appViewModel.showSnackbar(it)
-        }
-    }
+    HandleUiEvents(viewModel.uiEvents, appViewModel)
 
     LoadingOverlay(state.isLoading)
 

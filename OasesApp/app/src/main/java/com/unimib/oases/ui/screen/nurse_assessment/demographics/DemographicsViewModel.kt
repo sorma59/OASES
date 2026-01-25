@@ -11,6 +11,7 @@ import com.unimib.oases.domain.usecase.SavePatientDataAndCreateVisitUseCase
 import com.unimib.oases.domain.usecase.SavePatientDataUseCase
 import com.unimib.oases.domain.usecase.ValidatePatientInfoFormUseCase
 import com.unimib.oases.domain.usecase.toFormErrors
+import com.unimib.oases.ui.components.scaffold.UiEvent
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.ui.screen.nurse_assessment.PatientRegistrationScreensUiMode
@@ -74,8 +75,8 @@ class DemographicsViewModel @Inject constructor(
     private val navigationEventsChannel = Channel<NavigationEvent>()
     val navigationEvents = navigationEventsChannel.receiveAsFlow()
 
-    private val snackbarEventsChannel = Channel<SnackbarData>()
-    val snackbarEvents = snackbarEventsChannel.receiveAsFlow()
+    private val uiEventsChannel = Channel<UiEvent>()
+    val uiEvents = uiEventsChannel.receiveAsFlow()
 
     init {
         if (state.value.uiMode is PatientRegistrationScreensUiMode.Standalone)
@@ -343,21 +344,25 @@ class DemographicsViewModel @Inject constructor(
     }
 
     private suspend fun showSavingError(error: String? = null) {
-        snackbarEventsChannel.send(
-            SnackbarData(
-                message = error ?: "Save unsuccessful, try again",
-                type = SnackbarType.ERROR,
-                actionLabel = "Try again",
-                onAction = { savePatient() }
+        uiEventsChannel.send(
+            UiEvent.ShowSnackbar(
+                SnackbarData(
+                    message = error ?: "Save unsuccessful, try again",
+                    type = SnackbarType.ERROR,
+                    actionLabel = "Try again",
+                    onAction = { savePatient() }
+                )
             )
         )
     }
 
     private suspend fun showSavingSuccess() {
-        snackbarEventsChannel.send(
-            SnackbarData(
-                message = "Patient saved successfully",
-                type = SnackbarType.SUCCESS
+        uiEventsChannel.send(
+            UiEvent.ShowSnackbar(
+                SnackbarData(
+                    message = "Patient saved successfully",
+                    type = SnackbarType.SUCCESS
+                )
             )
         )
     }
