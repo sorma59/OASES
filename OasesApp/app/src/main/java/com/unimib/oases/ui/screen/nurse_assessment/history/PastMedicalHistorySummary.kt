@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.HorizontalDivider
@@ -34,9 +33,9 @@ fun PastHistorySummary(
     shouldShowEditButton: () -> Boolean,
     modifier: Modifier = Modifier
 ) {
-    val answeredDiseases = diseases
-        .filter { it.isDiagnosed != null }
-        .sortedByDescending { it.isDiagnosed }
+    val diagnosedDiseases = diseases
+        .filter { it.isDiagnosed == true }
+        .sortedByDescending { it.date }
 
     OasesCard(modifier = modifier.fillMaxWidth()) {
         Column(
@@ -75,15 +74,10 @@ fun PastHistorySummary(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                var wasPreviousDiseaseDiagnosed: Boolean? = null
-                answeredDiseases.forEach { disease ->
-                    if ((disease.isDiagnosed == true) != (wasPreviousDiseaseDiagnosed))
-                        // This is the first non-diagnosed disease, add some breathing room
-                        Spacer(Modifier.height(4.dp))
+                diagnosedDiseases.forEach { disease ->
                     DiagnosedDiseaseItem(
                         disease = disease
                     )
-                    wasPreviousDiseaseDiagnosed = (disease.isDiagnosed == true)
                 }
             }
         }
@@ -98,8 +92,8 @@ fun PastHistorySummary(
 private fun DiagnosedDiseaseItem(
     disease: PatientDiseaseState
 ) {
-    val icon = if (disease.isDiagnosed == true) Icons.Default.CheckCircle else Icons.Default.Cancel
-    val iconColor = if (disease.isDiagnosed == true) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+    val icon =Icons.Default.CheckCircle
+    val iconColor = MaterialTheme.colorScheme.primary
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -107,7 +101,7 @@ private fun DiagnosedDiseaseItem(
     ) {
         Icon(
             imageVector = icon,
-            contentDescription = if (disease.isDiagnosed == true) "Diagnosed" else "Not Diagnosed",
+            contentDescription = "Diagnosed",
             tint = iconColor,
             modifier = Modifier.padding(top = 4.dp)
         )
@@ -120,8 +114,8 @@ private fun DiagnosedDiseaseItem(
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                // Show the date only if it was diagnosed and the date is not blank
-                if (disease.isDiagnosed == true && disease.date.isNotBlank()) {
+                // Show the date only if the date is not blank
+                if (disease.date.isNotBlank()) {
                     Text(
                         text = " (Diagnosed: ${disease.date})",
                         style = MaterialTheme.typography.bodyMedium,
@@ -130,7 +124,7 @@ private fun DiagnosedDiseaseItem(
                 }
             }
             // Additional Info
-            if (disease.isDiagnosed == true && disease.additionalInfo.isNotBlank()) {
+            if (disease.additionalInfo.isNotBlank()) {
                 Text(
                     text = disease.additionalInfo,
                     style = MaterialTheme.typography.bodyMedium,

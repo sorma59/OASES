@@ -116,6 +116,18 @@ class HistoryViewModel @Inject constructor(
                 }
             }
 
+            HistoryEvent.DenyAllClicked -> {
+                updatePmhEditState {
+                    it.copy(
+                        editingDiseases = it.editingDiseases.map { diseaseState ->
+                            diseaseState.copy(
+                                isDiagnosed = false
+                            )
+                        }
+                    )
+                }
+            }
+
             HistoryEvent.ReloadPastVisits -> {
                 loadPastVisits()
             }

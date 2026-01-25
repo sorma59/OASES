@@ -404,7 +404,7 @@ private fun SingleChoiceQuestion(
 
         for ((index, option) in question.options.withIndex()) {
             LabeledRadioButton(
-                label = labels[index],
+                label = { Text(text = labels[index]) },
                 selected = isSelected(option),
                 onClick = { onSelected(option) }
             )

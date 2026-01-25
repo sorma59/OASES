@@ -89,8 +89,9 @@ private fun HistoryContent(
             }
 
             is PmhMode.Edit -> PastMedicalHistoryFormContent(
-                state.pastMedicalHistoryState.mode.editingDiseases,
-                onEvent
+                state.pastMedicalHistoryState.mode,
+                onEvent,
+                Modifier.padding(top = 8.dp)
             )
         }
     }

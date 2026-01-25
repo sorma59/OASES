@@ -37,7 +37,10 @@ sealed interface PmhMode {
     data class Edit(
         val originalDiseases: List<PatientDiseaseState>,
         val editingDiseases: List<PatientDiseaseState> = originalDiseases
-    ) : PmhMode
+    ) : PmhMode {
+        val areAllSetToNo: Boolean
+            get() = editingDiseases.all{ it.isDiagnosed == false}
+    }
 }
 
 data class PatientDiseaseState(

@@ -23,24 +23,26 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.unimib.oases.ui.components.form.DateSelectorWithTodayButton
+import com.unimib.oases.ui.components.input.LabeledRadioButton
 import com.unimib.oases.ui.components.util.AnimatedLabelOutlinedTextField
 import com.unimib.oases.ui.components.util.button.BottomButtons
 import com.unimib.oases.util.reactToKeyboardAppearance
 
 @Composable
 fun PastMedicalHistoryFormContent(
-    diseases: List<PatientDiseaseState>,
-    onEvent: (HistoryEvent) -> Unit
+    state: PmhMode.Edit,
+    onEvent: (HistoryEvent) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().then(modifier),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Bottom
     ) {
 
         Box(Modifier.weight(1f)) {
             ChronicConditionsForm(
-                diseases = diseases,
+                state = state,
                 onEvent = onEvent
             )
         }
@@ -108,7 +110,7 @@ fun RadioButtonsInputWithDateAndText(
 
 @Composable
 fun ChronicConditionsForm(
-    diseases: List<PatientDiseaseState>,
+    state: PmhMode.Edit,
     onEvent: (HistoryEvent) -> Unit,
     modifier: Modifier = Modifier
 ){
@@ -126,7 +128,7 @@ fun ChronicConditionsForm(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth(),
         ){
-            val fontSize = 18.sp
+            val fontSize = 20.sp
             val fontWeight = FontWeight.ExtraBold
             Text(
                 text = "Is the patient affected by the following disease?",
@@ -142,7 +144,7 @@ fun ChronicConditionsForm(
             )
         }
 
-        HorizontalDivider()
+        HorizontalDivider(Modifier.padding(vertical = 8.dp))
 
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -151,32 +153,46 @@ fun ChronicConditionsForm(
                 .verticalScroll(scrollState)
                 .reactToKeyboardAppearance()
         ) {
-            for (disease in diseases) {
+
+            LabeledRadioButton(
+                label = {
+                    Text(
+                        text = "No known chronic conditions",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                selected = state.areAllSetToNo,
+                onClick = { onEvent(HistoryEvent.DenyAllClicked) },
+                asReversed = true
+            )
+
+            state.editingDiseases.forEach { diseaseState ->
                 RadioButtonsInputWithDateAndText(
-                    label = disease.disease,
-                    isDiagnosed = disease.isDiagnosed,
+                    label = diseaseState.disease,
+                    isDiagnosed = diseaseState.isDiagnosed,
                     onSelected = { isDiagnosed ->
                         onEvent(
                             HistoryEvent.RadioButtonClicked(
-                                disease.disease,
+                                diseaseState.disease,
                                 isDiagnosed
                             )
                         )
                     },
-                    date = disease.date,
+                    date = diseaseState.date,
                     onDateChange = {
                         onEvent(
                             HistoryEvent.DateChanged(
-                                disease.disease,
+                                diseaseState.disease,
                                 it
                             )
                         )
                     },
-                    additionalInfo = disease.additionalInfo,
+                    additionalInfo = diseaseState.additionalInfo,
                     onAdditionalInfoChange = {
                         onEvent(
                             HistoryEvent.AdditionalInfoChanged(
-                                disease.disease,
+                                diseaseState.disease,
                                 it
                             )
                         )
@@ -193,7 +209,7 @@ fun ChronicConditionsForm(
 @Composable
 fun PastMedicalHistoryFormPreview() {
     PastMedicalHistoryFormContent(
-        listOf(
+        PmhMode.Edit(listOf(
             PatientDiseaseState(
                 disease = "Disease 1",
                 isDiagnosed = true
@@ -209,7 +225,7 @@ fun PastMedicalHistoryFormPreview() {
             PatientDiseaseState(
                 disease = "Disease 4",
                 isDiagnosed = true
-            )
+            ))
         ),
         onEvent = {}
     )
