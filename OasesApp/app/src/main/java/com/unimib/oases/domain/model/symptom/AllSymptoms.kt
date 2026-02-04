@@ -94,13 +94,11 @@ import com.unimib.oases.domain.model.symptom.Symptom.PoisoningIntoxication
 import com.unimib.oases.domain.model.symptom.Symptom.PregnancyWithActiveLabor
 import com.unimib.oases.domain.model.symptom.Symptom.PregnancyWithAlteredMentalStatus
 import com.unimib.oases.domain.model.symptom.Symptom.PregnancyWithHeavyBleeding
-import com.unimib.oases.domain.model.symptom.Symptom.PregnancyWithHighBloodPressure
 import com.unimib.oases.domain.model.symptom.Symptom.PregnancyWithSeizures
 import com.unimib.oases.domain.model.symptom.Symptom.PregnancyWithSevereAbdominalPain
 import com.unimib.oases.domain.model.symptom.Symptom.PregnancyWithSevereHeadache
 import com.unimib.oases.domain.model.symptom.Symptom.PregnancyWithTrauma
 import com.unimib.oases.domain.model.symptom.Symptom.PregnancyWithVisualChanges
-import com.unimib.oases.domain.model.symptom.Symptom.PretermAndUnderOneMonth
 import com.unimib.oases.domain.model.symptom.Symptom.ProlongedImmobilizationOrBedridden
 import com.unimib.oases.domain.model.symptom.Symptom.RecentChestTrauma
 import com.unimib.oases.domain.model.symptom.Symptom.RecentChokingOrForeignBodyInhalation
@@ -163,10 +161,8 @@ val allSymptoms: Set<Symptom> = setOf(
     SnakeBite,
     AggressiveBehavior,
     YoungerThanEightDays,
-    PretermAndUnderOneMonth,
     YoungerThanTwoMonthsAndLowOrHighTemperature,
     CurrentPregnancy,
-    PregnancyWithHighBloodPressure,
     PregnancyWithHeavyBleeding,
     PregnancyWithSevereAbdominalPain,
     PregnancyWithSeizures,

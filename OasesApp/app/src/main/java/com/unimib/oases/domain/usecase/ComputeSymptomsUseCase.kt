@@ -5,8 +5,6 @@ import com.unimib.oases.domain.model.symptom.PatientCategory
 import com.unimib.oases.domain.model.symptom.TriageSymptom
 import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.HR_HIGH
 import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.HR_LOW
-import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.PREGNANCY_HIGH_DBP
-import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.PREGNANCY_HIGH_SBP
 import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.RBS_HIGH
 import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.RBS_LOW
 import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.RR_HIGH
@@ -85,10 +83,10 @@ class ComputeSymptomsUseCase @Inject constructor(
         val newReds = selectedReds.resetComputedElements()
         when (patient.category){
             PatientCategory.ADULT -> {
-                if (vitalSigns.sbp != null && vitalSigns.sbp >= PREGNANCY_HIGH_SBP ||
-                    vitalSigns.dbp != null && vitalSigns.dbp >= PREGNANCY_HIGH_DBP
-                )
-                    newReds.add(TriageSymptom.PREGNANCY_HIGH_BP.id)
+//                if (vitalSigns.sbp != null && vitalSigns.sbp >= PREGNANCY_HIGH_SBP ||
+//                    vitalSigns.dbp != null && vitalSigns.dbp >= PREGNANCY_HIGH_DBP
+//                )
+//                    newReds.add(TriageSymptom.PREGNANCY_HIGH_BP.id)
             }
             PatientCategory.PEDIATRIC -> {
 //                if (ageInMonths < 2 &&

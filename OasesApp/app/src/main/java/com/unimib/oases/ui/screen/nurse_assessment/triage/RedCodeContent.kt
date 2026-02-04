@@ -37,6 +37,7 @@ import com.unimib.oases.domain.model.symptom.TriageSymptom
 import com.unimib.oases.ui.components.input.LabeledCheckbox
 import com.unimib.oases.ui.components.util.FadeOverlay
 import com.unimib.oases.ui.components.util.ShowMoreArrow
+import com.unimib.oases.ui.components.util.TitleText
 import com.unimib.oases.ui.components.util.button.RetryButton
 import kotlinx.coroutines.launch
 
@@ -110,8 +111,11 @@ fun RedCodeContent(
                     .fillMaxWidth()
                     .verticalScroll(scrollState)
             ) {
-                state.editingState!!.triageConfig.redOptions.forEach {
-                    val id = it.symptom.symptom.id
+                val redOptions = state.editingState?.triageConfig?.redOptions
+                redOptions?.forEachIndexed { index, it ->
+                    if (index == 0 || it.group != redOptions[index - 1].group)
+                        TitleText(it.group.label)
+                    val id = it.id
                     ConditionalAnimatedVisibility(
                         applyWrapper = it.symptom.parent != null,
                         visible = state.editingState.triageData.selectedReds.contains(it.symptom.parent?.symptom?.symptomId?.value?.string),
@@ -134,8 +138,8 @@ fun RedCodeContent(
                                             onEvent(TriageEvent.FieldToggled(id))
                                     },
                                     modifier = if (it.symptom.parent != null) Modifier.padding(
-                                        start = 16.dp
-                                    ) else Modifier
+                                        start = 24.dp
+                                    ) else Modifier.padding(8.dp)
                                 )
 
                                 if (it.symptom.id == TriageSymptom.PREGNANCY.id

@@ -62,10 +62,10 @@ sealed interface Symptom {
         override val symptomId = SymptomId.YoungerThanEightDaysId
         override val label = "Infant < 8 days old"
     }
-    data object PretermAndUnderOneMonth: Symptom {
-        override val symptomId = SymptomId.PretermAndUnderOneMonthId
-        override val label = "Preterm baby < 1 month old"
-    }
+//    data object PretermAndUnderOneMonth: Symptom {
+//        override val symptomId = SymptomId.PretermAndUnderOneMonthId
+//        override val label = "Preterm baby < 1 month old"
+//    }
     data object YoungerThanTwoMonthsAndLowOrHighTemperature: Symptom {
         override val symptomId = SymptomId.YoungerThanTwoMonthsAndLowOrHighTemperatureId
         override val label = "Younger than two months old and low or high temperature"
@@ -74,10 +74,10 @@ sealed interface Symptom {
         override val symptomId = SymptomId.PregnancyId
         override val label = "Currently pregnant"
     }
-    data object PregnancyWithHighBloodPressure: Symptom, Pregnancy {
-        override val symptomId = SymptomId.PregnancyWithHighBloodPressureId
-        override val label = "High blood pressure"
-    }
+//    data object PregnancyWithHighBloodPressure: Symptom, Pregnancy {
+//        override val symptomId = SymptomId.PregnancyWithHighBloodPressureId
+//        override val label = "High blood pressure"
+//    }
     data object PregnancyWithHeavyBleeding: Symptom, Pregnancy {
         override val symptomId = SymptomId.PregnancyWithHeavyBleedingId
         override val label = "Heavy bleeding"
@@ -726,10 +726,10 @@ sealed class SymptomId (
     object SnakeBiteId: SymptomId(snakeCase("snake_bite"))
     object AggressiveBehaviorId: SymptomId(snakeCase("aggressive_behavior"))
     object YoungerThanEightDaysId: SymptomId(snakeCase("younger_than_eight_days"))
-    object PretermAndUnderOneMonthId: SymptomId(snakeCase("preterm_and_under_one_month"))
+//    object PretermAndUnderOneMonthId: SymptomId(snakeCase("preterm_and_under_one_month"))
     object YoungerThanTwoMonthsAndLowOrHighTemperatureId: SymptomId(snakeCase("younger_than_two_months_and_low_or_high_temperature"))
     object PregnancyId: SymptomId(snakeCase("pregnancy"))
-    object PregnancyWithHighBloodPressureId: SymptomId(snakeCase("pregnancy_with_high_blood_pressure"))
+//    object PregnancyWithHighBloodPressureId: SymptomId(snakeCase("pregnancy_with_high_blood_pressure"))
     object PregnancyWithHeavyBleedingId: SymptomId(snakeCase("pregnancy_with_heavy_bleeding"))
     object PregnancyWithSevereAbdominalPainId: SymptomId(snakeCase("pregnancy_with_severe_abdominal_pain"))
     object PregnancyWithSeizuresId: SymptomId(snakeCase("pregnancy_with_seizures"))

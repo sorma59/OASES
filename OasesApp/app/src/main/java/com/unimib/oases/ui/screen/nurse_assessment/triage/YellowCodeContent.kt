@@ -25,6 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.unimib.oases.ui.components.input.LabeledCheckbox
 import com.unimib.oases.ui.components.util.FadeOverlay
+import com.unimib.oases.ui.components.util.TitleText
 import com.unimib.oases.ui.components.util.button.RetryButton
 
 @Composable
@@ -66,7 +67,7 @@ fun YellowCodeContent(
                 error = it,
                 onClick = { onEvent(TriageEvent.Retry) }
             )
-        } ?: state.editingState?.let {
+        } ?: state.editingState?.let { editingState ->
             Box {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -74,13 +75,16 @@ fun YellowCodeContent(
                         .fillMaxWidth()
                         .verticalScroll(scrollState)
                 ) {
-
-                    it.triageConfig.yellowOptions.forEach { (symptom, label) ->
-                        val id = symptom.symptom.id
+                    val yellowOptions = editingState.triageConfig.yellowOptions
+                    yellowOptions.forEachIndexed { index, it ->
+                        if (index == 0 || it.group != yellowOptions[index - 1].group)
+                            TitleText(it.group.label)
+                        val id = it.id
                         LabeledCheckbox(
-                            label = label,
-                            checked = it.triageData.selectedYellows.contains(id),
-                            onCheckedChange = { onEvent(TriageEvent.FieldToggled(id)) }
+                            label = it.label,
+                            checked = editingState.triageData.selectedYellows.contains(id),
+                            onCheckedChange = { onEvent(TriageEvent.FieldToggled(id)) },
+                            modifier = Modifier.padding(8.dp)
                         )
                     }
 

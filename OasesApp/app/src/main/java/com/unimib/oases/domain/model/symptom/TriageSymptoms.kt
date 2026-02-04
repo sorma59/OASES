@@ -8,6 +8,14 @@ enum class SymptomTriageCode {
     RED, YELLOW
 }
 
+enum class TriageSymptomGroup(val label: String) {
+    AIRWAY_AND_BREATHING("AIRWAY & BREATHING"),
+    CIRCULATION("CIRCULATION"),
+    DISABILITY("DISABILITY"),
+    EXPOSURE("EXPOSURE"),
+    ALTERED_VITAL_SIGNS("ALTERED VITAL SIGNS")
+}
+
 val redForAll = { _: PatientCategory -> SymptomTriageCode.RED }
 
 val yellowForAll = { _: PatientCategory -> SymptomTriageCode.YELLOW }
@@ -49,6 +57,7 @@ val nullForAdultRedForKid = { category: PatientCategory ->
 
 enum class TriageSymptom(
     val symptom: Symptom,
+    val group: TriageSymptomGroup,
     val colorAssigner: (PatientCategory) -> SymptomTriageCode?,
     val parent: TriageSymptom? = null,
     val isParent: Boolean = false,
@@ -56,26 +65,32 @@ enum class TriageSymptom(
 ) {
     UNCONSCIOUSNESS(
         Symptom.Unconsciousness,
+        TriageSymptomGroup.DISABILITY,
         redForAll
     ),
     CONVULSIONS(
         Symptom.Convulsions,
+        TriageSymptomGroup.DISABILITY,
         redForAll,
     ),
     STRIDOR(
         Symptom.Stridor,
+        TriageSymptomGroup.AIRWAY_AND_BREATHING,
         redForAll
     ),
     RESPIRATORY_DISTRESS(
         Symptom.RespiratoryDistress,
+        TriageSymptomGroup.AIRWAY_AND_BREATHING,
         redForAll,
     ),
     SHOCK(
         Symptom.Shock,
+        TriageSymptomGroup.CIRCULATION,
         redForAll,
     ),
     HEAVY_ACTIVE_BLEEDING(
         Symptom.HeavyBleeding,
+        TriageSymptomGroup.CIRCULATION,
         redForAll
     ),
 //    SEVERE_DEHYDRATION(
@@ -84,40 +99,48 @@ enum class TriageSymptom(
 //    ),
     HIGH_RISK_TRAUMA(
         Symptom.HighRiskTrauma,
+    TriageSymptomGroup.EXPOSURE,
         redForAll
     ),
     MAJOR_BURNS(
         Symptom.MajorBurns,
+        TriageSymptomGroup.EXPOSURE,
         redForAll
     ),
     THREATENED_LIMB(
         Symptom.ThreatenedLimb,
+        TriageSymptomGroup.EXPOSURE,
         redForAll
     ),
     POISONING_INTOXICATION(
         Symptom.PoisoningIntoxication,
+        TriageSymptomGroup.EXPOSURE,
         redForAll
     ),
     ACUTE_TESTICULAR_OR_SCROTAL_PAIN_OR_PRIAPISM(
         Symptom.AcuteTesticularOrScrotalPainOrPriapism,
+        TriageSymptomGroup.EXPOSURE,
         yellowForAdultRedForKid
     ),
     SNAKE_BITE(
         Symptom.SnakeBite,
+        TriageSymptomGroup.EXPOSURE,
         redForAll
     ),
     AGGRESSIVE_BEHAVIOR(
         Symptom.AggressiveBehavior,
+        TriageSymptomGroup.EXPOSURE,
         redForAdultNullForKid
     ),
     YOUNGER_THAN_EIGHT_DAYS(
         Symptom.YoungerThanEightDays,
+        TriageSymptomGroup.EXPOSURE,
         nullForAdultRedForKid
     ),
-    PRETERM_AND_UNDER_ONE_MONTH(
-        Symptom.PretermAndUnderOneMonth,
-        nullForAdultRedForKid
-    ),
+//    PRETERM_AND_UNDER_ONE_MONTH(
+//        Symptom.PretermAndUnderOneMonth,
+//        nullForAdultRedForKid
+//    ),
 //    YOUNGER_THAN_TWO_MONTHS_AND_LOW_OR_HIGH_TEMPERATURE(
 //        YoungerThanTwoMonthsAndLowOrHighTemperature,
 //        nullForAdultRedForKid,
@@ -125,142 +148,174 @@ enum class TriageSymptom(
 //    ),
     PREGNANCY(
         Symptom.CurrentPregnancy,
+    TriageSymptomGroup.EXPOSURE,
         redForAdultNullForKid,
         isParent = true
     ),
-    PREGNANCY_HIGH_BP(
-        Symptom.PregnancyWithHighBloodPressure,
-        redForAdultNullForKid,
-        parent = PREGNANCY,
-        isComputed = true
-    ),
+//    PREGNANCY_HIGH_BP(
+//        Symptom.PregnancyWithHighBloodPressure,
+//        TriageSymptomGroup.EXPOSURE,
+//        redForAdultNullForKid,
+//        parent = PREGNANCY,
+//        isComputed = true
+//    ),
     PREGNANCY_WITH_HEAVY_BLEEDING(
         Symptom.PregnancyWithHeavyBleeding,
+        TriageSymptomGroup.EXPOSURE,
         redForAdultNullForKid,
         parent = PREGNANCY
     ),
     PREGNANCY_WITH_SEVERE_ABDOMINAL_PAIN(
         Symptom.PregnancyWithSevereAbdominalPain,
+        TriageSymptomGroup.EXPOSURE,
         redForAdultNullForKid,
         parent = PREGNANCY
     ),
     PREGNANCY_WITH_SEIZURES(
         Symptom.PregnancyWithSeizures,
+        TriageSymptomGroup.EXPOSURE,
         redForAdultNullForKid,
         parent = PREGNANCY
     ),
     PREGNANCY_WITH_ALTERED_MENTAL_STATUS(
         Symptom.PregnancyWithAlteredMentalStatus,
+        TriageSymptomGroup.EXPOSURE,
         redForAdultNullForKid,
         parent = PREGNANCY
     ),
     PREGNANCY_WITH_SEVERE_HEADACHE(
         Symptom.PregnancyWithSevereHeadache,
+        TriageSymptomGroup.EXPOSURE,
         redForAdultNullForKid,
         parent = PREGNANCY
     ),
     PREGNANCY_WITH_VISUAL_CHANGES(
         Symptom.PregnancyWithVisualChanges,
+        TriageSymptomGroup.EXPOSURE,
         redForAdultNullForKid,
         parent = PREGNANCY
     ),
     PREGNANCY_WITH_TRAUMA(
         Symptom.PregnancyWithTrauma,
+        TriageSymptomGroup.EXPOSURE,
         redForAdultNullForKid,
         parent = PREGNANCY
     ),
     PREGNANCY_WITH_ACTIVE_LABOR(
         Symptom.PregnancyWithActiveLabor,
+        TriageSymptomGroup.EXPOSURE,
         redForAdultNullForKid,
         parent = PREGNANCY
     ),
     AIRWAY_SWELLING_OR_MASS_OF_MOUTH_OR_THROAT_OR_NECK(
         Symptom.AirwaySwellingOrMassOfMouthOrThroatOrNeck,
+        TriageSymptomGroup.AIRWAY_AND_BREATHING,
         yellowForAll
     ),
     WHEEZING(
         Symptom.Wheezing,
+        TriageSymptomGroup.AIRWAY_AND_BREATHING,
         yellowForAll
     ),
     ACTIVE_BLEEDING(
         Symptom.NonHeavyBleeding,
+        TriageSymptomGroup.CIRCULATION,
         yellowForAll
     ),
     SEVERE_PALLOR(
         Symptom.SeverePallor,
+        TriageSymptomGroup.CIRCULATION,
         yellowForAll
     ),
     ONGOING_SEVERE_VOMITING_OR_ONGOING_SEVERE_DIARRHEA(
         Symptom.OngoingSevereVomitingOrOngoingSevereDiarrhea,
+        TriageSymptomGroup.CIRCULATION,
         yellowForAll
     ),
     MODERATE_DEHYDRATION(
         Symptom.ModerateDehydration,
+        TriageSymptomGroup.CIRCULATION,
         nullForAdultYellowForKid
     ),
     UNABLE_TO_FEED_OR_DRINK(
         Symptom.UnableToFeedOrDrink,
+        TriageSymptomGroup.CIRCULATION,
         yellowForAll
     ),
     RECENT_FAINTING(
         Symptom.RecentFainting,
+        TriageSymptomGroup.CIRCULATION,
         yellowForAll
     ),
     LETHARGY_OR_CONFUSION_OR_AGITATION(
         Symptom.LethargyOrConfusionOrAgitation,
+        TriageSymptomGroup.DISABILITY,
         yellowForAdultNullForKid
     ),
     LETHARGY_OR_RESTLESS_OR_IRRITABLE_OR_CONFUSED(
         Symptom.LethargyOrRestlessOrIrritableOrConfused,
+        TriageSymptomGroup.DISABILITY,
         nullForAdultYellowForKid
     ),
     FOCAL_NEUROLOGIC_DEFICIT_OR_FOCAL_VISUAL_DEFICIT(
         Symptom.FocalNeurologicDeficitOrFocalVisualDeficit,
+        TriageSymptomGroup.DISABILITY,
         yellowForAll
     ),
     HEADACHE_WITH_STIFF_NECK(
         Symptom.HeadacheWithStiffNeck,
+        TriageSymptomGroup.DISABILITY,
         yellowForAll
     ),
     SEVERE_PAIN(
         Symptom.SeverePain,
+        TriageSymptomGroup.EXPOSURE,
         yellowForAll
     ),
     UNABLE_TO_PASS_URINE(
         Symptom.UnableToPassUrine,
+        TriageSymptomGroup.EXPOSURE,
         yellowForAll
     ),
     ACUTE_LIMB_DEFORMITY_OR_OPEN_FRACTURE(
         Symptom.AcuteLimbDeformityOrOpenFracture,
+        TriageSymptomGroup.EXPOSURE,
         yellowForAll
     ),
     OTHER_TRAUMA(
         Symptom.NonHighRiskTrauma,
+        TriageSymptomGroup.EXPOSURE,
         yellowForAll
     ),
     OTHER_BURNS(
         Symptom.NonMajorBurns,
+        TriageSymptomGroup.EXPOSURE,
         yellowForAll
     ),
     SEXUAL_ASSAULT(
         Symptom.SexualAssault,
+        TriageSymptomGroup.EXPOSURE,
         yellowForAll
     ),
     ANIMAL_BITE_OR_NEEDLESTICK_PUNCTURE(
         Symptom.AnimalBiteOrNeedlestickPuncture,
+        TriageSymptomGroup.EXPOSURE,
         yellowForAll
     ),
     SEVERE_VISIBLE_MALNUTRITION(
         Symptom.SevereMalnutrition,
+        TriageSymptomGroup.EXPOSURE,
         nullForAdultYellowForKid
     ),
     YOUNGER_THAN_SIX_MONTHS(
         Symptom.YoungerThanSixMonths,
+        TriageSymptomGroup.EXPOSURE,
         nullForAdultYellowForKid,
         isComputed = true
     ),
     OTHER_PREGNANCY_RELATED_COMPLAINTS(
         Symptom.NonHighRiskPregnancyRelatedComplaints,
+        TriageSymptomGroup.EXPOSURE,
         yellowForAdultNullForKid
     ),
 //    AGE_OVER_EIGHTY_YEARS(
@@ -270,56 +325,67 @@ enum class TriageSymptom(
 //    ),
     LOW_SPO2(
         Symptom.LowSpo2,
+    TriageSymptomGroup.ALTERED_VITAL_SIGNS,
         yellowForAll,
         isComputed = true
     ),
     LOW_RR(
         Symptom.LowRr,
+        TriageSymptomGroup.ALTERED_VITAL_SIGNS,
         yellowForAll,
         isComputed = true
     ),
     HIGH_RR(
         Symptom.HighRr,
+        TriageSymptomGroup.ALTERED_VITAL_SIGNS,
         yellowForAll,
         isComputed = true
     ),
     LOW_TEMP(
         Symptom.LowTemp,
+        TriageSymptomGroup.ALTERED_VITAL_SIGNS,
         yellowForAll,
         isComputed = true
     ),
     HIGH_TEMP(
         Symptom.HighTemp,
+        TriageSymptomGroup.ALTERED_VITAL_SIGNS,
         yellowForAll,
         isComputed = true
     ),
     LOW_RBS(
         Symptom.LowRbs,
+        TriageSymptomGroup.ALTERED_VITAL_SIGNS,
         yellowForAll,
         isComputed = true
     ),
     HIGH_RBS(
         Symptom.HighRbs,
+        TriageSymptomGroup.ALTERED_VITAL_SIGNS,
         yellowForAll,
         isComputed = true
     ),
     LOW_HR(
         Symptom.LowHr,
+        TriageSymptomGroup.ALTERED_VITAL_SIGNS,
         yellowForAll,
         isComputed = true
     ),
     HIGH_HR(
         Symptom.HighHr,
+        TriageSymptomGroup.ALTERED_VITAL_SIGNS,
         yellowForAll,
         isComputed = true
     ),
     LOW_SBP(
         Symptom.LowSbp,
+        TriageSymptomGroup.ALTERED_VITAL_SIGNS,
         yellowForAdultNullForKid,
         isComputed = true
     ),
     HIGH_SBP(
         Symptom.HighSbp,
+        TriageSymptomGroup.ALTERED_VITAL_SIGNS,
         yellowForAdultNullForKid,
         isComputed = true
     );
@@ -342,8 +408,8 @@ enum class TriageSymptom(
         const val HR_HIGH = 130
         const val SBP_LOW = 90
         const val SBP_HIGH = 220
-        const val PREGNANCY_HIGH_SBP = 160
-        const val PREGNANCY_HIGH_DBP = 110
+//        const val PREGNANCY_HIGH_SBP = 160
+//        const val PREGNANCY_HIGH_DBP = 110
 
         // Pediatric
         const val RR_LOW_FOR_ONE_YEAR_OLDS = 25
@@ -391,7 +457,7 @@ enum class TriageSymptom(
             }
             THREATENED_LIMB -> "Threatened limb (pulseless, painful and pale, weak, numb, or with massive swelling after trauma)"
             PREGNANCY -> "Pregnancy with any of:"
-            PREGNANCY_HIGH_BP -> "SBP > $PREGNANCY_HIGH_SBP or DBP > $PREGNANCY_HIGH_DBP"
+//            PREGNANCY_HIGH_BP -> "SBP > $PREGNANCY_HIGH_SBP or DBP > $PREGNANCY_HIGH_DBP"
             PREGNANCY_WITH_HEAVY_BLEEDING -> "Heavy bleeding"
             PREGNANCY_WITH_SEVERE_ABDOMINAL_PAIN -> "Severe abdominal pain"
             PREGNANCY_WITH_SEIZURES -> "Seizures"

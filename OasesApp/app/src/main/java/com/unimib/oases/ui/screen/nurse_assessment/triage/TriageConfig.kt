@@ -1,6 +1,7 @@
 package com.unimib.oases.ui.screen.nurse_assessment.triage
 
 import com.unimib.oases.domain.model.symptom.TriageSymptom
+import com.unimib.oases.domain.model.symptom.TriageSymptomGroup
 
 data class TriageConfig(
     val redOptions: List<SymptomWithLabel>,
@@ -13,4 +14,7 @@ data class SymptomWithLabel(
 ){
     val id: String
         get() = symptom.id
+
+    val group: TriageSymptomGroup
+        get() = symptom.group
 }
