@@ -1,6 +1,8 @@
 package com.unimib.oases.domain.model
 
+import com.unimib.oases.domain.model.symptom.PatientCategory
 import com.unimib.oases.ui.screen.nurse_assessment.demographics.Sex
+import com.unimib.oases.util.AppConstants
 import com.unimib.oases.util.PasswordUtils
 import java.util.UUID
 
@@ -21,6 +23,13 @@ data class Patient(
 ) {
     val age: Int
         get() = ageInMonths / 12
+
+    val category: PatientCategory
+        get() = if (age < AppConstants.MATURITY_AGE) {
+            PatientCategory.PEDIATRIC
+        } else {
+            PatientCategory.ADULT
+        }
 }
 
 /**

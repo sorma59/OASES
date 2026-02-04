@@ -1,6 +1,7 @@
 package com.unimib.oases.data.mapper.serializer
 
 import com.unimib.oases.domain.model.symptom.Symptom
+import com.unimib.oases.domain.model.symptom.symptomsById
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
@@ -22,7 +23,7 @@ object SymptomSerializer {
 
         val idBytes = buffer.readString()
 
-        return Symptom.symptoms[idBytes.toString()]
+        return symptomsById[idBytes]
             ?: throw IllegalArgumentException("Unknown symptom ID: $idBytes")
     }
 }

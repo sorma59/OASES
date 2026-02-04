@@ -30,7 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.unimib.oases.domain.model.Room
 import com.unimib.oases.domain.model.TriageCode
-import com.unimib.oases.domain.model.symptom.Symptom.Companion.symptoms
+import com.unimib.oases.domain.model.symptom.symptomsById
 import com.unimib.oases.ui.components.card.OasesCard
 import com.unimib.oases.ui.components.util.button.StartButton
 import com.unimib.oases.ui.screen.nurse_assessment.PatientRegistrationScreensUiMode
@@ -183,7 +183,7 @@ private fun SymptomSection(
         ) {
             symptomIds.forEach { symptomId ->
                 // Find the symptom label from the static map
-                val symptomLabel = symptoms[symptomId]?.label ?: "Unknown Symptom"
+                val symptomLabel = symptomsById[symptomId]?.label ?: "Unknown Symptom"
                 SuggestionChip(
                     onClick = { /* Chips are view-only for now */ },
                     label = { Text(symptomLabel) },

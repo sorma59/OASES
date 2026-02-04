@@ -117,7 +117,7 @@ class TriageViewModel @Inject constructor(
                     }
                     it.copy(
                         editingState = EditingState(
-                            configTriageUseCase(it.patient.ageInMonths)
+                            configTriageUseCase(it.patient.category)
                         )
                     )
                 }
@@ -478,7 +478,7 @@ class TriageViewModel @Inject constructor(
         val patient = state.value.patient ?: return
 
         _state.update {
-            val triageConfig = configTriageUseCase(patient.ageInMonths)
+            val triageConfig = configTriageUseCase(patient.category)
 
             val editingState = if (it.storedData == null) {
                 EditingState(triageConfig = triageConfig)

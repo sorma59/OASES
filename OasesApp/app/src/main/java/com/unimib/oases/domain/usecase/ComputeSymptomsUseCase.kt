@@ -1,110 +1,77 @@
 package com.unimib.oases.domain.usecase
 
+import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.domain.model.symptom.PatientCategory
 import com.unimib.oases.domain.model.symptom.TriageSymptom
 import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.HR_HIGH
-import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.HR_HIGH_FOR_FIVE_TO_TWELVE_YEARS_OLDS
-import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.HR_HIGH_FOR_ONE_TO_FOUR_YEARS_OLDS
-import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.HR_HIGH_FOR_ONE_YEAR_OLDS
 import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.HR_LOW
-import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.HR_LOW_FOR_FIVE_TO_TWELVE_YEARS_OLDS
-import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.HR_LOW_FOR_ONE_TO_FOUR_YEARS_OLDS
-import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.HR_LOW_FOR_ONE_YEAR_OLDS
 import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.PREGNANCY_HIGH_DBP
 import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.PREGNANCY_HIGH_SBP
+import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.RBS_HIGH
+import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.RBS_LOW
 import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.RR_HIGH
-import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.RR_HIGH_FOR_FIVE_TO_TWELVE_YEARS_OLDS
-import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.RR_HIGH_FOR_ONE_TO_FOUR_YEARS_OLDS
-import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.RR_HIGH_FOR_ONE_YEAR_OLDS
 import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.RR_LOW
-import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.RR_LOW_FOR_FIVE_TO_TWELVE_YEARS_OLDS
-import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.RR_LOW_FOR_ONE_TO_FOUR_YEARS_OLDS
-import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.RR_LOW_FOR_ONE_YEAR_OLDS
 import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.SBP_HIGH
 import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.SBP_LOW
 import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.SPO2_LOW
 import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.TEMP_HIGH
 import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.TEMP_LOW
+import com.unimib.oases.domain.policy.PediatricVitalSignsPolicy
 import javax.inject.Inject
 
 class ComputeSymptomsUseCase @Inject constructor(
-    private val getPatientCategory: GetPatientCategoryUseCase
+    private val pediatricVitalSignsPolicy: PediatricVitalSignsPolicy
 ){
     fun computeYellowSymptoms(
         selectedYellows: Set<String>,
-        ageInMonths: Int,
+        patient: Patient,
         vitalSigns: VitalSigns
     ): Set<String>{
 
         val newYellows = selectedYellows.resetComputedElements()
 
-        val patientCategory = getPatientCategory(ageInMonths)
-
-        when (patientCategory){
+        when (patient.category){
             PatientCategory.ADULT -> {
-                if ((ageInMonths / 12) >= 80)
-                    newYellows.add(TriageSymptom.AGE_OVER_EIGHTY_YEARS.id)
-                if (vitalSigns.rr != null && vitalSigns.rr < RR_LOW)
-                    newYellows.add(TriageSymptom.LOW_RR.id)
-                if (vitalSigns.rr != null && vitalSigns.rr > RR_HIGH)
-                    newYellows.add(TriageSymptom.HIGH_RR.id)
-                if (vitalSigns.hr != null && vitalSigns.hr < HR_LOW)
-                    newYellows.add(TriageSymptom.LOW_HR.id)
-                if (vitalSigns.hr != null && vitalSigns.hr > HR_HIGH)
-                    newYellows.add(TriageSymptom.HIGH_HR.id)
-                if (vitalSigns.sbp != null && vitalSigns.sbp < SBP_LOW)
-                    newYellows.add(TriageSymptom.LOW_SBP.id)
-                if (vitalSigns.sbp != null && vitalSigns.sbp > SBP_HIGH)
-                    newYellows.add(TriageSymptom.HIGH_SBP.id)
-            }
-            PatientCategory.PEDIATRIC -> {
-                var rrUpperBound: Int
-                var rrLowerBound: Int
-                var hrUpperBound: Int
-                var hrLowerBound: Int
-                when (ageInMonths / 12) {
-                    0 -> {
-                        if (ageInMonths < 6)
-                            newYellows.add(TriageSymptom.YOUNGER_THAN_SIX_MONTHS.id)
-                        rrUpperBound = RR_HIGH_FOR_ONE_YEAR_OLDS
-                        rrLowerBound = RR_LOW_FOR_ONE_YEAR_OLDS
-                        hrUpperBound = HR_HIGH_FOR_ONE_YEAR_OLDS
-                        hrLowerBound = HR_LOW_FOR_ONE_YEAR_OLDS
-                    }
-
-                    in 1..4 -> {
-                        rrUpperBound = RR_HIGH_FOR_ONE_TO_FOUR_YEARS_OLDS
-                        rrLowerBound = RR_LOW_FOR_ONE_TO_FOUR_YEARS_OLDS
-                        hrUpperBound = HR_HIGH_FOR_ONE_TO_FOUR_YEARS_OLDS
-                        hrLowerBound = HR_LOW_FOR_ONE_TO_FOUR_YEARS_OLDS
-                    }
-
-                    in 5..12 -> {
-                        rrUpperBound = RR_HIGH_FOR_FIVE_TO_TWELVE_YEARS_OLDS
-                        rrLowerBound = RR_LOW_FOR_FIVE_TO_TWELVE_YEARS_OLDS
-                        hrUpperBound = HR_HIGH_FOR_FIVE_TO_TWELVE_YEARS_OLDS
-                        hrLowerBound = HR_LOW_FOR_FIVE_TO_TWELVE_YEARS_OLDS
-                    }
-
-                    else -> return newYellows
+                vitalSigns.rr?.let {
+                    if (it < RR_LOW) newYellows.add(TriageSymptom.LOW_RR.id)
+                    if (it > RR_HIGH) newYellows.add(TriageSymptom.HIGH_RR.id)
                 }
-                if (vitalSigns.rr != null && vitalSigns.rr < rrLowerBound)
-                    newYellows.add(TriageSymptom.LOW_RR.id)
-                if (vitalSigns.rr != null && vitalSigns.rr > rrUpperBound)
-                    newYellows.add(TriageSymptom.HIGH_RR.id)
-                if (vitalSigns.hr != null && vitalSigns.hr < hrLowerBound)
-                    newYellows.add(TriageSymptom.LOW_HR.id)
-                if (vitalSigns.hr != null && vitalSigns.hr > hrUpperBound)
-                    newYellows.add(TriageSymptom.HIGH_HR.id)
+                vitalSigns.hr?.let {
+                    if (it < HR_LOW) newYellows.add(TriageSymptom.LOW_HR.id)
+                    if (it > HR_HIGH) newYellows.add(TriageSymptom.HIGH_HR.id)
+                }
+                vitalSigns.sbp?.let {
+                    if (it < SBP_LOW) newYellows.add(TriageSymptom.LOW_SBP.id)
+                    if (it > SBP_HIGH) newYellows.add(TriageSymptom.HIGH_SBP.id)
+                }
+            }
+
+            PatientCategory.PEDIATRIC -> {
+                val bounds = pediatricVitalSignsPolicy.pediatricBounds(patient.ageInMonths) ?: return newYellows
+                newYellows.addAll(bounds.extraSymptoms)
+
+                vitalSigns.rr?.let {
+                    if (it < bounds.rrLower) newYellows.add(TriageSymptom.LOW_RR.id)
+                    if (it > bounds.rrUpper) newYellows.add(TriageSymptom.HIGH_RR.id)
+                }
+                vitalSigns.hr?.let {
+                    if (it < bounds.hrLower) newYellows.add(TriageSymptom.LOW_HR.id)
+                    if (it > bounds.hrUpper) newYellows.add(TriageSymptom.HIGH_HR.id)
+                }
             }
         }
         // Common
-        if (vitalSigns.spo2 != null && vitalSigns.spo2 < SPO2_LOW)
-            newYellows.add(TriageSymptom.LOW_SPO2.id)
-        if (vitalSigns.temp != null && vitalSigns.temp < TEMP_LOW)
-            newYellows.add(TriageSymptom.LOW_TEMP.id)
-        if (vitalSigns.temp != null && vitalSigns.temp > TEMP_HIGH)
-            newYellows.add(TriageSymptom.HIGH_TEMP.id)
+        vitalSigns.spo2?.let {
+            if (it < SPO2_LOW) newYellows.add(TriageSymptom.LOW_SPO2.id)
+        }
+        vitalSigns.temp?.let {
+            if (it < TEMP_LOW) newYellows.add(TriageSymptom.LOW_TEMP.id)
+            if (it > TEMP_HIGH) newYellows.add(TriageSymptom.HIGH_TEMP.id)
+        }
+        vitalSigns.rbs?.let {
+            if (it < RBS_LOW) newYellows.add(TriageSymptom.LOW_RBS.id)
+            if (it > RBS_HIGH) newYellows.add(TriageSymptom.HIGH_RBS.id)
+        }
 
         return newYellows.toSet() // Make it immutable
 
@@ -112,12 +79,11 @@ class ComputeSymptomsUseCase @Inject constructor(
 
     fun computeRedSymptoms(
         selectedReds: Set<String>,
-        ageInMonths: Int,
+        patient: Patient,
         vitalSigns: VitalSigns
     ): Set<String>{
         val newReds = selectedReds.resetComputedElements()
-        val patientCategory = getPatientCategory(ageInMonths)
-        when (patientCategory){
+        when (patient.category){
             PatientCategory.ADULT -> {
                 if (vitalSigns.sbp != null && vitalSigns.sbp >= PREGNANCY_HIGH_SBP ||
                     vitalSigns.dbp != null && vitalSigns.dbp >= PREGNANCY_HIGH_DBP
@@ -152,4 +118,5 @@ data class VitalSigns(
     val rr: Int? = null,
     val spo2: Int? = null,
     val temp: Double? = null,
+    val rbs: Double? = null
 )

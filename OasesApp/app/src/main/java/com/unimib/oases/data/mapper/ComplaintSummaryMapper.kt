@@ -2,7 +2,7 @@ package com.unimib.oases.data.mapper
 
 import com.unimib.oases.data.local.model.ComplaintSummaryEntity
 import com.unimib.oases.domain.model.ComplaintSummary
-import com.unimib.oases.domain.model.symptom.Symptom
+import com.unimib.oases.domain.model.symptom.symptomsById
 
 fun ComplaintSummary.toEntity(): ComplaintSummaryEntity {
     return ComplaintSummaryEntity(
@@ -22,7 +22,7 @@ fun ComplaintSummaryEntity.toDomain(): ComplaintSummary {
         visitId = visitId,
         complaintId = complaintId,
         algorithmsQuestionsAndAnswers = algorithmsQuestionsAndAnswers,
-        symptoms = symptoms.map { Symptom.symptoms[it] ?: error("Symptom not found $it") }.toSet(),
+        symptoms = symptoms.map { symptomsById[it] ?: error("Symptom not found $it") }.toSet(),
         tests = labelledTests.toSet(),
         immediateTreatments = immediateTreatments.toSet(),
         supportiveTherapies = supportiveTherapies.toSet(),

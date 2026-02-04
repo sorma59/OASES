@@ -17,7 +17,6 @@ import com.unimib.oases.domain.usecase.AnswerImmediateTreatmentQuestionUseCase
 import com.unimib.oases.domain.usecase.GenerateSuggestedSupportiveTherapiesUseCase
 import com.unimib.oases.domain.usecase.GenerateSuggestedTestsUseCase
 import com.unimib.oases.domain.usecase.GetCurrentVisitUseCase
-import com.unimib.oases.domain.usecase.GetPatientCategoryUseCase
 import com.unimib.oases.domain.usecase.SelectSymptomUseCase
 import com.unimib.oases.domain.usecase.SubmitMedicalVisitPartOneUseCase
 import com.unimib.oases.domain.usecase.TranslateLatestVitalSignsToSymptomsUseCase
@@ -48,7 +47,6 @@ class MainComplaintViewModel @Inject constructor(
     private val submitMedicalVisitPartOneUseCase: SubmitMedicalVisitPartOneUseCase,
     private val generateSuggestedTestsUseCase: GenerateSuggestedTestsUseCase,
     private val generateSuggestedSupportiveTherapiesUseCase: GenerateSuggestedSupportiveTherapiesUseCase,
-    private val getPatientCategoryUseCase: GetPatientCategoryUseCase,
     private val getCurrentVisitUseCase: GetCurrentVisitUseCase,
     private val translateTriageSymptomIdsToSymptomsUseCase: TranslateTriageSymptomIdsToSymptomsUseCase,
     private val translateLatestVitalSignsToSymptomsUseCase: TranslateLatestVitalSignsToSymptomsUseCase,
@@ -114,7 +112,7 @@ class MainComplaintViewModel @Inject constructor(
         patient?.let { patient ->
             val age = patient.ageInMonths / 12
             val sex = patient.sex
-            val patientCategory = getPatientCategoryUseCase(patient.ageInMonths)
+            val patientCategory = patient.category
 
             when (state.value.complaintId) {
                 ComplaintId.DIARRHEA.id -> {

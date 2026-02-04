@@ -1,17 +1,14 @@
 package com.unimib.oases.domain.usecase
 
+import com.unimib.oases.domain.model.symptom.PatientCategory
 import com.unimib.oases.domain.model.symptom.SymptomTriageCode
 import com.unimib.oases.domain.model.symptom.TriageSymptom
 import com.unimib.oases.ui.screen.nurse_assessment.triage.SymptomWithLabel
 import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageConfig
 import javax.inject.Inject
 
-class ConfigTriageUseCase @Inject constructor(
-    private val getPatientCategoryUseCase: GetPatientCategoryUseCase
-) {
-    operator fun invoke(ageInMonths: Int): TriageConfig {
-
-        val category = getPatientCategoryUseCase(ageInMonths)
+class ConfigTriageUseCase @Inject constructor() {
+    operator fun invoke(category: PatientCategory): TriageConfig {
 
         val redOptions = mutableListOf<SymptomWithLabel>()
         val yellowOptions = mutableListOf<SymptomWithLabel>()
