@@ -13,13 +13,15 @@ object PatientDiseaseSerializer {
         val isDiagnosedBytes = patientDisease.isDiagnosed.toString().toByteArray(Charsets.UTF_8)
         val diagnosisDateBytes = patientDisease.diagnosisDate.toByteArray(Charsets.UTF_8)
         val additionalInfoBytes = patientDisease.additionalInfo.toByteArray(Charsets.UTF_8)
+        val freeTextBytes = patientDisease.freeTextValue.toByteArray(Charsets.UTF_8)
 
         val buffer = ByteBuffer.allocate(
                 4 + patientIdBytes.size +
                 4 + diseaseNameBytes.size +
                 4 + isDiagnosedBytes.size +
                 4 + diagnosisDateBytes.size +
-                4 + additionalInfoBytes.size
+                4 + additionalInfoBytes.size +
+                4 + freeTextBytes.size
         ).order(ByteOrder.BIG_ENDIAN)
 
         buffer.putBytes(patientIdBytes)
@@ -32,6 +34,8 @@ object PatientDiseaseSerializer {
 
         buffer.putBytes(additionalInfoBytes)
 
+        buffer.putBytes(freeTextBytes)
+
         return buffer.array()
     }
 
@@ -43,13 +47,15 @@ object PatientDiseaseSerializer {
         val isDiagnosed = buffer.readString().toBooleanStrict()
         val diagnosisDate = buffer.readString()
         val additionalInfo = buffer.readString()
+        val freeText = buffer.readString()
 
         return PatientDisease(
             patientId = patientId,
             diseaseName = diseaseName,
             isDiagnosed = isDiagnosed,
             diagnosisDate = diagnosisDate,
-            additionalInfo = additionalInfo
+            additionalInfo = additionalInfo,
+            freeTextValue = freeText
         )
     }
 
@@ -60,7 +66,8 @@ object PatientDiseaseSerializer {
             diseaseName = "name",
             isDiagnosed = true,
             diagnosisDate = "date",
-            additionalInfo = "info"
+            additionalInfo = "info",
+            freeTextValue = "aaaaaaaaaaaaaaaaaaaaaa"
         )
         Log.d("PatientDiseaseSerializer", "Original: $original")
         val bytes = serialize(original)

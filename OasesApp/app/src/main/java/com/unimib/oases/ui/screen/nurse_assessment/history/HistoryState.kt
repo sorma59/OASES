@@ -1,7 +1,9 @@
 package com.unimib.oases.ui.screen.nurse_assessment.history
 
 import androidx.compose.ui.graphics.Color
+import com.unimib.oases.domain.model.DiseaseEntryType
 import com.unimib.oases.domain.model.PatientStatus
+import com.unimib.oases.domain.model.PmhGroup
 
 data class HistoryState(
     val patientId: String,
@@ -50,9 +52,12 @@ sealed interface PmhMode {
 
 data class PatientDiseaseState(
     val disease: String,
+    val group: PmhGroup,
+    val entryType: DiseaseEntryType,
     val isDiagnosed: Boolean? = null, // null means not answered
     val additionalInfo: String = "",
-    val date: String = ""
+    val date: String = "",
+    val freeTextValue: String = ""
 )
 
 data class PastVisitsState(

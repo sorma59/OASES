@@ -5,5 +5,6 @@ data class PatientDisease(
     val diseaseName: String,
     val isDiagnosed: Boolean,
     val diagnosisDate: String = "",
-    val additionalInfo: String = ""
+    val additionalInfo: String = "",
+    val freeTextValue: String = ""
 )

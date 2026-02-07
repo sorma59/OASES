@@ -28,6 +28,8 @@ import com.unimib.oases.data.local.model.VisitVitalSignEntity
 import com.unimib.oases.data.local.model.VitalSignEntity
 import com.unimib.oases.data.local.model.relation.PatientWithLastVisitDateEntity
 import com.unimib.oases.data.local.model.relation.PatientWithVisitInfoEntity
+import com.unimib.oases.domain.model.AgeSpecificity
+import com.unimib.oases.domain.model.SexSpecificity
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 import javax.inject.Inject
@@ -154,7 +156,7 @@ class RoomDataSource @Inject constructor(
         diseaseDao.insert(disease)
     }
 
-    fun getFilteredDiseases(sex: String, age: String): Flow<List<DiseaseEntity>> {
+    fun getFilteredDiseases(sex: SexSpecificity, age: AgeSpecificity): Flow<List<DiseaseEntity>> {
         return diseaseDao.getFilteredDiseases(sex, age)
     }
 

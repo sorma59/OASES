@@ -7,6 +7,7 @@ sealed class HistoryEvent {
     data class RadioButtonClicked(val disease: String, val isDiagnosed: Boolean): HistoryEvent()
     data class AdditionalInfoChanged(val disease: String, val additionalInfo: String): HistoryEvent()
     data class DateChanged(val disease: String, val date: String): HistoryEvent()
+    data class FreeTextChanged(val disease: String, val text: String): HistoryEvent()
     data object CreateButtonClicked: HistoryEvent()
     data object Save: HistoryEvent()
     data object Cancel: HistoryEvent()

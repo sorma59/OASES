@@ -93,14 +93,14 @@ val MIGRATION_Disease_Refactor: Migration = object : Migration(2, 3) {
             INSERT INTO disease_new (name, sex_specificity, age_specificity, `group`, allows_free_text)
             SELECT 
                 name,
-                CASE sex_specificity 
-                    WHEN 'Male' THEN 'MALE'
-                    WHEN 'Female' THEN 'FEMALE'
+                CASE  
+                    WHEN sex_specificity IN ('Male', 'MALE') THEN 'MALE'
+                    WHEN sex_specificity IN ('Female', 'FEMALE') THEN 'FEMALE'
                     ELSE 'ALL' 
                 END,
-                CASE age_specificity
-                    WHEN 'Adults' THEN 'ADULTS'
-                    WHEN 'Children' THEN 'CHILDREN'
+                CASE 
+                    WHEN age_specificity IN ('Adults', 'ADULTS') THEN 'ADULTS'
+                    WHEN age_specificity IN ('Children', 'CHILDREN') THEN 'CHILDREN'
                     ELSE 'ALL'
                 END,
                 CASE 
@@ -130,7 +130,7 @@ val MIGRATION_Disease_Refactor: Migration = object : Migration(2, 3) {
         db.execSQL("DROP TABLE ${TableNames.DISEASE}")
         db.execSQL("ALTER TABLE disease_new RENAME TO ${TableNames.DISEASE}")
 
-
+        db.execSQL("ALTER TABLE ${TableNames.PATIENT_DISEASE} ADD COLUMN free_text_value TEXT NOT NULL DEFAULT ''")
 
         db.execSQL("PRAGMA foreign_keys=ON")
     }

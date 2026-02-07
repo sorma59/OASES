@@ -4,7 +4,9 @@ import android.util.Log
 import com.unimib.oases.data.local.RoomDataSource
 import com.unimib.oases.data.mapper.toDomain
 import com.unimib.oases.data.mapper.toEntity
+import com.unimib.oases.domain.model.AgeSpecificity
 import com.unimib.oases.domain.model.Disease
+import com.unimib.oases.domain.model.SexSpecificity
 import com.unimib.oases.domain.repository.DiseaseRepository
 import com.unimib.oases.util.Outcome
 import com.unimib.oases.util.Resource
@@ -37,7 +39,7 @@ class DiseaseRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getFilteredDiseases(sex: String, age: String): Flow<Resource<List<Disease>>> = flow {
+    override fun getFilteredDiseases(sex: SexSpecificity, age: AgeSpecificity): Flow<Resource<List<Disease>>> = flow {
         roomDataSource.getFilteredDiseases(sex, age)
             .onStart {
                 emit(Resource.Loading())

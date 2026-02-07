@@ -200,6 +200,19 @@ class HistoryViewModel @Inject constructor(
                     )
                 }
             }
+            is HistoryEvent.FreeTextChanged -> {
+                updatePmhEditState {
+                    val diseases = it.editingDiseases.map { diseaseState ->
+                        if (diseaseState.disease == event.disease)
+                            diseaseState.copy(freeTextValue = event.text)
+                        else
+                            diseaseState
+                    }
+                    it.copy(
+                        editingDiseases = diseases
+                    )
+                }
+            }
 
             HistoryEvent.CreateButtonClicked -> {
                 val currentMode = state.value.pastMedicalHistoryState.mode

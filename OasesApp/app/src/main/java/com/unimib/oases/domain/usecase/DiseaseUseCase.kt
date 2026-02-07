@@ -15,11 +15,6 @@ class DiseaseUseCase @Inject constructor(
         return repo.addDisease(disease)
     }
 
-    fun getFilteredDiseases(sex: String, age: String): Flow<Resource<List<Disease>>> {
-        val result = repo.getFilteredDiseases(sex, age)
-        return result
-    }
-
     fun getDiseases(): Flow<Resource<List<Disease>>> {
         val result = repo.getAllDiseases()
         return result

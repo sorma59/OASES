@@ -9,7 +9,8 @@ fun PatientDiseaseEntity.toDomain(): PatientDisease {
         diseaseName = diseaseName,
         isDiagnosed = isDiagnosed,
         diagnosisDate = diagnosisDate,
-        additionalInfo = additionalInfo
+        additionalInfo = additionalInfo,
+        freeTextValue = freeTextValue
     )
 }
 
@@ -19,7 +20,8 @@ fun PatientDisease.toEntity(): PatientDiseaseEntity {
         diseaseName = diseaseName,
         isDiagnosed = isDiagnosed,
         diagnosisDate = diagnosisDate,
-        additionalInfo = additionalInfo
+        additionalInfo = additionalInfo,
+        freeTextValue = freeTextValue
     )
 }
 

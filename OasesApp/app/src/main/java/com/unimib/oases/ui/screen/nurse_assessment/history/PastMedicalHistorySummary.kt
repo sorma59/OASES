@@ -21,6 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.unimib.oases.domain.model.DiseaseEntryType
+import com.unimib.oases.domain.model.PmhGroup
 import com.unimib.oases.ui.components.card.OasesCard
 
 /**
@@ -147,23 +149,31 @@ private fun PastHistorySummaryPreview() {
         diseases = listOf(
             PatientDiseaseState(
                 disease = "Hypertension",
+                group = PmhGroup.NEUROPSYCHIATRIC,
+                entryType = DiseaseEntryType.FREE_TEXT,
                 isDiagnosed = true,
                 date = "15/03/2021",
                 additionalInfo = "Controlled with medication."
             ),
             PatientDiseaseState(
                 disease = "Asthma",
+                group = PmhGroup.NEUROPSYCHIATRIC,
+                entryType = DiseaseEntryType.FREE_TEXT,
                 isDiagnosed = true,
                 date = "01/01/2010",
                 additionalInfo = ""
             ),
             PatientDiseaseState(
                 disease = "Diabetes",
-                isDiagnosed = false // This one WILL now appear
+                group = PmhGroup.NEUROPSYCHIATRIC,
+                entryType = DiseaseEntryType.FREE_TEXT,
+                isDiagnosed = false
             ),
             PatientDiseaseState(
                 disease = "Allergies",
-                isDiagnosed = null // This one will NOT appear
+                group = PmhGroup.NEUROPSYCHIATRIC,
+                entryType = DiseaseEntryType.FREE_TEXT,
+                isDiagnosed = null
             )
         ),
         onEvent = {},
@@ -176,8 +186,18 @@ private fun PastHistorySummaryPreview() {
 private fun PastHistorySummaryEmptyPreview() {
     PastHistorySummary(
         diseases = listOf(
-            PatientDiseaseState(disease = "Hypertension", isDiagnosed = null),
-            PatientDiseaseState(disease = "Asthma", isDiagnosed = null)
+            PatientDiseaseState(
+                disease = "Hypertension",
+                group = PmhGroup.NEUROPSYCHIATRIC,
+                entryType = DiseaseEntryType.FREE_TEXT,
+                isDiagnosed = null
+            ),
+            PatientDiseaseState(
+                disease = "Asthma",
+                group = PmhGroup.NEUROPSYCHIATRIC,
+                entryType = DiseaseEntryType.FREE_TEXT,
+                isDiagnosed = null
+            )
         ),
         onEvent = {},
         shouldShowEditButton = { true }

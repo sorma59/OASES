@@ -11,13 +11,13 @@ data class Disease(
 enum class SexSpecificity(val displayName: String) {
     MALE("Male"),
     FEMALE("Female"),
-    ALL("All");
+    ALL("All")
 }
 
 enum class AgeSpecificity(val displayName: String) {
     CHILDREN("Children"),
     ADULTS("Adults"),
-    ALL("All");
+    ALL("All")
 }
 
 enum class PmhGroup(val displayName: String) {

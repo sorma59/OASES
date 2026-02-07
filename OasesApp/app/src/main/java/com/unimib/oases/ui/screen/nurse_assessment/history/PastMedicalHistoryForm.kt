@@ -22,9 +22,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.unimib.oases.domain.model.DiseaseEntryType
+import com.unimib.oases.domain.model.PmhGroup
 import com.unimib.oases.ui.components.form.DateSelectorWithTodayButton
 import com.unimib.oases.ui.components.input.LabeledRadioButton
 import com.unimib.oases.ui.components.util.AnimatedLabelOutlinedTextField
+import com.unimib.oases.ui.components.util.TitleText
 import com.unimib.oases.ui.components.util.button.BottomButtons
 import com.unimib.oases.util.reactToKeyboardAppearance
 
@@ -167,37 +170,55 @@ fun ChronicConditionsForm(
                 asReversed = true
             )
 
-            state.editingDiseases.forEach { diseaseState ->
-                RadioButtonsInputWithDateAndText(
-                    label = diseaseState.disease,
-                    isDiagnosed = diseaseState.isDiagnosed,
-                    onSelected = { isDiagnosed ->
-                        onEvent(
-                            HistoryEvent.RadioButtonClicked(
-                                diseaseState.disease,
-                                isDiagnosed
+            val diseases = state.editingDiseases
+
+            diseases.forEachIndexed { index, diseaseState ->
+                if (index == 0 || diseaseState.group != diseases[index - 1].group)
+                    TitleText(diseaseState.group.displayName)
+                when (diseaseState.entryType) {
+                    DiseaseEntryType.SELECTION -> RadioButtonsInputWithDateAndText(
+                        label = diseaseState.disease,
+                        isDiagnosed = diseaseState.isDiagnosed,
+                        onSelected = { isDiagnosed ->
+                            onEvent(
+                                HistoryEvent.RadioButtonClicked(
+                                    diseaseState.disease,
+                                    isDiagnosed
+                                )
                             )
-                        )
-                    },
-                    date = diseaseState.date,
-                    onDateChange = {
-                        onEvent(
-                            HistoryEvent.DateChanged(
-                                diseaseState.disease,
-                                it
+                        },
+                        date = diseaseState.date,
+                        onDateChange = {
+                            onEvent(
+                                HistoryEvent.DateChanged(
+                                    diseaseState.disease,
+                                    it
+                                )
                             )
-                        )
-                    },
-                    additionalInfo = diseaseState.additionalInfo,
-                    onAdditionalInfoChange = {
-                        onEvent(
-                            HistoryEvent.AdditionalInfoChanged(
-                                diseaseState.disease,
-                                it
+                        },
+                        additionalInfo = diseaseState.additionalInfo,
+                        onAdditionalInfoChange = {
+                            onEvent(
+                                HistoryEvent.AdditionalInfoChanged(
+                                    diseaseState.disease,
+                                    it
+                                )
                             )
-                        )
-                    }
-                )
+                        }
+                    )
+                    DiseaseEntryType.FREE_TEXT -> AnimatedLabelOutlinedTextField(
+                        value = diseaseState.freeTextValue,
+                        onValueChange = {
+                            onEvent(
+                                HistoryEvent.FreeTextChanged(
+                                    disease = diseaseState.disease,
+                                    text = it
+                                )
+                            )
+                        },
+                        labelText = "Details",
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(60.dp)) // Adds breathing room before bottom buttons
@@ -212,18 +233,26 @@ fun PastMedicalHistoryFormPreview() {
         PmhMode.Edit(listOf(
             PatientDiseaseState(
                 disease = "Disease 1",
+                entryType = DiseaseEntryType.SELECTION,
+                group = PmhGroup.ALLERGIES,
                 isDiagnosed = true
             ),
             PatientDiseaseState(
                 disease = "Disease 2",
+                entryType = DiseaseEntryType.SELECTION,
+                group = PmhGroup.ALLERGIES,
                 isDiagnosed = true
             ),
             PatientDiseaseState(
                 disease = "Disease 3",
+                entryType = DiseaseEntryType.SELECTION,
+                group = PmhGroup.NEUROPSYCHIATRIC,
                 isDiagnosed = true
             ),
             PatientDiseaseState(
                 disease = "Disease 4",
+                entryType = DiseaseEntryType.FREE_TEXT,
+                group = PmhGroup.VACCINATIONS,
                 isDiagnosed = true
             ))
         ),
