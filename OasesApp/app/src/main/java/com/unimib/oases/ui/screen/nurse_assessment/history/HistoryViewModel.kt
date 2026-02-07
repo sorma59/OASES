@@ -168,7 +168,7 @@ class HistoryViewModel @Inject constructor(
             }
 
             HistoryEvent.Save -> {
-                if (_state.value.pastMedicalHistoryState.canSave)
+                if (_state.value.pastMedicalHistoryState.isSaveable)
                     savePastMedicalHistory()
                 else
                     showCannotSaveError()

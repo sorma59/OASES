@@ -22,7 +22,7 @@ data class PastMedicalHistoryState(
     val isPastMedicalHistoryPresent: Boolean
         get() = mode is PmhMode.View && mode.diseases.mapNotNull{it.isDiagnosed}.isNotEmpty()
 
-    val canSave: Boolean
+    val isSaveable: Boolean
         get() = mode is PmhMode.Edit && mode.hasAnyBeenFilledIn
 }
 
