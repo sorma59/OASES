@@ -25,6 +25,6 @@ interface VisitVitalSignDao {
     @Query("SELECT * FROM " + TableNames.VISIT_VITAL_SIGN + " WHERE visit_id = :visitId ORDER BY timestamp")
     fun getVisitVitalSigns(visitId: String): Flow<List<VisitVitalSignEntity>>
 
-    @Query("SELECT vs.* FROM ${TableNames.VISIT_VITAL_SIGN} vs JOIN (SELECT vital_sign_name, MAX(timestamp) AS latest_time FROM ${TableNames.VISIT_VITAL_SIGN} WHERE visit_id = :visitId GROUP BY vital_sign_name) latest ON vs.vital_sign_name = latest.vital_sign_name AND vs.timestamp = latest.latest_time WHERE vs.visit_id = :visitId")
+    @Query("SELECT vs.* FROM " + TableNames.VISIT_VITAL_SIGN + " vs JOIN (SELECT vital_sign_name, MAX(timestamp) AS latest_time FROM ${TableNames.VISIT_VITAL_SIGN} WHERE visit_id = :visitId GROUP BY vital_sign_name) latest ON vs.vital_sign_name = latest.vital_sign_name AND vs.timestamp = latest.latest_time WHERE vs.visit_id = :visitId")
     fun getVisitLatestVitalSigns(visitId: String): Flow<List<VisitVitalSignEntity>>
 }

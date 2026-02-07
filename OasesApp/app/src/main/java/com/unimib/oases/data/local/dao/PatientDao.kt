@@ -27,7 +27,7 @@ interface PatientDao {
 
     @Query("""
     SELECT p.*, MAX(v.date) as lastVisitDate 
-    FROM patients p 
+    FROM ${TableNames.PATIENT} p 
     INNER JOIN visits v ON p.id = v.patient_id -- INNER is correct as long as patients are created along visits
     GROUP BY p.id
     ORDER BY lastVisitDate DESC

@@ -20,9 +20,9 @@ interface ComplaintSummaryDao {
     @Delete
     suspend fun delete(complaintSummary: ComplaintSummaryEntity)
 
-    @Query("SELECT * FROM ${TableNames.COMPLAINT_SUMMARY} WHERE visit_id = :visitId")
+    @Query("SELECT * FROM " + TableNames.COMPLAINT_SUMMARY + " WHERE visit_id = :visitId")
     fun getVisitComplaintsSummaries(visitId: String): Flow<List<ComplaintSummaryEntity>>
 
-    @Query("SELECT * FROM ${TableNames.COMPLAINT_SUMMARY} WHERE complaint_id = :complaintId AND visit_id = :visitId")
+    @Query("SELECT * FROM " + TableNames.COMPLAINT_SUMMARY + " WHERE complaint_id = :complaintId AND visit_id = :visitId")
     fun getComplaintSummary(visitId: String, complaintId: String): Flow<ComplaintSummaryEntity?>
 }
