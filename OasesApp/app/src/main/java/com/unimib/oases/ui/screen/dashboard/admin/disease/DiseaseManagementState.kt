@@ -2,6 +2,8 @@ package com.unimib.oases.ui.screen.dashboard.admin.disease
 
 import com.unimib.oases.domain.model.AgeSpecificity
 import com.unimib.oases.domain.model.Disease
+import com.unimib.oases.domain.model.DiseaseEntryType
+import com.unimib.oases.domain.model.PmhGroup
 import com.unimib.oases.domain.model.SexSpecificity
 
 
@@ -9,7 +11,9 @@ data class DiseaseManagementState(
     val disease: Disease = Disease(
         name = "",
         sexSpecificity = SexSpecificity.ALL,
-        ageSpecificity = AgeSpecificity.ALL
+        ageSpecificity = AgeSpecificity.ALL,
+        group = PmhGroup.ALLERGIES,
+        entryType = DiseaseEntryType.SELECTION
     ),
     val diseases: List<Disease> = emptyList(),
     val isLoading: Boolean = false,

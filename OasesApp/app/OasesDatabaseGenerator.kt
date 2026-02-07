@@ -2,7 +2,7 @@ import java.sql.DriverManager
 
 fun main() {
     val dbName = "oases.db"
-    val dbVersion = 2 // Update when db version changes
+    val dbVersion = 2
     val conn = DriverManager.getConnection("jdbc:sqlite:$dbName")
     val stmt = conn.createStatement()
 

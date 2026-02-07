@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.model.AgeSpecificity
 import com.unimib.oases.domain.model.Disease
+import com.unimib.oases.domain.model.DiseaseEntryType
+import com.unimib.oases.domain.model.PmhGroup
 import com.unimib.oases.domain.model.SexSpecificity
 import com.unimib.oases.domain.usecase.DiseaseUseCase
 import com.unimib.oases.util.Resource
@@ -115,7 +117,9 @@ class DiseaseManagementViewModel @Inject constructor(
                                 disease = Disease(
                                     name = "",
                                     sexSpecificity = SexSpecificity.ALL,
-                                    ageSpecificity = AgeSpecificity.ALL
+                                    ageSpecificity = AgeSpecificity.ALL,
+                                    group = PmhGroup.ALLERGIES,
+                                    entryType = DiseaseEntryType.SELECTION
                                 )
                             )
                         }

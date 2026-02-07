@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.unimib.oases.data.local.db.AuthDatabase
 import com.unimib.oases.data.local.db.MIGRATION_1_2
+import com.unimib.oases.data.local.db.MIGRATION_Disease_Refactor
 import com.unimib.oases.data.local.db.OasesDatabase
 import dagger.Module
 import dagger.Provides
@@ -103,6 +104,7 @@ object AppModule {
 //        .fallbackToDestructiveMigration(true)
         .createFromAsset("databases/oases.db")
         .addMigrations(MIGRATION_1_2)
+        .addMigrations(MIGRATION_Disease_Refactor)
         .build()
     }
 

@@ -3,40 +3,41 @@ package com.unimib.oases.domain.model
 data class Disease(
     val name: String,
     val sexSpecificity: SexSpecificity,
-    val ageSpecificity: AgeSpecificity
+    val ageSpecificity: AgeSpecificity,
+    val group: PmhGroup,
+    val entryType: DiseaseEntryType
 )
 
 enum class SexSpecificity(val displayName: String) {
     MALE("Male"),
     FEMALE("Female"),
     ALL("All");
-
-    // Optional: Function to get enum from display name (useful for UI)
-    companion object {
-        fun fromSexSpecificityDisplayName(displayName: String): SexSpecificity {
-            return entries.find { it.displayName == displayName } ?: ALL
-        }
-
-        // Optional: Function to get enum from stored name (robust)
-        fun fromStoredName(storedName: String): SexSpecificity? {
-            return try {
-                valueOf(storedName)
-            } catch (e: IllegalArgumentException) {
-                null // Handle cases where the stored name might be invalid
-            }
-        }
-    }
 }
 
 enum class AgeSpecificity(val displayName: String) {
     CHILDREN("Children"),
     ADULTS("Adults"),
     ALL("All");
+}
 
-    // Optional: Function to get enum from display name (useful for UI)
-    companion object {
-        fun fromAgeSpecificityDisplayName(displayName: String): AgeSpecificity {
-            return AgeSpecificity.entries.find { it.displayName == displayName } ?: ALL
-        }
-    }
+enum class PmhGroup(val displayName: String) {
+    ALLERGIES("Allergies"),
+    MEDICATIONS("Current medications"),
+    VACCINATIONS("Vaccinations"),
+    INFECTIOUS("Infectious Diseases"),
+    HAEMATOLOGICAL("Haematological Diseases"),
+    GASTROINTESTINAL("Gastrointestinal Diseases"),
+    CARDIOVASCULAR("Cardiovascular Diseases"),
+    LUNG("Lung Diseases"),
+    KIDNEY("Kidney Diseases"),
+    ENDOCRINE("Endocrine Diseases"),
+    NEUROPSYCHIATRIC("Neuropsychiatric Diseases"),
+    MEDICAL_CONDITIONS("Other significant medical conditions"),
+    MEDICAL_EVENTS("Other significant past medical events"),
+    OBSTETRIC_HISTORY("Obstetric history")
+}
+
+enum class DiseaseEntryType {
+    SELECTION,
+    FREE_TEXT
 }
