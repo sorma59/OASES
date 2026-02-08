@@ -72,11 +72,9 @@ val MIGRATION_1_2: Migration = object : Migration(1, 2) {
 }
 
 val MIGRATION_Disease_Refactor: Migration = object : Migration(2, 3) {
-    override fun migrate(db: SupportSQLiteDatabase) {
-        db.execSQL("PRAGMA foreign_keys=OFF")
+    override fun migrate(db: SupportSQLiteDatabase) {db.execSQL("PRAGMA foreign_keys=OFF")
 
-        // 1. Create the new table with the updated schema
-        // Note: Enums map to TEXT, Booleans map to INTEGER (0/1) in SQLite
+        // --- 1. Refactor DISEASE Table (as before) ---
         db.execSQL("""
             CREATE TABLE disease_new (
                 name TEXT NOT NULL PRIMARY KEY,
@@ -87,8 +85,6 @@ val MIGRATION_Disease_Refactor: Migration = object : Migration(2, 3) {
             )
         """)
 
-        // 2. Transfer data and Map strings to Enum Names
-        // We use CASE to translate 'Male only' -> 'MALE_ONLY' etc.
         db.execSQL("""
             INSERT INTO disease_new (name, sex_specificity, age_specificity, `group`, allows_free_text)
             SELECT 
@@ -126,12 +122,38 @@ val MIGRATION_Disease_Refactor: Migration = object : Migration(2, 3) {
                 END FROM ${TableNames.DISEASE}
         """)
 
-        // 3. Swap tables
         db.execSQL("DROP TABLE ${TableNames.DISEASE}")
         db.execSQL("ALTER TABLE disease_new RENAME TO ${TableNames.DISEASE}")
 
-        db.execSQL("ALTER TABLE ${TableNames.PATIENT_DISEASE} ADD COLUMN free_text_value TEXT NOT NULL DEFAULT ''")
+        // --- 2. Refactor PATIENT_DISEASE Table (To make is_diagnosed nullable) ---
 
+        // Create new table with 'is_diagnosed' allowed to be NULL
+        db.execSQL("""
+            CREATE TABLE patient_disease_new (
+                patient_id TEXT NOT NULL,
+                disease_name TEXT NOT NULL,
+                is_diagnosed INTEGER, 
+                diagnosis_date TEXT NOT NULL,
+                additional_info TEXT NOT NULL,
+                free_text_value TEXT NOT NULL,
+                PRIMARY KEY(patient_id, disease_name),
+                FOREIGN KEY(patient_id) REFERENCES ${TableNames.PATIENT}(id) ON UPDATE NO ACTION ON DELETE CASCADE,
+                FOREIGN KEY(disease_name) REFERENCES ${TableNames.DISEASE}(name) ON UPDATE NO ACTION ON DELETE CASCADE
+            )
+        """)
+
+        // Copy data from old to new.
+        // Note: we include 'free_text_value' as empty string since it didn't exist in v2
+        db.execSQL("""
+            INSERT INTO patient_disease_new (patient_id, disease_name, is_diagnosed, diagnosis_date, additional_info, free_text_value)
+            SELECT patient_id, disease_name, is_diagnosed, diagnosis_date, additional_info, '' FROM ${TableNames.PATIENT_DISEASE}
+        """)
+
+        db.execSQL("DROP TABLE ${TableNames.PATIENT_DISEASE}")
+        db.execSQL("ALTER TABLE patient_disease_new RENAME TO ${TableNames.PATIENT_DISEASE}")
+
+        // --- 3. Finalize ---
+        // Insert any new tuples to the master disease list
         db.execSQL("INSERT INTO ${TableNames.DISEASE} (name, sex_specificity, age_specificity, `group`, allows_free_text) VALUES ('Previous hospitalizations', 'ALL', 'ALL', 'MEDICAL_EVENTS', 0)")
 
         db.execSQL("PRAGMA foreign_keys=ON")

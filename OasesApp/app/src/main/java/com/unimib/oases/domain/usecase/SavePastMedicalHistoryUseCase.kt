@@ -22,16 +22,17 @@ class SavePastMedicalHistoryUseCase @Inject constructor(
     }
 
     private fun List<PatientDiseaseState>.toPatientDiseases(patientId: String): List<PatientDisease> {
-        return this.mapNotNull {
-            it.isDiagnosed?.let { isDiagnosed ->
+        return this
+            .filter { it.isDiagnosed != null || it.freeTextValue.isNotBlank() }
+            .map {
                 PatientDisease(
                     patientId = patientId,
                     diseaseName = it.disease,
-                    isDiagnosed = isDiagnosed,
+                    isDiagnosed = it.isDiagnosed,
                     diagnosisDate = it.date,
                     additionalInfo = it.additionalInfo,
+                    freeTextValue = it.freeTextValue
                 )
             }
-        }
     }
 }

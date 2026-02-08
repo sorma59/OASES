@@ -78,10 +78,8 @@ fun PastHistorySummary(
                         FreeTextConditionItem(disease = disease)
                     }
                 }
-                // Add a divider if there are also diagnosed diseases to show
-                if (diagnosedDiseases.isNotEmpty()) {
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
-                }
+
+                HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
             }
 
             // --- Diagnosed Content ---
@@ -93,8 +91,7 @@ fun PastHistorySummary(
                         DiagnosedDiseaseItem(disease = disease)
                     }
                 }
-            } else if (documentedConditions.isEmpty()) {
-                // Show this text only if BOTH lists are empty
+            } else {
                 Text("No known chronic diseases")
             }
         }
