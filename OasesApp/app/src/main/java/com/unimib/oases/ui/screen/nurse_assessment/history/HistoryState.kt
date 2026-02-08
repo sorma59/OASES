@@ -16,13 +16,16 @@ data class HistoryState(
 data class PastMedicalHistoryState(
     // 1. The 'mode' property replaces 'isEditing' and 'editingDiseases'.
     //    It defaults to the View mode with an empty list.
-    val mode: PmhMode = PmhMode.View(diseases = emptyList()),
+    val mode: PmhMode = PmhMode.View(
+        freeTextDiseases = emptyList(),
+        selectionDiseases = emptyList()
+    ),
     val isLoading: Boolean = true,
     val error: String? = null
 ) {
     // 2. This computed property can now get the data directly from the mode.
     val isPastMedicalHistoryPresent: Boolean
-        get() = mode is PmhMode.View && mode.diseases.mapNotNull{it.isDiagnosed}.isNotEmpty()
+        get() = mode is PmhMode.View && mode.isPastMedicalHistoryPresent
 
     val isSaveable: Boolean
         get() = mode is PmhMode.Edit && mode.hasAnyBeenFilledIn
@@ -33,20 +36,35 @@ sealed interface PmhMode {
     /**
      * Represents the view-only state, holding the final displayed data.
      */
-    data class View(val diseases: List<PatientDiseaseState>) : PmhMode
+    data class View(
+        val freeTextDiseases: List<PatientDiseaseState>,
+        val selectionDiseases: List<PatientDiseaseState>
+    ) : PmhMode {
+        val diseases: List<PatientDiseaseState>
+            get() = freeTextDiseases + selectionDiseases
+
+        val isPastMedicalHistoryPresent: Boolean
+            get() = diseases.any { it.isDiagnosed != null || it.freeTextValue.isNotBlank() }
+    }
 
     /**
      * Represents the editing state, holding the data currently being edited in the form.
      */
     data class Edit(
-        val originalDiseases: List<PatientDiseaseState>,
-        val editingDiseases: List<PatientDiseaseState> = originalDiseases
+        val originalFreeTextDiseases: List<PatientDiseaseState>,
+        val originalSelectionDiseases: List<PatientDiseaseState>,
+
+        val editingFreeTextDiseases: List<PatientDiseaseState> = originalFreeTextDiseases,
+        val editingSelectionDiseases: List<PatientDiseaseState> = originalSelectionDiseases
     ) : PmhMode {
+        val editingDiseases: List<PatientDiseaseState>
+            get() = editingFreeTextDiseases + editingSelectionDiseases
+
         val areAllSetToNo: Boolean
-            get() = editingDiseases.all{ it.isDiagnosed == false}
+            get() = editingSelectionDiseases.all{ it.isDiagnosed == false}
 
         val hasAnyBeenFilledIn: Boolean
-            get() = editingDiseases.any { it.isDiagnosed != null }
+            get() = editingDiseases.any { it.isDiagnosed != null || it.freeTextValue.isNotBlank() }
     }
 }
 

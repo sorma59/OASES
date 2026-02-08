@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Notes
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.HorizontalDivider
@@ -19,10 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.unimib.oases.domain.model.DiseaseEntryType
-import com.unimib.oases.domain.model.PmhGroup
 import com.unimib.oases.ui.components.card.OasesCard
 
 /**
@@ -30,13 +28,17 @@ import com.unimib.oases.ui.components.card.OasesCard
  */
 @Composable
 fun PastHistorySummary(
-    diseases: List<PatientDiseaseState>,
+    freeTextDiseases: List<PatientDiseaseState>,
+    selectionDiseases: List<PatientDiseaseState>,
     onEvent: (HistoryEvent) -> Unit,
     shouldShowEditButton: () -> Boolean,
     modifier: Modifier = Modifier
 ) {
-    val diagnosedDiseases = diseases
-        .filter { it.isDiagnosed == true }
+    val documentedConditions = freeTextDiseases
+        .filter { it.freeTextValue.isNotBlank() }
+
+    val diagnosedDiseases = selectionDiseases
+        .filter { it.isDiagnosed == true } // Simplified this filter, as freeText is handled above
         .sortedByDescending { it.date }
 
     OasesCard(modifier = modifier.fillMaxWidth()) {
@@ -69,23 +71,66 @@ fun PastHistorySummary(
             HorizontalDivider()
             Spacer(modifier = Modifier.height(8.dp))
 
-            // --- Content ---
+            // --- Documented Content ---
+            if (documentedConditions.isNotEmpty()) {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    documentedConditions.forEach { disease ->
+                        FreeTextConditionItem(disease = disease)
+                    }
+                }
+                // Add a divider if there are also diagnosed diseases to show
+                if (diagnosedDiseases.isNotEmpty()) {
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
+                }
+            }
+
+            // --- Diagnosed Content ---
             if (diagnosedDiseases.isNotEmpty()) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     diagnosedDiseases.forEach { disease ->
-                        DiagnosedDiseaseItem(
-                            disease = disease
-                        )
+                        DiagnosedDiseaseItem(disease = disease)
                     }
                 }
-            } else {
+            } else if (documentedConditions.isEmpty()) {
+                // Show this text only if BOTH lists are empty
                 Text("No known chronic diseases")
             }
         }
     }
 }
+
+/**
+ * A sub-composable for displaying a free-text documented condition.
+ */
+@Composable
+private fun FreeTextConditionItem(disease: PatientDiseaseState) {
+    Row(
+        verticalAlignment = Alignment.Top, // Align icon to the top of the text
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.Notes,
+            contentDescription = "Documented condition",
+            tint = MaterialTheme.colorScheme.secondary,
+            modifier = Modifier.padding(top = 4.dp)
+        )
+        Column {
+            Text(
+                text = disease.disease, // e.g., "Surgical History"
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = disease.freeTextValue, // The actual free text entered by the user
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
 
 /**
  * A sub-composable to display a single answered disease item,
@@ -95,6 +140,7 @@ fun PastHistorySummary(
 private fun DiagnosedDiseaseItem(
     disease: PatientDiseaseState
 ) {
+    // ... (This composable remains unchanged)
     val icon =Icons.Default.CheckCircle
     val iconColor = MaterialTheme.colorScheme.primary
 
@@ -142,64 +188,64 @@ private fun DiagnosedDiseaseItem(
 // Previews (Also updated to reflect the new logic)
 // =====================================================================================
 
-@Preview(showBackground = true)
-@Composable
-private fun PastHistorySummaryPreview() {
-    PastHistorySummary(
-        diseases = listOf(
-            PatientDiseaseState(
-                disease = "Hypertension",
-                group = PmhGroup.NEUROPSYCHIATRIC,
-                entryType = DiseaseEntryType.FREE_TEXT,
-                isDiagnosed = true,
-                date = "15/03/2021",
-                additionalInfo = "Controlled with medication."
-            ),
-            PatientDiseaseState(
-                disease = "Asthma",
-                group = PmhGroup.NEUROPSYCHIATRIC,
-                entryType = DiseaseEntryType.FREE_TEXT,
-                isDiagnosed = true,
-                date = "01/01/2010",
-                additionalInfo = ""
-            ),
-            PatientDiseaseState(
-                disease = "Diabetes",
-                group = PmhGroup.NEUROPSYCHIATRIC,
-                entryType = DiseaseEntryType.FREE_TEXT,
-                isDiagnosed = false
-            ),
-            PatientDiseaseState(
-                disease = "Allergies",
-                group = PmhGroup.NEUROPSYCHIATRIC,
-                entryType = DiseaseEntryType.FREE_TEXT,
-                isDiagnosed = null
-            )
-        ),
-        onEvent = {},
-        shouldShowEditButton = { true }
-    )
-}
+//@Preview(showBackground = true)
+//@Composable
+//private fun PastHistorySummaryPreview() {
+//    PastHistorySummary(
+//        selectionDiseases = listOf(
+//            PatientDiseaseState(
+//                disease = "Hypertension",
+//                group = PmhGroup.NEUROPSYCHIATRIC,
+//                entryType = DiseaseEntryType.FREE_TEXT,
+//                isDiagnosed = true,
+//                date = "15/03/2021",
+//                additionalInfo = "Controlled with medication."
+//            ),
+//            PatientDiseaseState(
+//                disease = "Asthma",
+//                group = PmhGroup.NEUROPSYCHIATRIC,
+//                entryType = DiseaseEntryType.FREE_TEXT,
+//                isDiagnosed = true,
+//                date = "01/01/2010",
+//                additionalInfo = ""
+//            ),
+//            PatientDiseaseState(
+//                disease = "Diabetes",
+//                group = PmhGroup.NEUROPSYCHIATRIC,
+//                entryType = DiseaseEntryType.FREE_TEXT,
+//                isDiagnosed = false
+//            ),
+//            PatientDiseaseState(
+//                disease = "Allergies",
+//                group = PmhGroup.NEUROPSYCHIATRIC,
+//                entryType = DiseaseEntryType.FREE_TEXT,
+//                isDiagnosed = null
+//            )
+//        ),
+//        onEvent = {},
+//        shouldShowEditButton = { true }
+//    )
+//}
 
-@Preview(showBackground = true)
-@Composable
-private fun PastHistorySummaryEmptyPreview() {
-    PastHistorySummary(
-        diseases = listOf(
-            PatientDiseaseState(
-                disease = "Hypertension",
-                group = PmhGroup.NEUROPSYCHIATRIC,
-                entryType = DiseaseEntryType.FREE_TEXT,
-                isDiagnosed = null
-            ),
-            PatientDiseaseState(
-                disease = "Asthma",
-                group = PmhGroup.NEUROPSYCHIATRIC,
-                entryType = DiseaseEntryType.FREE_TEXT,
-                isDiagnosed = null
-            )
-        ),
-        onEvent = {},
-        shouldShowEditButton = { true }
-    )
-}
+//@Preview(showBackground = true)
+//@Composable
+//private fun PastHistorySummaryEmptyPreview() {
+//    PastHistorySummary(
+//        selectionDiseases = listOf(
+//            PatientDiseaseState(
+//                disease = "Hypertension",
+//                group = PmhGroup.NEUROPSYCHIATRIC,
+//                entryType = DiseaseEntryType.FREE_TEXT,
+//                isDiagnosed = null
+//            ),
+//            PatientDiseaseState(
+//                disease = "Asthma",
+//                group = PmhGroup.NEUROPSYCHIATRIC,
+//                entryType = DiseaseEntryType.FREE_TEXT,
+//                isDiagnosed = null
+//            )
+//        ),
+//        onEvent = {},
+//        shouldShowEditButton = { true }
+//    )
+//}

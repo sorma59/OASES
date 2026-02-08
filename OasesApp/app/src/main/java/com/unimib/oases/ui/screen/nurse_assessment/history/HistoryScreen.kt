@@ -66,7 +66,8 @@ private fun HistoryContent(
             is PmhMode.View -> {
                 if (state.pastMedicalHistoryState.isPastMedicalHistoryPresent)
                     PastHistorySummary(
-                        state.pastMedicalHistoryState.mode.diseases,
+                        state.pastMedicalHistoryState.mode.freeTextDiseases,
+                        state.pastMedicalHistoryState.mode.selectionDiseases,
                         onEvent,
                         shouldShowEditButton,
                         Modifier.padding(16.dp)

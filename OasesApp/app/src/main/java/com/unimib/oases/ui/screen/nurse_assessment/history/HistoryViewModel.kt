@@ -101,10 +101,16 @@ class HistoryViewModel @Inject constructor(
                 it.copy(
                     mode = when (it.mode) {
                         is PmhMode.View -> {
-                            PmhMode.View(diseases = diseases)
+                            PmhMode.View(
+                                freeTextDiseases = diseases.first,
+                                selectionDiseases = diseases.second
+                            )
                         }
                         is PmhMode.Edit -> {
-                            PmhMode.Edit(originalDiseases = diseases)
+                            PmhMode.Edit(
+                                originalFreeTextDiseases = diseases.first,
+                                originalSelectionDiseases = diseases.second
+                            )
                         }
                     },
                     isLoading = false
@@ -124,7 +130,10 @@ class HistoryViewModel @Inject constructor(
                 if (currentMode is PmhMode.View) {
                     updatePastMedicalHistoryState {
                         it.copy(
-                            mode = PmhMode.Edit(currentMode.diseases)
+                            mode = PmhMode.Edit(
+                                originalFreeTextDiseases = currentMode.freeTextDiseases,
+                                originalSelectionDiseases = currentMode.selectionDiseases,
+                            )
                         )
                     }
                 }
@@ -132,9 +141,9 @@ class HistoryViewModel @Inject constructor(
 
             HistoryEvent.DenyAllClicked -> {
                 updatePmhEditState {
-                    diseasesBeforeDenyingAll = it.editingDiseases
+                    diseasesBeforeDenyingAll = it.editingSelectionDiseases
                     it.copy(
-                        editingDiseases = it.editingDiseases.map { diseaseState ->
+                        editingSelectionDiseases = it.editingSelectionDiseases.map { diseaseState ->
                             diseaseState.copy(
                                 isDiagnosed = false
                             )
@@ -153,14 +162,14 @@ class HistoryViewModel @Inject constructor(
 
             is HistoryEvent.RadioButtonClicked -> {
                 updatePmhEditState {
-                    val diseases = it.editingDiseases.map { diseaseState ->
+                    val diseases = it.editingSelectionDiseases.map { diseaseState ->
                         if (diseaseState.disease == event.disease)
                             diseaseState.copy(isDiagnosed = event.isDiagnosed)
                         else
                             diseaseState
                     }
                     it.copy(
-                        editingDiseases = diseases
+                        editingSelectionDiseases = diseases
                     )
                 }
             }
@@ -170,7 +179,7 @@ class HistoryViewModel @Inject constructor(
             }
 
             HistoryEvent.Save -> {
-                if (_state.value.pastMedicalHistoryState.isSaveable)
+                if (state.value.pastMedicalHistoryState.isSaveable)
                     savePastMedicalHistory()
                 else
                     showCannotSaveError()
@@ -178,40 +187,40 @@ class HistoryViewModel @Inject constructor(
 
             is HistoryEvent.AdditionalInfoChanged -> {
                 updatePmhEditState {
-                    val diseases = it.editingDiseases.map { diseaseState ->
+                    val diseases = it.editingSelectionDiseases.map { diseaseState ->
                         if (diseaseState.disease == event.disease)
                             diseaseState.copy(additionalInfo = event.additionalInfo)
                         else
                             diseaseState
                     }
                     it.copy(
-                        editingDiseases = diseases
+                        editingSelectionDiseases = diseases
                     )
                 }
             }
             is HistoryEvent.DateChanged -> {
                 updatePmhEditState {
-                    val diseases = it.editingDiseases.map { diseaseState ->
+                    val diseases = it.editingSelectionDiseases.map { diseaseState ->
                         if (diseaseState.disease == event.disease)
                             diseaseState.copy(date = event.date)
                         else
                             diseaseState
                     }
                     it.copy(
-                        editingDiseases = diseases
+                        editingSelectionDiseases = diseases
                     )
                 }
             }
             is HistoryEvent.FreeTextChanged -> {
                 updatePmhEditState {
-                    val diseases = it.editingDiseases.map { diseaseState ->
+                    val diseases = it.editingFreeTextDiseases.map { diseaseState ->
                         if (diseaseState.disease == event.disease)
                             diseaseState.copy(freeTextValue = event.text)
                         else
                             diseaseState
                     }
                     it.copy(
-                        editingDiseases = diseases
+                        editingFreeTextDiseases = diseases
                     )
                 }
             }
@@ -221,7 +230,10 @@ class HistoryViewModel @Inject constructor(
                 if (currentMode !is PmhMode.View) return // Safety check
                 updatePastMedicalHistoryState {
                     it.copy(
-                        mode = PmhMode.Edit(currentMode.diseases)
+                        mode = PmhMode.Edit(
+                            originalFreeTextDiseases = currentMode.freeTextDiseases,
+                            originalSelectionDiseases = currentMode.selectionDiseases
+                        )
                     )
                 }
             }
@@ -234,7 +246,7 @@ class HistoryViewModel @Inject constructor(
                 diseasesBeforeDenyingAll?.let { previousState ->
                     updatePmhEditState {
                         it.copy(
-                            editingDiseases = previousState
+                            editingSelectionDiseases = previousState
                         )
                     }
                 }
@@ -252,7 +264,10 @@ class HistoryViewModel @Inject constructor(
         if (currentMode !is PmhMode.Edit) return // Safety check
         updatePastMedicalHistoryState {
             it.copy(
-                mode = PmhMode.View(currentMode.originalDiseases)
+                mode = PmhMode.View(
+                    freeTextDiseases = currentMode.originalFreeTextDiseases,
+                    selectionDiseases = currentMode.originalSelectionDiseases
+                )
             )
         }
     }
@@ -261,7 +276,10 @@ class HistoryViewModel @Inject constructor(
         val currentMode = state.value.pastMedicalHistoryState.mode
         if (currentMode !is PmhMode.Edit) return // Safety check
 
-        val diseasesToSave = currentMode.editingDiseases
+        val currentFreeTextDiseases = currentMode.editingFreeTextDiseases
+        val currentSelectionDiseases = currentMode.editingSelectionDiseases
+
+        val diseasesToSave = currentFreeTextDiseases + currentSelectionDiseases
 
         updatePastMedicalHistoryState { it.copy(isLoading = true) }
 
@@ -278,7 +296,12 @@ class HistoryViewModel @Inject constructor(
                 is Outcome.Success -> {
                     // Switch back to View mode with the newly saved data
                     updatePastMedicalHistoryState {
-                        it.copy(mode = PmhMode.View(diseases = diseasesToSave))
+                        it.copy(
+                            mode = PmhMode.View(
+                                freeTextDiseases = currentFreeTextDiseases,
+                                selectionDiseases = currentSelectionDiseases
+                            )
+                        )
                     }
                 }
             }

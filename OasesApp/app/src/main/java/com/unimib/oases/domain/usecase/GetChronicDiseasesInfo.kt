@@ -3,6 +3,7 @@ package com.unimib.oases.domain.usecase
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.model.AgeSpecificity
 import com.unimib.oases.domain.model.Disease
+import com.unimib.oases.domain.model.DiseaseEntryType
 import com.unimib.oases.domain.model.SexSpecificity
 import com.unimib.oases.domain.repository.DiseaseRepository
 import com.unimib.oases.domain.repository.PatientRepository
@@ -21,7 +22,7 @@ class GetChronicDiseasesInfo  @Inject constructor(
     private val getPatientChronicDiseasesMapUseCase: GetPatientChronicDiseasesMapUseCase,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ){
-    suspend operator fun invoke(patientId: String): List<PatientDiseaseState> {
+    suspend operator fun invoke(patientId: String): Pair<List<PatientDiseaseState>, List<PatientDiseaseState>> {
         return withContext(ioDispatcher){
             val diseasesDeferred = async {
                 val (sex, age) = getSexAndAge(patientId)
@@ -41,6 +42,7 @@ class GetChronicDiseasesInfo  @Inject constructor(
                         )
                     } ?: diseaseState
                 }
+                .partition { it.entryType == DiseaseEntryType.FREE_TEXT }
         }
     }
 
