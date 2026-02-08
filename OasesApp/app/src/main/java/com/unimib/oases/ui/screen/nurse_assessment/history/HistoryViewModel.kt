@@ -87,6 +87,8 @@ class HistoryViewModel @Inject constructor(
     private val uiEventsChannel = Channel<UiEvent>()
     val uiEvents = uiEventsChannel.receiveAsFlow()
 
+    private var diseasesBeforeDenyingAll: List<PatientDiseaseState>? = null
+
     init {
         loadChronicDiseases()
         loadPastVisits()
@@ -130,7 +132,7 @@ class HistoryViewModel @Inject constructor(
 
             HistoryEvent.DenyAllClicked -> {
                 updatePmhEditState {
-                    showMarkedAllAsNosSnackbar(it.editingDiseases)
+                    diseasesBeforeDenyingAll = it.editingDiseases
                     it.copy(
                         editingDiseases = it.editingDiseases.map { diseaseState ->
                             diseaseState.copy(
@@ -228,12 +230,15 @@ class HistoryViewModel @Inject constructor(
                 onEvent(HistoryEvent.Save)
             }
 
-            is HistoryEvent.UndoMarkingAllAsNos -> {
-                updatePmhEditState {
-                    it.copy(
-                        editingDiseases = event.previousDiseases
-                    )
+            HistoryEvent.UndoMarkingAllAsNos -> {
+                diseasesBeforeDenyingAll?.let { previousState ->
+                    updatePmhEditState {
+                        it.copy(
+                            editingDiseases = previousState
+                        )
+                    }
                 }
+                diseasesBeforeDenyingAll = null
             }
         }
     }
@@ -327,21 +332,21 @@ class HistoryViewModel @Inject constructor(
         }
     }
 
-    private fun showMarkedAllAsNosSnackbar(diseasesBeforeDenyingAll: List<PatientDiseaseState>) {
-        viewModelScope.launch(pastMedicalHistoryContext) {
-            uiEventsChannel.send(
-                UiEvent.ShowSnackbar(
-                    SnackbarData(
-                        message = "All chronic diseases set no",
-                        type = SnackbarType.INFO,
-                        actionLabel = "Undo",
-                    ) {
-                        onEvent(HistoryEvent.UndoMarkingAllAsNos(diseasesBeforeDenyingAll))
-                    }
-                )
-            )
-        }
-    }
+//    private fun showMarkedAllAsNosSnackbar(diseasesBeforeDenyingAll: List<PatientDiseaseState>) {
+//        viewModelScope.launch(pastMedicalHistoryContext) {
+//            uiEventsChannel.send(
+//                UiEvent.ShowSnackbar(
+//                    SnackbarData(
+//                        message = "All chronic diseases set no",
+//                        type = SnackbarType.INFO,
+//                        actionLabel = "Undo",
+//                    ) {
+//                        onEvent(HistoryEvent.UndoMarkingAllAsNos(diseasesBeforeDenyingAll))
+//                    }
+//                )
+//            )
+//        }
+//    }
 
     private fun updatePastMedicalHistoryState(update: (PastMedicalHistoryState) -> PastMedicalHistoryState) {
         _state.update {

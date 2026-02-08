@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.sp
 import com.unimib.oases.domain.model.DiseaseEntryType
 import com.unimib.oases.domain.model.PmhGroup
 import com.unimib.oases.ui.components.form.DateSelectorWithTodayButton
-import com.unimib.oases.ui.components.input.LabeledRadioButton
+import com.unimib.oases.ui.components.input.LabeledSwitchButton
 import com.unimib.oases.ui.components.util.AnimatedLabelOutlinedTextField
 import com.unimib.oases.ui.components.util.TitleText
 import com.unimib.oases.ui.components.util.button.BottomButtons
@@ -157,7 +157,7 @@ fun ChronicConditionsForm(
                 .reactToKeyboardAppearance()
         ) {
 
-            LabeledRadioButton(
+            LabeledSwitchButton(
                 label = {
                     Text(
                         text = "No known chronic conditions",
@@ -165,10 +165,30 @@ fun ChronicConditionsForm(
                         fontWeight = FontWeight.Bold
                     )
                 },
-                selected = state.areAllSetToNo,
-                onClick = { onEvent(HistoryEvent.DenyAllClicked) },
-                asReversed = true
+                checked = state.areAllSetToNo,
+                onCheckedChange = { isChecked ->
+                    onEvent(
+                        if (isChecked)
+                            HistoryEvent.DenyAllClicked
+                        else
+                            HistoryEvent.UndoMarkingAllAsNos
+                    )
+                },
+                reversed = true
             )
+
+//            LabeledRadioButton(
+//                label = {
+//                    Text(
+//                        text = "No known chronic conditions",
+//                        fontSize = 18.sp,
+//                        fontWeight = FontWeight.Bold
+//                    )
+//                },
+//                selected = state.areAllSetToNo,
+//                onClick = { onEvent(HistoryEvent.DenyAllClicked) },
+//                asReversed = true
+//            )
 
             val diseases = state.editingDiseases
 
