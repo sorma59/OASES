@@ -15,7 +15,7 @@ object DateAndTimeUtils {
      *
      * @param birthDateString The birth date as a String.
      * @param formatter The DateAndTimeUtils to parse the birthDateString.
-     *                  Defaults to ISO_LOCAL_DATE (yyyy-MM-dd).
+     *                  Defaults to dd/MM/yyyy.
      * @return The age in years, or null if the birthDateString is invalid or cannot be parsed.
      */
     fun calculateAgeInMonths(birthDateString: String, date: LocalDate = getCurrentDate(), formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")): Int? {
