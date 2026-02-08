@@ -116,7 +116,7 @@ val MIGRATION_Disease_Refactor: Migration = object : Migration(2, 3) {
                     WHEN name IN ('Diabetes mellitus', 'Thyroid dysfunction (e.g., goitre, hypothyroidism)') THEN 'ENDOCRINE'
                     WHEN name IN ('Epilepsy/seizure disorder', 'Depression or other mental health disorders', 'Substance use disorder (e.g., alcohol, drugs)', 'Neurodevelopmental delay or cerebral palsy') THEN 'NEUROPSYCHIATRIC'
                     WHEN name IN ('Malnutrition', 'Prematurity/low birth weight', 'Genetic syndrome', 'Cancer', 'Other (specify)') THEN 'MEDICAL_CONDITIONS'
-                    WHEN name IN ('Previous major surgeries', 'Previous major trauma/fractures', 'Previous transfusions', 'Previous hospitalization') THEN 'MEDICAL_EVENTS'
+                    WHEN name IN ('Previous major surgeries', 'Previous major trauma/fractures', 'Previous transfusions') THEN 'MEDICAL_EVENTS'
                     WHEN name IN ('Current pregnancy', 'Currently lactating', 'Prior pregnancies', 'Previous C-section', 'Previous obstetric complications', 'Menopause') THEN 'OBSTETRIC_HISTORY'
                     ELSE 'ALLERGIES' 
                 END,
@@ -131,6 +131,8 @@ val MIGRATION_Disease_Refactor: Migration = object : Migration(2, 3) {
         db.execSQL("ALTER TABLE disease_new RENAME TO ${TableNames.DISEASE}")
 
         db.execSQL("ALTER TABLE ${TableNames.PATIENT_DISEASE} ADD COLUMN free_text_value TEXT NOT NULL DEFAULT ''")
+
+        db.execSQL("INSERT INTO ${TableNames.DISEASE} (name, sex_specificity, age_specificity, `group`, allows_free_text) VALUES ('Previous hospitalizations', 'ALL', 'ALL', 'MEDICAL_EVENTS', 0)")
 
         db.execSQL("PRAGMA foreign_keys=ON")
     }
