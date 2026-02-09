@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -24,7 +26,7 @@ import com.unimib.oases.ui.components.util.loading.LoadingOverlay
 import com.unimib.oases.ui.screen.root.AppViewModel
 
 @Composable
-fun VitalSignsScreen(
+fun VitalSignsForm(
     appViewModel: AppViewModel
 ){
 
@@ -36,11 +38,11 @@ fun VitalSignsScreen(
 
     LoadingOverlay(state.isLoading)
 
-    VitalSignsContent(state, viewModel::onEvent, viewModel::getPrecisionFor)
+    InputFields (state, viewModel::onEvent, viewModel::getPrecisionFor)
 }
 
 @Composable
-fun VitalSignsContent(
+fun InputFields(
     state: VitalSignsState,
     onEvent: (VitalSignsEvent) -> Unit,
     getPrecisionFor: (String) -> NumericPrecision?
@@ -49,40 +51,38 @@ fun VitalSignsContent(
     val scrollState = rememberScrollState()
 
     Box{
-        state.error?.let {
-            RetryButton(
-                it,
-                onClick = {
-                    onEvent(VitalSignsEvent.Retry)
-                }
-            )
-        } ?: Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(scrollState)
-                .padding(16.dp)
-        ) {
 
-            for (vitalSign in state.vitalSigns) {
-                AnimatedLabelOutlinedTextField(
-                    value = vitalSign.value,
-                    onValueChange = {
-                        onEvent(
-                            VitalSignsEvent.ValueChanged(
-                                vitalSign.name,
-                                it
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(scrollState)
+                    .padding(16.dp)
+            ) {
+
+                for (vitalSign in state.vitalSigns) {
+                    AnimatedLabelOutlinedTextField(
+                        value = vitalSign.value,
+                        onValueChange = {
+                            onEvent(
+                                VitalSignsEvent.ValueChanged(
+                                    vitalSign.name,
+                                    it
+                                )
                             )
-                        )
-                    },
-                    labelText = vitalSign.name + " (" + vitalSign.acronym + ", " + vitalSign.unit + ")",
-                    isError = vitalSign.error != null,
-                    isInteger = getPrecisionFor(vitalSign.name) == NumericPrecision.INTEGER,
-                    isDouble = getPrecisionFor(vitalSign.name) == NumericPrecision.FLOAT
-                )
+                        },
+                        labelText = vitalSign.name + " (" + vitalSign.acronym + ", " + vitalSign.unit + ")",
+                        isError = vitalSign.error != null,
+                        isInteger = getPrecisionFor(vitalSign.name) == NumericPrecision.INTEGER,
+                        isDouble = getPrecisionFor(vitalSign.name) == NumericPrecision.FLOAT
+                    )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+
+                Button(onClick = { onEvent(VitalSignsEvent.Save) }) {
+                    Text("Save")
+                }
             }
-        }
 
         FadeOverlay(Modifier.align(Alignment.BottomCenter))
     }

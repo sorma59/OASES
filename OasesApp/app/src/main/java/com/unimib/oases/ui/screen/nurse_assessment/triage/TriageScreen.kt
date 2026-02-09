@@ -23,9 +23,10 @@ import com.unimib.oases.ui.components.util.effect.HandleNavigationEvents
 import com.unimib.oases.ui.components.util.effect.HandleUiEvents
 import com.unimib.oases.ui.components.util.loading.LoadingOverlay
 import com.unimib.oases.ui.screen.nurse_assessment.PatientRegistrationScreensUiMode
-import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.VitalSignsContent
 import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.VitalSignsEvent
 import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.VitalSignsState
+import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.VitalSignsSummary
+import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.VitalSignsTable
 import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.VitalSignsViewModel
 import com.unimib.oases.ui.screen.root.AppViewModel
 import com.unimib.oases.util.reactToKeyboardAppearance
@@ -99,10 +100,9 @@ private fun TriageContent(
                         when (editingState.currentTab) {
                             TriageTab.REDS -> RedCodeContent(state, onEvent)
                             TriageTab.YELLOWS -> YellowCodeContent(state, onEvent)
-                            TriageTab.VITAL_SIGNS -> VitalSignsContent(
+                            TriageTab.VITAL_SIGNS -> VitalSignsTable (
                                 vitalSignsState,
-                                onVitalSignsEvent,
-                                getPrecisionFor
+                                onVitalSignsEvent
                             )
 
                             TriageTab.ROOM -> RoomContent(editingState, onEvent)

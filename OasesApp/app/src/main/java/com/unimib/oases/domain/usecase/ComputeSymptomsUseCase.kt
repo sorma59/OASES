@@ -98,6 +98,84 @@ class ComputeSymptomsUseCase @Inject constructor(
         }
         return newReds.toSet()
     }
+
+    data class VitalRange<T : Number>(
+        val low: T? = null,
+        val high: T? = null
+    )
+
+    enum class VitalKey {
+        SPO2,
+        RR,
+        HR,
+        SBP,
+        DBP,
+        TEMP,
+        RBS
+    }
+
+
+
+    fun getVitalLimits(
+        category: PatientCategory,
+        ageInMonths: Int
+    ): Map<VitalKey, VitalRange<*>>? {
+
+
+
+
+        return when (category) {
+
+            PatientCategory.ADULT -> mapOf(
+                VitalKey.SPO2 to VitalRange(low = 92),
+
+                VitalKey.RR to VitalRange(low = 10, high = 25),
+                VitalKey.HR to VitalRange(low = 40, high = 130),
+
+                VitalKey.SBP to VitalRange(low = 90, high = 220),
+                VitalKey.DBP to VitalRange(high = 130),
+
+                VitalKey.TEMP to VitalRange(low = 35.0, high = 39.0),
+                VitalKey.RBS to VitalRange(low = 3.0, high = 14.0)
+            )
+
+            PatientCategory.PEDIATRIC -> {
+                when (ageInMonths / 12) {
+                    // < 1 year
+                    0 -> mapOf(
+                        VitalKey.RR to VitalRange(low = 25, high = 50),
+                        VitalKey.HR to VitalRange(low = 90, high = 180),
+
+                        VitalKey.SPO2 to VitalRange(low = 92),
+                        VitalKey.TEMP to VitalRange(low = 35.0, high = 39.0),
+                        VitalKey.RBS to VitalRange(low = 3.0, high = 14.0)
+                    )
+
+                    // 1–4 years
+                    in 1..4 -> mapOf(
+                        VitalKey.RR to VitalRange(low = 20, high = 40),
+                        VitalKey.HR to VitalRange(low = 80, high = 160),
+
+                        VitalKey.SPO2 to VitalRange(low = 92),
+                        VitalKey.TEMP to VitalRange(low = 35.0, high = 39.0),
+                        VitalKey.RBS to VitalRange(low = 3.0, high = 14.0)
+                    )
+
+                    // 5–12 years
+                    in 5..12 -> mapOf(
+                        VitalKey.RR to VitalRange(low = 10, high = 30),
+                        VitalKey.HR to VitalRange(low = 70, high = 140),
+
+                        VitalKey.SPO2 to VitalRange(low = 92),
+                        VitalKey.TEMP to VitalRange(low = 35.0, high = 39.0),
+                        VitalKey.RBS to VitalRange(low = 3.0, high = 14.0)
+                    )
+
+                    else -> null
+                }
+            }
+        }
+    }
 }
 
 private fun Set<String>.resetComputedElements(): MutableSet<String> {

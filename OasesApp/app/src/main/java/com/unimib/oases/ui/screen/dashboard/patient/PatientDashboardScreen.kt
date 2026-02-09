@@ -183,6 +183,7 @@ sealed interface PatientDashboardAction {
             listOf(
                 Demographics,
                 Triage,
+                VitalSigns,
                 MalnutritionScreening,
                 History,
                 StartVisit,
@@ -230,6 +231,26 @@ sealed interface PatientDashboardAction {
         fun createRoute(patientId: String, visitId: String) = Route.Triage(patientId, visitId)
     }
 
+    data object VitalSigns: Navigable {
+        override val text = "Vital Signs"
+        override val icon = Icons.Default.PriorityHigh
+        override val contentDescription = "Vital Signs"
+        override val roles = Role.entries
+
+        fun createRoute(patientId: String, visitId: String) = Route.VitalSigns(patientId, visitId)
+    }
+
+    data object VitalSignsForm: Navigable {
+        override val text = "Vital Signs Form"
+        override val icon = Icons.Default.PriorityHigh
+        override val contentDescription = "Vital Signs Form"
+        override val roles = Role.entries
+
+        fun createRoute(patientId: String, visitId: String) = Route.VitalSignsForm
+    }
+
+
+
     data object MalnutritionScreening: Navigable {
         override val text = "Malnutrition Screening"
         override val icon = Icons.Default.Straighten
@@ -240,6 +261,8 @@ sealed interface PatientDashboardAction {
             patientId, visitId
         )
     }
+
+
 
     data object History: PatientNavigable {
         override val text = "History"

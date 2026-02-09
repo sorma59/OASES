@@ -13,6 +13,7 @@ import com.unimib.oases.domain.repository.VisitRepository
 import com.unimib.oases.domain.usecase.ConfigPatientDashboardActionsUseCase
 import com.unimib.oases.ui.components.scaffold.UiEvent
 import com.unimib.oases.ui.navigation.NavigationEvent
+import com.unimib.oases.ui.navigation.NavigationEvent.*
 import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.ui.util.snackbar.SnackbarData
 import com.unimib.oases.ui.util.snackbar.SnackbarType
@@ -162,7 +163,7 @@ class PatientDashboardViewModel @Inject constructor(
             when (action) {
                 is PatientDashboardAction.PatientNavigable -> {
                     navigationEventsChannel.send(
-                        NavigationEvent.Navigate(
+                        Navigate(
                             action.createRoute(
                                 state.value.patientId
                             )
@@ -172,7 +173,7 @@ class PatientDashboardViewModel @Inject constructor(
 
                 is PatientDashboardAction.Triage -> {
                     navigationEventsChannel.send(
-                        NavigationEvent.Navigate(
+                        Navigate(
                             action.createRoute(
                                 state.value.patientId,
                                 state.value.visitId
@@ -181,9 +182,20 @@ class PatientDashboardViewModel @Inject constructor(
                     )
                 }
 
+                is PatientDashboardAction.VitalSigns -> {
+                    navigationEventsChannel.send(
+                        Navigate(
+                            action.createRoute(
+                                state.value.patientId,
+                                state.value.visitId
+                            )
+                    )
+                    )
+                }
+
                 is PatientDashboardAction.MalnutritionScreening -> {
                     navigationEventsChannel.send(
-                        NavigationEvent.Navigate(
+                        Navigate(
                             action.createRoute(
                                 state.value.patientId,
                                 state.value.visitId
@@ -194,7 +206,7 @@ class PatientDashboardViewModel @Inject constructor(
 
                 is PatientDashboardAction.Send -> {
                     navigationEventsChannel.send(
-                        NavigationEvent.Navigate(
+                        Navigate(
                             action.createRoute(
                                 state.value.patientId,
                                 state.value.visitId
@@ -209,6 +221,17 @@ class PatientDashboardViewModel @Inject constructor(
                             showAlertDialog = true
                         )
                     }
+                }
+
+                PatientDashboardAction.VitalSignsForm -> {
+                    navigationEventsChannel.send(
+                        Navigate(
+                            Route.VitalSignsForm(
+                                state.value.patientId,
+                                state.value.visitId
+                            )
+                        )
+                    )
                 }
             }
         }

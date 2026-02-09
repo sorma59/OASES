@@ -14,6 +14,10 @@ class VisitVitalSignsUseCase @Inject constructor(
         return visitVitalSignRepository.addVisitVitalSign(visitVitalSign)
     }
 
+    suspend fun addVisitVitalSigns(visitVitalSigns: List<VisitVitalSign>): Outcome<Unit> {
+        return visitVitalSignRepository.addVisitVitalSigns(visitVitalSigns)
+    }
+
     fun getVisitVitalSigns(visitId: String): Flow<Resource<List<VisitVitalSign>>> {
         return visitVitalSignRepository.getVisitVitalSigns(visitId)
     }

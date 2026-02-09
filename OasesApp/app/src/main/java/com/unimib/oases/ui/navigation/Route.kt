@@ -16,6 +16,13 @@ sealed class Route {
     data object AdminDashboard: Route()
     @Serializable
     data object PatientRegistration: Route()
+
+    @Serializable
+    data class VitalSignsForm(
+        val patientId: String,
+        val visitId: String? = null,
+        val isWizardMode: Boolean = false
+    ) : Route()
     @Serializable
     data class Demographics(
         val patientId: String? = null

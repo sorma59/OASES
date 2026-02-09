@@ -13,8 +13,9 @@ import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.RR_HIGH_FOR
 import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.RR_LOW_FOR_FIVE_TO_TWELVE_YEARS_OLDS
 import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.RR_LOW_FOR_ONE_TO_FOUR_YEARS_OLDS
 import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.RR_LOW_FOR_ONE_YEAR_OLDS
+import javax.inject.Inject
 
-class PediatricVitalSignsPolicy {
+class PediatricVitalSignsPolicy @Inject constructor() {
     fun pediatricBounds(ageInMonths: Int): PediatricVitalBounds? {
         return when (ageInMonths / 12) {
             0 -> PediatricVitalBounds(

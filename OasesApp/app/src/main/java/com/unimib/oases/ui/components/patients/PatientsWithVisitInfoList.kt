@@ -1,22 +1,21 @@
 package com.unimib.oases.ui.components.patients
 
+import android.R.attr.maxHeight
+import android.R.attr.maxWidth
 import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Circle
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -27,19 +26,32 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.seanproctor.datatable.DataColumn
+import com.seanproctor.datatable.DataTableScope
 import com.seanproctor.datatable.material3.DataTable
 import com.unimib.oases.domain.model.PatientAndVisitIds
 import com.unimib.oases.domain.model.PatientWithVisitInfo
 import com.unimib.oases.ui.components.util.CenteredText
 import com.unimib.oases.ui.components.util.SmallGrayText
 import com.unimib.oases.util.DateAndTimeUtils
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.sp
+import com.unimib.oases.util.StringFormatHelper.getAgeWithSuffix
 
 @Composable
 fun PatientsWithVisitInfoList(
@@ -58,22 +70,70 @@ fun PatientsWithVisitInfoList(
 
     var roomFilter by remember { mutableStateOf<String?>(null) }
 
-
+    var statusFilter by remember { mutableStateOf<String?>(null) }
 
     val availableRooms = patientsWithVisitInfo.mapNotNull { it.visit.roomName }.distinct()
+
+    val availableStatus = patientsWithVisitInfo.map { it.visit.patientStatus.displayValue }.distinct()
+
+
 
     val filteredData = patientList
         .filter { patient ->
             roomFilter == null || patient.visit.roomName == roomFilter
+        }.filter { patient -> statusFilter == null || patient.visit.patientStatus.displayValue == statusFilter  }
+
+
+    val sortedData = when(sortColumnIndex) {
+
+        null -> filteredData.sortedWith(
+            compareBy<PatientWithVisitInfo> { patient ->
+                when (patient.visit.triageCode.name.uppercase()) {
+                    "RED" -> 0
+                    "YELLOW" -> 1
+                    "GREEN" -> 2
+                    else -> 3
+                }
+            }.thenBy { patient ->
+                patient.visit.arrivalTime
+            }
+        )
+        4 -> if (sortAscending) filteredData.sortedWith(
+            compareBy<PatientWithVisitInfo> { patient ->
+                when (patient.visit.triageCode.name.uppercase()) {
+                    "RED" -> 0
+                    "YELLOW" -> 1
+                    "GREEN" -> 2
+                    else -> 3
+                }
+            }.thenBy { patient ->
+                patient.visit.arrivalTime
+            }
+        ) else filteredData.sortedWith(
+            compareBy<PatientWithVisitInfo> { patient ->
+                when (patient.visit.triageCode.name.uppercase()) {
+                    "RED" -> 0
+                    "YELLOW" -> 1
+                    "GREEN" -> 2
+                    else -> 3
+                }
+            }.thenByDescending { patient ->
+                patient.visit.arrivalTime
+            })
+        else -> {
+            filteredData.sortedWith(
+                compareBy<PatientWithVisitInfo> { patient ->
+                    when (patient.visit.triageCode.name.uppercase()) {
+                        "RED" -> 0
+                        "YELLOW" -> 1
+                        "GREEN" -> 2
+                        else -> 3
+                    }
+                }.thenBy { patient ->
+                    patient.visit.arrivalTime
+                })
         }
-
-
-    val sortedData = when (sortColumnIndex) {
-        null -> filteredData.sortedBy { it.visit.arrivalTime}
-        4 -> if (sortAscending) filteredData.sortedBy { it.visit.arrivalTime} else filteredData.sortedByDescending { it.visit.arrivalTime }
-        else -> filteredData.sortedBy { it.visit.arrivalTime}
     }
-
 
 
     val itemSize = when (configuration.orientation) {
@@ -124,6 +184,24 @@ fun PatientsWithVisitInfoList(
 
 
             }
+            statusFilter?.let {
+
+                Card(
+                    modifier = Modifier.padding(5.dp),
+                    border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.onBackground),
+                    shape = RoundedCornerShape(0),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.padding(5.dp)) {
+                        Text(text = statusFilter.toString(), fontSize = 12.sp)
+                        Icon(contentDescription = "Clear Icon", imageVector = Icons.Default.Clear, tint = MaterialTheme.colorScheme.onBackground.copy(0.7f), modifier = Modifier.padding(start = 3.dp).size(15.dp).clickable(onClick = {statusFilter = null}))
+
+                    }
+
+                }
+
+
+            }
         }
 
 
@@ -159,7 +237,15 @@ fun PatientsWithVisitInfoList(
 
                     },
                     DataColumn(Alignment.Center) {
-                        Text(color = MaterialTheme.colorScheme.surface, text = "Status")
+                        Row {
+                            Text(color = MaterialTheme.colorScheme.surface, text = "Status")
+                            FilterableHeader(
+                                options = availableStatus,
+                                selected = statusFilter,
+                                labelMapper = { it },
+                                onSelected = { statusFilter = it }
+                            )
+                        }
                     },
                     DataColumn(Alignment.Center) {
                         Row {
@@ -192,8 +278,8 @@ fun PatientsWithVisitInfoList(
 
                         // Column 2 Data
                         cell {
-                            // TODO: Replace with actual property
-                            Text(patient.patient.birthDate)
+                            val ageString = getAgeWithSuffix(ageInMonths = patient.patient.ageInMonths)
+                            Text(ageString)
                         }
 
                         // Column 3 Data
