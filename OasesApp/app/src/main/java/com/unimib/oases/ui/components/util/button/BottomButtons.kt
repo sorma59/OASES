@@ -4,9 +4,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -50,7 +51,9 @@ fun BottomButtons(
         else -> null
     }
     val actualModifier = let2(width, height) { w, h ->
-        Modifier.size(width = w, height = h)
+        Modifier
+            .widthIn(w)
+            .heightIn(h)
     } ?: Modifier
 
     Row(

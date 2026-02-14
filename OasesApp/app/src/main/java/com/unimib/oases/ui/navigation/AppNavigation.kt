@@ -105,7 +105,6 @@ fun AppNavigation(
             VitalSignsForm(appViewModel)
         }
 
-
         composable<Route.MalnutritionScreening> {
             MalnutritionScreeningScreen(appViewModel)
         }
