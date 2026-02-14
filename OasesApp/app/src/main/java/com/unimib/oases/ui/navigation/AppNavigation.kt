@@ -1,12 +1,11 @@
 package com.unimib.oases.ui.navigation
 
-import androidx.compose.animation.AnimatedContentTransitionScope.SlideDirection
-import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.unimib.oases.ui.navigation.NavigationAnimation.Push
 import com.unimib.oases.ui.screen.bluetooth.pairing.PairNewDeviceScreen
 import com.unimib.oases.ui.screen.bluetooth.sending.SendPatientViaBluetoothScreen
 import com.unimib.oases.ui.screen.dashboard.admin.AdminScreen
@@ -38,10 +37,24 @@ fun AppNavigation(
     appViewModel: AppViewModel,
     modifier: Modifier = Modifier
 ){
+    val defaultAnimation = Push
+
     NavHost(
         navController = navController,
         startDestination = startDestination,
-        modifier = modifier
+        modifier = modifier,
+        enterTransition = {
+            defaultAnimation.enter
+        },
+        exitTransition = {
+            defaultAnimation.exit
+        },
+        popEnterTransition = {
+            defaultAnimation.popEnter
+        },
+        popExitTransition = {
+            defaultAnimation.popExit
+        }
     ) {
 
         composable<Route.AdminDashboard> {
@@ -72,32 +85,7 @@ fun AppNavigation(
             InitialIntakeScreen(appViewModel)
         }
 
-        composable<Route.PatientRegistration>(
-            enterTransition = {
-                slideIntoContainer(
-                    SlideDirection.Left,
-                    animationSpec = tween(400)
-                )
-            },
-            exitTransition = {
-                slideOutOfContainer(
-                    SlideDirection.Right,
-                    animationSpec = tween(400)
-                )
-            },
-            popEnterTransition = {
-                slideIntoContainer(
-                    SlideDirection.Right,
-                    animationSpec = tween(400)
-                )
-            },
-            popExitTransition = {
-                slideOutOfContainer(
-                    SlideDirection.Right,
-                    animationSpec = tween(400)
-                )
-            }
-        ) {
+        composable<Route.PatientRegistration> {
             RegistrationScreen(appViewModel, navController)
         }
 

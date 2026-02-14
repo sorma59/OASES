@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.MedicalServices
 import androidx.compose.material.icons.filled.PersonSearch
 import androidx.compose.material.icons.filled.PriorityHigh
 import androidx.compose.material.icons.filled.Straighten
+import androidx.compose.material.icons.filled.Thermostat
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -233,23 +234,12 @@ sealed interface PatientDashboardAction {
 
     data object VitalSigns: Navigable {
         override val text = "Vital Signs"
-        override val icon = Icons.Default.PriorityHigh
+        override val icon = Icons.Default.Thermostat
         override val contentDescription = "Vital Signs"
         override val roles = Role.entries
 
         fun createRoute(patientId: String, visitId: String) = Route.VitalSigns(patientId, visitId)
     }
-
-    data object VitalSignsForm: Navigable {
-        override val text = "Vital Signs Form"
-        override val icon = Icons.Default.PriorityHigh
-        override val contentDescription = "Vital Signs Form"
-        override val roles = Role.entries
-
-        fun createRoute(patientId: String, visitId: String) = Route.VitalSignsForm
-    }
-
-
 
     data object MalnutritionScreening: Navigable {
         override val text = "Malnutrition Screening"
@@ -261,8 +251,6 @@ sealed interface PatientDashboardAction {
             patientId, visitId
         )
     }
-
-
 
     data object History: PatientNavigable {
         override val text = "History"

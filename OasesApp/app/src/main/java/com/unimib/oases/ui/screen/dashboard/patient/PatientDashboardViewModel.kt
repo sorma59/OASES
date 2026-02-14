@@ -13,7 +13,8 @@ import com.unimib.oases.domain.repository.VisitRepository
 import com.unimib.oases.domain.usecase.ConfigPatientDashboardActionsUseCase
 import com.unimib.oases.ui.components.scaffold.UiEvent
 import com.unimib.oases.ui.navigation.NavigationEvent
-import com.unimib.oases.ui.navigation.NavigationEvent.*
+import com.unimib.oases.ui.navigation.NavigationEvent.Navigate
+import com.unimib.oases.ui.navigation.NavigationEvent.NavigateBack
 import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.ui.util.snackbar.SnackbarData
 import com.unimib.oases.ui.util.snackbar.SnackbarType
@@ -146,7 +147,7 @@ class PatientDashboardViewModel @Inject constructor(
 
             PatientDashboardEvent.OnBack -> {
                 viewModelScope.launch(mainContext) {
-                    navigationEventsChannel.send(NavigationEvent.NavigateBack)
+                    navigationEventsChannel.send(NavigateBack)
                 }
             }
 
@@ -222,17 +223,6 @@ class PatientDashboardViewModel @Inject constructor(
                         )
                     }
                 }
-
-                PatientDashboardAction.VitalSignsForm -> {
-                    navigationEventsChannel.send(
-                        Navigate(
-                            Route.VitalSignsForm(
-                                state.value.patientId,
-                                state.value.visitId
-                            )
-                        )
-                    )
-                }
             }
         }
     }
@@ -263,7 +253,7 @@ class PatientDashboardViewModel @Inject constructor(
                             )
                         )
                     )
-                    navigationEventsChannel.send(NavigationEvent.NavigateBack)
+                    navigationEventsChannel.send(NavigateBack)
                 }
 
                 is Outcome.Error -> {
