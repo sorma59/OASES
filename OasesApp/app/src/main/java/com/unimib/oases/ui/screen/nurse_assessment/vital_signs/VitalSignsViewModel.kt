@@ -1,6 +1,5 @@
 package com.unimib.oases.ui.screen.nurse_assessment.vital_signs
 
-import android.annotation.SuppressLint
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -8,19 +7,16 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.model.NumericPrecision
-import com.unimib.oases.domain.model.VisitVitalSign
-import com.unimib.oases.domain.model.symptom.PatientCategory
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.domain.usecase.ComputeSymptomsUseCase
 import com.unimib.oases.domain.usecase.GetCurrentVisitUseCase
-import com.unimib.oases.domain.usecase.GetLatestVitalSignsUseCase
 import com.unimib.oases.domain.usecase.GetVitalSignPrecisionUseCase
 import com.unimib.oases.domain.usecase.VisitVitalSignsUseCase
 import com.unimib.oases.domain.usecase.VitalSignUseCase
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Route
+import com.unimib.oases.util.DateAndTimeUtils
 import com.unimib.oases.util.Resource
-import com.unimib.oases.util.firstNullableSuccess
 import com.unimib.oases.util.firstSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -28,10 +24,10 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 //private fun VitalSignsViewModel.evaluateSymptomColor(
@@ -59,7 +55,8 @@ class VitalSignsViewModel @Inject constructor(
         e.printStackTrace()
         _state.update{
             it.copy(
-                error = e.message
+                error = e.message,
+                isLoading = false
             )
         }
     }
@@ -123,12 +120,13 @@ class VitalSignsViewModel @Inject constructor(
 
     private fun refreshVitalSigns() {
         viewModelScope.launch(coroutineContext) {
-            _state.update { it.copy(error = null, isLoading = true) }
             loadVitalSigns()
             val visit = getCurrentVisitUseCase(state.value.patientId)
+            _state.update {
+                it.copy(visitDate = visit.date.format(DateTimeFormatter.ISO_DATE))
+            }
             if (state.value.error == null)
                 loadVisitVitalSigns(visit.id)
-            _state.update { it.copy(isLoading = false) }
         }
     }
 
@@ -160,13 +158,10 @@ class VitalSignsViewModel @Inject constructor(
 
         val result = visitVitalSignsUseCases.getVisitVitalSigns(visitId)
 
-        val data = getPatientData.getPatientById(state.value.patientId).firstSuccess()
+        val patientData = getPatientData.getPatientById(state.value.patientId).firstSuccess()
 
 
-
-
-        val vitalLimits = computeSymptomsUseCase.getVitalLimits(data.category, data.ageInMonths)
-
+        val vitalLimits = computeSymptomsUseCase.getVitalLimits(patientData.category, patientData.ageInMonths)
 
 
 
@@ -188,8 +183,7 @@ class VitalSignsViewModel @Inject constructor(
                                     val acronym =
                                         state.value.vitalSigns.firstOrNull { it.name == visitVitalSign.vitalSignName }?.acronym
 
-                                    val vitalLimit = vitalLimits?.filter { it -> it.key.name == acronym}
-
+                                    val vitalLimit = vitalLimits?.filter { it -> it.key.name.equals(acronym, true)}?.values?.firstOrNull()
 
 
                                     val precision = getPrecisionFor(visitVitalSign.vitalSignName)
@@ -198,18 +192,30 @@ class VitalSignsViewModel @Inject constructor(
                                         "Precision for ${visitVitalSign.vitalSignName} not found"
                                     }
 
-                                    val value = when (precision) {
-                                        NumericPrecision.INTEGER -> visitVitalSign.value.toInt().toString()
-                                        NumericPrecision.FLOAT -> visitVitalSign.value.toString()
-                                    }
+                                    var value: Number
+
+                                    var symptomColor: Color? = null
+
+
+                                   when (precision) {
+                                        NumericPrecision.INTEGER -> {
+                                            value = visitVitalSign.value.toInt()
+                                            symptomColor = evaluateSymptomColor(value, vitalLimit)
+                                        }
+
+                                        NumericPrecision.FLOAT -> {
+                                            value = visitVitalSign.value
+                                            symptomColor = evaluateSymptomColorDouble(value, vitalLimit)
+                                        }
+                                   }
 
 
 
                                     VisitVitalSignUI(
                                         name = visitVitalSign.vitalSignName,
-                                        value = value,
+                                        value = value.toString(),
                                         timestamp = visitVitalSign.timestamp,
-                                        color = Color.Yellow
+                                        color = symptomColor
 
                                     )
                                 },
@@ -279,6 +285,45 @@ class VitalSignsViewModel @Inject constructor(
 
     fun getPrecisionFor(name: String) = getVitalSignPrecisionUseCase(name)
 
+    fun evaluateSymptomColorDouble(
+        value: Double,
+        vitalLimit: ComputeSymptomsUseCase.VitalRange<*>?
+    ) : Color {
+
+        if (vitalLimit == null) {
+            return Color.Transparent
+        }
+
+        val max = vitalLimit.high?.toDouble()
+        val min = vitalLimit.low?.toDouble()
+
+
+        if (min != null && value < min) return Color.Yellow.copy(alpha= 0.3f)
+
+        if (max != null && value > max) return Color.Yellow.copy(alpha = 0.3f)
+
+        return Color.Transparent
+    }
+
+
+    fun evaluateSymptomColor(
+        value: Int,
+        vitalLimit: ComputeSymptomsUseCase.VitalRange<*>?
+    ): Color {
+        if (vitalLimit == null) {
+            return Color.Transparent
+        }
+
+        val max = vitalLimit.high?.toInt()
+        val min = vitalLimit.low?.toInt()
+
+
+        if (min != null && value < min) return Color.Yellow.copy(alpha= 0.3f)
+
+        if (max != null && value > max) return Color.Yellow.copy(alpha = 0.3f)
+
+        return Color.Transparent
+    }
 
 
 }

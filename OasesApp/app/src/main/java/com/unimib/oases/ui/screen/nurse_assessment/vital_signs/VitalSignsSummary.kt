@@ -8,8 +8,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,21 +29,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewModelScope
 import com.seanproctor.datatable.DataColumn
 import com.seanproctor.datatable.material3.DataTable
-import com.unimib.oases.domain.model.NumericPrecision
-import com.unimib.oases.ui.navigation.NavigationEvent
-import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.ui.screen.root.AppViewModel
-import com.unimib.oases.ui.theme.backgroundDark
 import com.unimib.oases.util.DateAndTimeUtils
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.ZoneId
-
 
 
 @Composable
@@ -69,21 +64,13 @@ fun VitalSignsTable(
 ) {
 
 
-    Box {
+    Box (Modifier.fillMaxWidth()) {
         val groupedTimelines = remember(state.visitVitalSigns) {
             state.visitVitalSigns
                 .sortedByDescending { it.timestamp }
                 .groupBy { it.timestamp }
 
         }
-
-//        val vitalSignNames = remember(state.vitalSigns) {
-//            state.vitalSigns
-//                .map { it }
-//                .distinct()
-//        }
-
-
 
 
         val vitalLookup = remember(state.visitVitalSigns) {
@@ -93,13 +80,33 @@ fun VitalSignsTable(
         }
 
 
-        Column (horizontalAlignment = Alignment.Start, modifier = Modifier.fillMaxWidth().padding(20.dp)) {
+        Column (modifier = Modifier.fillMaxWidth().padding(20.dp)) {
 
-            Row (verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(5.dp)) {
-                Text("Add a Vital Sign ", modifier = Modifier.padding(end = 5.dp))
-                Button(onClick = { onEvent(VitalSignsEvent.AddButtonClicked) })
-                {
-                    Text("Add new")
+            Row (verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                Row(horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        fontSize = 15.sp,
+                        text = "Current visit date: ${state.visitDate}",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+
+
+                    Button(onClick = { onEvent(VitalSignsEvent.AddButtonClicked) })
+                    {
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                modifier = Modifier.padding(end = 2.dp).size(25.dp),
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "Add Vital Sign"
+                            )
+                            Text("Add Vital Sign", fontSize = 15.sp)
+
+                        }
+
+                    }
                 }
             }
 
@@ -108,10 +115,8 @@ fun VitalSignsTable(
 
             else  Row {
 
-
-
                 DataTable(
-                    modifier  = Modifier.border(1.dp, MaterialTheme.colorScheme.surfaceContainerLowest).width(100.dp),
+                    modifier  = Modifier.border(1.dp, Color.LightGray.copy(alpha = 0.5f)).width(100.dp).padding(end = 1.dp),
                     headerBackgroundColor = MaterialTheme.colorScheme.primaryContainer,
                     columns = listOf(
                         DataColumn(Alignment.Center) {
@@ -142,7 +147,7 @@ fun VitalSignsTable(
 
                 DataTable(
                     headerBackgroundColor = MaterialTheme.colorScheme.primaryContainer,
-
+                    modifier = Modifier.border(1.dp, Color.LightGray.copy(alpha = 0.5f)).padding(start = 1.dp),
                     columns =
                         groupedTimelines.map { time ->
                             DataColumn(Alignment.Center) {
