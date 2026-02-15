@@ -17,7 +17,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -31,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.seanproctor.datatable.DataColumn
 import com.seanproctor.datatable.material3.DataTable
+import com.unimib.oases.ui.components.util.effect.HandleNavigationEvents
 import com.unimib.oases.ui.screen.root.AppViewModel
 import com.unimib.oases.util.DateAndTimeUtils
 import java.time.Instant
@@ -44,14 +44,9 @@ fun VitalSignsSummary(
 
     val viewModel: VitalSignsViewModel = hiltViewModel()
 
-
     val state by viewModel.state.collectAsState()
 
-    LaunchedEffect(Unit) {
-        viewModel.navigationEvents.collect {
-            appViewModel.onNavEvent(it)
-        }
-    }
+    HandleNavigationEvents(viewModel.navigationEvents, appViewModel)
 
     VitalSignsTable (state, viewModel::onEvent)
 }

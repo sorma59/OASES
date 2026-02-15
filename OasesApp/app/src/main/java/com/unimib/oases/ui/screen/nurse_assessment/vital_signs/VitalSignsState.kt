@@ -6,6 +6,7 @@ import com.unimib.oases.domain.model.VisitVitalSign
 
 data class VitalSignsState (
     val patientId: String,
+    val visitId: String,
     val visitDate: String = "",
     val vitalSigns: List<PatientVitalSignState> = emptyList(),
     val visitVitalSigns: List<VisitVitalSignUI> = emptyList(),

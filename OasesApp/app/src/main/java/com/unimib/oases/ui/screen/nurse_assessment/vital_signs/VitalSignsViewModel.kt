@@ -8,14 +8,13 @@ import androidx.navigation.toRoute
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.model.NumericPrecision
 import com.unimib.oases.domain.repository.PatientRepository
+import com.unimib.oases.domain.repository.VisitRepository
 import com.unimib.oases.domain.usecase.ComputeSymptomsUseCase
-import com.unimib.oases.domain.usecase.GetCurrentVisitUseCase
 import com.unimib.oases.domain.usecase.GetVitalSignPrecisionUseCase
 import com.unimib.oases.domain.usecase.VisitVitalSignsUseCase
 import com.unimib.oases.domain.usecase.VitalSignUseCase
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Route
-import com.unimib.oases.util.DateAndTimeUtils
 import com.unimib.oases.util.Resource
 import com.unimib.oases.util.firstSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -41,7 +40,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class VitalSignsViewModel @Inject constructor(
-    private val getCurrentVisitUseCase: GetCurrentVisitUseCase,
+    private val visitRepository: VisitRepository,
     private val getVitalSignPrecisionUseCase: GetVitalSignPrecisionUseCase,
     private val visitVitalSignsUseCases: VisitVitalSignsUseCase,
     private val getPatientData: PatientRepository,
@@ -67,7 +66,8 @@ class VitalSignsViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(
         VitalSignsState(
-            route.patientId
+            route.patientId,
+            route.visitId
         )
     )
     val state = _state.asStateFlow()
@@ -83,6 +83,7 @@ class VitalSignsViewModel @Inject constructor(
             VitalSignsEvent.Retry -> {
                 refreshVitalSigns()
             }
+
             is VitalSignsEvent.ValueChanged -> {
                 _state.update {
                     it.copy(
@@ -97,8 +98,6 @@ class VitalSignsViewModel @Inject constructor(
                 }
             }
 
-
-
             is VitalSignsEvent.Save -> {
                 viewModelScope.launch(coroutineContext) {
                     addVitalSigns()
@@ -110,7 +109,10 @@ class VitalSignsViewModel @Inject constructor(
                 viewModelScope.launch(coroutineContext) {
                     navigationEventsChannel.send(
                         NavigationEvent.Navigate(
-                            Route.VitalSignsForm(state.value.patientId)
+                            Route.VitalSignsForm(
+                                state.value.patientId,
+                                state.value.visitId
+                            )
                         )
                     )
                 }
@@ -121,12 +123,12 @@ class VitalSignsViewModel @Inject constructor(
     private fun refreshVitalSigns() {
         viewModelScope.launch(coroutineContext) {
             loadVitalSigns()
-            val visit = getCurrentVisitUseCase(state.value.patientId)
+            val visit = visitRepository.getVisitById(state.value.visitId).firstSuccess()
             _state.update {
                 it.copy(visitDate = visit.date.format(DateTimeFormatter.ISO_DATE))
             }
             if (state.value.error == null)
-                loadVisitVitalSigns(visit.id)
+                loadVisitVitalSigns(state.value.visitId)
         }
     }
 
@@ -145,104 +147,98 @@ class VitalSignsViewModel @Inject constructor(
         }
     }
 
-
     private suspend fun addVitalSigns(){
-        val visit = getCurrentVisitUseCase(state.value.patientId)
-        visitVitalSignsUseCases.addVisitVitalSigns(_state.value.toVisitVitalSigns(visit.id))
+        visitVitalSignsUseCases.addVisitVitalSigns(state.value.toVisitVitalSigns(state.value.visitId))
 
         navigationEventsChannel.send(NavigationEvent.NavigateBack)
     }
 
     private suspend fun loadVisitVitalSigns(visitId: String) {
 
-
         val result = visitVitalSignsUseCases.getVisitVitalSigns(visitId)
 
         val patientData = getPatientData.getPatientById(state.value.patientId).firstSuccess()
 
-
         val vitalLimits = computeSymptomsUseCase.getVitalLimits(patientData.category, patientData.ageInMonths)
 
-
-
         result.collect { resource ->
-                when (resource) {
-                    is Resource.Loading -> {
-                        _state.update {
-                            it.copy(
-                                isLoading = true
-                            )
-                        }
+            when (resource) {
+                is Resource.Loading -> {
+                    _state.update {
+                        it.copy(
+                            isLoading = true
+                        )
                     }
+                }
 
-                    is Resource.Success -> {
-                        _state.update {
-                            it.copy(
-                                visitVitalSigns = resource.data.map { visitVitalSign ->
+                is Resource.Success -> {
+                    _state.update {
+                        it.copy(
+                            visitVitalSigns = resource.data.map { visitVitalSign ->
 
-                                    val acronym =
-                                        state.value.vitalSigns.firstOrNull { it.name == visitVitalSign.vitalSignName }?.acronym
+                                val acronym =
+                                    state.value.vitalSigns.firstOrNull { it.name == visitVitalSign.vitalSignName }?.acronym
 
-                                    val vitalLimit = vitalLimits?.filter { it -> it.key.name.equals(acronym, true)}?.values?.firstOrNull()
+                                val vitalLimit = vitalLimits?.filter { it -> it.key.name.equals(acronym, true)}?.values?.firstOrNull()
 
 
-                                    val precision = getPrecisionFor(visitVitalSign.vitalSignName)
+                                val precision = getPrecisionFor(visitVitalSign.vitalSignName)
 
-                                    check(precision != null) {
-                                        "Precision for ${visitVitalSign.vitalSignName} not found"
+                                check(precision != null) {
+                                    "Precision for ${visitVitalSign.vitalSignName} not found"
+                                }
+
+                                var value: Number
+
+                                var symptomColor: Color? = null
+
+
+                               when (precision) {
+                                    NumericPrecision.INTEGER -> {
+                                        value = visitVitalSign.value.toInt()
+                                        symptomColor = evaluateSymptomColor(value, vitalLimit)
                                     }
 
-                                    var value: Number
-
-                                    var symptomColor: Color? = null
-
-
-                                   when (precision) {
-                                        NumericPrecision.INTEGER -> {
-                                            value = visitVitalSign.value.toInt()
-                                            symptomColor = evaluateSymptomColor(value, vitalLimit)
-                                        }
-
-                                        NumericPrecision.FLOAT -> {
-                                            value = visitVitalSign.value
-                                            symptomColor = evaluateSymptomColorDouble(value, vitalLimit)
-                                        }
-                                   }
+                                    NumericPrecision.FLOAT -> {
+                                        value = visitVitalSign.value
+                                        symptomColor = evaluateSymptomColorDouble(value, vitalLimit)
+                                    }
+                               }
 
 
 
-                                    VisitVitalSignUI(
-                                        name = visitVitalSign.vitalSignName,
-                                        value = value.toString(),
-                                        timestamp = visitVitalSign.timestamp,
-                                        color = symptomColor
+                                VisitVitalSignUI(
+                                    name = visitVitalSign.vitalSignName,
+                                    value = value.toString(),
+                                    timestamp = visitVitalSign.timestamp,
+                                    color = symptomColor
 
-                                    )
-                                },
-                                isLoading = false
-                            )
-                        }
+                                )
+                            },
+                            isLoading = false
+                        )
                     }
+                }
 
-                    is Resource.Error -> {
-                        _state.update {
-                            it.copy(
-                                error = resource.message,
-                                isLoading = false
-                            )
-                        }
+                is Resource.Error -> {
+                    _state.update {
+                        it.copy(
+                            error = resource.message,
+                            isLoading = false
+                        )
                     }
+                }
 
-                    is Resource.NotFound -> {
-                        _state.update {
-                            it.copy(
-                                visitVitalSigns = emptyList(),
-                                isLoading = false
-                            )
-                        }
+                is Resource.NotFound -> {
+                    _state.update {
+                        it.copy(
+                            visitVitalSigns = emptyList(),
+                            isLoading = false
+                        )
                     }
                 }
             }
+        }
 
 
 //        val visitVitalSignsDbMap = vitalSigns.associateBy { it.timestamp }

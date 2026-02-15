@@ -190,7 +190,7 @@ class PatientDashboardViewModel @Inject constructor(
                                 state.value.patientId,
                                 state.value.visitId
                             )
-                    )
+                        )
                     )
                 }
 
