@@ -29,7 +29,7 @@ import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
-//private fun VitalSignsViewModel.evaluateSymptomColor(
+//private fun VitalSignsSummaryViewModel.evaluateSymptomColor(
 //    vitalLimits: Map<ComputeSymptomsUseCase.VitalKey, ComputeSymptomsUseCase.VitalRange<*>>?,
 //    acronym: String?
 //): Color {
@@ -39,7 +39,7 @@ import javax.inject.Inject
 //}
 
 @HiltViewModel
-class VitalSignsViewModel @Inject constructor(
+class VitalSignsSummaryViewModel @Inject constructor(
     private val visitRepository: VisitRepository,
     private val getVitalSignPrecisionUseCase: GetVitalSignPrecisionUseCase,
     private val visitVitalSignsUseCases: VisitVitalSignsUseCase,
@@ -65,12 +65,13 @@ class VitalSignsViewModel @Inject constructor(
     private val route: Route.VitalSigns = savedStateHandle.toRoute()
 
     private val _state = MutableStateFlow(
-        VitalSignsState(
+        VitalSignsSummaryState(
             route.patientId,
             route.visitId
         )
     )
     val state = _state.asStateFlow()
+
     private val navigationEventsChannel = Channel<NavigationEvent>()
     val navigationEvents = navigationEventsChannel.receiveAsFlow()
 
@@ -82,27 +83,6 @@ class VitalSignsViewModel @Inject constructor(
         when (event) {
             VitalSignsEvent.Retry -> {
                 refreshVitalSigns()
-            }
-
-            is VitalSignsEvent.ValueChanged -> {
-                _state.update {
-                    it.copy(
-                        vitalSigns = it.vitalSigns.map { vitalSign ->
-                            if (vitalSign.name == event.vitalSign) {
-                                vitalSign.copy(value = event.value)
-                            } else {
-                                vitalSign
-                            }
-                        }
-                    )
-                }
-            }
-
-            is VitalSignsEvent.Save -> {
-                viewModelScope.launch(coroutineContext) {
-                    addVitalSigns()
-                    refreshVitalSigns()
-                }
             }
 
             VitalSignsEvent.AddButtonClicked -> {
@@ -138,7 +118,7 @@ class VitalSignsViewModel @Inject constructor(
             .firstSuccess()
 
         val newStates = vitalSigns.map { vitalSign -> // More efficient mapping
-            PatientVitalSignState(vitalSign.name, vitalSign.acronym, vitalSign.unit)
+            VitalSignState(vitalSign.name, vitalSign.acronym, vitalSign.unit)
         }
         _state.update {
             it.copy(
@@ -146,13 +126,6 @@ class VitalSignsViewModel @Inject constructor(
             )
         }
     }
-
-    private suspend fun addVitalSigns(){
-        visitVitalSignsUseCases.addVisitVitalSigns(state.value.toVisitVitalSigns(state.value.visitId))
-
-        navigationEventsChannel.send(NavigationEvent.NavigateBack)
-    }
-
     private suspend fun loadVisitVitalSigns(visitId: String) {
 
         val result = visitVitalSignsUseCases.getVisitVitalSigns(visitId)
@@ -176,10 +149,13 @@ class VitalSignsViewModel @Inject constructor(
                         it.copy(
                             visitVitalSigns = resource.data.map { visitVitalSign ->
 
-                                val acronym =
-                                    state.value.vitalSigns.firstOrNull { it.name == visitVitalSign.vitalSignName }?.acronym
+                                val acronym = it.vitalSigns.firstOrNull { vitalSign ->
+                                    vitalSign.name == visitVitalSign.vitalSignName
+                                }?.acronym
 
-                                val vitalLimit = vitalLimits?.filter { it -> it.key.name.equals(acronym, true)}?.values?.firstOrNull()
+                                val vitalLimit = vitalLimits.filter { limit ->
+                                    limit.key.name.equals(acronym, true)
+                                }.values.firstOrNull()
 
 
                                 val precision = getPrecisionFor(visitVitalSign.vitalSignName)
@@ -190,10 +166,10 @@ class VitalSignsViewModel @Inject constructor(
 
                                 var value: Number
 
-                                var symptomColor: Color? = null
+                                var symptomColor: Color?
 
 
-                               when (precision) {
+                                when (precision) {
                                     NumericPrecision.INTEGER -> {
                                         value = visitVitalSign.value.toInt()
                                         symptomColor = evaluateSymptomColor(value, vitalLimit)
@@ -203,16 +179,13 @@ class VitalSignsViewModel @Inject constructor(
                                         value = visitVitalSign.value
                                         symptomColor = evaluateSymptomColorDouble(value, vitalLimit)
                                     }
-                               }
-
-
+                                }
 
                                 VisitVitalSignUI(
                                     name = visitVitalSign.vitalSignName,
                                     value = value.toString(),
                                     timestamp = visitVitalSign.timestamp,
                                     color = symptomColor
-
                                 )
                             },
                             isLoading = false
@@ -283,15 +256,15 @@ class VitalSignsViewModel @Inject constructor(
 
     fun evaluateSymptomColorDouble(
         value: Double,
-        vitalLimit: ComputeSymptomsUseCase.VitalRange<*>?
+        vitalLimit: ComputeSymptomsUseCase.VitalRange?
     ) : Color {
 
         if (vitalLimit == null) {
             return Color.Transparent
         }
 
-        val max = vitalLimit.high?.toDouble()
-        val min = vitalLimit.low?.toDouble()
+        val max = vitalLimit.high
+        val min = vitalLimit.low
 
 
         if (min != null && value < min) return Color.Yellow.copy(alpha= 0.3f)
@@ -304,7 +277,7 @@ class VitalSignsViewModel @Inject constructor(
 
     fun evaluateSymptomColor(
         value: Int,
-        vitalLimit: ComputeSymptomsUseCase.VitalRange<*>?
+        vitalLimit: ComputeSymptomsUseCase.VitalRange?
     ): Color {
         if (vitalLimit == null) {
             return Color.Transparent

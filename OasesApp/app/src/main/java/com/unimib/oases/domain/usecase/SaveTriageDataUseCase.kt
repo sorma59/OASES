@@ -2,6 +2,7 @@ package com.unimib.oases.domain.usecase
 
 import com.unimib.oases.domain.model.PatientStatus
 import com.unimib.oases.domain.model.TriageEvaluation
+import com.unimib.oases.domain.model.VisitVitalSign
 import com.unimib.oases.domain.model.symptom.Pregnancy
 import com.unimib.oases.domain.model.symptom.TriageSymptom
 import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.triageSymptoms
@@ -16,7 +17,7 @@ class SaveTriageDataUseCase @Inject constructor(
     private val visitRepository: VisitRepository
 ) {
 
-    suspend operator fun invoke(state: TriageState): Outcome<Unit> {
+    suspend operator fun invoke(state: TriageState, vitalSigns: List<VisitVitalSign>): Outcome<Unit> {
         delay(3000)
 
         if (Random.nextBoolean())
@@ -28,9 +29,10 @@ class SaveTriageDataUseCase @Inject constructor(
             roomName = state.editingState.triageData.selectedRoom!!.name
         )
         val triageEvaluation = state.toModel(state.visitId)
-        return visitRepository.insertTriageEvaluationAndUpdateVisit(
+        return visitRepository.insertTriageEvaluationAndVitalSignsAndUpdateVisit(
             visit,
-            triageEvaluation
+            triageEvaluation,
+            vitalSigns
         )
     }
 

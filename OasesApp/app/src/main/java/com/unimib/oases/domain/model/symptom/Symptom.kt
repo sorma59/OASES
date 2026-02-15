@@ -252,6 +252,11 @@ sealed interface Symptom {
         override val label = "High SBP"
     }
 
+    data object HighDbp: Symptom {
+        override val symptomId = SymptomId.HighDbpId
+        override val label = "High DBP"
+    }
+
     data object Hypotension: Symptom {
         override val symptomId = SymptomId.HypotensionId
         override val label = "Hypotension"
@@ -774,7 +779,7 @@ sealed class SymptomId (
     object HighHrId: SymptomId(snakeCase("high_hr"))
     object LowSbpId: SymptomId(snakeCase("low_sbp"))
     object HighSbpId: SymptomId(snakeCase("high_sbp"))
-
+    object HighDbpId: SymptomId(snakeCase("high_dbp"))
     object HypertensiveEmergencyId: SymptomId(snakeCase("hypertensive_emergency"))
     object HypotensionId: SymptomId(snakeCase("hypotension"))
 

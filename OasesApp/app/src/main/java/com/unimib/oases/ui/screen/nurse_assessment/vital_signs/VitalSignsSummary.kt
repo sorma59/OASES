@@ -42,7 +42,7 @@ fun VitalSignsSummary(
     appViewModel: AppViewModel
 ){
 
-    val viewModel: VitalSignsViewModel = hiltViewModel()
+    val viewModel: VitalSignsSummaryViewModel = hiltViewModel()
 
     val state by viewModel.state.collectAsState()
 
@@ -54,7 +54,7 @@ fun VitalSignsSummary(
 
 @Composable
 fun VitalSignsTable(
-    state: VitalSignsState,
+    state: VitalSignsSummaryState,
     onEvent: (VitalSignsEvent) -> Unit
 ) {
 
@@ -176,18 +176,9 @@ fun VitalSignsTable(
                                 }
                             }
                         }
-
                     }
-
-
                 }
             }
-
-
         }
-
-
     }
-
-
 }

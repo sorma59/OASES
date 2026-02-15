@@ -50,13 +50,13 @@ fun YellowCodeContent(
         ) {
             Icon(
                 imageVector = Icons.Filled.Circle,
-                contentDescription = "Yellow Code",
+                contentDescription = "Yellow Criteria",
                 tint = Color.Yellow,
                 modifier = Modifier.size(24.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "YELLOW Code",
+                text = "YELLOW Criteria",
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold
             )

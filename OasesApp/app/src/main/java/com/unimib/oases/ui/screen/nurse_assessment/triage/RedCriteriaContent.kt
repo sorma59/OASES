@@ -87,13 +87,13 @@ fun RedCodeContent(
         ) {
             Icon(
                 imageVector = Icons.Filled.Circle,
-                contentDescription = "Red Code",
+                contentDescription = "Red Criteria",
                 tint = Color.Red,
                 modifier = Modifier.size(24.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "RED Code",
+                text = "RED Criteria",
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold
             )

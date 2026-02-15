@@ -75,8 +75,8 @@ data class TriageState(
 )
 
 enum class TriageTab(val title: String){
-    REDS("Red code"),
-    YELLOWS("Yellow code"),
+    REDS("Red criteria"),
+    YELLOWS("Yellow criteria"),
     VITAL_SIGNS("Vital signs"),
     ROOM("Room selection")
 }

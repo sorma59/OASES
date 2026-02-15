@@ -112,7 +112,7 @@ class RegistrationScreenViewModel @Inject constructor(
 //            .getVitalSigns()
 //            .firstSuccess()
 //        val newStates = vitalSigns.map { vitalSign -> // More efficient mapping
-//            PatientVitalSignState(vitalSign.name, vitalSign.acronym, vitalSign.unit)
+//            VitalSignState(vitalSign.name, vitalSign.acronym, vitalSign.unit)
 //        }
 //        updateVitalSignsState {
 //            it.copy(

@@ -1,6 +1,7 @@
 package com.unimib.oases.ui.screen.nurse_assessment.triage
 
 import com.unimib.oases.domain.model.Room
+import com.unimib.oases.domain.model.VisitVitalSign
 
 sealed class TriageEvent {
     data class FieldToggled(val fieldId: String) : TriageEvent()
@@ -8,10 +9,10 @@ sealed class TriageEvent {
     data object EditButtonPressed: TriageEvent()
     data object CreateButtonPressed: TriageEvent()
     data object Retry: TriageEvent()
-    data object NextButtonPressed: TriageEvent()
+    data class NextButtonPressed(val vitalSigns: List<VisitVitalSign>? = null): TriageEvent()
     data object ReattemptSaving: TriageEvent()
     data object BackButtonPressed: TriageEvent()
-    data object ConfirmDialog: TriageEvent()
+    data class ConfirmDialog(val vitalSigns: List<VisitVitalSign>): TriageEvent()
     data object DismissDialog: TriageEvent()
-    data object RetrySaving: TriageEvent()
+    data class RetrySaving(val vitalSigns: List<VisitVitalSign>): TriageEvent()
 }

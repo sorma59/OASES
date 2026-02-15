@@ -9,7 +9,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -17,18 +16,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.unimib.oases.domain.model.NumericPrecision
+import com.unimib.oases.domain.model.VisitVitalSign
 import com.unimib.oases.ui.components.util.button.BottomButtons
 import com.unimib.oases.ui.components.util.button.RetryButton
 import com.unimib.oases.ui.components.util.effect.HandleNavigationEvents
 import com.unimib.oases.ui.components.util.effect.HandleUiEvents
 import com.unimib.oases.ui.components.util.loading.LoadingOverlay
 import com.unimib.oases.ui.screen.nurse_assessment.PatientRegistrationScreensUiMode
-import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.VitalSignsEvent
-import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.VitalSignsForm
-import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.VitalSignsState
-import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.VitalSignsSummary
-import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.VitalSignsTable
-import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.VitalSignsViewModel
+import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.form.InputFields
+import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.form.VitalSignsFormEvent
+import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.form.VitalSignsFormState
+import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.form.VitalSignsFormViewModel
 import com.unimib.oases.ui.screen.root.AppViewModel
 import com.unimib.oases.util.reactToKeyboardAppearance
 
@@ -37,7 +35,7 @@ fun TriageScreen(appViewModel: AppViewModel) {
 
     val viewModel: TriageViewModel = hiltViewModel()
 
-    val vitalSignsViewModel: VitalSignsViewModel = hiltViewModel()
+    val vitalSignsViewModel: VitalSignsFormViewModel = hiltViewModel()
 
     val state by viewModel.state.collectAsState()
 
@@ -47,29 +45,27 @@ fun TriageScreen(appViewModel: AppViewModel) {
 
     HandleUiEvents(viewModel.uiEvents, appViewModel)
 
-    LaunchedEffect(Unit) {
-        vitalSignsViewModel.onEvent(VitalSignsEvent.Retry)
-    }
-
     LoadingOverlay(state.isLoading)
 
-
-
-
-
     TriageContent(
-        appViewModel,
         state,
         viewModel::onEvent,
+        vitalSignsState,
+        vitalSignsViewModel::onEvent,
+        vitalSignsViewModel::getVisitVitalSigns,
+        vitalSignsViewModel::getPrecisionFor,
         Modifier.fillMaxHeight()
     )
 }
 
 @Composable
 private fun TriageContent(
-    appViewModel: AppViewModel,
     state: TriageState,
     onEvent: (TriageEvent) -> Unit,
+    vitalSignsState: VitalSignsFormState,
+    onVitalSignsEvent: (VitalSignsFormEvent) -> Unit,
+    getVisitVitalSigns: () -> List<VisitVitalSign>,
+    getPrecisionFor: (String) -> NumericPrecision?,
     modifier: Modifier = Modifier
 ) {
 
@@ -78,7 +74,13 @@ private fun TriageContent(
     }
 
     val onConfirm = remember {
-        { onEvent(TriageEvent.ConfirmDialog) }
+        {
+            onEvent(
+                TriageEvent.ConfirmDialog(
+                    getVisitVitalSigns()
+                )
+            )
+        }
     }
 
     state.error?.let {
@@ -101,8 +103,11 @@ private fun TriageContent(
                         when (editingState.currentTab) {
                             TriageTab.REDS -> RedCodeContent(state, onEvent)
                             TriageTab.YELLOWS -> YellowCodeContent(state, onEvent)
-                            TriageTab.VITAL_SIGNS -> VitalSignsSummary(
-                                appViewModel = appViewModel
+                            TriageTab.VITAL_SIGNS -> InputFields(
+                                vitalSignsState,
+                                onVitalSignsEvent,
+                                getPrecisionFor,
+
                             )
 
                             TriageTab.ROOM -> RoomContent(editingState, onEvent)
@@ -111,7 +116,15 @@ private fun TriageContent(
 
                     BottomButtons(
                         onCancel = { onEvent(TriageEvent.BackButtonPressed) },
-                        onConfirm = { onEvent(TriageEvent.NextButtonPressed) },
+                        onConfirm = {
+                            onEvent(
+                                TriageEvent.NextButtonPressed(
+                                    getVisitVitalSigns().takeIf {
+                                        state.editingState.currentTab == TriageTab.VITAL_SIGNS
+                                    }
+                                )
+                            )
+                        },
                         cancelButtonText = editingState.cancelButtonText,
                         confirmButtonText = editingState.nextButtonText,
                     )

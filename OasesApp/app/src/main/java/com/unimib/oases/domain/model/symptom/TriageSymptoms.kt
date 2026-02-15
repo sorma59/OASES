@@ -388,6 +388,13 @@ enum class TriageSymptom(
         TriageSymptomGroup.ALTERED_VITAL_SIGNS,
         yellowForAdultNullForKid,
         isComputed = true
+    ),
+
+    HIGH_DBP(
+        Symptom.HighDbp,
+        TriageSymptomGroup.ALTERED_VITAL_SIGNS,
+        yellowForAll,
+        isComputed = true
     );
 
     companion object {
@@ -408,6 +415,7 @@ enum class TriageSymptom(
         const val HR_HIGH = 130
         const val SBP_LOW = 90
         const val SBP_HIGH = 220
+        const val DBP_HIGH = 130
 //        const val PREGNANCY_HIGH_SBP = 160
 //        const val PREGNANCY_HIGH_DBP = 110
 

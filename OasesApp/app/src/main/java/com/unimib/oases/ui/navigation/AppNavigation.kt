@@ -25,8 +25,8 @@ import com.unimib.oases.ui.screen.nurse_assessment.history.HistoryScreen
 import com.unimib.oases.ui.screen.nurse_assessment.intake.InitialIntakeScreen
 import com.unimib.oases.ui.screen.nurse_assessment.malnutrition_screening.MalnutritionScreeningScreen
 import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageScreen
-import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.VitalSignsForm
 import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.VitalSignsSummary
+import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.form.VitalSignsForm
 import com.unimib.oases.ui.screen.root.AppViewModel
 
 @Composable

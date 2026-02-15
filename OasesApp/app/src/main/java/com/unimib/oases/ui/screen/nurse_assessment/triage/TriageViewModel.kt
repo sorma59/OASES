@@ -6,11 +6,13 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.model.Room
+import com.unimib.oases.domain.model.VisitVitalSign
 import com.unimib.oases.domain.model.symptom.TriageSymptom.Companion.triageSymptoms
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.domain.repository.RoomRepository
 import com.unimib.oases.domain.repository.TriageEvaluationRepository
 import com.unimib.oases.domain.repository.VisitRepository
+import com.unimib.oases.domain.usecase.ComputeSymptomsUseCase
 import com.unimib.oases.domain.usecase.ConfigTriageUseCase
 import com.unimib.oases.domain.usecase.EvaluateTriageCodeUseCase
 import com.unimib.oases.domain.usecase.GetCurrentVisitUseCase
@@ -25,6 +27,7 @@ import com.unimib.oases.ui.util.snackbar.SnackbarType
 import com.unimib.oases.util.Outcome
 import com.unimib.oases.util.firstNullableSuccess
 import com.unimib.oases.util.firstSuccess
+import com.unimib.oases.util.let2
 import com.unimib.oases.util.toggle
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -54,6 +57,7 @@ class TriageViewModel @Inject constructor(
     private val evaluateTriageCodeUseCase: EvaluateTriageCodeUseCase,
     private val saveTriageDataUseCase: SaveTriageDataUseCase,
     private val getCurrentVisitUseCase: GetCurrentVisitUseCase,
+    private val computeSymptomsUseCase: ComputeSymptomsUseCase,
     savedStateHandle: SavedStateHandle,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ): ViewModel() {
@@ -188,23 +192,43 @@ class TriageViewModel @Inject constructor(
 
             TriageEvent.CreateButtonPressed -> enterEditMode()
 
-            TriageEvent.NextButtonPressed -> onNext()
+            is TriageEvent.NextButtonPressed -> {
+                let2(event.vitalSigns, state.value.patient) { vitalSigns, patient ->
+                    _state.update {
+                        it.copy(
+                            editingState = it.editingState?.copy(
+                                triageData = it.editingState.triageData.copy(
+                                    selectedYellows = computeSymptomsUseCase(
+                                        selectedYellows = it.editingState.triageData.selectedYellows,
+                                        ageInMonths = patient.ageInMonths,
+                                        category = patient.category,
+                                        vitalSigns = vitalSigns.mapNotNull { vitalSign ->
+                                            vitalSign.vitalSignName.toVitalKey()?.to(vitalSign.value)
+                                        }
+                                    )
+                                )
+                            )
+                        )
+                    }
+                }
+                onNext()
+            }
 
             TriageEvent.ReattemptSaving -> onNext()
 
             TriageEvent.BackButtonPressed -> onBack()
 
-            TriageEvent.ConfirmDialog -> {
+            is TriageEvent.ConfirmDialog -> {
                 _state.update {
                     it.copy(
                         isLoading = true,
                         showAlertDialog = false
                     )
                 }
-                saveTriage()
+                saveTriage(event.vitalSigns)
             }
 
-            TriageEvent.RetrySaving -> saveTriage()
+            is TriageEvent.RetrySaving -> saveTriage(event.vitalSigns)
 
             TriageEvent.DismissDialog -> {
                 _state.update {
@@ -216,24 +240,24 @@ class TriageViewModel @Inject constructor(
         }
     }
 
-    private fun saveTriage() {
+    private fun saveTriage(vitalSigns: List<VisitVitalSign>) {
         viewModelScope.launch {
             when (state.value.uiMode) {
-                is PatientRegistrationScreensUiMode.Wizard -> saveTriageFromWizard()
-                is PatientRegistrationScreensUiMode.Standalone -> saveTriageFromStandalone()
+                is PatientRegistrationScreensUiMode.Wizard -> saveTriageFromWizard(vitalSigns)
+                is PatientRegistrationScreensUiMode.Standalone -> saveTriageFromStandalone(vitalSigns)
             }
         }
     }
 
-    private suspend fun saveTriageFromWizard() {
-        if (saveTriageDataUseCase(state.value) is Outcome.Success)
+    private suspend fun saveTriageFromWizard(vitalSigns: List<VisitVitalSign>) {
+        if (saveTriageDataUseCase(state.value, vitalSigns) is Outcome.Success)
             goBackToWizard()
         else
             showSavingError()
     }
 
-    private suspend fun saveTriageFromStandalone() {
-        if (saveTriageDataUseCase(state.value) is Outcome.Success){
+    private suspend fun saveTriageFromStandalone(vitalSigns: List<VisitVitalSign>) {
+        if (saveTriageDataUseCase(state.value, vitalSigns) is Outcome.Success){
             saveEdits()
             goBackToViewMode()
         }
@@ -344,7 +368,7 @@ class TriageViewModel @Inject constructor(
                     editingState = it.editingState.copy(
                         triageData = it.editingState.triageData.copy(
                             selectedReds = it.editingState.triageData.selectedReds.toggle(fieldId)
-                        ),
+                        )
                     )
                 )
             } else {
@@ -352,7 +376,7 @@ class TriageViewModel @Inject constructor(
                     editingState = it.editingState.copy(
                         triageData = it.editingState.triageData.copy(
                             selectedYellows = it.editingState.triageData.selectedYellows.toggle(fieldId)
-                        ),
+                        )
                     )
                 )
             }
@@ -391,7 +415,7 @@ class TriageViewModel @Inject constructor(
         }
     }
 
-    private fun onNext(){
+    private fun onNext() {
         updateTriageCode()
         val nextTab = state.value.editingState!!.nextTab()
 
@@ -444,9 +468,7 @@ class TriageViewModel @Inject constructor(
         if (state.value.uiMode is PatientRegistrationScreensUiMode.Wizard)
             concludeTriage(false)
         else
-            _state.update {
-                it.copy(uiMode = PatientRegistrationScreensUiMode.Standalone(false))
-            }
+            goBackToViewMode()
     }
 
     private fun goBackToViewMode() {
@@ -500,4 +522,16 @@ class TriageViewModel @Inject constructor(
         }
     }
 
+    private fun String.toVitalKey(): ComputeSymptomsUseCase.VitalKey? {
+        return when (this) {
+            "Systolic Blood Pressure" -> ComputeSymptomsUseCase.VitalKey.SBP
+            "Diastolic Blood Pressure" -> ComputeSymptomsUseCase.VitalKey.DBP
+            "Heart Rate" -> ComputeSymptomsUseCase.VitalKey.HR
+            "Oxygen Saturation" -> ComputeSymptomsUseCase.VitalKey.SPO2
+            "Respiratory Rate" -> ComputeSymptomsUseCase.VitalKey.RR
+            "Temperature" -> ComputeSymptomsUseCase.VitalKey.TEMP
+            "Rapid Blood Sugar" -> ComputeSymptomsUseCase.VitalKey.RBS
+            else -> null
+        }
+    }
 }

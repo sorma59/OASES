@@ -3,6 +3,7 @@ package com.unimib.oases.domain.repository
 import com.unimib.oases.domain.model.PatientWithVisitInfo
 import com.unimib.oases.domain.model.TriageEvaluation
 import com.unimib.oases.domain.model.Visit
+import com.unimib.oases.domain.model.VisitVitalSign
 import com.unimib.oases.util.Outcome
 import com.unimib.oases.util.Resource
 import kotlinx.coroutines.flow.Flow
@@ -11,7 +12,11 @@ interface VisitRepository {
 
     suspend fun addVisit(visit: Visit): Outcome<String>
 
-    suspend fun insertTriageEvaluationAndUpdateVisit(visit: Visit, triageEvaluation: TriageEvaluation): Outcome<Unit>
+    suspend fun insertTriageEvaluationAndVitalSignsAndUpdateVisit(
+        visit: Visit,
+        triageEvaluation: TriageEvaluation,
+        vitalSigns: List<VisitVitalSign>
+    ): Outcome<Unit>
 
     suspend fun updateVisit(visit: Visit): Outcome<Unit>
 

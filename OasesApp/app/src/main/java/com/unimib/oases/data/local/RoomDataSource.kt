@@ -198,11 +198,13 @@ class RoomDataSource @Inject constructor(
 
     suspend fun insertTriageEvaluationAndUpdateVisit(
         visit: VisitEntity,
-        triageEvaluation: TriageEvaluationEntity
+        triageEvaluation: TriageEvaluationEntity,
+        vitalSigns: List<VisitVitalSignEntity>
     ) {
         appDatabase.withTransaction {
             insertVisit(visit)
             insertTriageEvaluation(triageEvaluation)
+            insertVisitVitalSigns(vitalSigns)
         }
     }
 
