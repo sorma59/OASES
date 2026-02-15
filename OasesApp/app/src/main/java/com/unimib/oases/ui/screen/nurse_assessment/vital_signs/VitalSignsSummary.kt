@@ -95,9 +95,9 @@ fun VitalSignsTable(
                             Icon(
                                 modifier = Modifier.padding(end = 2.dp).size(25.dp),
                                 imageVector = Icons.Default.Add,
-                                contentDescription = "Add Vital Sign"
+                                contentDescription = "Add Vital Signs"
                             )
-                            Text("Add Vital Sign", fontSize = 15.sp)
+                            Text("Add Vital Signs", fontSize = 15.sp)
 
                         }
 
@@ -115,7 +115,7 @@ fun VitalSignsTable(
                     headerBackgroundColor = MaterialTheme.colorScheme.primaryContainer,
                     columns = listOf(
                         DataColumn(Alignment.Center) {
-                            Text("Vital", color = MaterialTheme.colorScheme.surface)
+                            Text("Vitals", color = MaterialTheme.colorScheme.surface)
                         }
                     )
                 ) {
