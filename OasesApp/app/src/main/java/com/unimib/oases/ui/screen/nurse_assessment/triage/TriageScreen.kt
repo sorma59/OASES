@@ -24,6 +24,7 @@ import com.unimib.oases.ui.components.util.effect.HandleUiEvents
 import com.unimib.oases.ui.components.util.loading.LoadingOverlay
 import com.unimib.oases.ui.screen.nurse_assessment.PatientRegistrationScreensUiMode
 import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.VitalSignsEvent
+import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.VitalSignsForm
 import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.VitalSignsState
 import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.VitalSignsSummary
 import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.VitalSignsTable
@@ -52,7 +53,12 @@ fun TriageScreen(appViewModel: AppViewModel) {
 
     LoadingOverlay(state.isLoading)
 
+
+
+
+
     TriageContent(
+        appViewModel,
         state,
         viewModel::onEvent,
         vitalSignsState,
@@ -64,6 +70,7 @@ fun TriageScreen(appViewModel: AppViewModel) {
 
 @Composable
 private fun TriageContent(
+    appViewModel: AppViewModel,
     state: TriageState,
     onEvent: (TriageEvent) -> Unit,
     vitalSignsState: VitalSignsState,
@@ -100,9 +107,8 @@ private fun TriageContent(
                         when (editingState.currentTab) {
                             TriageTab.REDS -> RedCodeContent(state, onEvent)
                             TriageTab.YELLOWS -> YellowCodeContent(state, onEvent)
-                            TriageTab.VITAL_SIGNS -> VitalSignsTable (
-                                vitalSignsState,
-                                onVitalSignsEvent
+                            TriageTab.VITAL_SIGNS -> VitalSignsSummary(
+                                appViewModel = appViewModel
                             )
 
                             TriageTab.ROOM -> RoomContent(editingState, onEvent)
