@@ -61,9 +61,6 @@ fun TriageScreen(appViewModel: AppViewModel) {
         appViewModel,
         state,
         viewModel::onEvent,
-        vitalSignsState,
-        vitalSignsViewModel::onEvent,
-        vitalSignsViewModel::getPrecisionFor,
         Modifier.fillMaxHeight()
     )
 }
@@ -73,9 +70,6 @@ private fun TriageContent(
     appViewModel: AppViewModel,
     state: TriageState,
     onEvent: (TriageEvent) -> Unit,
-    vitalSignsState: VitalSignsState,
-    onVitalSignsEvent: (VitalSignsEvent) -> Unit,
-    getPrecisionFor: (String) -> NumericPrecision?,
     modifier: Modifier = Modifier
 ) {
 
