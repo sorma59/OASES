@@ -186,8 +186,8 @@ sealed interface PatientDashboardAction {
                 Triage,
                 VitalSigns,
                 MalnutritionScreening,
-                History,
-                StartVisit,
+                MedicalHistory,
+                CurrentVisit,
                 Send,
                 Delete
             )
@@ -252,13 +252,13 @@ sealed interface PatientDashboardAction {
         )
     }
 
-    data object History: PatientNavigable {
-        override val text = "History"
+    data object MedicalHistory: PatientNavigable {
+        override val text = "Medical History"
         override val icon = Icons.Default.History
-        override val contentDescription = "History"
+        override val contentDescription = "Medical History"
         override val roles = Role.entries
 
-        override fun createRoute(patientId: String) = Route.History(patientId)
+        override fun createRoute(patientId: String) = Route.MedicalHistory(patientId)
     }
 
     data object Send : Navigable {
@@ -269,10 +269,10 @@ sealed interface PatientDashboardAction {
         fun createRoute(patientId: String, visitId: String) = Route.SendPatient(patientId, visitId)
     }
 
-    data object StartVisit : PatientNavigable {
-        override val text = "Start visit"
+    data object CurrentVisit : PatientNavigable {
+        override val text = "Current visit"
         override val icon = Icons.Default.MedicalServices
-        override val contentDescription = "Start a new visit"
+        override val contentDescription = "Current visit"
         override val roles = listOf(Role.DOCTOR)
         override fun createRoute(patientId: String) = Route.MedicalVisit(patientId)
     }

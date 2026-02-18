@@ -66,7 +66,7 @@ class HistoryViewModel @Inject constructor(
 
     val pastVisitsContext: CoroutineContext = ioDispatcher + pastVisitsErrorHandler
 
-    val args = savedStateHandle.toRoute<Route.History>()
+    val args = savedStateHandle.toRoute<Route.MedicalHistory>()
 
     val isDoctor by derivedStateOf {
         authManager.getCurrentRole() == Role.DOCTOR

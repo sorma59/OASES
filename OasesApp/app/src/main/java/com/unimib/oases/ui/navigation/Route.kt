@@ -45,7 +45,7 @@ sealed class Route {
         val isWizardMode: Boolean = false
     ) : Route()
     @Serializable
-    data class History(
+    data class MedicalHistory(
         val patientId: String
     ): Route()
     @Serializable

@@ -109,7 +109,7 @@ fun AppNavigation(
             MalnutritionScreeningScreen(appViewModel)
         }
 
-        composable<Route.History> {
+        composable<Route.MedicalHistory> {
             HistoryScreen(appViewModel)
         }
 
