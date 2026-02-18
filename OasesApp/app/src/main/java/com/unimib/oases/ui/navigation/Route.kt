@@ -20,8 +20,7 @@ sealed class Route {
     @Serializable
     data class VitalSignsForm(
         val patientId: String,
-        val visitId: String,
-        val isWizardMode: Boolean = false
+        val visitId: String
     ) : Route()
     @Serializable
     data class Demographics(

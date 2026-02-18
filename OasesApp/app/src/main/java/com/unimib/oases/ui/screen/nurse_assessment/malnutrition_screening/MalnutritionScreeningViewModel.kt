@@ -30,7 +30,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
-import kotlin.random.Random
 
 @HiltViewModel
 class MalnutritionScreeningViewModel @Inject constructor(
@@ -294,8 +293,6 @@ class MalnutritionScreeningViewModel @Inject constructor(
     }
 
     private suspend fun saveMalnutritionScreeningData(): Boolean {
-        if (Random.nextBoolean()) //TODO("DEBUG ONLY: REMOVE")
-            return false
         _state.update {
             it.copy(isLoading = true)
         }

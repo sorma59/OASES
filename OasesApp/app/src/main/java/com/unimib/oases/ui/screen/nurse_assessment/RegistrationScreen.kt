@@ -22,15 +22,15 @@ import com.unimib.oases.domain.model.PatientAndVisitIds
 import com.unimib.oases.ui.components.util.button.BottomButtons
 import com.unimib.oases.ui.components.util.button.RetryButton
 import com.unimib.oases.ui.components.util.effect.HandleNavigationEvents
-import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreenViewModel.Companion.DEMOGRAPHICS_COMPLETED_KEY
 import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreenViewModel.Companion.STEP_COMPLETED_KEY
+import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreenViewModel.Companion.VITAL_SIGNS_TAKEN_KEY
 import com.unimib.oases.ui.screen.nurse_assessment.transitionscreens.ContinueToMalnutritionDecisionScreen
 import com.unimib.oases.ui.screen.nurse_assessment.transitionscreens.ContinueToTriageDecisionScreen
+import com.unimib.oases.ui.screen.nurse_assessment.transitionscreens.ContinueToVitalSignsDecisionScreen
 import com.unimib.oases.ui.screen.nurse_assessment.transitionscreens.StartWithDemographicsDecisionScreen
 import com.unimib.oases.ui.screen.nurse_assessment.transitionscreens.SubmissionScreen
 import com.unimib.oases.ui.screen.root.AppViewModel
-import kotlin.reflect.KClass
 
 @Composable
 fun RegistrationScreen(
@@ -64,6 +64,28 @@ fun RegistrationScreen(
     LaunchedEffect(navController.currentBackStackEntry) {
         navController.currentBackStackEntry
             ?.savedStateHandle
+            ?.getLiveData<Boolean?>(VITAL_SIGNS_TAKEN_KEY)
+            ?.asFlow()
+            ?.collect { wereVitalSignsTaken ->
+                wereVitalSignsTaken?.let {
+                    if (it) {
+                        viewModel.onEvent(
+                            RegistrationEvent.VitalSignsTaken
+                        )
+                        navController.currentBackStackEntry
+                            ?.savedStateHandle
+                            // Remove the mapping since it is a one timer
+                            ?.remove<Boolean>(VITAL_SIGNS_TAKEN_KEY)
+                    }
+
+                    viewModel.onEvent(RegistrationEvent.StepCompleted)
+                }
+            }
+    }
+
+    LaunchedEffect(navController.currentBackStackEntry) {
+        navController.currentBackStackEntry
+            ?.savedStateHandle
             ?.getLiveData<PatientAndVisitIds?>(DEMOGRAPHICS_COMPLETED_KEY)
             ?.asFlow()
             ?.collect { ids ->
@@ -77,6 +99,8 @@ fun RegistrationScreen(
                         ?.savedStateHandle
                         // Remove the mapping since it is a one timer
                         ?.remove<PatientAndVisitIds?>(DEMOGRAPHICS_COMPLETED_KEY)
+
+                    viewModel.onEvent(RegistrationEvent.StepCompleted)
                 }
             }
     }
@@ -101,16 +125,16 @@ fun RegistrationContent(
         when (state.currentTab) {
             Tab.START_WITH_DEMOGRAPHICS_DECISION -> "Go"
             Tab.CONTINUE_TO_TRIAGE -> "Triage"
+            Tab.CONTINUE_TO_VITAL_SIGNS -> "Vital Signs"
             Tab.CONTINUE_TO_MALNUTRITION_SCREENING -> "Malnutrition Screening"
-            Tab.SUBMIT_ALL -> "Submit"
+            Tab.SUBMIT_ALL -> "Done"
         }
     }
 
     val cancelButtonText = remember(state.currentTab) {
         when (state.currentTab) {
             Tab.START_WITH_DEMOGRAPHICS_DECISION -> "Cancel"
-            Tab.CONTINUE_TO_TRIAGE, Tab.CONTINUE_TO_MALNUTRITION_SCREENING -> "Home"
-            else -> "Back"
+            Tab.CONTINUE_TO_TRIAGE, Tab.CONTINUE_TO_MALNUTRITION_SCREENING, Tab.CONTINUE_TO_VITAL_SIGNS, Tab.SUBMIT_ALL -> "Home"
         }
     }
 
@@ -150,6 +174,8 @@ fun RegistrationContent(
 
                     Tab.CONTINUE_TO_TRIAGE -> ContinueToTriageDecisionScreen()
 
+                    Tab.CONTINUE_TO_VITAL_SIGNS -> ContinueToVitalSignsDecisionScreen()
+
                     Tab.CONTINUE_TO_MALNUTRITION_SCREENING -> ContinueToMalnutritionDecisionScreen()
 
                     Tab.SUBMIT_ALL -> SubmissionScreen()
@@ -166,9 +192,10 @@ fun RegistrationContent(
     }
 }
 
-enum class Tab(val title: String, val destinationClass: KClass<out Route>?){
-    START_WITH_DEMOGRAPHICS_DECISION("First step: Demographics", Route.Demographics::class),
-    CONTINUE_TO_TRIAGE("Continue to Triage?", Route.Triage::class),
-    CONTINUE_TO_MALNUTRITION_SCREENING("Continue to Malnutrition Screening?", Route.MalnutritionScreening::class),
-    SUBMIT_ALL("Submit everything", null)
+enum class Tab(val title: String){
+    START_WITH_DEMOGRAPHICS_DECISION("First step: Demographics"),
+    CONTINUE_TO_TRIAGE("Continue to Triage?"),
+    CONTINUE_TO_VITAL_SIGNS("Continue to vital signs?"),
+    CONTINUE_TO_MALNUTRITION_SCREENING("Continue to Malnutrition Screening?"),
+    SUBMIT_ALL("Submit everything")
 }

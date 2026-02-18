@@ -26,7 +26,7 @@ fun SubmissionScreen(){
         Spacer(modifier = Modifier.height(32.dp))
 
         CenteredText(
-            "Do you want to submit everything?",
+            "You can go back to home now",
             fontSize = 20.sp
         )
 

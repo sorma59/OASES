@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Route
+import com.unimib.oases.util.let2
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -44,20 +45,29 @@ class RegistrationScreenViewModel @Inject constructor(
     fun onEvent(event: RegistrationEvent) {
         when (event) {
             is RegistrationEvent.PatientAndVisitCreated -> {
-               _state.update {
-                   it.copy(
-                       patientId = event.patientId,
-                       visitId = event.visitId
-                   )
-               }
-                onEvent(RegistrationEvent.StepCompleted)
+                _state.update {
+                    it.copy(
+                        patientId = event.patientId,
+                        visitId = event.visitId
+                    )
+                }
+            }
+
+            RegistrationEvent.VitalSignsTaken -> {
+                _state.update {
+                    it.copy(
+                        wereVitalSignsTaken = true
+                    )
+                }
             }
 
             RegistrationEvent.StepCompleted -> {
-                _state.update {
-                    it.copy(
-                        currentStep = it.currentStep + 1
-                    )
+                state.value.nextTab()?.let { tab ->
+                    _state.update {
+                        it.copy(
+                            currentTab = tab
+                        )
+                    }
                 }
             }
 
@@ -253,30 +263,23 @@ class RegistrationScreenViewModel @Inject constructor(
 
     fun onNext() {
         viewModelScope.launch(mainContext) {
-            val currentTab = state.value.currentTab
 
-            val destination: Route? = when (currentTab.destinationClass) {
-                Route.Demographics::class -> Route.Demographics()
+            val destination: Route? = when (state.value.currentTab) {
+                Tab.START_WITH_DEMOGRAPHICS_DECISION -> Route.Demographics()
 
-                Route.Triage::class -> {
-                    val patientId = state.value.patientId
-                    requireNotNull(patientId) { "Cannot navigate to Triage without a patientId." }
-                    val visitId = state.value.visitId
-                    requireNotNull(visitId) { "Cannot navigate to Malnutrition Screening without a visitId." }
+                Tab.CONTINUE_TO_TRIAGE -> let2(state.value.patientId, state.value.visitId) { patientId, visitId ->
                     Route.Triage(patientId, visitId, isWizardMode = true)
-                }
+                } ?: throw IllegalStateException("patientId or visitId is null")
 
-                Route.MalnutritionScreening::class -> {
-                    val patientId = state.value.patientId
-                    requireNotNull(patientId) { "Cannot navigate to Malnutrition Screening without a patientId." }
-                    val visitId = state.value.visitId
-                    requireNotNull(visitId) { "Cannot navigate to Malnutrition Screening without a visitId." }
-                    Route.MalnutritionScreening(patientId, visitId, true)
-                }
+                Tab.CONTINUE_TO_VITAL_SIGNS -> let2(state.value.patientId, state.value.visitId) { patientId, visitId ->
+                    Route.VitalSignsForm(patientId, visitId)
+                } ?: throw IllegalStateException("patientId or visitId is null")
 
-                null -> null
+                Tab.CONTINUE_TO_MALNUTRITION_SCREENING -> let2(state.value.patientId, state.value.visitId) { patientId, visitId ->
+                    Route.MalnutritionScreening(patientId, visitId, isWizardMode = true)
+                } ?: throw IllegalStateException("patientId or visitId is null")
 
-                else -> throw IllegalStateException("Unhandled route class in wizard: ${currentTab.destinationClass}")
+                Tab.SUBMIT_ALL -> null
             }
 
             destination?.let {
@@ -297,6 +300,7 @@ class RegistrationScreenViewModel @Inject constructor(
 
     companion object {
         const val DEMOGRAPHICS_COMPLETED_KEY = "demographics_completed"
+        const val VITAL_SIGNS_TAKEN_KEY = "vital_signs_taken"
         const val STEP_COMPLETED_KEY = "step_completed"
     }
 }

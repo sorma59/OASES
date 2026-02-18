@@ -15,13 +15,12 @@ import com.unimib.oases.domain.repository.VisitRepository
 import com.unimib.oases.domain.usecase.ComputeSymptomsUseCase
 import com.unimib.oases.domain.usecase.ConfigTriageUseCase
 import com.unimib.oases.domain.usecase.EvaluateTriageCodeUseCase
-import com.unimib.oases.domain.usecase.GetCurrentVisitUseCase
 import com.unimib.oases.domain.usecase.SaveTriageDataUseCase
 import com.unimib.oases.ui.components.scaffold.UiEvent
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.ui.screen.nurse_assessment.PatientRegistrationScreensUiMode
-import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreenViewModel.Companion.STEP_COMPLETED_KEY
+import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreenViewModel.Companion.VITAL_SIGNS_TAKEN_KEY
 import com.unimib.oases.ui.util.snackbar.SnackbarData
 import com.unimib.oases.ui.util.snackbar.SnackbarType
 import com.unimib.oases.util.Outcome
@@ -56,7 +55,6 @@ class TriageViewModel @Inject constructor(
     private val configTriageUseCase: ConfigTriageUseCase,
     private val evaluateTriageCodeUseCase: EvaluateTriageCodeUseCase,
     private val saveTriageDataUseCase: SaveTriageDataUseCase,
-    private val getCurrentVisitUseCase: GetCurrentVisitUseCase,
     private val computeSymptomsUseCase: ComputeSymptomsUseCase,
     savedStateHandle: SavedStateHandle,
     @param:IoDispatcher private val ioDispatcher: CoroutineDispatcher
@@ -128,19 +126,6 @@ class TriageViewModel @Inject constructor(
                 collectRooms()
             }
             _state.update { it.copy(isLoading = false) }
-        }
-    }
-
-    private suspend fun getCurrentVisitData() {
-        val visit = getCurrentVisitUseCase(state.value.patientId)
-        _state.update {
-            it.copy(
-                visit = visit,
-                storedData = it.storedData?.copy(
-                    triageCode = visit.triageCode,
-                    selectedRoom = visit.roomName?.let { name -> Room(name) }
-                )
-            )
         }
     }
 
@@ -251,7 +236,7 @@ class TriageViewModel @Inject constructor(
 
     private suspend fun saveTriageFromWizard(vitalSigns: List<VisitVitalSign>) {
         if (saveTriageDataUseCase(state.value, vitalSigns) is Outcome.Success)
-            goBackToWizard()
+            goBackToWizard(wereVitalSignsTaken = vitalSigns.isNotEmpty())
         else
             showSavingError()
     }
@@ -287,11 +272,11 @@ class TriageViewModel @Inject constructor(
         }
     }
 
-    private suspend fun navigateBackWithResult(result: Boolean) {
+    private suspend fun navigateBackWithResult(wereVitalSignsTaken: Boolean?) {
         navigationEventsChannel.send(
             NavigationEvent.NavigateBackWithResult(
-                STEP_COMPLETED_KEY,
-                result
+                VITAL_SIGNS_TAKEN_KEY,
+                wereVitalSignsTaken
             )
         )
     }
@@ -466,7 +451,7 @@ class TriageViewModel @Inject constructor(
 
     private fun goBack() {
         if (state.value.uiMode is PatientRegistrationScreensUiMode.Wizard)
-            concludeTriage(false)
+            concludeTriage(null)
         else
             goBackToViewMode()
     }
@@ -479,11 +464,11 @@ class TriageViewModel @Inject constructor(
         }
     }
 
-    private fun goBackToWizard() {
-        concludeTriage(true)
+    private fun goBackToWizard(wereVitalSignsTaken: Boolean?) {
+        concludeTriage(wereVitalSignsTaken)
     }
 
-    private fun concludeTriage(result: Boolean){
+    private fun concludeTriage(result: Boolean?){
         viewModelScope.launch{ navigateBackWithResult(result) }
     }
 

@@ -142,7 +142,7 @@ fun ChronicConditionsForm(
                     onEvent(HistoryEvent.FreeTextChanged(diseaseState.disease, it))
                 },
                 labelText = "Details",
-                modifier = Modifier.padding(bottom = 8.dp)
+                modifier = Modifier.padding(bottom = 24.dp)
             )
         }
 

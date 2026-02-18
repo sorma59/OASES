@@ -12,21 +12,21 @@ import androidx.compose.ui.unit.sp
 import com.unimib.oases.ui.components.util.CenteredText
 
 @Composable
-fun ContinueToMalnutritionDecisionScreen() {
+fun ContinueToVitalSignsDecisionScreen() {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
 
         CenteredText(
-            "The data was saved, you will be able to edit it later on.",
+            "The triage data was saved, you will be able to edit it later on.",
             fontSize = 20.sp
         )
 
         Spacer(modifier = Modifier.height(32.dp))
 
         CenteredText(
-            "Do you want to continue with the malnutrition screening or go back to home?",
+            "Do you want to continue with their vital signs or go back to home?",
             fontSize = 20.sp
         )
     }
