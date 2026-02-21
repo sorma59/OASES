@@ -4,19 +4,19 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.unimib.oases.domain.usecase.TranslateLatestVitalSignsToSymptomsUseCase
+import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Route
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MedicalVisitViewModel @Inject constructor(
-    private val translateLatestVitalSignsToSymptomsUseCase: TranslateLatestVitalSignsToSymptomsUseCase,
     savedStateHandle: SavedStateHandle
 ):ViewModel() {
 
@@ -29,14 +29,23 @@ class MedicalVisitViewModel @Inject constructor(
     )
     val state: StateFlow<MedicalVisitState> = _state.asStateFlow()
 
-    init {
-        viewModelScope.launch {
-            _state.update {
-                it.copy(
-                    symptoms = translateLatestVitalSignsToSymptomsUseCase(_state.value.patientId)
-                )
+    private val navigationEventsChannel = Channel<NavigationEvent>()
+    val navigationEvents = navigationEventsChannel.receiveAsFlow()
+
+    fun onEvent(event: MedicalVisitEvent) {
+        when (event) {
+            is MedicalVisitEvent.ComplaintClicked -> {
+                viewModelScope.launch {
+                    navigationEventsChannel.send(
+                        NavigationEvent.Navigate(
+                            Route.MainComplaint(
+                                patientId = state.value.patientId,
+                                mainComplaintId = event.complaintId
+                            )
+                        )
+                    )
+                }
             }
         }
     }
-
 }

@@ -8,14 +8,9 @@ import javax.inject.Inject
 class GenerateSuggestedTestsUseCase @Inject constructor() {
 
     operator fun invoke(complaint: Complaint, symptoms: Set<Symptom>): List<Condition> {
-        val conditions = mutableListOf<Condition>()
-
-        for (condition in complaint.tests.conditions){
-            if (condition.predicate(symptoms))
-                conditions.add(condition)
+        return complaint.tests.conditions.filter {
+            it.predicate(symptoms)
         }
-
-        return conditions.toList()
     }
 
 }

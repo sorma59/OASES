@@ -13,15 +13,15 @@ import com.unimib.oases.domain.model.complaint.binarytree.ManualNode
 import com.unimib.oases.domain.model.complaint.binarytree.Tree
 import com.unimib.oases.domain.model.symptom.Symptom
 
-fun List<ImmediateTreatmentQuestionState>.rebranch(node: ManualNode, answer: Boolean)
-: List<ImmediateTreatmentQuestionState> {
-    val list = this.toMutableList()
-    while(list.last().node != node){
-        list.removeAt(list.lastIndex)
-    }
-    list.removeAt(list.lastIndex)
-    list.add(ImmediateTreatmentQuestionState(node, answer))
-    return list.toList()
+fun List<ImmediateTreatmentQuestionState>.rebranch(
+    node: ManualNode,
+    answer: Boolean
+): List<ImmediateTreatmentQuestionState> {
+    val index = this.indexOfFirst { it.node == node }
+
+    if (index == -1) return this // should not happen though
+
+    return this.take(index) + ImmediateTreatmentQuestionState(node, answer)
 }
 
 data class MainComplaintState(

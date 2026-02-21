@@ -25,8 +25,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.unimib.oases.domain.model.complaint.ComplaintId
 import com.unimib.oases.ui.components.util.CenteredTextInBox
 import com.unimib.oases.ui.components.util.TitleText
-import com.unimib.oases.ui.navigation.NavigationEvent
-import com.unimib.oases.ui.navigation.Route
+import com.unimib.oases.ui.components.util.effect.HandleNavigationEvents
 import com.unimib.oases.ui.screen.root.AppViewModel
 
 @Composable
@@ -38,13 +37,15 @@ fun MedicalVisitScreen(
 
     val state by viewModel.state.collectAsState()
 
-    MedicalVisitContent(state, appViewModel)
+    HandleNavigationEvents(viewModel.navigationEvents, appViewModel)
+
+    MedicalVisitContent(state, viewModel::onEvent)
 }
 
 @Composable
 private fun MedicalVisitContent(
     state: MedicalVisitState,
-    appViewModel: AppViewModel
+    onEvent: (MedicalVisitEvent) -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -53,14 +54,13 @@ private fun MedicalVisitContent(
     ) {
         Spacer(Modifier.height(64.dp))
 
-        MainComplaintsGrid(state.patientId, appViewModel)
+        MainComplaintsGrid(onEvent)
     }
 }
 
 @Composable
 private fun MainComplaintsGrid(
-    patientId: String,
-    appViewModel: AppViewModel
+    onEvent: (MedicalVisitEvent) -> Unit
 ) {
 
     Column(
@@ -74,8 +74,9 @@ private fun MainComplaintsGrid(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            for (complaint in ComplaintId.entries)
-                MainComplaintBoxButton(complaint, patientId, appViewModel)
+            ComplaintId.entries.forEach {
+                MainComplaintBoxButton(it, onEvent)
+            }
         }
     }
 }
@@ -83,21 +84,16 @@ private fun MainComplaintsGrid(
 @Composable
 private fun MainComplaintBoxButton(
     complaintId: ComplaintId,
-    patientId: String,
-    appViewModel: AppViewModel
+    onEvent: (MedicalVisitEvent) -> Unit
+
 ){
-    BoxButton(
-        complaintId.label,
-        Route.MainComplaint(patientId, complaintId.id),
-        appViewModel
-    )
+    BoxButton(complaintId, onEvent)
 }
 
 @Composable
 private fun BoxButton(
-    label: String,
-    destination: Route,
-    appViewModel: AppViewModel
+    complaintId: ComplaintId,
+    onEvent: (MedicalVisitEvent) -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -106,13 +102,11 @@ private fun BoxButton(
             .background(MaterialTheme.colorScheme.primaryContainer)
             .padding(4.dp)
             .clickable {
-                appViewModel.onNavEvent(
-                    NavigationEvent.Navigate(
-                        destination
-                    )
+                onEvent(
+                    MedicalVisitEvent.ComplaintClicked(complaintId.id)
                 )
             }
     ) {
-        CenteredTextInBox(label, 20.sp, MaterialTheme.colorScheme.onPrimaryContainer)
+        CenteredTextInBox(complaintId.label, 20.sp, MaterialTheme.colorScheme.onPrimaryContainer)
     }
 }

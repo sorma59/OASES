@@ -9,22 +9,14 @@ class ConvertTreeBranchesToTextUseCase @Inject constructor(
 ) {
 
     operator fun invoke(listOfAnsweredNodes: List<List<ImmediateTreatmentQuestionState>>): List<List<QuestionAndAnswer>> {
-
-        val list = mutableListOf<MutableList<QuestionAndAnswer>>()
-
-        for ((index, algorithm) in listOfAnsweredNodes.withIndex()){
-            list.add(mutableListOf())
-            for (question in algorithm){
-                list[index].add(
-                    QuestionAndAnswer(
-                        question.node.value,
-                        convertNodeAnswerToStringUseCase(question.answer!!)
-                    )
+        return listOfAnsweredNodes.map { list ->
+            list.map {
+                QuestionAndAnswer(
+                    it.node.value,
+                    convertNodeAnswerToStringUseCase(it.answer!!)
                 )
             }
         }
-
-        return list.toList()
     }
 
 }

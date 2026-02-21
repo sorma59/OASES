@@ -23,7 +23,6 @@ sealed interface Complaint {
     val details: ComplaintDetails
     val tests: ComplaintTests
     val supportiveTherapies: ComplaintSupportiveTherapies
-
     val therapies get() = supportiveTherapies.therapies
 }
 
