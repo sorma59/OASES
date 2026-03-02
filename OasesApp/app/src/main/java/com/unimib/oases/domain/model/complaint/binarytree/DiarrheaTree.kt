@@ -8,7 +8,7 @@ class DiarrheaTree(val ageInYears: Int): Tree {
 
     val shockOrSevereDehydrationQuestion = "Are there signs of shock/severe dehydration (lethargic/unconscious, weak rapid pulse, cold extremities, capillary refill > 3 sec, hypotension, unable to drink)?"
 
-    val moderateDehydrationQuestion = "Are there signs of moderate dehydration (restless/irritable, sunken eyes and fontanels, skin pinch returns slowly, reduced urine output, drinks eagerly)?"
+    val someDehydrationQuestion = "Are there signs of some dehydration (restless/irritable, sunken eyes and fontanels, skin pinch returns slowly, reduced urine output, drinks eagerly)?"
 
     val malnutritionQuestion = "Is the patient malnourished?"
 
@@ -71,7 +71,7 @@ class DiarrheaTree(val ageInYears: Int): Tree {
         """.trimIndent()
         )
 
-    val moderateDehydrationAndMalnutritionImmediateTreatment = ImmediateTreatment(
+    val someDehydrationAndMalnutritionImmediateTreatment = ImmediateTreatment(
         """
             This is a high-risk patient with moderate dehydration and malnutrition.
             Rapidly perform the following actions:
@@ -82,7 +82,7 @@ class DiarrheaTree(val ageInYears: Int): Tree {
         """.trimIndent()
     )
 
-    val moderateDehydrationWithoutMalnutritionAndFiveYearsOldOrOlderImmediateTreatment = ImmediateTreatment(
+    val someDehydrationWithoutMalnutritionAndFiveYearsOldOrOlderImmediateTreatment = ImmediateTreatment(
         """
             This is a patient with moderate dehydration. Perform the following actions:
                 - give ORS 50 ml/kg in the first 4 hours. Initially, adults can take up to 750 ml ORS/hour (3 L in 4 hours)
@@ -90,7 +90,7 @@ class DiarrheaTree(val ageInYears: Int): Tree {
         """.trimIndent()
     )
 
-    val moderateDehydrationWithoutMalnutritionAndYoungerThanFiveYearsOldImmediateTreatment =
+    val someDehydrationWithoutMalnutritionAndYoungerThanFiveYearsOldImmediateTreatment =
         ImmediateTreatment(
             """
             This is a patient with moderate dehydration. Perform the following actions:
@@ -117,16 +117,16 @@ class DiarrheaTree(val ageInYears: Int): Tree {
         shockOrSevereDehydrationWithoutMalnutritionAndYoungerThanFiveYearsOldImmediateTreatment
     )
 
-    val moderateDehydrationAndMalnutritionLeaf = LeafNode(
-        moderateDehydrationAndMalnutritionImmediateTreatment
+    val someDehydrationAndMalnutritionLeaf = LeafNode(
+        someDehydrationAndMalnutritionImmediateTreatment
     )
 
-    val moderateDehydrationWithoutMalnutritionAndFiveYearsOldOrOlderLeaf = LeafNode(
-        moderateDehydrationWithoutMalnutritionAndFiveYearsOldOrOlderImmediateTreatment
+    val someDehydrationWithoutMalnutritionAndFiveYearsOldOrOlderLeaf = LeafNode(
+        someDehydrationWithoutMalnutritionAndFiveYearsOldOrOlderImmediateTreatment
     )
 
-    val moderateDehydrationWithoutMalnutritionAndYoungerThanFiveYearsOldLeaf = LeafNode(
-        moderateDehydrationWithoutMalnutritionAndYoungerThanFiveYearsOldImmediateTreatment
+    val someDehydrationWithoutMalnutritionAndYoungerThanFiveYearsOldLeaf = LeafNode(
+        someDehydrationWithoutMalnutritionAndYoungerThanFiveYearsOldImmediateTreatment
     )
 
     val noShockNorSevereDehydrationAndNoMalnutritionLeaf = LeafNode(
@@ -135,10 +135,10 @@ class DiarrheaTree(val ageInYears: Int): Tree {
 
       // Internal nodes
 
-    val moderateDehydrationWithoutMalnutritionNode = AutoNode(
+    val someDehydrationWithoutMalnutritionNode = AutoNode(
         children = Children(
-            left = moderateDehydrationWithoutMalnutritionAndFiveYearsOldOrOlderLeaf,
-            right = moderateDehydrationWithoutMalnutritionAndYoungerThanFiveYearsOldLeaf
+            left = someDehydrationWithoutMalnutritionAndFiveYearsOldOrOlderLeaf,
+            right = someDehydrationWithoutMalnutritionAndYoungerThanFiveYearsOldLeaf
         ),
         predicate = {
             ageInYears >= 5
@@ -155,11 +155,11 @@ class DiarrheaTree(val ageInYears: Int): Tree {
         }
     )
 
-    val moderateDehydrationNode = ManualNode(
+    val someDehydrationNode = ManualNode(
         value = malnutritionQuestion,
         children = Children(
-            left = moderateDehydrationAndMalnutritionLeaf,
-            right = moderateDehydrationWithoutMalnutritionNode
+            left = someDehydrationAndMalnutritionLeaf,
+            right = someDehydrationWithoutMalnutritionNode
         )
     )
 
@@ -172,9 +172,9 @@ class DiarrheaTree(val ageInYears: Int): Tree {
     )
 
     val noShockNorSevereDehydrationNode = ManualNode(
-        value = moderateDehydrationQuestion,
+        value = someDehydrationQuestion,
         children = Children(
-            left = moderateDehydrationNode,
+            left = someDehydrationNode,
             right = noShockNorSevereDehydrationAndNoMalnutritionLeaf
         )
     )
