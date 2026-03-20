@@ -1,8 +1,6 @@
 package com.unimib.oases.domain.model.complaint
 
-class DiarrheaDefinitiveTherapies(
-    complaintId: ComplaintId
-): ComplaintDefinitiveTherapies {
+object DiarrheaDefinitiveTherapies: ComplaintDefinitiveTherapies {
     override val definitiveTherapies = setOf(
         DefinitiveTherapy.BacterialInfection,
         DefinitiveTherapy.CholeraInfection,
@@ -10,9 +8,9 @@ class DiarrheaDefinitiveTherapies(
         DefinitiveTherapy.GiardiaInfection,
         DefinitiveTherapy.CryptosporidiumInfection,
         DefinitiveTherapy.IntestinalWorms,
-        DefinitiveTherapy.Malaria(complaintId),
+        DefinitiveTherapy.Malaria(ComplaintId.DIARRHEA),
         DefinitiveTherapy.ToxicMegacolonOrIntestinalObstruction,
-        DefinitiveTherapy.HIVInfection(complaintId),
+        DefinitiveTherapy.HIVInfection(ComplaintId.DIARRHEA),
         DefinitiveTherapy.HemolyticUremicSyndrome,
         DefinitiveTherapy.LowHemoglobin,
         DefinitiveTherapy.DiarrheaHighRiskPatientHospitalization
