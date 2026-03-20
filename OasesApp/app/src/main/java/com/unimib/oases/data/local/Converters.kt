@@ -5,7 +5,7 @@ import androidx.room.TypeConverter
 import com.unimib.oases.domain.model.QuestionAndAnswer
 import com.unimib.oases.domain.model.complaint.ImmediateTreatment
 import com.unimib.oases.domain.model.complaint.LabelledTest
-import com.unimib.oases.domain.model.complaint.SupportiveTherapyText
+import com.unimib.oases.domain.model.complaint.TherapyText
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.time.LocalDate
@@ -63,13 +63,13 @@ object Converters {
     }
 
     @TypeConverter
-    fun fromSupportiveTherapyTextListToString(list: List<SupportiveTherapyText>): String {
+    fun fromSupportiveTherapyTextListToString(list: List<TherapyText>): String {
         return list.joinToString(separator = "_")
     }
 
     @TypeConverter
-    fun fromStringToSupportiveTherapyTextList(string: String): List<SupportiveTherapyText> {
-        return if (string.isBlank()) emptyList() else string.split("_").map{ SupportiveTherapyText("G$it") }
+    fun fromStringToSupportiveTherapyTextList(string: String): List<TherapyText> {
+        return if (string.isBlank()) emptyList() else string.split("_").map{ TherapyText("G$it") }
     }
 
     @TypeConverter

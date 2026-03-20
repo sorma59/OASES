@@ -13,7 +13,7 @@ object DiarrheaSupportiveTherapies: ComplaintSupportiveTherapies {
 }
 
 data object DiarrheaWithFeverOrPain: SupportiveTherapy(
-    SupportiveTherapyText("""
+    TherapyText("""
         If fever or pain are present, give paracetamol.
           - IV paracetamol dosage: 1 gr in 100 of normal saline (children: 15 mg/kg)
           - oral paracetamol dosage: 1 gr (children: 15 mg/kg or 7.5mg/kg if < 10 kg)) maximum 3 times/day
@@ -26,14 +26,14 @@ data object DiarrheaWithFeverOrPain: SupportiveTherapy(
 )
 
 data object DiarrheaWithConvulsions: SupportiveTherapy(
-    SupportiveTherapyText("If convulsions are present, do not restrain the patient or put anything in the mouth, position the patient in recovery position and give O2 if SpO2 < 90%. Promptly check RBS and temperature."),
+    TherapyText("If convulsions are present, do not restrain the patient or put anything in the mouth, position the patient in recovery position and give O2 if SpO2 < 90%. Promptly check RBS and temperature."),
     { symptoms: Set<Symptom> ->
         symptoms.contains(Symptom.Convulsions)
     }
 )
 
 data object DiarrheaWithHypoglycemia: SupportiveTherapy(
-    SupportiveTherapyText("""
+    TherapyText("""
         If hypoglycemia is present (RBS < 2.5 mmol/L in a well-nourished or < 3 mmol/L in a severely malnourished child), give rapidly IV glucose:
           - Adults: D50% 1 ml/kg IV, check RBG after 15 min, repeat if low
           - Children: D10% 5 ml/kg IV, check RBG after 15 min, repeat if low

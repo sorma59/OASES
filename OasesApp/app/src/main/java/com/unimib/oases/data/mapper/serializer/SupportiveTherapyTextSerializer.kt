@@ -1,13 +1,13 @@
 package com.unimib.oases.data.mapper.serializer
 
-import com.unimib.oases.domain.model.complaint.SupportiveTherapyText
+import com.unimib.oases.domain.model.complaint.TherapyText
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
 object SupportiveTherapyTextSerializer {
 
-    fun serialize(supportiveTherapyText: SupportiveTherapyText): ByteArray {
-        val textBytes = supportiveTherapyText.text.toByteArray()
+    fun serialize(therapyText: TherapyText): ByteArray {
+        val textBytes = therapyText.text.toByteArray()
 
         val buffer = ByteBuffer
             .allocate(4 + textBytes.size)
@@ -18,12 +18,12 @@ object SupportiveTherapyTextSerializer {
         return buffer.array()
     }
 
-    fun deserialize(bytes: ByteArray): SupportiveTherapyText {
+    fun deserialize(bytes: ByteArray): TherapyText {
         val buffer = ByteBuffer.wrap(bytes)
 
         val text = buffer.readString()
 
-        return SupportiveTherapyText(text)
+        return TherapyText(text)
     }
 
 }

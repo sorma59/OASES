@@ -3,7 +3,7 @@ package com.unimib.oases.domain.model.complaint
 import com.unimib.oases.domain.model.symptom.Symptom
 
 sealed class SupportiveTherapy(
-    val therapy: SupportiveTherapyText,
+    val therapy: TherapyText,
     val predicate: (Set<Symptom>) -> Boolean
 ){
     val text: String
@@ -11,7 +11,7 @@ sealed class SupportiveTherapy(
 }
 
 @JvmInline
-value class SupportiveTherapyText(val text: String) {
+value class TherapyText(val text: String) {
     override fun toString(): String = text
 }
 

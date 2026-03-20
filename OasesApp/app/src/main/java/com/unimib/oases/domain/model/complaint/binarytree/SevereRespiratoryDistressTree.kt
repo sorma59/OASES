@@ -1,6 +1,7 @@
 package com.unimib.oases.domain.model.complaint.binarytree
 
 import com.unimib.oases.domain.model.complaint.ImmediateTreatment
+import com.unimib.oases.domain.model.symptom.Symptom
 
 data object SevereRespiratoryDistressTree: Tree {
 
@@ -37,7 +38,8 @@ data object SevereRespiratoryDistressTree: Tree {
         children = Children(
             left = severeRespiratoryDistressLeaf,
             right = noSevereRespiratoryDistressLeaf
-        )
+        ),
+        symptoms = setOf(Symptom.DyspneaSevereRespiratoryDistress)
     )
 
 }

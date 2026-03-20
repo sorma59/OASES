@@ -269,6 +269,16 @@ sealed interface Symptom {
 
     //---------------------------------------------------
 
+    data object DiarrheaShockOrSevereDehydration: Symptom {
+        override val symptomId = SymptomId.DiarrheaShockOrSevereDehydration
+        override val label = ""
+    }
+
+    data object DiarrheaMalnourishment: Symptom {
+        override val symptomId = SymptomId.DiarrheaMalnourishment
+        override val label = ""
+    }
+
     data object DiarrheaInTheLastOneToSevenDays: Symptom, DiarrheaDuration {
         override val symptomId = SymptomId.DiarrheaInTheLastOneToSevenDaysId
         override val label = "1-7 days"
@@ -321,6 +331,20 @@ sealed interface Symptom {
     }
 
     // Dyspnea
+    data object DyspneaSevereRespiratoryDistress: Symptom {
+        override val symptomId = SymptomId.DyspneaSevereRespiratoryDistressId
+        override val label = ""
+    }
+
+    data object DyspneaAirwayObstruction: Symptom {
+        override val symptomId = SymptomId.DyspneaAirwayObstructionId
+        override val label = ""
+    }
+
+    data object DyspneaWheezing: Symptom {
+        override val symptomId = SymptomId.DyspneaWheezingId
+        override val label = ""
+    }
 
     data object DyspneaInTheLastOneToSevenDays: Symptom, DyspneaDuration {
         override val symptomId = SymptomId.DyspneaInTheLastOneToSevenDaysId
@@ -378,6 +402,11 @@ sealed interface Symptom {
     }
 
     // Seizures-Coma
+
+    data object SeizuresOrComaPregnancyBeyondTwentyWeeks: Symptom {
+        override val symptomId = SymptomId.SeizuresOrComaPregnancyBeyondTwentyWeeksId
+        override val label = ""
+    }
 
     data object AlertLevelOfConsciousness: Symptom, SeizuresOrComaConsciousness {
         override val symptomId = SymptomId.AlertLevelOfConsciousnessId
@@ -786,6 +815,9 @@ sealed class SymptomId (
     //---------------------------------------------------------------
 
     // Diarrhea
+    object DiarrheaShockOrSevereDehydration: SymptomId(snakeCase("diarrhea_shock_or_severe_dehydration"))
+    object DiarrheaMalnourishment: SymptomId(snakeCase("diarrhea_malnourishment"))
+
     object DiarrheaInTheLastOneToSevenDaysId: SymptomId(snakeCase("diarrhea_in_the_last_one_to_seven_days"))
     object DiarrheaInTheLastEightToFourteenDaysId: SymptomId(snakeCase("diarrhea_in_the_last_eight_to_fourteen_days"))
     object DiarrheaInTheLastFifteenToThirtyDaysId: SymptomId(snakeCase("diarrhea_in_the_last_fifteen_to_thirty_days"))
@@ -800,6 +832,9 @@ sealed class SymptomId (
     object DiarrheaOilyOrGreasyOrFoulSmellingStoolsId: SymptomId(snakeCase("diarrhea_oily_or_greasy_or_foul_smelling_stools"))
 
     // Dyspnea
+    object DyspneaSevereRespiratoryDistressId: SymptomId(snakeCase("dyspnea_severe_respiratory_distress"))
+    object DyspneaAirwayObstructionId: SymptomId(snakeCase("dyspnea_airway_obstruction"))
+    object DyspneaWheezingId: SymptomId(snakeCase("dyspnea_wheezing"))
     object DyspneaInTheLastOneToSevenDaysId: SymptomId(snakeCase("dyspnea_in_the_last_one_to_seven_days"))
     object DyspneaInTheLastEightToFourteenDaysId: SymptomId(snakeCase("dyspnea_in_the_last_eight_to_fourteen_days"))
     object DyspneaInTheLastFifteenToThirtyDaysId: SymptomId(snakeCase("dyspnea_in_the_last_fifteen_to_thirty_days"))
@@ -815,6 +850,8 @@ sealed class SymptomId (
     object DyspneaParoxysmalCoughWithWhoopsOrCentralCyanosisOrVomitingId: SymptomId(snakeCase("dyspnea_paroxysmal_cough_with_whoops_or_central_cyanosis_or_vomiting"))
 
     // Seizures-Coma
+    object SeizuresOrComaPregnancyBeyondTwentyWeeksId: SymptomId(snakeCase("seizures_or_coma_pregnancy_beyond_twenty_weeks"))
+
     object AlertLevelOfConsciousnessId: SymptomId(snakeCase("alert_level_of_consciousness"))
     object ResponsiveToVoiceLevelOfConsciousnessId: SymptomId(snakeCase("responsive_to_voice_level_of_consciousness"))
     object ResponsiveToPainLevelOfConsciousnessId: SymptomId(snakeCase("responsive_to_pain_level_of_consciousness"))

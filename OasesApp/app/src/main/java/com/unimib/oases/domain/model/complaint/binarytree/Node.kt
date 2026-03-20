@@ -1,6 +1,7 @@
 package com.unimib.oases.domain.model.complaint.binarytree
 
 import com.unimib.oases.domain.model.complaint.ImmediateTreatment
+import com.unimib.oases.domain.model.symptom.Symptom
 import com.unimib.oases.ui.screen.medical_visit.maincomplaint.ImmediateTreatmentQuestionState
 
 fun ManualNode.next(boolean: Boolean): ShowableNode {
@@ -54,12 +55,12 @@ data class AutoNode(
 // Internal node that needs the user input
 data class ManualNode(
     override val value: String,
-    override val children: Children
+    override val children: Children,
+    val symptoms: Set<Symptom> = emptySet()
 ) : InternalNode, ShowableNode
 
 // Leaf node: therapy suggested
 data class LeafNode(
     override val value: ImmediateTreatment?,
-    override val children: Nothing? = null
+    override val children: Nothing? = null,
 ) : Node, ShowableNode
-

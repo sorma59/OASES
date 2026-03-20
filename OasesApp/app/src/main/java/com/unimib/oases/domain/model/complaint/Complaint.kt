@@ -24,6 +24,8 @@ sealed interface Complaint {
     val tests: ComplaintTests
     val supportiveTherapies: ComplaintSupportiveTherapies
     val therapies get() = supportiveTherapies.therapies
+    val findings: ComplaintFindings
+    val definitiveTherapies: ComplaintDefinitiveTherapies
 }
 
 enum class ComplaintId(val value: SnakeCaseString, val label: String) {
@@ -54,6 +56,14 @@ interface ComplaintTests {
 
 interface ComplaintSupportiveTherapies {
     val therapies: List<SupportiveTherapy>
+}
+
+interface ComplaintFindings {
+    val findings: Set<Finding>
+}
+
+interface ComplaintDefinitiveTherapies {
+    val definitiveTherapies: Set<DefinitiveTherapy>
 }
 
 sealed interface Question {

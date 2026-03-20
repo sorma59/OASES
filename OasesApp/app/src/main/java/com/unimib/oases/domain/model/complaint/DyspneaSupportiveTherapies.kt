@@ -15,7 +15,7 @@ object DyspneaSupportiveTherapies: ComplaintSupportiveTherapies {
 }
 
 data object DyspneaWithFeverOrPain: SupportiveTherapy(
-    SupportiveTherapyText("""
+    TherapyText("""
         If fever or pain are present, give paracetamol
           - IV paracetamol dosage: 1 gr in 100 of normal saline (children: 15 mg/kg)
           - oral paracetamol dosage: 1 gr (children: 15 mg/kg or 7.5mg/kg if >10 kg) maximum 3 times/day
@@ -28,7 +28,7 @@ data object DyspneaWithFeverOrPain: SupportiveTherapy(
 )
 
 data object DyspneaWithConvulsions: SupportiveTherapy(
-    SupportiveTherapyText("""
+    TherapyText("""
         If convulsions are present, do not restrain the patient or put anything in the mouth, position the patient in recovery position and give O2 if SpO2 < 90%. Promptly check RBS and temperature.
 
         If convulsions are prolonged (> 5 min) or repeated (≥ 2 discrete seizure without complete recovery of consciousness), give diazepam:
@@ -55,7 +55,7 @@ data object DyspneaWithConvulsions: SupportiveTherapy(
 )
 
 data object DyspneaWithHypoglycemia: SupportiveTherapy(
-    SupportiveTherapyText("""
+    TherapyText("""
         If hypoglycemia is present (RBS < 2.5 mmol/L in a well-nourished or < 3 mmol/L in a severely malnourished child), give rapidly IV glucose:
           - Adults: D50% 1 ml/kg IV, check RBG after 15 min, repeat if low
           - Children: D10% 5 ml/kg IV, check RBG after 15 min, repeat if low
@@ -70,7 +70,7 @@ data object DyspneaWithHypoglycemia: SupportiveTherapy(
 )
 
 data object DyspneaWithHypotensionOrShock: SupportiveTherapy(
-    SupportiveTherapyText("If hypotension / signs of shock are present without signs of volume overload and without severe malnutrition, set 2 large bore IV lines and infuse IV fluids (Ringer's lactate or Normal Saline 0.9%) 20 ml/kg boluses (up to 1 L in adults) in 30 min according to response (repeat up to 2 times).Monitor closely for worsening signs of fluid overload (increasing respiratory rate or heart rate, worsening difficulty breathing, inability to lie flat and increasing crackles in the chest and peripheral edema): stop IV fluids if any of these signs develop."),
+    TherapyText("If hypotension / signs of shock are present without signs of volume overload and without severe malnutrition, set 2 large bore IV lines and infuse IV fluids (Ringer's lactate or Normal Saline 0.9%) 20 ml/kg boluses (up to 1 L in adults) in 30 min according to response (repeat up to 2 times).Monitor closely for worsening signs of fluid overload (increasing respiratory rate or heart rate, worsening difficulty breathing, inability to lie flat and increasing crackles in the chest and peripheral edema): stop IV fluids if any of these signs develop."),
     { symptoms: Set<Symptom> ->
         symptoms.contains(Symptom.Shock)
         || symptoms.contains(Symptom.Hypotension)
@@ -78,7 +78,7 @@ data object DyspneaWithHypotensionOrShock: SupportiveTherapy(
 )
 
 data object DyspneaWithHypertensiveEmergency: SupportiveTherapy(
-    SupportiveTherapyText("If hypertensive emergency (BP > 180/110 mmHg with symptoms and acute life threatening complications, eg. pulmonary edema): give hydralazine 10 mg IV over 20 minutes. Check blood pressure regularly, repeat dose after 20-30 minutes if necessary"),
+    TherapyText("If hypertensive emergency (BP > 180/110 mmHg with symptoms and acute life threatening complications, eg. pulmonary edema): give hydralazine 10 mg IV over 20 minutes. Check blood pressure regularly, repeat dose after 20-30 minutes if necessary"),
     { symptoms: Set<Symptom> ->
         symptoms.contains(Symptom.HypertensiveEmergency)
     }

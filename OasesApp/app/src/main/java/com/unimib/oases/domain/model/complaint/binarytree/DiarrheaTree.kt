@@ -1,6 +1,7 @@
 package com.unimib.oases.domain.model.complaint.binarytree
 
 import com.unimib.oases.domain.model.complaint.ImmediateTreatment
+import com.unimib.oases.domain.model.symptom.Symptom
 
 class DiarrheaTree(val ageInYears: Int): Tree {
 
@@ -168,7 +169,8 @@ class DiarrheaTree(val ageInYears: Int): Tree {
         children = Children(
             left = shockOrSevereDehydrationAndMalnutritionLeaf,
             right = shockOrSevereDehydrationWithoutMalnutritionNode
-        )
+        ),
+        symptoms = setOf(Symptom.DiarrheaMalnourishment)
     )
 
     val noShockNorSevereDehydrationNode = ManualNode(
@@ -184,6 +186,7 @@ class DiarrheaTree(val ageInYears: Int): Tree {
         children = Children(
             left = shockOrSevereDehydrationNode,
             right = noShockNorSevereDehydrationNode
-        )
+        ),
+        symptoms = setOf(Symptom.DiarrheaShockOrSevereDehydration)
     )
 }

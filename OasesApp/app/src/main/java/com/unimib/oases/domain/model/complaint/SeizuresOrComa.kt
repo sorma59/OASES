@@ -15,4 +15,6 @@ class SeizuresOrComa(
     override val details = SeizuresOrComaDetails
     override val tests = SeizuresOrComaTests
     override val supportiveTherapies = SeizuresOrComaSupportiveTherapies
+    override val findings = SeizuresOrComaFindings
+    override val definitiveTherapies = SeizuresOrComaDefinitiveTherapies
 }

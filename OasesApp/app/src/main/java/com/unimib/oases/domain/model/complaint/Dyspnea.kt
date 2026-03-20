@@ -14,4 +14,6 @@ data object Dyspnea: Complaint {
     override val details = DyspneaDetails
     override val tests = DyspneaTests
     override val supportiveTherapies = DyspneaSupportiveTherapies
+    override val findings = DyspneaFindings
+    override val definitiveTherapies = DyspneaDefinitiveTherapies
 }
