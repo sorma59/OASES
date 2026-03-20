@@ -244,7 +244,7 @@ class MainComplaintViewModel @Inject constructor(
         try {
             _state.update {
                 it.copy(
-                    symptoms = _state.value.symptoms + translateLatestVitalSignsToSymptomsUseCase(state.value.patientId)
+                    symptoms = it.symptoms + translateLatestVitalSignsToSymptomsUseCase(it.patientId)
                 )
             }
         } catch (e: Exception) {

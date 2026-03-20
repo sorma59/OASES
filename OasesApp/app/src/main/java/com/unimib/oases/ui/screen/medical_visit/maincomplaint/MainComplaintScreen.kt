@@ -178,13 +178,13 @@ private fun SupportiveTherapies(
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ){
-        state.supportiveTherapies?.let {
+        state.supportiveTherapies?.let { supportiveTherapies ->
 
-            if (it.isNotEmpty()){
+            if (supportiveTherapies.isNotEmpty()){
                 TitleText("Supportive therapies", fontSize = 18)
                 HorizontalDivider(thickness = 0.8.dp)
-                for (supportiveTherapy in it) {
-                    Text(supportiveTherapy.text)
+                supportiveTherapies.forEach {
+                    Text(it.text)
                     HorizontalDivider(thickness = 0.8.dp)
                 }
             } else
@@ -225,11 +225,11 @@ private fun Tests(
     ){
         if (state.conditions.isNotEmpty()){
             TitleText("Suggested tests (flag if you do order)")
-            for (condition in state.conditions) {
+            state.conditions.forEach { condition ->
                 Column{
                     TitleText(condition.label, fontSize = 18)
                     Column(verticalArrangement =  Arrangement.spacedBy(8.dp)){
-                        for (labelledTest in condition.suggestedTests) {
+                        condition.suggestedTests.forEach { labelledTest ->
                             LabeledCheckbox(
                                 label = labelledTest.label,
                                 checked = isChecked(labelledTest),
@@ -271,7 +271,7 @@ private fun DetailsQuestions(
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        for (question in state.detailsQuestions.take(state.detailsQuestionsToShow)) {
+        state.detailsQuestions.take(state.detailsQuestionsToShow).forEach { question ->
             when(question){
                 is MultipleChoiceComplaintQuestion -> {
                     MultipleChoiceQuestion(
@@ -317,11 +317,10 @@ private fun ImmediateTreatmentQuestions(
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         )  {
-            for ((index, algorithm) in algorithms.withIndex()) {
+            algorithms.forEachIndexed { index, algorithm ->
                 if (index <= state.immediateTreatmentQuestions.size) // Somewhat defensive
                     Column{
-                        for ((node, answer) in state.immediateTreatmentQuestions.elementAt(index)) {
-
+                        state.immediateTreatmentQuestions.elementAt(index).forEach { (node, answer) ->
                             YesOrNoQuestion(
                                 question = node.value,
                                 onAnswer = {
@@ -402,7 +401,7 @@ private fun SingleChoiceQuestion(
     Column{
         TitleText(question.question)
 
-        for ((index, option) in question.options.withIndex()) {
+        question.options.forEachIndexed { index, option ->
             LabeledRadioButton(
                 label = { Text(text = labels[index]) },
                 selected = isSelected(option),
@@ -421,7 +420,7 @@ private fun MultipleChoiceQuestion(
     Column{
         TitleText(question.question)
 
-        for (symptom in question.options) {
+        question.options.forEach { symptom ->
             LabeledCheckbox(
                 label = symptom.label,
                 checked = isChecked(symptom),
