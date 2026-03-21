@@ -205,6 +205,17 @@ class PatientDashboardViewModel @Inject constructor(
                     )
                 }
 
+                is PatientDashboardAction.CurrentVisit -> {
+                    navigationEventsChannel.send(
+                        Navigate(
+                            action.createRoute(
+                                state.value.patientId,
+                                state.value.visitId
+                            )
+                        )
+                    )
+                }
+
                 is PatientDashboardAction.Send -> {
                     navigationEventsChannel.send(
                         Navigate(

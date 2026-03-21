@@ -1,4 +1,4 @@
-package com.unimib.oases.ui.screen.medical_visit.maincomplaint
+package com.unimib.oases.ui.screen.medical_visit.initial_medical_evaluation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,12 +19,10 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -39,65 +37,58 @@ import com.unimib.oases.ui.components.input.LabeledRadioButton
 import com.unimib.oases.ui.components.util.TitleText
 import com.unimib.oases.ui.components.util.button.RetryButton
 import com.unimib.oases.ui.components.util.effect.HandleNavigationEvents
+import com.unimib.oases.ui.components.util.effect.HandleUiEvents
 import com.unimib.oases.ui.components.util.loading.LoadingOverlay
-import com.unimib.oases.ui.screen.medical_visit.maincomplaint.MainComplaintEvent.SymptomSelected
+import com.unimib.oases.ui.screen.medical_visit.initial_medical_evaluation.EvaluationEvent.SymptomSelected
 import com.unimib.oases.ui.screen.root.AppViewModel
-import com.unimib.oases.ui.util.ToastUtils
 
 @Composable
-fun MainComplaintScreen(
+fun EvaluationScreen(
     appViewModel: AppViewModel
 ){
 
-    val viewModel: MainComplaintViewModel = hiltViewModel()
+    val viewModel: EvaluationViewModel = hiltViewModel()
 
     val state by viewModel.state.collectAsState()
 
     val additionalTestsText by viewModel.additionalTestsText.collectAsState()
 
-    val context = LocalContext.current
-
     HandleNavigationEvents(viewModel.navigationEvents, appViewModel)
 
-    LaunchedEffect(state.toastMessage){
-        state.toastMessage?.let {
-            ToastUtils.showToast(context, it)
-        }
-        viewModel.onEvent(MainComplaintEvent.ToastShown)
-    }
+    HandleUiEvents(viewModel.uiEvents, appViewModel)
 
     LoadingOverlay(state.isLoading)
 
-    MainComplaintContent(state, { additionalTestsText }, viewModel::onEvent)
+    EvaluationContent(state, { additionalTestsText }, viewModel::onEvent)
 }
 
 @Composable
-private fun MainComplaintContent(
-    state: MainComplaintState,
+private fun EvaluationContent(
+    state: EvaluationState,
     additionalTestsText: () -> String,
-    onEvent: (MainComplaintEvent) -> Unit
+    onEvent: (EvaluationEvent) -> Unit
 ) {
     val scrollState = rememberScrollState()
 
     val onAdditionalTestsChanged: (String) -> Unit = {
         onEvent(
-            MainComplaintEvent.AdditionalTestsTextChanged(it)
+            EvaluationEvent.AdditionalTestsTextChanged(it)
         )
     }
 
     val onCheckedChange: (LabelledTest) -> Unit = {
         onEvent(
-            MainComplaintEvent.TestSelected(it)
+            EvaluationEvent.TestSelected(it)
         )
     }
 
     val isChecked: (LabelledTest) -> Boolean = { state.requestedTests.contains(it) }
 
     val onGenerateTestsPressed: () -> Unit = {
-        onEvent(MainComplaintEvent.GenerateTestsPressed)
+        onEvent(EvaluationEvent.GenerateTestsPressed)
     }
 
-    val onSubmit = { onEvent(MainComplaintEvent.SubmitPressed) }
+    val onSubmit = { onEvent(EvaluationEvent.SubmitPressed) }
 
     state.error?.let {
         Box(
@@ -105,7 +96,7 @@ private fun MainComplaintContent(
         ) {
             RetryButton(
                 error = it,
-                onClick = { onEvent(MainComplaintEvent.RetryButtonClicked) }
+                onClick = { onEvent(EvaluationEvent.RetryButtonClicked) }
             )
         }
     } ?: Column(
@@ -173,7 +164,7 @@ private fun SubmitButton(
 
 @Composable
 private fun SupportiveTherapies(
-    state: MainComplaintState
+    state: EvaluationState
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -214,7 +205,7 @@ private fun GenerateTestsButton(
 
 @Composable
 private fun Tests(
-    state: MainComplaintState,
+    state: EvaluationState,
     isChecked: (LabelledTest) -> Boolean,
     onCheckedChange: (LabelledTest) -> Unit,
     additionalTestsText: () -> String,
@@ -264,8 +255,8 @@ private fun AdditionalTests(
 
 @Composable
 private fun DetailsQuestions(
-    state: MainComplaintState,
-    onEvent: (MainComplaintEvent) -> Unit
+    state: EvaluationState,
+    onEvent: (EvaluationEvent) -> Unit
 ) {
 
     Column(
@@ -304,8 +295,8 @@ private fun DetailsQuestions(
 
 @Composable
 private fun ImmediateTreatmentQuestions(
-    state: MainComplaintState,
-    onEvent: (MainComplaintEvent) -> Unit,
+    state: EvaluationState,
+    onEvent: (EvaluationEvent) -> Unit,
     readOnly: Boolean = false
 ) {
     state.complaint?.let {
@@ -324,7 +315,7 @@ private fun ImmediateTreatmentQuestions(
                             YesOrNoQuestion(
                                 question = node.value,
                                 onAnswer = {
-                                    onEvent(MainComplaintEvent.NodeAnswered(it, node, algorithm))
+                                    onEvent(EvaluationEvent.NodeAnswered(it, node, algorithm))
                                 },
                                 enabled = !readOnly,
                                 answer = answer

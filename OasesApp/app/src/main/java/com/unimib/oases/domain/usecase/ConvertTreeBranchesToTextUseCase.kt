@@ -1,7 +1,7 @@
 package com.unimib.oases.domain.usecase
 
 import com.unimib.oases.domain.model.QuestionAndAnswer
-import com.unimib.oases.ui.screen.medical_visit.maincomplaint.ImmediateTreatmentQuestionState
+import com.unimib.oases.ui.screen.medical_visit.initial_medical_evaluation.ImmediateTreatmentQuestionState
 import javax.inject.Inject
 
 class ConvertTreeBranchesToTextUseCase @Inject constructor(

@@ -1,7 +1,9 @@
 package com.unimib.oases.domain.model.complaint
 
 import com.unimib.oases.domain.model.complaint.binarytree.Tree
+import com.unimib.oases.domain.model.symptom.PatientCategory
 import com.unimib.oases.domain.model.symptom.Symptom
+import com.unimib.oases.ui.screen.nurse_assessment.demographics.Sex
 import com.unimib.oases.util.StringFormatHelper.SnakeCaseString
 import com.unimib.oases.util.StringFormatHelper.snakeCase
 
@@ -26,6 +28,34 @@ sealed interface Complaint {
     val therapies get() = supportiveTherapies.therapies
     val findings: ComplaintFindings
     val definitiveTherapies: ComplaintDefinitiveTherapies
+
+    companion object {
+        fun getComplaint(
+            complaintId: String,
+            ageInMonths: Int,
+            sex: Sex,
+            patientCategory: PatientCategory,
+        ): Complaint? {
+
+            return when (complaintId) {
+                ComplaintId.DIARRHEA.id -> {
+                    Diarrhea(ageInMonths/12)
+                }
+
+                ComplaintId.DYSPNEA.id -> {
+                    Dyspnea
+                }
+
+                ComplaintId.SEIZURES_OR_COMA.id -> {
+                    SeizuresOrComa(sex, patientCategory)
+                }
+
+                else -> {
+                    null
+                }
+            }
+        }
+    }
 }
 
 enum class ComplaintId(val value: SnakeCaseString, val label: String) {

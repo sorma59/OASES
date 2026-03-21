@@ -1,4 +1,4 @@
-package com.unimib.oases.ui.screen.medical_visit.maincomplaint
+package com.unimib.oases.ui.screen.medical_visit.initial_medical_evaluation
 
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.domain.model.complaint.Complaint
@@ -24,8 +24,9 @@ fun List<ImmediateTreatmentQuestionState>.rebranch(
     return this.take(index) + ImmediateTreatmentQuestionState(node, answer)
 }
 
-data class MainComplaintState(
+data class EvaluationState(
     val patientId: String,
+    val visitId: String,
     val complaintId: String,
     val patient: Patient? = null,
     val complaint: Complaint? = null,
@@ -51,8 +52,7 @@ data class MainComplaintState(
     val shouldShowSubmitButton: Boolean = false,
 
     val isLoading: Boolean = false,
-    val toastMessage: String? = null,
-    val error: String? = null
+    val error: String? = null,
 ){
     val immediateTreatments : List<ImmediateTreatment?>
         get() = leaves.map { it?.value } +

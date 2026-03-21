@@ -2,25 +2,22 @@ package com.unimib.oases.domain.usecase
 
 import com.unimib.oases.domain.model.ComplaintSummary
 import com.unimib.oases.domain.model.symptom.Symptom
-import com.unimib.oases.ui.screen.medical_visit.maincomplaint.ImmediateTreatmentQuestionState
-import com.unimib.oases.ui.screen.medical_visit.maincomplaint.MainComplaintState
+import com.unimib.oases.ui.screen.medical_visit.initial_medical_evaluation.EvaluationState
+import com.unimib.oases.ui.screen.medical_visit.initial_medical_evaluation.ImmediateTreatmentQuestionState
 import javax.inject.Inject
 
 class BuildComplaintSummaryFromStateUseCase @Inject constructor(
-    private val getCurrentVisitUseCase: GetCurrentVisitUseCase,
     private val convertTreeBranchesToTextUseCase: ConvertTreeBranchesToTextUseCase
 ) {
 
-    suspend operator fun invoke(state: MainComplaintState): ComplaintSummary {
+    operator fun invoke(state: EvaluationState): ComplaintSummary {
         check(state.immediateTreatments.all { it != null }){
             "Answers are incomplete"
         }
         check(state.supportiveTherapies != null)
 
-        val visit = getCurrentVisitUseCase(state.patientId)
-
         return ComplaintSummary(
-            visitId = visit.id,
+            visitId = state.visitId,
             complaintId = state.complaintId,
             algorithmsQuestionsAndAnswers = convertTreeBranchesToTextUseCase(state.immediateTreatmentQuestions),
             symptoms = state.symptoms + state.immediateTreatmentQuestions.extractSymptomsFromAlgorithmQuestions(),

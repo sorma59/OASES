@@ -54,7 +54,10 @@ sealed class Route {
         val visitId: String
     ): Route()
     @Serializable
-    data class MedicalVisit(val patientId: String): Route()
+    data class MedicalVisit(
+        val patientId: String,
+        val visitId: String,
+    ): Route()
     @Serializable
     data class PatientDashboard(
         val patientId: String,
@@ -63,9 +66,16 @@ sealed class Route {
     @Serializable
     data class ViewPatientDetails(val patientId: String): Route()
     @Serializable
-    data class MainComplaint(
+    data class Evaluation(
         val patientId: String,
-        val mainComplaintId: String
+        val visitId: String,
+        val complaintId: String,
+    ): Route()
+    @Serializable
+    data class Reassessment(
+        val patientId: String,
+        val visitId: String,
+        val complaintId: String,
     ): Route()
     @Serializable
     data object DiseaseManagement: Route()

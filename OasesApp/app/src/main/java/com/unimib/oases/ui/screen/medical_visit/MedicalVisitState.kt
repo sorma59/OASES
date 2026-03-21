@@ -1,8 +1,12 @@
 package com.unimib.oases.ui.screen.medical_visit
 
-import com.unimib.oases.domain.model.symptom.Symptom
+import com.unimib.oases.domain.model.ComplaintSummary
 
 data class MedicalVisitState(
     val patientId: String,
-    val symptoms: Set<Symptom> = emptySet()
+    val visitId: String,
+    val complaintSummaries: Map<String, ComplaintSummary> = emptyMap(),
+
+    val isLoading: Boolean = false,
+    val error: String? = null,
 )

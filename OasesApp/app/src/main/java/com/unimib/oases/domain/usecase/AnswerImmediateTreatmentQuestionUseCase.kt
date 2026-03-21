@@ -5,14 +5,14 @@ import com.unimib.oases.domain.model.complaint.binarytree.ManualNode
 import com.unimib.oases.domain.model.complaint.binarytree.Tree
 import com.unimib.oases.domain.model.complaint.binarytree.next
 import com.unimib.oases.domain.model.complaint.binarytree.toImmediateTreatmentQuestionState
-import com.unimib.oases.ui.screen.medical_visit.maincomplaint.ImmediateTreatmentQuestionState
-import com.unimib.oases.ui.screen.medical_visit.maincomplaint.MainComplaintState
-import com.unimib.oases.ui.screen.medical_visit.maincomplaint.rebranch
+import com.unimib.oases.ui.screen.medical_visit.initial_medical_evaluation.EvaluationState
+import com.unimib.oases.ui.screen.medical_visit.initial_medical_evaluation.ImmediateTreatmentQuestionState
+import com.unimib.oases.ui.screen.medical_visit.initial_medical_evaluation.rebranch
 import com.unimib.oases.util.replaceAt
 import javax.inject.Inject
 
 class AnswerImmediateTreatmentQuestionUseCase @Inject constructor() {
-    operator fun invoke(answer: Boolean, node: ManualNode, tree: Tree, state: MainComplaintState): MainComplaintState{
+    operator fun invoke(answer: Boolean, node: ManualNode, tree: Tree, state: EvaluationState): EvaluationState{
         val nextNode = node.next(answer)
 
         val treeIndex = state.immediateTreatmentAlgorithms.indexOf(tree)
@@ -70,7 +70,7 @@ class AnswerImmediateTreatmentQuestionUseCase @Inject constructor() {
         }
     }
 
-    private fun getDetailsQuestion(state: MainComplaintState) = state.complaint!!.details.questions
+    private fun getDetailsQuestion(state: EvaluationState) = state.complaint!!.details.questions
 
     /**
      * Calculates the number of immediate treatment algorithms to show based on the current state and the answered tree.
@@ -80,10 +80,10 @@ class AnswerImmediateTreatmentQuestionUseCase @Inject constructor() {
      * Otherwise, it increments the number of trees to show, up to the total number of available algorithms.
      *
      * @param tree The immediate treatment algorithm (Tree) that was just answered.
-     * @param state The current [MainComplaintState] of the medical visit.
+     * @param state The current [EvaluationState] of the medical visit.
      * @return The updated number of immediate treatment algorithms to display.
      */
-    private fun calculateNumberOfTreesToShow(tree: Tree, state: MainComplaintState): Int {
+    private fun calculateNumberOfTreesToShow(tree: Tree, state: EvaluationState): Int {
         val treeOrdinal = state.immediateTreatmentAlgorithms.indexOf(tree) + 1
         return if (treeOrdinal != state.immediateTreatmentAlgorithmsToShow)
             state.immediateTreatmentAlgorithmsToShow
@@ -93,7 +93,7 @@ class AnswerImmediateTreatmentQuestionUseCase @Inject constructor() {
     }
 
     private fun updateImmediateTreatmentQuestions(
-        state: MainComplaintState,
+        state: EvaluationState,
         algorithmToEdit: Int,
         updatedList: List<ImmediateTreatmentQuestionState>,
         shouldShowNextAlgorithm: Boolean

@@ -5,12 +5,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -54,59 +56,98 @@ private fun MedicalVisitContent(
     ) {
         Spacer(Modifier.height(64.dp))
 
-        MainComplaintsGrid(onEvent)
+        MainComplaintsGrid(state, onEvent)
     }
 }
 
 @Composable
 private fun MainComplaintsGrid(
+    state: MedicalVisitState,
     onEvent: (MedicalVisitEvent) -> Unit
 ) {
-
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
-    ){
-
+    ) {
         TitleText("Choose a main complaint")
 
-        FlowRow(
+        LazyHorizontalGrid(
+            rows = GridCells.Fixed(2),
+            modifier = Modifier.height(340.dp), // Height for 2 rows of 160dp + spacing
+            contentPadding = PaddingValues(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            ComplaintId.entries.forEach {
-                MainComplaintBoxButton(it, onEvent)
+            // Interleaving Evaluation and Reassessment items for each complaint.
+            // In a LazyHorizontalGrid with Fixed(2) rows, items are placed vertically first.
+            ComplaintId.entries.forEach { complaint ->
+                item {
+                    EvaluationBoxButton(complaint, onEvent)
+                }
+                item {
+                    ReassessmentBoxButton(state, complaint, onEvent)
+                }
             }
         }
     }
 }
 
 @Composable
-private fun MainComplaintBoxButton(
+private fun EvaluationBoxButton(
     complaintId: ComplaintId,
-    onEvent: (MedicalVisitEvent) -> Unit
-
+    onEvent: (MedicalVisitEvent) -> Unit,
 ){
-    BoxButton(complaintId, onEvent)
+    BoxButton(complaintId, { true }) {
+        onEvent(
+            MedicalVisitEvent.EvaluationClicked(complaintId.id)
+        )
+    }
+}
+
+@Composable
+private fun ReassessmentBoxButton(
+    state: MedicalVisitState,
+    complaintId: ComplaintId,
+    onEvent: (MedicalVisitEvent) -> Unit,
+){
+    BoxButton(
+        complaintId,
+        isEnabled = {
+            state.complaintSummaries[complaintId.id] != null
+        }
+    ) {
+        onEvent(
+            MedicalVisitEvent.ReassessmentClicked(complaintId.id)
+        )
+    }
 }
 
 @Composable
 private fun BoxButton(
     complaintId: ComplaintId,
-    onEvent: (MedicalVisitEvent) -> Unit
+    isEnabled: () -> Boolean,
+    onClick: () -> Unit,
 ) {
     Box(
         modifier = Modifier
-            .size(128.dp)
+            .size(160.dp)
             .clip(RoundedCornerShape(16.dp))
-            .background(MaterialTheme.colorScheme.primaryContainer)
+            .background(
+                if (isEnabled())
+                    MaterialTheme.colorScheme.primaryContainer
+                else
+                    MaterialTheme.colorScheme.primaryContainer.copy(0.38f)
+            )
             .padding(4.dp)
-            .clickable {
-                onEvent(
-                    MedicalVisitEvent.ComplaintClicked(complaintId.id)
-                )
-            }
+            .clickable { if (isEnabled()) onClick() }
     ) {
-        CenteredTextInBox(complaintId.label, 20.sp, MaterialTheme.colorScheme.onPrimaryContainer)
+        CenteredTextInBox(
+            complaintId.label,
+            20.sp,
+            if (isEnabled())
+                MaterialTheme.colorScheme.onPrimaryContainer
+            else
+                MaterialTheme.colorScheme.onPrimaryContainer.copy(0.3f)
+        )
     }
 }

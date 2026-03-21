@@ -31,7 +31,7 @@ sealed interface DefinitiveTherapy {
             """.trimIndent()
         )
 
-        override val predicate = { (symptoms, findings, age): TherapyEvaluationParameters ->
+        override val predicate = { (symptoms, findings): TherapyEvaluationParameters ->
             Symptom.DiarrheaBloodyStools in symptoms
         }
     }
@@ -48,7 +48,7 @@ sealed interface DefinitiveTherapy {
             """.trimIndent()
         )
 
-        override val predicate = { (symptoms, findings, age): TherapyEvaluationParameters ->
+        override val predicate = { (symptoms, findings): TherapyEvaluationParameters ->
             Symptom.DiarrheaBloodyStools in symptoms
             && Symptom.CholeraOutbreak in symptoms
         }
@@ -66,7 +66,7 @@ sealed interface DefinitiveTherapy {
             """.trimIndent()
         )
 
-        override val predicate = { (symptoms, findings, age): TherapyEvaluationParameters ->
+        override val predicate = { (symptoms, findings): TherapyEvaluationParameters ->
             Finding.EntamoebaHistolyticaPositive in findings
         }
     }
@@ -82,7 +82,7 @@ sealed interface DefinitiveTherapy {
             """.trimIndent()
         )
 
-        override val predicate = { (symptoms, findings, age): TherapyEvaluationParameters ->
+        override val predicate = { (symptoms, findings): TherapyEvaluationParameters ->
             Finding.GiardiaPositive in findings
         }
     }
@@ -96,7 +96,7 @@ sealed interface DefinitiveTherapy {
             """.trimIndent()
         )
 
-        override val predicate = { (symptoms, findings, age): TherapyEvaluationParameters ->
+        override val predicate = { (symptoms, findings): TherapyEvaluationParameters ->
             Finding.CryptosporidiumPositive in findings
         }
     }
@@ -111,7 +111,7 @@ sealed interface DefinitiveTherapy {
             """.trimIndent()
         )
 
-        override val predicate = { (symptoms, findings, age): TherapyEvaluationParameters ->
+        override val predicate = { (symptoms, findings): TherapyEvaluationParameters ->
             Finding.IntestinalWormsPositive in findings
         }
     }
@@ -132,7 +132,7 @@ sealed interface DefinitiveTherapy {
             }
         )
 
-        override val predicate = { (symptoms, findings, age): TherapyEvaluationParameters ->
+        override val predicate = { (symptoms, findings): TherapyEvaluationParameters ->
             Finding.MalariaRapidDiagnosticTestPositive in findings
             || Finding.BloodSmearPositiveForMalaria in findings
         }
@@ -148,7 +148,7 @@ sealed interface DefinitiveTherapy {
             """.trimIndent()
         )
 
-        override val predicate = { (symptoms, findings, age): TherapyEvaluationParameters ->
+        override val predicate = { (symptoms, findings): TherapyEvaluationParameters ->
             Finding.ToxicMegacolonOrIntestinalObstruction in findings
         }
     }
@@ -168,7 +168,7 @@ sealed interface DefinitiveTherapy {
             }
         )
 
-        override val predicate = { (symptoms, findings, age): TherapyEvaluationParameters ->
+        override val predicate = { (symptoms, findings): TherapyEvaluationParameters ->
             Finding.HIVTestPositive in findings
         }
     }
@@ -181,7 +181,7 @@ sealed interface DefinitiveTherapy {
             """.trimIndent()
         )
 
-        override val predicate = { (symptoms, findings, age): TherapyEvaluationParameters ->
+        override val predicate = { (symptoms, findings): TherapyEvaluationParameters ->
             Finding.LowPlateletCount in findings
             || Finding.LowHemoglobin in findings
         }
@@ -196,7 +196,7 @@ sealed interface DefinitiveTherapy {
             """.trimIndent()
         )
 
-        override val predicate = { (symptoms, findings, age): TherapyEvaluationParameters ->
+        override val predicate = { (symptoms, findings): TherapyEvaluationParameters ->
             Finding.LowHemoglobin in findings
         }
     }
@@ -215,7 +215,7 @@ sealed interface DefinitiveTherapy {
             """.trimIndent()
         )
 
-        override val predicate = { (symptoms, findings, age): TherapyEvaluationParameters ->
+        override val predicate = { (symptoms, findings): TherapyEvaluationParameters ->
             symptoms.any {
                 it in setOf(
                     Symptom.DiarrheaBloodyStools,
@@ -244,7 +244,7 @@ sealed interface DefinitiveTherapy {
             """.trimIndent()
         )
 
-        override val predicate = { (symptoms, findings, age): TherapyEvaluationParameters ->
+        override val predicate = { (symptoms, findings): TherapyEvaluationParameters ->
 
             val severeRespiratoryDistress = Symptom.DyspneaSevereRespiratoryDistress in symptoms
             val pneumoniaEvidence =
@@ -268,7 +268,7 @@ sealed interface DefinitiveTherapy {
             """.trimIndent()
         )
 
-        override val predicate = { (symptoms, findings, age): TherapyEvaluationParameters ->
+        override val predicate = { (symptoms, findings): TherapyEvaluationParameters ->
 
             val absentSevereRespiratoryDistress = Symptom.DyspneaSevereRespiratoryDistress !in symptoms
             val pneumoniaEvidence = Finding.ChestXRayOrPhysicalExaminationSuggestiveOfPneumonia in findings
@@ -290,7 +290,7 @@ sealed interface DefinitiveTherapy {
             """.trimIndent()
         )
 
-        override val predicate = { (symptoms, findings, age): TherapyEvaluationParameters ->
+        override val predicate = { (symptoms, findings): TherapyEvaluationParameters ->
             Finding.ChestXRaySuggestiveOfPleuralEffusion in findings
         }
     }
@@ -303,7 +303,7 @@ sealed interface DefinitiveTherapy {
             """.trimIndent()
         )
 
-        override val predicate = { (symptoms, findings, age): TherapyEvaluationParameters ->
+        override val predicate = { (symptoms, findings): TherapyEvaluationParameters ->
             Finding.ChestXRaySuggestiveOfPneumothorax in findings
         }
     }
@@ -324,7 +324,7 @@ sealed interface DefinitiveTherapy {
             """.trimIndent()
         )
 
-        override val predicate = { (symptoms, findings, age): TherapyEvaluationParameters ->
+        override val predicate = { (symptoms, findings): TherapyEvaluationParameters ->
             Finding.ChestXRaySuggestiveOfTuberculosis in findings
             || Finding.TuberculosisGeneXpertOrMicroscopyPositive in findings
         }
@@ -343,7 +343,7 @@ sealed interface DefinitiveTherapy {
             """.trimIndent()
         )
 
-        override val predicate = { (symptoms, findings, age): TherapyEvaluationParameters ->
+        override val predicate = { (symptoms, findings): TherapyEvaluationParameters ->
             Finding.ChestXRaySuggestiveOfPulmonaryEdema in findings
         }
     }
@@ -357,7 +357,7 @@ sealed interface DefinitiveTherapy {
             """.trimMargin()
         )
 
-        override val predicate = { (symptoms, findings, age): TherapyEvaluationParameters ->
+        override val predicate = { (symptoms, findings): TherapyEvaluationParameters ->
             Finding.EchocardiographyOrChestXRaySuggestiveOfPericardialEffusionTamponade in findings
         }
     }
@@ -372,7 +372,7 @@ sealed interface DefinitiveTherapy {
             """.trimIndent()
         )
 
-        override val predicate = { (symptoms, findings, age): TherapyEvaluationParameters ->
+        override val predicate = { (symptoms, findings): TherapyEvaluationParameters ->
             Finding.EchoCardiographySuggestiveOfMyocardialInfarction in findings
         }
     }
@@ -385,7 +385,7 @@ sealed interface DefinitiveTherapy {
             """.trimIndent()
         )
 
-        override val predicate = { (symptoms, findings, age): TherapyEvaluationParameters ->
+        override val predicate = { (symptoms, findings): TherapyEvaluationParameters ->
             Finding.EchoCardiographySuggestiveOfAtrialFibrillation in findings
         }
     }
@@ -399,7 +399,7 @@ sealed interface DefinitiveTherapy {
             """.trimIndent()
         )
 
-        override val predicate = { (symptoms, findings, age): TherapyEvaluationParameters ->
+        override val predicate = { (symptoms, findings): TherapyEvaluationParameters ->
             Finding.VenousUltraSoundSuggestiveOfDeepVeinThrombosis in findings
         }
     }
@@ -415,12 +415,12 @@ sealed interface DefinitiveTherapy {
             """.trimIndent()
         )
 
-        override val predicate = { (symptoms, findings, age): TherapyEvaluationParameters ->
-            age?.let {
+        override val predicate = { params: TherapyEvaluationParameters ->
+            params.age?.let {
                 it >= 2
-                && Symptom.DyspneaWheezing in symptoms
-                && Finding.ChestXRayOrPhysicalExaminationSuggestiveOfPneumonia !in findings
-                && Symptom.DyspneaSevereRespiratoryDistress in symptoms
+                && Symptom.DyspneaWheezing in params.symptoms
+                && Finding.ChestXRayOrPhysicalExaminationSuggestiveOfPneumonia !in params.findings
+                && Symptom.DyspneaSevereRespiratoryDistress in params.symptoms
             } ?: false
         }
     }
@@ -436,12 +436,12 @@ sealed interface DefinitiveTherapy {
             """.trimIndent()
         )
 
-        override val predicate = { (symptoms, findings, age): TherapyEvaluationParameters ->
-            age?.let {
+        override val predicate = { params: TherapyEvaluationParameters ->
+            params.age?.let {
                 it >= 2
-                && Symptom.DyspneaWheezing in symptoms
-                && Finding.ChestXRayOrPhysicalExaminationSuggestiveOfPneumonia !in findings
-                && Symptom.DyspneaSevereRespiratoryDistress !in symptoms
+                && Symptom.DyspneaWheezing in params.symptoms
+                && Finding.ChestXRayOrPhysicalExaminationSuggestiveOfPneumonia !in params.findings
+                && Symptom.DyspneaSevereRespiratoryDistress !in params.symptoms
             } ?: false
         }
     }
@@ -457,12 +457,12 @@ sealed interface DefinitiveTherapy {
             """.trimIndent()
         )
 
-        override val predicate = { (symptoms, findings, age): TherapyEvaluationParameters ->
-            age?.let {
+        override val predicate = { params: TherapyEvaluationParameters ->
+            params.age?.let {
                 it > 18
-                && Symptom.DyspneaWheezing in symptoms
-                && Finding.ChestXRayOrPhysicalExaminationSuggestiveOfPneumonia !in findings
-                && Symptom.SmokingOrExposedToSmoke in symptoms
+                && Symptom.DyspneaWheezing in params.symptoms
+                && Finding.ChestXRayOrPhysicalExaminationSuggestiveOfPneumonia !in params.findings
+                && Symptom.SmokingOrExposedToSmoke in params.symptoms
             } ?: false
         }
     }
@@ -477,11 +477,11 @@ sealed interface DefinitiveTherapy {
             """.trimIndent()
         )
 
-        override val predicate = { (symptoms, findings, age): TherapyEvaluationParameters ->
-            age?.let {
+        override val predicate = { params: TherapyEvaluationParameters ->
+            params.age?.let {
                 it < 2
-                && Symptom.DyspneaWheezing in symptoms
-                && Finding.ChestXRayOrPhysicalExaminationSuggestiveOfPneumonia !in findings
+                && Symptom.DyspneaWheezing in params.symptoms
+                && Finding.ChestXRayOrPhysicalExaminationSuggestiveOfPneumonia !in params.findings
             } ?: false
         }
     }
@@ -497,7 +497,7 @@ sealed interface DefinitiveTherapy {
             """.trimIndent()
         )
 
-        override val predicate = { (symptoms, findings, age): TherapyEvaluationParameters ->
+        override val predicate = { (symptoms, findings): TherapyEvaluationParameters ->
             Symptom.DyspneaParoxysmalCoughWithWhoopsOrCentralCyanosisOrVomiting in symptoms
             && Symptom.Unvaccinated in symptoms
         }
@@ -553,7 +553,7 @@ sealed interface DefinitiveTherapy {
             """.trimIndent()
         )
 
-        override val predicate = { (symptoms, findings, age): TherapyEvaluationParameters ->
+        override val predicate = { (symptoms, findings): TherapyEvaluationParameters ->
             symptoms.any {
                 it in setOf(
                     Symptom.DyspneaSevereRespiratoryDistress,
@@ -580,7 +580,7 @@ sealed interface DefinitiveTherapy {
             """.trimIndent()
         )
 
-        override val predicate = { (symptoms, findings, age): TherapyEvaluationParameters ->
+        override val predicate = { (symptoms, findings): TherapyEvaluationParameters ->
             Symptom.FeverAbove38Degrees in symptoms
             && Symptom.StiffNeck in symptoms
             || Symptom.HeadacheOrCervicalPain in symptoms
@@ -609,7 +609,7 @@ sealed interface DefinitiveTherapy {
             """.trimIndent()
         )
 
-        override val predicate = { (symptoms, findings, age): TherapyEvaluationParameters ->
+        override val predicate = { (symptoms, findings): TherapyEvaluationParameters ->
             Finding.TuberculosisGeneXpertOrMicroscopyPositive in findings
             || Finding.CerebrospinalFluidSuggestiveOfTuberculosisMeningitis in findings
         }
@@ -627,7 +627,7 @@ sealed interface DefinitiveTherapy {
             """.trimIndent()
         )
 
-        override val predicate = { (symptoms, findings, age): TherapyEvaluationParameters ->
+        override val predicate = { (symptoms, findings): TherapyEvaluationParameters ->
             Finding.CerebrospinalFluidSuggestiveOfCryptococcalMeningitis in findings
         }
     }
@@ -644,7 +644,7 @@ sealed interface DefinitiveTherapy {
             """.trimIndent()
         )
 
-        override val predicate = { (symptoms, findings, age): TherapyEvaluationParameters ->
+        override val predicate = { (symptoms, findings): TherapyEvaluationParameters ->
             Finding.CerebrospinalFluidSuggestiveOfNeurosyphilis in findings
         }
     }
@@ -663,7 +663,7 @@ sealed interface DefinitiveTherapy {
             """.trimIndent()
         )
 
-        override val predicate = { (symptoms, findings, age): TherapyEvaluationParameters ->
+        override val predicate = { (symptoms, findings): TherapyEvaluationParameters ->
             Symptom.EpilepsyOrHistoryOfRecurrentUnprovokedSeizures in symptoms
         }
     }
@@ -681,11 +681,11 @@ sealed interface DefinitiveTherapy {
             """.trimIndent()
         )
 
-        override val predicate = { (symptoms, findings, age, sbp, dbp): TherapyEvaluationParameters ->
-            Symptom.SeizuresOrComaPregnancyBeyondTwentyWeeks in symptoms
-            && (Finding.UrineAnalysisWithProteinuria in findings
-                || sbp?.let { it >= 140 } ?: false
-                || dbp?.let { it >= 90 } ?: false
+        override val predicate = { params: TherapyEvaluationParameters ->
+            Symptom.SeizuresOrComaPregnancyBeyondTwentyWeeks in params.symptoms
+            && (Finding.UrineAnalysisWithProteinuria in params.findings
+                || params.sbp?.let { it >= 140 } ?: false
+                || params.dbp?.let { it >= 90 } ?: false
             )
         }
     }

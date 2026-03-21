@@ -269,12 +269,12 @@ sealed interface PatientDashboardAction {
         fun createRoute(patientId: String, visitId: String) = Route.SendPatient(patientId, visitId)
     }
 
-    data object CurrentVisit : PatientNavigable {
+    data object CurrentVisit : Navigable {
         override val text = "Current visit"
         override val icon = Icons.Default.MedicalServices
         override val contentDescription = "Current visit"
         override val roles = listOf(Role.DOCTOR)
-        override fun createRoute(patientId: String) = Route.MedicalVisit(patientId)
+        fun createRoute(patientId: String, visitId: String) = Route.MedicalVisit(patientId, visitId)
     }
 
     // --- UI Logic common to all actions ---

@@ -29,9 +29,12 @@ import com.unimib.oases.domain.model.symptom.Symptom.DiarrheaInTheLastEightToFou
 import com.unimib.oases.domain.model.symptom.Symptom.DiarrheaInTheLastFifteenToThirtyDays
 import com.unimib.oases.domain.model.symptom.Symptom.DiarrheaInTheLastOneToSevenDays
 import com.unimib.oases.domain.model.symptom.Symptom.DiarrheaInTheLastThirtyPlusDays
+import com.unimib.oases.domain.model.symptom.Symptom.DiarrheaMalnourishment
 import com.unimib.oases.domain.model.symptom.Symptom.DiarrheaOilyOrGreasyOrFoulSmellingStools
+import com.unimib.oases.domain.model.symptom.Symptom.DiarrheaShockOrSevereDehydration
 import com.unimib.oases.domain.model.symptom.Symptom.DiarrheaWateryStools
 import com.unimib.oases.domain.model.symptom.Symptom.DyspneaAcuteCourse
+import com.unimib.oases.domain.model.symptom.Symptom.DyspneaAirwayObstruction
 import com.unimib.oases.domain.model.symptom.Symptom.DyspneaCoughWithBlood
 import com.unimib.oases.domain.model.symptom.Symptom.DyspneaCoughWithMucous
 import com.unimib.oases.domain.model.symptom.Symptom.DyspneaDryCough
@@ -42,6 +45,8 @@ import com.unimib.oases.domain.model.symptom.Symptom.DyspneaInTheLastThirtyPlusD
 import com.unimib.oases.domain.model.symptom.Symptom.DyspneaParoxysmalCoughWithWhoopsOrCentralCyanosisOrVomiting
 import com.unimib.oases.domain.model.symptom.Symptom.DyspneaProgressiveCourse
 import com.unimib.oases.domain.model.symptom.Symptom.DyspneaRecurrentCourse
+import com.unimib.oases.domain.model.symptom.Symptom.DyspneaSevereRespiratoryDistress
+import com.unimib.oases.domain.model.symptom.Symptom.DyspneaWheezing
 import com.unimib.oases.domain.model.symptom.Symptom.EasyBruising
 import com.unimib.oases.domain.model.symptom.Symptom.EdemaOfBothFeet
 import com.unimib.oases.domain.model.symptom.Symptom.EpilepsyOrHistoryOfRecurrentUnprovokedSeizures
@@ -114,6 +119,7 @@ import com.unimib.oases.domain.model.symptom.Symptom.SeizuresOrComaInTheLastEigh
 import com.unimib.oases.domain.model.symptom.Symptom.SeizuresOrComaInTheLastFifteenToThirtyDays
 import com.unimib.oases.domain.model.symptom.Symptom.SeizuresOrComaInTheLastOneToSevenDays
 import com.unimib.oases.domain.model.symptom.Symptom.SeizuresOrComaInTheLastThirtyPlusDays
+import com.unimib.oases.domain.model.symptom.Symptom.SeizuresOrComaPregnancyBeyondTwentyWeeks
 import com.unimib.oases.domain.model.symptom.Symptom.SevereDehydration
 import com.unimib.oases.domain.model.symptom.Symptom.SevereMalnutrition
 import com.unimib.oases.domain.model.symptom.Symptom.SeverePain
@@ -208,6 +214,8 @@ val allSymptoms: Set<Symptom> = setOf(
     HighSbp,
     Hypotension,
     HypertensiveEmergency,
+    DiarrheaShockOrSevereDehydration,
+    DiarrheaMalnourishment,
     DiarrheaInTheLastOneToSevenDays,
     DiarrheaInTheLastEightToFourteenDays,
     DiarrheaInTheLastFifteenToThirtyDays,
@@ -218,6 +226,9 @@ val allSymptoms: Set<Symptom> = setOf(
     DiarrheaWateryStools,
     DiarrheaBloodyStools,
     DiarrheaOilyOrGreasyOrFoulSmellingStools,
+    DyspneaSevereRespiratoryDistress,
+    DyspneaAirwayObstruction,
+    DyspneaWheezing,
     DyspneaInTheLastOneToSevenDays,
     DyspneaInTheLastEightToFourteenDays,
     DyspneaInTheLastFifteenToThirtyDays,
@@ -229,6 +240,7 @@ val allSymptoms: Set<Symptom> = setOf(
     DyspneaCoughWithMucous,
     DyspneaCoughWithBlood,
     DyspneaParoxysmalCoughWithWhoopsOrCentralCyanosisOrVomiting,
+    SeizuresOrComaPregnancyBeyondTwentyWeeks,
     AlertLevelOfConsciousness,
     ResponsiveToVoiceLevelOfConsciousness,
     ResponsiveToPainLevelOfConsciousness,

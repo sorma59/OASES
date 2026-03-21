@@ -40,7 +40,6 @@ import com.unimib.oases.data.local.model.VitalSignEntity
     ],
     version = 3
 )
-// If modified, assets database must be modified too
 @TypeConverters(Converters::class)
 abstract class OasesDatabase : RoomDatabase() {
     abstract fun patientDao(): PatientDao

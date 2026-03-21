@@ -1,15 +1,12 @@
-package com.unimib.oases.ui.screen.medical_visit.maincomplaint
+package com.unimib.oases.ui.screen.medical_visit.initial_medical_evaluation
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.unimib.oases.di.IoDispatcher
-import com.unimib.oases.domain.model.complaint.ComplaintId
+import com.unimib.oases.domain.model.complaint.Complaint
 import com.unimib.oases.domain.model.complaint.ComplaintQuestion
-import com.unimib.oases.domain.model.complaint.Diarrhea
-import com.unimib.oases.domain.model.complaint.Dyspnea
-import com.unimib.oases.domain.model.complaint.SeizuresOrComa
 import com.unimib.oases.domain.model.complaint.binarytree.ManualNode
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.domain.repository.TriageEvaluationRepository
@@ -21,8 +18,10 @@ import com.unimib.oases.domain.usecase.SelectSymptomUseCase
 import com.unimib.oases.domain.usecase.SubmitMedicalVisitPartOneUseCase
 import com.unimib.oases.domain.usecase.TranslateLatestVitalSignsToSymptomsUseCase
 import com.unimib.oases.domain.usecase.TranslateTriageSymptomIdsToSymptomsUseCase
+import com.unimib.oases.ui.components.scaffold.UiEvent
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Route
+import com.unimib.oases.ui.util.snackbar.SnackbarData
 import com.unimib.oases.util.Outcome
 import com.unimib.oases.util.firstSuccess
 import com.unimib.oases.util.toggle
@@ -42,7 +41,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MainComplaintViewModel @Inject constructor(
+class EvaluationViewModel @Inject constructor(
     private val answerImmediateTreatmentQuestionUseCase: AnswerImmediateTreatmentQuestionUseCase,
     private val submitMedicalVisitPartOneUseCase: SubmitMedicalVisitPartOneUseCase,
     private val generateSuggestedTestsUseCase: GenerateSuggestedTestsUseCase,
@@ -66,18 +65,22 @@ class MainComplaintViewModel @Inject constructor(
         }
     }
 
-    private val args = savedStateHandle.toRoute<Route.MainComplaint>()
+    private val args = savedStateHandle.toRoute<Route.Evaluation>()
 
     private val _state = MutableStateFlow(
-        MainComplaintState(
+        EvaluationState(
             patientId = args.patientId,
-            complaintId = args.mainComplaintId
+            visitId = args.visitId,
+            complaintId = args.complaintId
         )
     )
-    val state: StateFlow<MainComplaintState> = _state.asStateFlow()
+    val state: StateFlow<EvaluationState> = _state.asStateFlow()
 
     private val navigationEventsChannel = Channel<NavigationEvent>()
     val navigationEvents = navigationEventsChannel.receiveAsFlow()
+
+    private val uiEventsChannel = Channel<UiEvent>()
+    val uiEvents = uiEventsChannel.receiveAsFlow()
 
     val additionalTestsText: StateFlow<String> = _state
         .map { it.additionalTestsText }
@@ -110,38 +113,15 @@ class MainComplaintViewModel @Inject constructor(
 
         val patient = state.value.patient
         patient?.let { patient ->
-            val age = patient.ageInMonths / 12
-            val sex = patient.sex
-            val patientCategory = patient.category
-
-            when (state.value.complaintId) {
-                ComplaintId.DIARRHEA.id -> {
-                    _state.update{
-                        it.copy(
-                            complaint = Diarrhea(age)
-                        )
-                    }
-                }
-
-                ComplaintId.DYSPNEA.id -> {
-                    _state.update{
-                        it.copy(
-                            complaint = Dyspnea
-                        )
-                    }
-                }
-
-                ComplaintId.SEIZURES_OR_COMA.id -> {
-                    _state.update{
-                        it.copy(
-                            complaint = SeizuresOrComa(sex, patientCategory)
-                        )
-                    }
-                }
-
-                else -> {
-                    updateError("Complaint data not found")
-                }
+            _state.update{
+                it.copy(
+                    complaint = Complaint.getComplaint(
+                        state.value.complaintId,
+                        patient.ageInMonths,
+                        patient.sex,
+                        patient.category
+                    )
+                )
             }
 
         } ?: run {
@@ -254,15 +234,15 @@ class MainComplaintViewModel @Inject constructor(
         }
     }
 
-    fun onEvent(event: MainComplaintEvent){
+    fun onEvent(event: EvaluationEvent){
         when(event){
-            is MainComplaintEvent.NodeAnswered -> {
+            is EvaluationEvent.NodeAnswered -> {
                 _state.update {
                     answerImmediateTreatmentQuestionUseCase(event.answer, event.node, event.tree, it)
                 }
             }
 
-            is MainComplaintEvent.SymptomSelected -> {
+            is EvaluationEvent.SymptomSelected -> {
                 _state.update {
                     it.copy(
                         symptoms = selectSymptomUseCase(event.symptom, it.symptoms, event.question),
@@ -271,7 +251,7 @@ class MainComplaintViewModel @Inject constructor(
                 }
             }
 
-            is MainComplaintEvent.TestSelected -> {
+            is EvaluationEvent.TestSelected -> {
                 _state.update {
                     it.copy(
                         requestedTests = it.requestedTests.toggle(event.test)
@@ -279,7 +259,7 @@ class MainComplaintViewModel @Inject constructor(
                 }
             }
 
-            is MainComplaintEvent.AdditionalTestsTextChanged -> {
+            is EvaluationEvent.AdditionalTestsTextChanged -> {
                 _state.update {
                     it.copy(
                         additionalTestsText = event.text
@@ -287,19 +267,11 @@ class MainComplaintViewModel @Inject constructor(
                 }
             }
 
-            MainComplaintEvent.ToastShown -> {
-                _state.update {
-                    it.copy(
-                        toastMessage = null
-                    )
-                }
-            }
-
-            MainComplaintEvent.RetryButtonClicked -> {
+            EvaluationEvent.RetryButtonClicked -> {
                 initialize(false)
             }
 
-            MainComplaintEvent.GenerateTestsPressed -> {
+            EvaluationEvent.GenerateTestsPressed -> {
                 _state.update {
                     it.copy(
                         conditions = generateSuggestedTestsUseCase(it.complaint!!, it.symptoms),
@@ -309,9 +281,9 @@ class MainComplaintViewModel @Inject constructor(
                 }
             }
 
-            MainComplaintEvent.SubmitPressed -> {
+            EvaluationEvent.SubmitPressed -> {
                 viewModelScope.launch(dispatcher + errorHandler){
-                    when(val result = submitMedicalVisitPartOneUseCase(state.value)){
+                    when(val result = submitMedicalVisitPartOneUseCase(state.value)) {
                         is Outcome.Error -> {
                             _state.update {
                                 it.copy(
@@ -320,12 +292,8 @@ class MainComplaintViewModel @Inject constructor(
                             }
                         }
                         is Outcome.Success -> {
-                            _state.update {
-                                it.copy(
-                                    toastMessage = "Medical visit submitted successfully"
-                                )
-                            }
                             patientRepository.addPatient(state.value.patient!!)
+                            uiEventsChannel.send(UiEvent.ShowSnackbar(SnackbarData.SaveSuccess))
                             navigationEventsChannel.send(NavigationEvent.NavigateBack)
                         }
                     }

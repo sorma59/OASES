@@ -18,7 +18,8 @@ import com.unimib.oases.ui.screen.dashboard.patient.view.PatientDetailsScreen
 import com.unimib.oases.ui.screen.homepage.HomeScreen
 import com.unimib.oases.ui.screen.login.AuthViewModel
 import com.unimib.oases.ui.screen.medical_visit.MedicalVisitScreen
-import com.unimib.oases.ui.screen.medical_visit.maincomplaint.MainComplaintScreen
+import com.unimib.oases.ui.screen.medical_visit.initial_medical_evaluation.EvaluationScreen
+import com.unimib.oases.ui.screen.medical_visit.reassessment.ReassessmentScreen
 import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreen
 import com.unimib.oases.ui.screen.nurse_assessment.demographics.DemographicsScreen
 import com.unimib.oases.ui.screen.nurse_assessment.history.HistoryScreen
@@ -73,7 +74,7 @@ fun AppNavigation(
             DiseaseManagementScreen()
         }
 
-        composable<Route.RoomsManagement>{
+        composable<Route.RoomsManagement> {
             RoomsManagementScreen()
         }
 
@@ -93,7 +94,7 @@ fun AppNavigation(
             DemographicsScreen(appViewModel)
         }
         
-        composable<Route.Triage>{
+        composable<Route.Triage> {
             TriageScreen(appViewModel)
         }
 
@@ -117,7 +118,7 @@ fun AppNavigation(
             SendPatientViaBluetoothScreen(navController)
         }
 
-        composable<Route.PairDevice>{
+        composable<Route.PairDevice> {
             PairNewDeviceScreen(navController)
         }
 
@@ -133,8 +134,12 @@ fun AppNavigation(
             PatientDetailsScreen(appViewModel)
         }
 
-        composable<Route.MainComplaint>{
-            MainComplaintScreen(appViewModel)
+        composable<Route.Evaluation> {
+            EvaluationScreen(appViewModel)
+        }
+
+        composable<Route.Reassessment> {
+            ReassessmentScreen(appViewModel)
         }
     }
 }

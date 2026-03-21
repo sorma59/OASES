@@ -148,12 +148,7 @@ fun MainScaffold(
             appViewModel.uiEvents.collect { event ->
                 when (event) {
                     is UiEvent.ShowToast -> ToastUtils.showToast(navController.context, event.message)
-                    is UiEvent.ShowSnackbar -> SnackbarController.showMessage(
-                        event.snackbarData.message,
-                        event.snackbarData.type,
-                        event.snackbarData.actionLabel,
-                        event.snackbarData.onAction
-                    )
+                    is UiEvent.ShowSnackbar -> SnackbarController.showSnackbar(event.snackbarData)
                 }
             }
         }

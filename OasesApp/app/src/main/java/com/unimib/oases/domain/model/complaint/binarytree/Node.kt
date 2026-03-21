@@ -2,7 +2,7 @@ package com.unimib.oases.domain.model.complaint.binarytree
 
 import com.unimib.oases.domain.model.complaint.ImmediateTreatment
 import com.unimib.oases.domain.model.symptom.Symptom
-import com.unimib.oases.ui.screen.medical_visit.maincomplaint.ImmediateTreatmentQuestionState
+import com.unimib.oases.ui.screen.medical_visit.initial_medical_evaluation.ImmediateTreatmentQuestionState
 
 fun ManualNode.next(boolean: Boolean): ShowableNode {
     var node = if (boolean) children.left else children.right

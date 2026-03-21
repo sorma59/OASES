@@ -15,7 +15,7 @@ object SnackbarController {
     private var snackbarHostState: SnackbarHostState? = null
     private val scope = CoroutineScope(Dispatchers.Main)
 
-    // We store the current type so the UI can read it when drawing
+    // Store the current type so the UI can read it when drawing
     var currentType: SnackbarType = SnackbarType.INFO
         private set
 
@@ -23,12 +23,24 @@ object SnackbarController {
         snackbarHostState = hostState
     }
 
+    fun showSnackbar(data: SnackbarData) {
+        showMessage(
+            message = data.message,
+            type = data.type,
+            actionLabel = data.actionLabel,
+            onAction = data.onAction,
+            withDismissAction = data.withDismissAction,
+            duration = data.duration
+        )
+    }
+
     fun showMessage(
         message: String,
         type: SnackbarType,
         actionLabel: String? = null,
         onAction: (() -> Unit)? = null,
-        withDismissAction: Boolean = true
+        withDismissAction: Boolean = true,
+        duration: SnackbarDuration = SnackbarDuration.Short
     ) {
         currentType = type
 
@@ -36,7 +48,7 @@ object SnackbarController {
             snackbarHostState?.showSnackbar(
                 message = message,
                 actionLabel = actionLabel,
-                duration = SnackbarDuration.Short,
+                duration = duration,
                 withDismissAction = withDismissAction
             ).run {
                 when(this) {
