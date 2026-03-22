@@ -1,19 +1,23 @@
 package com.unimib.oases.ui.screen.medical_visit
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -49,14 +53,28 @@ private fun MedicalVisitContent(
     state: MedicalVisitState,
     onEvent: (MedicalVisitEvent) -> Unit
 ) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        Spacer(Modifier.height(64.dp))
+    val scrollState = rememberScrollState()
 
-        MainComplaintsGrid(state, onEvent)
+    Box(Modifier.padding(bottom = 32.dp)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(scrollState),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Spacer(Modifier.height(32.dp))
+
+            MainComplaintsGrid(state, onEvent)
+        }
+
+        FloatingActionButton(
+            modifier = Modifier
+                .size(256.dp, 64.dp)
+                .align(Alignment.BottomCenter),
+            onClick = { },
+            shape = ButtonDefaults.shape
+        ) { TitleText("Disposition") }
     }
 }
 
@@ -65,39 +83,55 @@ private fun MainComplaintsGrid(
     state: MedicalVisitState,
     onEvent: (MedicalVisitEvent) -> Unit
 ) {
+    val scrollState = rememberScrollState()
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        TitleText("Choose a main complaint")
+        TitleText("Choose a main complaint", fontSize = 28)
 
-        LazyHorizontalGrid(
-            rows = GridCells.Fixed(2),
-            modifier = Modifier.height(340.dp), // Height for 2 rows of 160dp + spacing
-            contentPadding = PaddingValues(horizontal = 16.dp),
+        Spacer(Modifier.height(32.dp))
+
+        TitleText("Evaluation", fontSize = 24)
+
+        Row(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier = Modifier.horizontalScroll(scrollState),
         ) {
-            // Interleaving Evaluation and Reassessment items for each complaint.
-            // In a LazyHorizontalGrid with Fixed(2) rows, items are placed vertically first.
             ComplaintId.entries.forEach { complaint ->
-                item {
-                    EvaluationBoxButton(complaint, onEvent)
-                }
-                item {
-                    ReassessmentBoxButton(state, complaint, onEvent)
-                }
+                EvaluationBoxButton(state, complaint, onEvent)
             }
         }
+
+        Spacer(Modifier.height(32.dp))
+
+        TitleText("Reassessment", fontSize = 24)
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.horizontalScroll(scrollState),
+        ) {
+            ComplaintId.entries.forEach { complaint ->
+                ReassessmentBoxButton(state, complaint, onEvent)
+            }
+        }
+
+        Spacer(Modifier.height(32.dp))
     }
 }
 
 @Composable
 private fun EvaluationBoxButton(
+    state: MedicalVisitState,
     complaintId: ComplaintId,
     onEvent: (MedicalVisitEvent) -> Unit,
 ){
-    BoxButton(complaintId, { true }) {
+    BoxButton(
+        complaintId,
+        isEnabled = { true },
+        hasBorder = { state.complaintSummaries[complaintId.id] != null }
+    ) {
         onEvent(
             MedicalVisitEvent.EvaluationClicked(complaintId.id)
         )
@@ -114,6 +148,9 @@ private fun ReassessmentBoxButton(
         complaintId,
         isEnabled = {
             state.complaintSummaries[complaintId.id] != null
+        },
+        hasBorder = {
+            false //TODO
         }
     ) {
         onEvent(
@@ -126,20 +163,32 @@ private fun ReassessmentBoxButton(
 private fun BoxButton(
     complaintId: ComplaintId,
     isEnabled: () -> Boolean,
+    hasBorder: () -> Boolean,
     onClick: () -> Unit,
 ) {
+    val shape = RoundedCornerShape(16.dp)
+
     Box(
         modifier = Modifier
             .size(160.dp)
-            .clip(RoundedCornerShape(16.dp))
+            .clip(shape)
             .background(
                 if (isEnabled())
                     MaterialTheme.colorScheme.primaryContainer
                 else
                     MaterialTheme.colorScheme.primaryContainer.copy(0.38f)
             )
+            .run {
+                if (hasBorder()) {
+                    this.border(2.dp, MaterialTheme.colorScheme.tertiaryContainer, shape)
+                } else this
+            }
+            .run {
+                if (isEnabled()) {
+                    this.clickable { onClick() }
+                } else this
+            }
             .padding(4.dp)
-            .clickable { if (isEnabled()) onClick() }
     ) {
         CenteredTextInBox(
             complaintId.label,
