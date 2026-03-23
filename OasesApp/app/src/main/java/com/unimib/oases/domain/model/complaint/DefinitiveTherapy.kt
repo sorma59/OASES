@@ -354,7 +354,7 @@ sealed interface DefinitiveTherapy {
             This is a patient with pericardial effusion / tamponade.
             If abundant fluid, consider performing pericardial tapping; also test for TB.
             If suspected pericarditis, start ibuprofene 600 mg every 8 hours.
-            """.trimMargin()
+            """.trimIndent()
         )
 
         override val predicate = { (symptoms, findings): TherapyEvaluationParameters ->

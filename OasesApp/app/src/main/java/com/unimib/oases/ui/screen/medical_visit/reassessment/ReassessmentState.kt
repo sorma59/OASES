@@ -24,4 +24,7 @@ data class ReassessmentState(
 ) {
     val possibleFindings: Set<Finding>
         get() = complaint?.findings?.findings.orEmpty()
+
+    val shouldShowSubmitButton: Boolean
+        get() = definitiveTherapies != null
 }

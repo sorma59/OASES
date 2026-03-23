@@ -1,5 +1,6 @@
 package com.unimib.oases.ui.screen.medical_visit
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -16,8 +17,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -25,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -95,29 +101,60 @@ private fun MainComplaintsGrid(
 
         TitleText("Evaluation", fontSize = 24)
 
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.horizontalScroll(scrollState),
-        ) {
-            ComplaintId.entries.forEach { complaint ->
-                EvaluationBoxButton(state, complaint, onEvent)
-            }
-        }
+        EvaluationButtons(scrollState, state, onEvent)
 
-        Spacer(Modifier.height(32.dp))
+        FlowIcon()
 
         TitleText("Reassessment", fontSize = 24)
 
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.horizontalScroll(scrollState),
-        ) {
-            ComplaintId.entries.forEach { complaint ->
-                ReassessmentBoxButton(state, complaint, onEvent)
-            }
-        }
+        ReassessmentButtons(scrollState, state, onEvent)
 
         Spacer(Modifier.height(32.dp))
+    }
+}
+
+@Composable
+private fun ReassessmentButtons(
+    scrollState: ScrollState,
+    state: MedicalVisitState,
+    onEvent: (MedicalVisitEvent) -> Unit
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = Modifier.horizontalScroll(scrollState),
+    ) {
+        ComplaintId.entries.forEach { complaint ->
+            ReassessmentBoxButton(state, complaint, onEvent)
+        }
+    }
+}
+
+@Composable
+private fun FlowIcon() {
+    Icon(
+        imageVector = Icons.Default.KeyboardArrowDown,
+        contentDescription = null,
+        modifier = Modifier
+            .padding(top = 16.dp)
+            .size(48.dp)
+            .graphicsLayer(scaleX = 2f),
+        tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f)
+    )
+}
+
+@Composable
+private fun EvaluationButtons(
+    scrollState: ScrollState,
+    state: MedicalVisitState,
+    onEvent: (MedicalVisitEvent) -> Unit
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = Modifier.horizontalScroll(scrollState),
+    ) {
+        ComplaintId.entries.forEach { complaint ->
+            EvaluationBoxButton(state, complaint, onEvent)
+        }
     }
 }
 
@@ -130,7 +167,7 @@ private fun EvaluationBoxButton(
     BoxButton(
         complaintId,
         isEnabled = { true },
-        hasBorder = { state.complaintSummaries[complaintId.id] != null }
+        isCompleted = { state.complaintSummaries[complaintId.id] != null }
     ) {
         onEvent(
             MedicalVisitEvent.EvaluationClicked(complaintId.id)
@@ -149,7 +186,7 @@ private fun ReassessmentBoxButton(
         isEnabled = {
             state.complaintSummaries[complaintId.id] != null
         },
-        hasBorder = {
+        isCompleted = {
             false //TODO
         }
     ) {
@@ -163,24 +200,25 @@ private fun ReassessmentBoxButton(
 private fun BoxButton(
     complaintId: ComplaintId,
     isEnabled: () -> Boolean,
-    hasBorder: () -> Boolean,
+    isCompleted: () -> Boolean,
     onClick: () -> Unit,
 ) {
     val shape = RoundedCornerShape(16.dp)
+
+    val (boxColor, textColor) = if (isEnabled()) {
+        MaterialTheme.colorScheme.primaryContainer to MaterialTheme.colorScheme.onPrimaryContainer
+    } else {
+        MaterialTheme.colorScheme.primaryContainer.copy(0.38f) to MaterialTheme.colorScheme.onPrimaryContainer.copy(0.3f)
+    }
 
     Box(
         modifier = Modifier
             .size(160.dp)
             .clip(shape)
-            .background(
-                if (isEnabled())
-                    MaterialTheme.colorScheme.primaryContainer
-                else
-                    MaterialTheme.colorScheme.primaryContainer.copy(0.38f)
-            )
+            .background(boxColor)
             .run {
-                if (hasBorder()) {
-                    this.border(2.dp, MaterialTheme.colorScheme.tertiaryContainer, shape)
+                if (isCompleted()) {
+                    this.border(3.dp, MaterialTheme.colorScheme.primary, shape)
                 } else this
             }
             .run {
@@ -193,10 +231,19 @@ private fun BoxButton(
         CenteredTextInBox(
             complaintId.label,
             20.sp,
-            if (isEnabled())
-                MaterialTheme.colorScheme.onPrimaryContainer
-            else
-                MaterialTheme.colorScheme.onPrimaryContainer.copy(0.3f)
+            textColor
         )
+
+        if (isCompleted()) {
+            Icon(
+                imageVector = Icons.Default.CheckCircle,
+                contentDescription = "Completed",
+                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(8.dp)
+                    .size(32.dp)
+            )
+        }
     }
 }

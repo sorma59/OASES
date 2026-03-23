@@ -95,7 +95,7 @@ fun ReassessmentContent(
 
         state.definitiveTherapies?.let { DefinitiveTherapies(it) }
 
-        SubmitButton { onSubmit() }
+        SubmitButton(state.shouldShowSubmitButton) { onSubmit() }
 
         Spacer(Modifier.height(256.dp))
     }
@@ -129,7 +129,7 @@ private fun GenerateDefinitiveTherapiesButton(
         Button(
             onClick = onClick
         ) {
-            Text("Suggest tests and supportive therapies", fontWeight = FontWeight.Bold)
+            Text("Suggest diagnosis and treatment", fontWeight = FontWeight.Bold)
         }
     }
 }
@@ -142,30 +142,33 @@ private fun DefinitiveTherapies(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ){
         if (definitiveTherapies.isNotEmpty()){
-            TitleText("Definitive therapies", fontSize = 18)
+            TitleText("Suggested diagnosis and treatment", fontSize = 18)
             HorizontalDivider(thickness = 0.8.dp)
             definitiveTherapies.forEach {
                 Text(it.description.text)
                 HorizontalDivider(thickness = 0.8.dp)
             }
         } else
-            Text("No supportive therapies suggested")
+            Text("No diagnosis or treatment suggested")
     }
 }
 
 @Composable
 private fun SubmitButton(
+    isVisible: Boolean,
     onClick: () -> Unit,
 ) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier.fillMaxWidth()
-    ){
-        Button(
-            onClick = onClick,
-            modifier = Modifier.size(256.dp, 64.dp)
+    if (isVisible){
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.fillMaxWidth()
         ) {
-            TitleText("Submit")
+            Button(
+                onClick = onClick,
+                modifier = Modifier.size(256.dp, 64.dp)
+            ) {
+                TitleText("Submit")
+            }
         }
     }
 }
