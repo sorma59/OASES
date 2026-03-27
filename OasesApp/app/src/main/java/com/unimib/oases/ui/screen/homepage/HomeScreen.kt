@@ -24,18 +24,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.unimib.oases.data.local.model.Role
 import com.unimib.oases.domain.model.PatientAndVisitIds
 import com.unimib.oases.ui.components.patients.PatientsWithVisitInfoList
 import com.unimib.oases.ui.components.search.SearchBar
 import com.unimib.oases.ui.components.util.effect.HandleNavigationEvents
 import com.unimib.oases.ui.components.util.loading.LoadingOverlay
-import com.unimib.oases.ui.screen.login.AuthViewModel
 import com.unimib.oases.ui.screen.root.AppViewModel
 
 @Composable
 fun HomeScreen(
-    authViewModel: AuthViewModel,
     appViewModel: AppViewModel,
 ) {
 
@@ -47,14 +44,13 @@ fun HomeScreen(
 
     LoadingOverlay(state.isLoading)
 
-    HomeContent(state, viewModel::onEvent, authViewModel)
+    HomeContent(state, viewModel::onEvent)
 }
 
 @Composable
 private fun HomeContent(
     state: HomeScreenState,
     onEvent: (HomeScreenEvent) -> Unit,
-    authViewModel: AuthViewModel
 ) {
 
     var searchText by remember { mutableStateOf("") }
@@ -73,10 +69,6 @@ private fun HomeContent(
     val onPatientItemClick = { ids: PatientAndVisitIds ->
         onEvent(HomeScreenEvent.PatientItemClicked(ids))
     }
-
-    val userRole by authViewModel.userRole.collectAsState()
-
-    val shouldShowAddPatientButton = userRole == Role.NURSE
 
     val filteredItems = state.patientsWithVisitInfo.filter { item ->
         item.patient.publicId.contains(searchText, ignoreCase = true) || // Public id
@@ -126,21 +118,19 @@ private fun HomeContent(
                 }
 
             }
-            if (shouldShowAddPatientButton) {
-                FloatingActionButton(
-                    onClick = { onEvent(HomeScreenEvent.AddButtonClicked) },
-                    modifier = Modifier.padding(30.dp),
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "Add a patient",
-                    )
-                }
-
-                Spacer(Modifier.height(64.dp))
+            FloatingActionButton(
+                onClick = { onEvent(HomeScreenEvent.AddButtonClicked) },
+                modifier = Modifier.padding(30.dp),
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Add a patient",
+                )
             }
+
+            Spacer(Modifier.height(64.dp))
         }
     }
 }

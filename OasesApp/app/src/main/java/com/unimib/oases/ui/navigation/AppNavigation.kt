@@ -16,7 +16,6 @@ import com.unimib.oases.ui.screen.dashboard.admin.vitalsigns.VitalSignManagement
 import com.unimib.oases.ui.screen.dashboard.patient.PatientDashboardScreen
 import com.unimib.oases.ui.screen.dashboard.patient.view.PatientDetailsScreen
 import com.unimib.oases.ui.screen.homepage.HomeScreen
-import com.unimib.oases.ui.screen.login.AuthViewModel
 import com.unimib.oases.ui.screen.medical_visit.MedicalVisitScreen
 import com.unimib.oases.ui.screen.medical_visit.initial_medical_evaluation.EvaluationScreen
 import com.unimib.oases.ui.screen.medical_visit.reassessment.ReassessmentScreen
@@ -34,7 +33,6 @@ import com.unimib.oases.ui.screen.root.AppViewModel
 fun AppNavigation(
     startDestination: Route,
     navController: NavHostController,
-    authViewModel: AuthViewModel,
     appViewModel: AppViewModel,
     modifier: Modifier = Modifier
 ){
@@ -79,7 +77,7 @@ fun AppNavigation(
         }
 
         composable<Route.Home> {
-            HomeScreen(authViewModel, appViewModel)
+            HomeScreen(appViewModel)
         }
 
         composable<Route.InitialIntake> {
