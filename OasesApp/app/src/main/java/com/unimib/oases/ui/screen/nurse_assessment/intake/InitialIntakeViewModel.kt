@@ -2,7 +2,10 @@ package com.unimib.oases.ui.screen.nurse_assessment.intake
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.unimib.oases.data.local.model.VisitEntity
+import com.unimib.oases.data.util.FirestoreManagerInterface
 import com.unimib.oases.di.IoDispatcher
+import com.unimib.oases.domain.model.Visit
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.domain.repository.VisitRepository
 import com.unimib.oases.domain.usecase.CreateReturnVisitUseCase
@@ -11,6 +14,7 @@ import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.ui.util.snackbar.SnackbarData
 import com.unimib.oases.ui.util.snackbar.SnackbarType
+import com.unimib.oases.util.DateAndTimeUtils
 import com.unimib.oases.util.Outcome
 import com.unimib.oases.util.Resource
 import com.unimib.oases.util.firstNullableSuccess
@@ -29,10 +33,9 @@ import javax.inject.Inject
 @HiltViewModel
 class InitialIntakeViewModel @Inject constructor(
     private val patientRepository: PatientRepository,
-    private val createReturnVisitUseCase: CreateReturnVisitUseCase,
     private val visitRepository: VisitRepository,
     @param:IoDispatcher private val dispatcher: CoroutineDispatcher,
-): ViewModel() {
+) : ViewModel() {
     private val _state = MutableStateFlow(InitialIntakeState())
     val state: StateFlow<InitialIntakeState> = _state.asStateFlow()
 
@@ -44,7 +47,7 @@ class InitialIntakeViewModel @Inject constructor(
 
     private val errorHandler = CoroutineExceptionHandler { _, e ->
         e.printStackTrace()
-        _state.update{
+        _state.update {
             _state.value.copy(
                 error = e.message,
                 isLoading = false
@@ -69,6 +72,7 @@ class InitialIntakeViewModel @Inject constructor(
                     )
                 }
             }
+
             InitialIntakeEvent.ReturnButtonClicked -> {
                 _state.update {
                     it.copy(isReturn = true)
@@ -79,7 +83,7 @@ class InitialIntakeViewModel @Inject constructor(
 
                 viewModelScope.launch(coroutineContext) {
 
-                    visitRepository.getCurrentVisit(event.patientId).firstNullableSuccess()?.let {
+                    visitRepository.getCurrentVisit(event.patient.id).firstNullableSuccess()?.let {
                         uiEventsChannel.send(
                             UiEvent.ShowSnackbar(
                                 snackbarData = SnackbarData(
@@ -88,32 +92,78 @@ class InitialIntakeViewModel @Inject constructor(
                                 )
                             )
                         )
-                    } ?: when (val result = createReturnVisitUseCase(event.patientId)) {
-                        is Outcome.Error -> {
-                            _state.update {
-                                it.copy(error = result.message)
-                            }
-                        }
-                        is Outcome.Success<String> -> {
+                    } ?: run {
 
-                            uiEventsChannel.send(
-                                UiEvent.ShowSnackbar(
-                                    snackbarData = SnackbarData(
-                                        message = "New visit created",
-                                        type = SnackbarType.SUCCESS
-                                    )
+                        val visit = Visit(
+                            patientId = event.patient.id,
+                            arrivalTime = DateAndTimeUtils.getCurrentTime(),
+                            date = DateAndTimeUtils.getCurrentDate()
+                        )
+                        patientRepository.addPatientAndCreateVisit(
+                            event.patient, visit
+                        )
+
+                        uiEventsChannel.send(
+                            UiEvent.ShowSnackbar(
+                                snackbarData = SnackbarData(
+                                    message = "New visit created",
+                                    type = SnackbarType.SUCCESS
                                 )
                             )
+                        )
 
-                            navigationEventsChannel.send(
-                                NavigationEvent.PopAndNavigate(
-                                    Route.PatientDashboard(
-                                        patientId = event.patientId,
-                                        visitId = result.data
-                                    )
+                        navigationEventsChannel.send(
+                            NavigationEvent.PopAndNavigate(
+                                Route.PatientDashboard(
+                                    patientId = event.patient.id,
+                                    visitId = visit.id
                                 )
                             )
-                        }
+                        )
+
+//                        when (val result = patientRepository.addPatient(event.patient)) {
+//
+//                            is Outcome.Error -> {
+//                                _state.update {
+//                                    it.copy(error = result.message)
+//                                }
+//                            }
+//
+//                            is Outcome.Success<String> -> {
+//
+//                                when (val visit = createReturnVisitUseCase(event.patient.id)) {
+//                                    is Outcome.Error -> {
+//                                        _state.update {
+//                                            it.copy(error = visit.message)
+//                                        }
+//                                    }
+//
+//                                    is Outcome.Success<String> -> {
+//
+//                                        uiEventsChannel.send(
+//                                            UiEvent.ShowSnackbar(
+//                                                snackbarData = SnackbarData(
+//                                                    message = "New visit created",
+//                                                    type = SnackbarType.SUCCESS
+//                                                )
+//                                            )
+//                                        )
+//
+//                                        navigationEventsChannel.send(
+//                                            NavigationEvent.PopAndNavigate(
+//                                                Route.PatientDashboard(
+//                                                    patientId = event.patient.id,
+//                                                    visitId = result.data
+//                                                )
+//                                            )
+//                                        )
+//                                    }
+//                                }
+//
+//                            }
+//                        }
+
+
                     }
                 }
             }
@@ -125,11 +175,11 @@ class InitialIntakeViewModel @Inject constructor(
     fun getPatients() {
         viewModelScope.launch(coroutineContext) {
 
-            patientRepository.getPatientsWithLastVisitDate()
+            patientRepository.getHistoryPatients()
                 .collect { resource ->
                     when (resource) {
                         is Resource.Loading -> {
-                            _state.update{
+                            _state.update {
                                 _state.value.copy(
                                     isLoading = true
                                 )
@@ -137,7 +187,7 @@ class InitialIntakeViewModel @Inject constructor(
                         }
 
                         is Resource.Success -> {
-                            _state.update{
+                            _state.update {
                                 _state.value.copy(
                                     patients = resource.data,
                                     isLoading = false
@@ -146,7 +196,7 @@ class InitialIntakeViewModel @Inject constructor(
                         }
 
                         is Resource.Error -> {
-                            _state.update{
+                            _state.update {
                                 _state.value.copy(
                                     error = resource.message,
                                     isLoading = false

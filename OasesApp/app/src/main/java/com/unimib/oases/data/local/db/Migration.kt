@@ -159,3 +159,28 @@ val MIGRATION_Disease_Refactor: Migration = object : Migration(2, 3) {
         db.execSQL("PRAGMA foreign_keys=ON")
     }
 }
+
+val MIGRATION_history_patients: Migration = object : Migration(3, 4) {
+    override fun migrate(db: SupportSQLiteDatabase) {db.execSQL("PRAGMA foreign_keys=OFF")
+
+        // --- 1. Refactor DISEASE Table (as before) ---
+        db.execSQL("""
+            CREATE TABLE ${TableNames.HISTORY} (
+                id TEXT NOT NULL PRIMARY KEY,
+                public_id TEXT NOT NULL,
+                name TEXT NOT NULL,
+                birth_date TEXT NOT NULL,
+                sex TEXT NOT NULL,
+                village TEXT NOT NULL,
+                parish TEXT NOT NULL,
+                sub_county TEXT NOT NULL,
+                district TEXT NOT NULL,
+                next_of_kin TEXT NOT NULL,
+                contact TEXT NOT NULL,
+                image BLOB
+            )
+        """)
+
+        db.execSQL("PRAGMA foreign_keys=ON")
+    }
+}

@@ -4,6 +4,7 @@ import android.util.Log
 import com.unimib.oases.data.local.RoomDataSource
 import com.unimib.oases.data.mapper.toDomain
 import com.unimib.oases.data.mapper.toEntity
+import com.unimib.oases.data.util.FirestoreManager
 import com.unimib.oases.domain.model.TriageEvaluation
 import com.unimib.oases.domain.repository.TriageEvaluationRepository
 import com.unimib.oases.util.Outcome
@@ -14,9 +15,11 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
-class TriageEvaluationRepositoryImpl @Inject constructor(private val roomDataSource: RoomDataSource): TriageEvaluationRepository {
+class TriageEvaluationRepositoryImpl @Inject constructor(private val roomDataSource: RoomDataSource,
+                                                         private val firestoreManager: FirestoreManager): TriageEvaluationRepository {
     override suspend fun insertTriageEvaluation(triageEvaluation: TriageEvaluation): Outcome<Unit> {
         return try {
+            // firestoreManager.insertTriageEvaluation(triageEvaluation)
             roomDataSource.insertTriageEvaluation(triageEvaluation.toEntity())
             Outcome.Success(Unit)
         } catch (e: Exception){
