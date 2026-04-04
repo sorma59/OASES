@@ -2,7 +2,6 @@ package com.unimib.oases
 
 import android.app.Application
 import android.content.Context
-import com.google.firebase.FirebaseApp
 import com.unimib.oases.util.PermissionHelper
 import dagger.hilt.android.HiltAndroidApp
 
@@ -13,13 +12,10 @@ class OasesApp: Application(){
         super.onCreate()
         instance = this
         PermissionHelper.init(this)
-        FirebaseApp.initializeApp(this)
     }
 
     companion object {
         private lateinit var instance: OasesApp
         fun getAppContext(): Context = instance.applicationContext
-
-
     }
 }

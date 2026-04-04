@@ -6,7 +6,6 @@ import androidx.room.TypeConverters
 import com.unimib.oases.data.local.Converters
 import com.unimib.oases.data.local.dao.ComplaintSummaryDao
 import com.unimib.oases.data.local.dao.DiseaseDao
-import com.unimib.oases.data.local.dao.HistoryDao
 import com.unimib.oases.data.local.dao.MalnutritionScreeningDao
 import com.unimib.oases.data.local.dao.PatientDao
 import com.unimib.oases.data.local.dao.PatientDiseaseDao
@@ -17,7 +16,6 @@ import com.unimib.oases.data.local.dao.VisitVitalSignDao
 import com.unimib.oases.data.local.dao.VitalSignsDao
 import com.unimib.oases.data.local.model.ComplaintSummaryEntity
 import com.unimib.oases.data.local.model.DiseaseEntity
-import com.unimib.oases.data.local.model.HistoryEntity
 import com.unimib.oases.data.local.model.MalnutritionScreeningEntity
 import com.unimib.oases.data.local.model.PatientDiseaseEntity
 import com.unimib.oases.data.local.model.PatientEntity
@@ -32,7 +30,6 @@ import com.unimib.oases.data.local.model.VitalSignEntity
         DiseaseEntity::class,
         MalnutritionScreeningEntity::class,
         PatientEntity::class,
-        HistoryEntity::class,
         PatientDiseaseEntity::class,
         TriageEvaluationEntity::class,
         VisitEntity::class,
@@ -41,12 +38,11 @@ import com.unimib.oases.data.local.model.VitalSignEntity
         RoomEntity::class,
         ComplaintSummaryEntity::class
     ],
-    version = 4
+    version = 3
 )
 @TypeConverters(Converters::class)
 abstract class OasesDatabase : RoomDatabase() {
     abstract fun patientDao(): PatientDao
-    abstract fun historyDao(): HistoryDao
     abstract fun patientDiseaseDao(): PatientDiseaseDao
     abstract fun diseaseDao(): DiseaseDao
     abstract fun malnutritionScreeningDao(): MalnutritionScreeningDao

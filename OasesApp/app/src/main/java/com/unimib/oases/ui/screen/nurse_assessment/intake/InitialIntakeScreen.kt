@@ -140,9 +140,9 @@ private fun PatientsListContent(
                     DataColumn(Alignment.Center) {
                         Text(color = MaterialTheme.colorScheme.surface, text = "Village")
                     },
-//                    DataColumn(Alignment.Center) {
-//                        Text(color = MaterialTheme.colorScheme.surface, text = "Last time here")
-//                    }
+                    DataColumn(Alignment.Center) {
+                        Text(color = MaterialTheme.colorScheme.surface, text = "Last time here")
+                    }
                 )
             ) {
 
@@ -152,7 +152,7 @@ private fun PatientsListContent(
                         backgroundColor = if (index % 2 == 0) colorEven else colorOdd
                         // Handle row click
                         onClick = {
-                            onEvent(InitialIntakeEvent.PatientClicked(patient))
+                            onEvent(InitialIntakeEvent.PatientClicked(patient.id))
                         }
 
                         cell {
@@ -164,7 +164,7 @@ private fun PatientsListContent(
                         }
 
                         cell {
-                            Text(getAgeString(patient), textAlign = TextAlign.Center)
+                            Text(getAgeString(patient.patient), textAlign = TextAlign.Center)
                         }
 
                         cell {
@@ -175,9 +175,9 @@ private fun PatientsListContent(
                             Text(patient.village)
                         }
 
-//                        cell {
-//                            Text(formatDate(patient.lastVisitDate))
-//                        }
+                        cell {
+                            Text(formatDate(patient.lastVisitDate))
+                        }
                     }
                 }
             }

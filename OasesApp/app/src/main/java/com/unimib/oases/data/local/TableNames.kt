@@ -4,7 +4,6 @@ object TableNames {
     const val DISEASE = "diseases"
     const val PATIENT_DISEASE = "patients_diseases"
     const val PATIENT = "patients"
-    const val HISTORY = "history"
     const val USER = "users"
     const val VISIT = "visits"
     const val VISIT_VITAL_SIGN = "visits_vital_signs"

@@ -5,7 +5,6 @@ import com.unimib.oases.data.local.RoomDataSource
 import com.unimib.oases.data.mapper.toDomain
 import com.unimib.oases.data.mapper.toEntities
 import com.unimib.oases.data.mapper.toEntity
-import com.unimib.oases.data.util.FirestoreManager
 import com.unimib.oases.domain.model.PatientWithVisitInfo
 import com.unimib.oases.domain.model.TriageEvaluation
 import com.unimib.oases.domain.model.Visit
@@ -21,7 +20,6 @@ import javax.inject.Inject
 
 class VisitRepositoryImpl @Inject constructor(
     private val roomDataSource: RoomDataSource,
-    private val firestoreManager: FirestoreManager
 ): VisitRepository {
 
     override suspend fun addVisit(visit: Visit): Outcome<String> {
@@ -40,13 +38,11 @@ class VisitRepositoryImpl @Inject constructor(
         vitalSigns: List<VisitVitalSign>
     ): Outcome<Unit> {
         return try {
-            firestoreManager.updateVisit(visit.toEntity())
             roomDataSource.insertTriageEvaluationAndUpdateVisit(
                 visit.toEntity(),
                 triageEvaluation.toEntity(),
                 vitalSigns.toEntities()
             )
-
             Outcome.Success(Unit)
         } catch (e: Exception) {
             Log.e("VisitRepository", "Error adding visit with triage evaluation: ${e.message}")

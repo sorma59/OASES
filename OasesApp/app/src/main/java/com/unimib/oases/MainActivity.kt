@@ -11,9 +11,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.CompositionLocalProvider
-import com.google.firebase.FirebaseApp
 import com.unimib.oases.bluetooth.BluetoothCustomManager
-import com.unimib.oases.data.util.FirestoreManager
 import com.unimib.oases.ui.screen.root.OasesRoot
 import com.unimib.oases.ui.theme.OasesTheme
 import com.unimib.oases.util.LocalWindowSizeClass
@@ -23,19 +21,17 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    @Inject
-    lateinit var firestoreManager: FirestoreManager
-
+//    @Inject
+//    lateinit var firestoreManager: FirestoreManager
 
     @Inject
     lateinit var bluetoothCustomManager: BluetoothCustomManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
 
         // start listener
-       firestoreManager.startListener()
+//        firestoreManager.startListener()
 
 
         // Define an ActivityResultLauncher for enabling Bluetooth
