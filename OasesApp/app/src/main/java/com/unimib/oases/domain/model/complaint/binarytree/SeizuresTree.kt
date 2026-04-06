@@ -9,6 +9,8 @@ class SeizuresTree(
     patientCategory: PatientCategory
 ): Tree {
 
+    override val id = TreeId.SEIZURES
+
     // Questions
 
     val activeTonicClonicSeizuresQuestion = "Are there active tonic-clonic seizures?"

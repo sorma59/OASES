@@ -6,5 +6,6 @@ sealed class ReassessmentEvent {
     data class FindingSelected(val finding: Finding): ReassessmentEvent()
     data object GenerateDefinitiveTherapiesClicked: ReassessmentEvent()
     data object SubmitClicked: ReassessmentEvent()
+    data object ReattemptSaving: ReassessmentEvent()
     data object RetryButtonClicked: ReassessmentEvent()
 }

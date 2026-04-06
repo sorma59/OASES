@@ -5,6 +5,8 @@ import com.unimib.oases.domain.model.symptom.Symptom
 
 class DiarrheaTree(val ageInYears: Int): Tree {
 
+    override val id = TreeId.DIARRHEA
+
     // Questions
 
     val shockOrSevereDehydrationQuestion = "Are there signs of shock/severe dehydration (lethargic/unconscious, weak rapid pulse, cold extremities, capillary refill > 3 sec, hypotension, unable to drink)?"

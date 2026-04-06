@@ -106,7 +106,6 @@ fun MainScaffold(
                 AppNavigation(
                     startDestination,
                     navController,
-                    authViewModel,
                     appViewModel,
                     Modifier
                         .consumeWindowInsets(padding)

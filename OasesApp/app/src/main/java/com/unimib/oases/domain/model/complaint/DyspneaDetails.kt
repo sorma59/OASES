@@ -13,6 +13,7 @@ object DyspneaDetails: ComplaintDetails {
 }
 
 data object DyspneaDurationQuestion: SingleChoiceComplaintQuestion{
+    override val id = DyspneaDetailQuestionsIds.DURATION
     override val question = "How long did the patient experience cough/difficulty breathing for?"
     override val isRequired = true
     override val options: List<Symptom> = listOf(
@@ -24,6 +25,7 @@ data object DyspneaDurationQuestion: SingleChoiceComplaintQuestion{
 }
 
 data object DyspneaCourseQuestion: SingleChoiceComplaintQuestion{
+    override val id = DyspneaDetailQuestionsIds.COURSE
     override val question = "How was the course of the cough/dyspnea?"
     override val isRequired = true
     override val options: List<Symptom> = listOf(
@@ -34,6 +36,7 @@ data object DyspneaCourseQuestion: SingleChoiceComplaintQuestion{
 }
 
 data object DyspneaCoughAspectQuestion: SingleChoiceComplaintQuestion{
+    override val id = DyspneaDetailQuestionsIds.ASPECT
     override val question = "How does the cough look like?"
     override val isRequired = true
     override val options: List<Symptom> = listOf(
@@ -45,6 +48,7 @@ data object DyspneaCoughAspectQuestion: SingleChoiceComplaintQuestion{
 }
 
 data object DyspneaOtherSymptoms: OtherSymptomsQuestion {
+    override val id = DyspneaDetailQuestionsIds.OTHER_SYMPTOMS
     override val isRequired = false
     override val options = listOf(
         Symptom.FeverAbove38Degrees,
@@ -69,6 +73,7 @@ data object DyspneaOtherSymptoms: OtherSymptomsQuestion {
 }
 
 data object DyspneaOtherHighRiskSymptoms: OtherHighRiskSymptomsQuestion {
+    override val id = DyspneaDetailQuestionsIds.OTHER_HIGH_RISK_SYMPTOMS
     override val isRequired = false
     override val options = listOf(
         Symptom.RecentChokingOrForeignBodyInhalation,
@@ -84,4 +89,12 @@ data object DyspneaOtherHighRiskSymptoms: OtherHighRiskSymptomsQuestion {
         Symptom.Unvaccinated,
         Symptom.SmokingOrExposedToSmoke
     )
+}
+
+object DyspneaDetailQuestionsIds {
+    const val DURATION = "dyspnea_duration"
+    const val COURSE = "dyspnea_course"
+    const val ASPECT = "dyspnea_aspect"
+    const val OTHER_SYMPTOMS = "dyspnea_other_symptoms"
+    const val OTHER_HIGH_RISK_SYMPTOMS = "dyspnea_other_high_risk_symptoms"
 }

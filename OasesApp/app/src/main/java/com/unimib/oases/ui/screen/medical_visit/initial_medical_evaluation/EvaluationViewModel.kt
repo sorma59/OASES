@@ -4,16 +4,21 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.unimib.oases.data.local.model.TreeAnswers
 import com.unimib.oases.di.IoDispatcher
+import com.unimib.oases.domain.model.Evaluation
 import com.unimib.oases.domain.model.complaint.Complaint
 import com.unimib.oases.domain.model.complaint.ComplaintQuestion
+import com.unimib.oases.domain.model.complaint.binarytree.LeafNode
 import com.unimib.oases.domain.model.complaint.binarytree.ManualNode
+import com.unimib.oases.domain.model.complaint.binarytree.ShowableNode
+import com.unimib.oases.domain.model.complaint.binarytree.next
+import com.unimib.oases.domain.repository.EvaluationRepository
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.domain.repository.TriageEvaluationRepository
 import com.unimib.oases.domain.usecase.AnswerImmediateTreatmentQuestionUseCase
 import com.unimib.oases.domain.usecase.GenerateSuggestedSupportiveTherapiesUseCase
 import com.unimib.oases.domain.usecase.GenerateSuggestedTestsUseCase
-import com.unimib.oases.domain.usecase.GetCurrentVisitUseCase
 import com.unimib.oases.domain.usecase.SelectSymptomUseCase
 import com.unimib.oases.domain.usecase.SubmitMedicalVisitPartOneUseCase
 import com.unimib.oases.domain.usecase.TranslateLatestVitalSignsToSymptomsUseCase
@@ -23,11 +28,13 @@ import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.ui.util.snackbar.SnackbarData
 import com.unimib.oases.util.Outcome
+import com.unimib.oases.util.firstNullableSuccess
 import com.unimib.oases.util.firstSuccess
 import com.unimib.oases.util.toggle
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -46,21 +53,22 @@ class EvaluationViewModel @Inject constructor(
     private val submitMedicalVisitPartOneUseCase: SubmitMedicalVisitPartOneUseCase,
     private val generateSuggestedTestsUseCase: GenerateSuggestedTestsUseCase,
     private val generateSuggestedSupportiveTherapiesUseCase: GenerateSuggestedSupportiveTherapiesUseCase,
-    private val getCurrentVisitUseCase: GetCurrentVisitUseCase,
     private val translateTriageSymptomIdsToSymptomsUseCase: TranslateTriageSymptomIdsToSymptomsUseCase,
     private val translateLatestVitalSignsToSymptomsUseCase: TranslateLatestVitalSignsToSymptomsUseCase,
     private val selectSymptomUseCase: SelectSymptomUseCase,
     savedStateHandle: SavedStateHandle,
     @param:IoDispatcher private val dispatcher: CoroutineDispatcher,
     private val patientRepository: PatientRepository,
-    private val triageEvaluationRepository: TriageEvaluationRepository
+    private val triageEvaluationRepository: TriageEvaluationRepository,
+    private val evaluationRepository: EvaluationRepository,
 ): ViewModel() {
 
     private val errorHandler = CoroutineExceptionHandler { _, e ->
         e.printStackTrace()
         _state.update{
             it.copy(
-                error = e.message
+                error = e.message,
+                isLoading = false,
             )
         }
     }
@@ -94,40 +102,78 @@ class EvaluationViewModel @Inject constructor(
         initialize()
     }
 
-    private fun initialize(shouldRebuildTree: Boolean = true){
+    private fun initialize(){
         viewModelScope.launch(dispatcher + errorHandler){
-            updateError(null)
-            updateLoading(true)
-            getPatientData()
-            getTriageData()
-            getVitalSignsData()
-            if (shouldRebuildTree){
-                getComplaint()
-                handleComplaint()
-            }
-            updateLoading(false)
-        }
-    }
 
-    private fun getComplaint() {
-
-        val patient = state.value.patient
-        patient?.let { patient ->
-            _state.update{
+            _state.update {
                 it.copy(
+                    error = null,
+                    isLoading = true,
+                )
+            }
+
+            val evaluationDeferred = async {
+                evaluationRepository
+                    .getEvaluation(
+                        visitId = state.value.visitId,
+                        complaintId = state.value.complaintId,
+                    )
+                    .firstNullableSuccess()
+            }
+
+            val patientDeferred = async {
+                patientRepository
+                    .getPatientById(patientId = state.value.patientId)
+                    .firstSuccess()
+            }
+
+            val triageEvaluationDeferred = async {
+                triageEvaluationRepository
+                    .getTriageEvaluation(visitId = state.value.visitId)
+                    .firstSuccess()
+            }
+
+            val vitalSignsDeferred = async {
+                translateLatestVitalSignsToSymptomsUseCase(patientId = state.value.patientId)
+            }
+
+            val evaluation = evaluationDeferred.await()
+            val patient = patientDeferred.await()
+            val triageEvaluation = triageEvaluationDeferred.await()
+            val vitalSignsSymptomsIds = vitalSignsDeferred.await()
+
+            _state.update {
+                it.copy(
+                    patient = patient,
                     complaint = Complaint.getComplaint(
                         state.value.complaintId,
                         patient.ageInMonths,
                         patient.sex,
                         patient.category
-                    )
+                    ),
                 )
             }
 
-        } ?: run {
-            updateError("Patient not found")
-        }
+            val triageSymptomsIds = translateTriageSymptomIdsToSymptomsUseCase(
+                triageEvaluation.symptomsIds
+            )
 
+            if (evaluation == null) {
+                _state.update {
+                    it.copy(
+                        patient = patient,
+                        symptoms = triageSymptomsIds + vitalSignsSymptomsIds
+                    )
+                }
+                handleComplaint()
+            } else {
+                _state.update {
+                    evaluation.toEvaluationState()
+                }
+            }
+
+            stopLoading()
+        }
     }
 
     private fun handleComplaint() {
@@ -162,75 +208,29 @@ class EvaluationViewModel @Inject constructor(
         }
     }
 
-    private fun updateLoading(isLoading: Boolean) {
+    private fun stopLoading() {
         _state.update {
             it.copy(
-                isLoading = isLoading
+                isLoading = false
             )
         }
     }
 
     private fun showFirstQuestion(firstNode: ManualNode) {
         _state.update {
+            checkNotNull(it.complaint) {
+                "Complaint was not found"
+            }
             it.copy(
                 immediateTreatmentQuestions = listOf(
-                    listOf(
-                        ImmediateTreatmentQuestionState(firstNode)
+                    TreeSummary(
+                        treeId = it.complaint.immediateTreatmentTrees[0].id.value,
+                        answers = listOf(
+                            ImmediateTreatmentQuestionState(firstNode)
+                        )
                     )
                 )
             )
-        }
-    }
-
-    private suspend fun getPatientData() {
-        try {
-            val patient = patientRepository
-                .getPatientById(state.value.patientId)
-                .firstSuccess()
-            _state.update {
-                it.copy(
-                    patient = patient
-                )
-            }
-        } catch (e: Exception) {
-            updateError(e.message ?: "Unknown error")
-        }
-    }
-
-    private suspend fun getTriageData(){
-        try {
-
-            val visit = getCurrentVisitUseCase(state.value.patientId)
-
-            val triageEvaluation = triageEvaluationRepository
-                .getTriageEvaluation(visit.id)
-                .firstSuccess()
-
-            val ids = triageEvaluation.redSymptomIds + triageEvaluation.yellowSymptomIds
-            _state.update {
-                it.copy(
-                    symptoms = it.symptoms + translateTriageSymptomIdsToSymptomsUseCase(ids)
-                )
-            }
-
-        } catch (e: Exception) {
-            _state.update { it.copy(error = e.message) }
-        } finally {
-            _state.update { it.copy(isLoading = false) }
-        }
-    }
-
-    private suspend fun getVitalSignsData(){
-        try {
-            _state.update {
-                it.copy(
-                    symptoms = it.symptoms + translateLatestVitalSignsToSymptomsUseCase(it.patientId)
-                )
-            }
-        } catch (e: Exception) {
-            _state.update { it.copy(error = e.message) }
-        } finally {
-            _state.update { it.copy(isLoading = false) }
         }
     }
 
@@ -268,7 +268,7 @@ class EvaluationViewModel @Inject constructor(
             }
 
             EvaluationEvent.RetryButtonClicked -> {
-                initialize(false)
+                initialize()
             }
 
             EvaluationEvent.GenerateTestsPressed -> {
@@ -276,7 +276,7 @@ class EvaluationViewModel @Inject constructor(
                     it.copy(
                         conditions = generateSuggestedTestsUseCase(it.complaint!!, it.symptoms),
                         supportiveTherapies = generateSuggestedSupportiveTherapiesUseCase(it.complaint, it.symptoms),
-                        shouldShowSubmitButton = true
+                        wereTestsGenerated = true,
                     )
                 }
             }
@@ -333,6 +333,63 @@ class EvaluationViewModel @Inject constructor(
                     state.value.detailsQuestions.size
             }
         }
+    }
+
+    fun Evaluation.toEvaluationState(): EvaluationState {
+
+        val complaint = state.value.complaint ?: error("Complaint id $complaintId not found")
+        
+        // replay tree paths to reconstruct question states
+        val immediateTreatmentQuestions = treeAnswers.map { treeAnswer ->
+            val tree = complaint.immediateTreatmentTrees.first { it.id.value == treeAnswer.treeId }
+            replayTreePath(tree.root, treeAnswer)
+        }
+
+        val detailQuestions = complaint.details.questions
+
+        return state.value.copy(
+            immediateTreatmentAlgorithms = complaint.immediateTreatmentTrees,
+            immediateTreatmentAlgorithmsToShow = complaint.immediateTreatmentTrees.size,
+            immediateTreatmentQuestions = immediateTreatmentQuestions,
+            leaves = immediateTreatmentQuestions.map { treeSummary ->
+                treeSummary.answers.lastOrNull()?.let { last ->
+                    last.node.children.let { children ->
+                        val answer = last.answer ?: return@let null
+                        if (answer) children.left else children.right
+                    } as? LeafNode
+                }
+            },
+            detailsQuestions = detailQuestions,
+            detailsQuestionsToShow = detailQuestions.size,
+            symptoms = symptoms,
+            requestedTests = emptySet(), // must fill in again
+            additionalTestsText = additionalTestsText,
+            conditions = complaint.tests.conditions.filter { it.predicate(symptoms) },
+        )
+    }
+
+    private fun replayTreePath(
+        root: ManualNode,
+        treeAnswers: TreeAnswers,
+    ): TreeSummary {
+        val result = mutableListOf<ImmediateTreatmentQuestionState>()
+        var current: ShowableNode = root
+
+        for (answer in treeAnswers.path) {
+            if (current !is ManualNode) break
+            result.add(ImmediateTreatmentQuestionState(node = current, answer = answer))
+            current = current.next(answer)
+        }
+
+        // add the last node without an answer (the one currently shown)
+        if (current is ManualNode) {
+            result.add(ImmediateTreatmentQuestionState(node = current, answer = null))
+        }
+
+        return TreeSummary(
+            treeId = treeAnswers.treeId,
+            answers = result,
+        )
     }
 }
 

@@ -1,12 +1,17 @@
 package com.unimib.oases.ui.screen.medical_visit
 
-import com.unimib.oases.domain.model.ComplaintSummary
+import com.unimib.oases.domain.model.Evaluation
+import com.unimib.oases.domain.model.Reassessment
 
 data class MedicalVisitState(
     val patientId: String,
     val visitId: String,
-    val complaintSummaries: Map<String, ComplaintSummary> = emptyMap(),
+    val evaluations: Map<String, Evaluation> = emptyMap(),
+    val reassessments: Map<String, Reassessment> = emptyMap(),
 
     val isLoading: Boolean = false,
     val error: String? = null,
-)
+) {
+    val isDispositionUnlocked: Boolean
+        get() = reassessments.isNotEmpty()
+}

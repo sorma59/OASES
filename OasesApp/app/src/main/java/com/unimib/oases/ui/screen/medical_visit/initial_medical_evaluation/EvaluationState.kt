@@ -13,15 +13,25 @@ import com.unimib.oases.domain.model.complaint.binarytree.ManualNode
 import com.unimib.oases.domain.model.complaint.binarytree.Tree
 import com.unimib.oases.domain.model.symptom.Symptom
 
-fun List<ImmediateTreatmentQuestionState>.rebranch(
+fun TreeSummary.rebranch(
     node: ManualNode,
     answer: Boolean
-): List<ImmediateTreatmentQuestionState> {
-    val index = this.indexOfFirst { it.node == node }
+): TreeSummary {
+    val index = this.answers.indexOfFirst { it.node == node }
 
     if (index == -1) return this // should not happen though
 
-    return this.take(index) + ImmediateTreatmentQuestionState(node, answer)
+    return this.copy(
+        answers = this.answers.take(index) + ImmediateTreatmentQuestionState(node, answer)
+    )
+}
+
+fun TreeSummary.appendQuestion(
+    question: ImmediateTreatmentQuestionState,
+): TreeSummary {
+    return this.copy(
+        answers = this.answers + question
+    )
 }
 
 data class EvaluationState(
@@ -33,7 +43,7 @@ data class EvaluationState(
 
     val immediateTreatmentAlgorithmsToShow: Int = 0,
     val immediateTreatmentAlgorithms: List<Tree> = emptyList(),
-    val immediateTreatmentQuestions: List<List<ImmediateTreatmentQuestionState>> = emptyList(),
+    val immediateTreatmentQuestions: List<TreeSummary> = emptyList(),
     val leaves: List<LeafNode?> = emptyList(),
 
     val detailsQuestions: List<ComplaintQuestion> = emptyList(),
@@ -49,7 +59,7 @@ data class EvaluationState(
 
     val supportiveTherapies: List<SupportiveTherapy>? = null,
 
-    val shouldShowSubmitButton: Boolean = false,
+    val wereTestsGenerated: Boolean = false,
 
     val isLoading: Boolean = false,
     val error: String? = null,
@@ -69,4 +79,9 @@ data class EvaluationState(
 data class ImmediateTreatmentQuestionState(
     val node: ManualNode,
     val answer: Boolean? = null
+)
+
+data class TreeSummary(
+    val treeId: String,
+    val answers: List<ImmediateTreatmentQuestionState>
 )

@@ -1,18 +1,18 @@
 package com.unimib.oases.domain.usecase
 
 import com.unimib.oases.domain.model.QuestionAndAnswer
-import com.unimib.oases.ui.screen.medical_visit.initial_medical_evaluation.ImmediateTreatmentQuestionState
+import com.unimib.oases.ui.screen.medical_visit.initial_medical_evaluation.TreeSummary
 import javax.inject.Inject
 
 class ConvertTreeBranchesToTextUseCase @Inject constructor(
     private val convertNodeAnswerToStringUseCase: ConvertNodeAnswerToStringUseCase
 ) {
 
-    operator fun invoke(listOfAnsweredNodes: List<List<ImmediateTreatmentQuestionState>>): List<List<QuestionAndAnswer>> {
-        return listOfAnsweredNodes.map { list ->
-            list.map {
+    operator fun invoke(listOfAnsweredNodes: List<TreeSummary>): List<List<QuestionAndAnswer>> {
+        return listOfAnsweredNodes.map { summary ->
+            summary.answers.map {
                 QuestionAndAnswer(
-                    it.node.value,
+                    it .node.value,
                     convertNodeAnswerToStringUseCase(it.answer!!)
                 )
             }

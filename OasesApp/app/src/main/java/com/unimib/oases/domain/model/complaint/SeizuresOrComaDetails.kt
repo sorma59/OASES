@@ -23,6 +23,7 @@ object SeizuresOrComaDetails: ComplaintDetails {
 }
 
 data object SeizuresOrComaResponsivenessQuestion: SingleChoiceComplaintQuestion, ComplaintQuestionWithImmediateTreatment {
+    override val id = SeizuresOrComaDetailQuestionsIds.RESPONSIVENESS
     override val question = "How is the patient current level of consciousness?"
     override val isRequired = true
     override val options: List<Symptom> = listOf(
@@ -39,6 +40,7 @@ data object SeizuresOrComaResponsivenessQuestion: SingleChoiceComplaintQuestion,
 }
 
 data object SeizuresOrComaDurationQuestion: SingleChoiceComplaintQuestion {
+    override val id = SeizuresOrComaDetailQuestionsIds.DURATION
     override val question = "How long did the patient experience seizures or altered state of consciousness for?"
     override val isRequired = true
     override val options: List<Symptom> = listOf(
@@ -50,6 +52,7 @@ data object SeizuresOrComaDurationQuestion: SingleChoiceComplaintQuestion {
 }
 
 data object SeizuresOrComaEpilepsyQuestion: BooleanComplaintQuestion {
+    override val id = SeizuresOrComaDetailQuestionsIds.EPILEPSY
     override val question = "Has the patient had ≥ 2 seizures with incomplete recovery of consciousness between them or a seizure lasting > 5 min?"
     override val isRequired = true
     override val trueSymptom = Symptom.StatusEpilepticus
@@ -61,6 +64,7 @@ data object SeizuresOrComaEpilepsyQuestion: BooleanComplaintQuestion {
 }
 
 data object SeizureOrComaSeizuresTypeQuestion: SingleChoiceComplaintQuestion {
+    override val id = SeizuresOrComaDetailQuestionsIds.SEIZURES_TYPE
     override val question = "How are the seizures?"
     override val isRequired = true
     override val options: List<Symptom> = listOf(
@@ -71,6 +75,7 @@ data object SeizureOrComaSeizuresTypeQuestion: SingleChoiceComplaintQuestion {
 }
 
 data object SeizuresOrComaOtherSymptoms: OtherSymptomsQuestion {
+    override val id = SeizuresOrComaDetailQuestionsIds.OTHER_SYMPTOMS
     override val isRequired = false
     override val options = listOf(
         Symptom.Hypoglycemia,
@@ -94,6 +99,7 @@ data object SeizuresOrComaOtherSymptoms: OtherSymptomsQuestion {
 }
 
 data object SeizuresOrComaOtherHighRiskSymptoms: OtherHighRiskSymptomsQuestion {
+    override val id = SeizuresOrComaDetailQuestionsIds.OTHER_HIGH_RISK_SYMPTOMS
     override val isRequired = false
     override val options: List<Symptom> = listOf(
         Symptom.EpilepsyOrHistoryOfRecurrentUnprovokedSeizures,
@@ -107,4 +113,13 @@ data object SeizuresOrComaOtherHighRiskSymptoms: OtherHighRiskSymptomsQuestion {
         Symptom.Diabetes,
         Symptom.CurrentPregnancy
     )
+}
+
+object SeizuresOrComaDetailQuestionsIds {
+    const val RESPONSIVENESS = "seizures_or_coma_responsiveness"
+    const val DURATION = "seizures_or_coma_frequency"
+    const val EPILEPSY = "seizures_or_coma_epilepsy"
+    const val SEIZURES_TYPE = "seizures_or_coma_seizures_type"
+    const val OTHER_SYMPTOMS = "seizures_or_coma_other_symptoms"
+    const val OTHER_HIGH_RISK_SYMPTOMS = "seizures_or_coma_other_high_risk_symptoms"
 }

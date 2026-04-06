@@ -14,6 +14,7 @@ object DiarrheaDetails: ComplaintDetails {
 }
 
 data object DiarrheaDurationQuestion: SingleChoiceComplaintQuestion{
+    override val id = DiarrheaDetailQuestionsIds.DURATION
     override val question = "How long did the patient experience diarrhea for?"
     override val isRequired = true
     override val options: List<Symptom> = listOf(
@@ -25,6 +26,7 @@ data object DiarrheaDurationQuestion: SingleChoiceComplaintQuestion{
 }
 
 data object DiarrheaFrequencyQuestion: SingleChoiceComplaintQuestion{
+    override val id = DiarrheaDetailQuestionsIds.FREQUENCY
     override val question = "How many episodes of diarrhea does the patient have?"
     override val isRequired = true
     override val options: List<Symptom> = listOf(
@@ -35,6 +37,7 @@ data object DiarrheaFrequencyQuestion: SingleChoiceComplaintQuestion{
 }
 
 data object DiarrheaAspectQuestion: SingleChoiceComplaintQuestion{
+    override val id = DiarrheaDetailQuestionsIds.ASPECT
     override val question = "How do the stools look like?"
     override val isRequired = true
     override val options: List<Symptom> = listOf(
@@ -45,6 +48,7 @@ data object DiarrheaAspectQuestion: SingleChoiceComplaintQuestion{
 }
 
 data object DiarrheaOtherSymptoms: OtherSymptomsQuestion {
+    override val id = DiarrheaDetailQuestionsIds.OTHER_SYMPTOMS
     override val isRequired = false
     override val options = listOf(
         Symptom.Vomiting,
@@ -61,9 +65,18 @@ data object DiarrheaOtherSymptoms: OtherSymptomsQuestion {
 }
 
 data object DiarrheaOtherHighRiskSymptoms: OtherHighRiskSymptomsQuestion {
+    override val id = DiarrheaDetailQuestionsIds.OTHER_HIGH_RISK_SYMPTOMS
     override val isRequired = false
     override val options = listOf(
         Symptom.HivPositive,
         Symptom.CholeraOutbreak
     )
+}
+
+object DiarrheaDetailQuestionsIds {
+    const val DURATION = "diarrhea_duration"
+    const val FREQUENCY = "diarrhea_frequency"
+    const val ASPECT = "diarrhea_aspect"
+    const val OTHER_SYMPTOMS = "diarrhea_other_symptoms"
+    const val OTHER_HIGH_RISK_SYMPTOMS = "diarrhea_other_high_risk_symptoms"
 }

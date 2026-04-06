@@ -7,5 +7,6 @@ data class PatientFullData(
     val vitalSigns: List<VisitVitalSign> = emptyList(),
     val triageEvaluation: TriageEvaluation? = null,
     val malnutritionScreening: MalnutritionScreening? = null,
-    val complaintsSummaries: List<ComplaintSummary> = emptyList()
+    val evaluations: List<Evaluation> = emptyList(),
+    val reassessment: List<Reassessment> = emptyList(),
 )

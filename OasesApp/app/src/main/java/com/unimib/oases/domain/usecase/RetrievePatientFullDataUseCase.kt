@@ -2,7 +2,7 @@ package com.unimib.oases.domain.usecase
 
 import android.util.Log
 import com.unimib.oases.domain.model.PatientFullData
-import com.unimib.oases.domain.repository.ComplaintSummaryRepository
+import com.unimib.oases.domain.repository.EvaluationRepository
 import com.unimib.oases.domain.repository.MalnutritionScreeningRepository
 import com.unimib.oases.domain.repository.PatientRepository
 import com.unimib.oases.domain.repository.TriageEvaluationRepository
@@ -23,7 +23,7 @@ class RetrievePatientFullDataUseCase @Inject constructor(
     private val visitVitalSignRepository: VisitVitalSignRepository,
     private val triageEvaluationRepository: TriageEvaluationRepository,
     private val malnutritionScreeningRepository: MalnutritionScreeningRepository,
-    private val complaintSummaryRepository: ComplaintSummaryRepository
+    private val evaluationRepository: EvaluationRepository
 ) {
 
     suspend operator fun invoke(patientId: String): Resource<PatientFullData> {
@@ -75,8 +75,8 @@ class RetrievePatientFullDataUseCase @Inject constructor(
 
                     // Current visit's complaints summaries
                     val complaintsSummariesDeferred = async {
-                        complaintSummaryRepository
-                            .getVisitComplaintsSummaries(visit.id)
+                        evaluationRepository
+                            .getVisitEvaluations(visit.id)
                             .firstSuccess()
                     }
 
@@ -95,7 +95,7 @@ class RetrievePatientFullDataUseCase @Inject constructor(
                             vitalSigns = vitalSigns,
                             triageEvaluation = triageEvaluation,
                             malnutritionScreening = malnutritionScreening,
-                            complaintsSummaries = complaintsSummaries
+                            evaluations = complaintsSummaries
                         )
                     )
                 }

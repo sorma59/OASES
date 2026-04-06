@@ -121,7 +121,8 @@ private fun EvaluationContent(
             state.shouldShowGenerateTestsButton
         )
 
-        state.complaint?.let {
+
+        if (state.wereTestsGenerated){
             Tests(
                 state,
                 isChecked,
@@ -131,12 +132,11 @@ private fun EvaluationContent(
             )
 
             SupportiveTherapies(state)
-        }
 
-        SubmitButton(
-            onSubmit,
-            state.shouldShowSubmitButton
-        )
+            SubmitButton(
+                onSubmit,
+            )
+        }
 
         Spacer(Modifier.height(256.dp))
     }
@@ -145,19 +145,16 @@ private fun EvaluationContent(
 @Composable
 private fun SubmitButton(
     onClick: () -> Unit,
-    visible: Boolean
 ) {
-    if (visible) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier.fillMaxWidth()
-        ){
-            Button(
-                onClick = onClick,
-                modifier = Modifier.size(256.dp, 64.dp)
-            ) {
-                TitleText("Submit")
-            }
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier.fillMaxWidth()
+    ){
+        Button(
+            onClick = onClick,
+            modifier = Modifier.size(256.dp, 64.dp)
+        ) {
+            TitleText("Submit")
         }
     }
 }
@@ -311,7 +308,7 @@ private fun ImmediateTreatmentQuestions(
             algorithms.forEachIndexed { index, algorithm ->
                 if (index <= state.immediateTreatmentQuestions.size) // Somewhat defensive
                     Column{
-                        state.immediateTreatmentQuestions.elementAt(index).forEach { (node, answer) ->
+                        state.immediateTreatmentQuestions.elementAt(index).answers.forEach { (node, answer) ->
                             YesOrNoQuestion(
                                 question = node.value,
                                 onAnswer = {

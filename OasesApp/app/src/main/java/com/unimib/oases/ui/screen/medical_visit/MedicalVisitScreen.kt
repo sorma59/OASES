@@ -20,8 +20,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -61,26 +61,16 @@ private fun MedicalVisitContent(
 ) {
     val scrollState = rememberScrollState()
 
-    Box(Modifier.padding(bottom = 32.dp)) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(scrollState),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Spacer(Modifier.height(32.dp))
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(scrollState),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Spacer(Modifier.height(32.dp))
 
-            MainComplaintsGrid(state, onEvent)
-        }
-
-        FloatingActionButton(
-            modifier = Modifier
-                .size(256.dp, 64.dp)
-                .align(Alignment.BottomCenter),
-            onClick = { },
-            shape = ButtonDefaults.shape
-        ) { TitleText("Disposition") }
+        MainComplaintsGrid(state, onEvent)
     }
 }
 
@@ -109,7 +99,36 @@ private fun MainComplaintsGrid(
 
         ReassessmentButtons(scrollState, state, onEvent)
 
+        FlowIcon()
+
+        Spacer(Modifier.height(8.dp))
+
+        DispositionButton(
+            isEnabled = state.isDispositionUnlocked
+        )
+
         Spacer(Modifier.height(32.dp))
+    }
+}
+
+@Composable
+private fun DispositionButton(isEnabled: Boolean) {
+
+    val (boxColor, textColor) = if (isEnabled) {
+        MaterialTheme.colorScheme.primaryContainer to MaterialTheme.colorScheme.onPrimaryContainer
+    } else {
+        MaterialTheme.colorScheme.primaryContainer.copy(0.38f) to MaterialTheme.colorScheme.onPrimaryContainer.copy(0.3f)
+    }
+
+    Button(
+        onClick = { },
+        modifier = Modifier.size(256.dp, 64.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = boxColor,
+            contentColor = textColor,
+        )
+    ) {
+        TitleText("Disposition")
     }
 }
 
@@ -167,7 +186,7 @@ private fun EvaluationBoxButton(
     BoxButton(
         complaintId,
         isEnabled = { true },
-        isCompleted = { state.complaintSummaries[complaintId.id] != null }
+        isCompleted = { state.evaluations[complaintId.id] != null }
     ) {
         onEvent(
             MedicalVisitEvent.EvaluationClicked(complaintId.id)
@@ -184,10 +203,10 @@ private fun ReassessmentBoxButton(
     BoxButton(
         complaintId,
         isEnabled = {
-            state.complaintSummaries[complaintId.id] != null
+            state.evaluations[complaintId.id] != null
         },
         isCompleted = {
-            false //TODO
+            state.reassessments[complaintId.id] != null
         }
     ) {
         onEvent(

@@ -1,16 +1,11 @@
 package com.unimib.oases.ui.screen.dashboard.patient.view
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.HorizontalDivider
@@ -18,93 +13,85 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.unimib.oases.domain.model.ComplaintSummary
+import com.unimib.oases.domain.model.Evaluation
 import com.unimib.oases.domain.model.Patient
-import com.unimib.oases.domain.model.complaint.ComplaintId
-import com.unimib.oases.ui.components.util.CenteredText
 import com.unimib.oases.ui.components.util.TitleText
-import com.unimib.oases.ui.components.util.button.RetryButton
-import com.unimib.oases.ui.components.util.effect.HandleNavigationEvents
-import com.unimib.oases.ui.screen.root.AppViewModel
 import com.unimib.oases.util.StringFormatHelper.getAgeWithSuffix
 
+//@Composable
+//fun PatientDetailsScreen(
+//    appViewModel: AppViewModel
+//) {
+//
+//    val viewModel: PatientDetailsViewModel = hiltViewModel()
+//
+//    val state by viewModel.state.collectAsState()
+//
+//    val scrollState = rememberScrollState()
+//
+//    HandleNavigationEvents(viewModel.navigationEvents, appViewModel)
+//
+//    Column(
+//        verticalArrangement = Arrangement.spacedBy(32.dp),
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .padding(16.dp)
+//            .verticalScroll(scrollState),
+//    ){
+//
+//        state.patient?.let {
+//            PatientDetails(it)
+//        } ?: Box(Modifier.fillMaxSize()) {
+//            RetryButton(
+//                error = "Failed to load patient data",
+//                onClick = { viewModel.onEvent(PatientDetailsEvent.OnRetryPatientDetails) },
+//            )
+//        }
+//
+//        MainComplaintsDetails(state, viewModel)
+//    }
+//}
+
+//@Composable
+//fun MainComplaintsDetails(
+//    state: PatientDetailsState,
+//    viewModel: PatientDetailsViewModel
+//) {
+//    state.currentVisit?.let {
+//        state.currentVisitRelatedError?.let {
+//            RetryButton(
+//                error = it,
+//                onClick = { viewModel.onEvent(PatientDetailsEvent.OnRetryCurrentVisitRelated) },
+//            )
+//        } ?: Column(
+//            verticalArrangement = Arrangement.spacedBy(16.dp)
+//        ){
+//            TitleText("Main complaints summaries", fontSize = 22)
+//            if (state.mainComplaintsSummaries.isEmpty())
+//                CenteredText("No main complaints summaries")
+//            else {
+//                for (complaint in state.mainComplaintsSummaries) {
+//                    MainComplaintSummary(complaint)
+//                    HorizontalDivider()
+//                }
+//            }
+//        }
+//    } ?: CenteredText("No current visit")
+//}
+
 @Composable
-fun PatientDetailsScreen(
-    appViewModel: AppViewModel
-) {
-
-    val viewModel: PatientDetailsViewModel = hiltViewModel()
-
-    val state by viewModel.state.collectAsState()
-
-    val scrollState = rememberScrollState()
-
-    HandleNavigationEvents(viewModel.navigationEvents, appViewModel)
-
-    Column(
-        verticalArrangement = Arrangement.spacedBy(32.dp),
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-            .verticalScroll(scrollState),
-    ){
-
-        state.patient?.let {
-            PatientDetails(it)
-        } ?: Box(Modifier.fillMaxSize()) {
-            RetryButton(
-                error = "Failed to load patient data",
-                onClick = { viewModel.onEvent(PatientDetailsEvent.OnRetryPatientDetails) },
-            )
-        }
-
-        MainComplaintsDetails(state, viewModel)
-    }
-}
-
-@Composable
-fun MainComplaintsDetails(
-    state: PatientDetailsState,
-    viewModel: PatientDetailsViewModel
-) {
-    state.currentVisit?.let {
-        state.currentVisitRelatedError?.let {
-            RetryButton(
-                error = it,
-                onClick = { viewModel.onEvent(PatientDetailsEvent.OnRetryCurrentVisitRelated) },
-            )
-        } ?: Column(
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ){
-            TitleText("Main complaints summaries", fontSize = 22)
-            if (state.mainComplaintsSummaries.isEmpty())
-                CenteredText("No main complaints summaries")
-            else {
-                for (complaint in state.mainComplaintsSummaries) {
-                    MainComplaintSummary(complaint)
-                    HorizontalDivider()
-                }
-            }
-        }
-    } ?: CenteredText("No current visit")
-}
-
-@Composable
-fun MainComplaintSummary(complaint: ComplaintSummary) {
+fun MainComplaintSummary(complaint: Evaluation) {
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ){
         Spacer(Modifier.height(8.dp))
 
-        val title = ComplaintId.complaints[complaint.complaintId]!!.label
+        val title = complaint.complaintId.label
         TitleText(title, fontSize = 20)
 
         Spacer(Modifier.height(8.dp))
@@ -159,8 +146,8 @@ fun MainComplaintSummary(complaint: ComplaintSummary) {
 
         TitleText("Selected tests", fontSize = 16)
 
-        if (complaint.tests.isNotEmpty() || complaint.additionalTests.isNotBlank()){
-            for (test in complaint.tests) {
+        if (complaint.requestedTests.isNotEmpty() || complaint.additionalTestsText.isNotBlank()){
+            for (test in complaint.requestedTests) {
                 Text(
                     text = test.label,
                     fontSize = 14.sp
@@ -174,11 +161,11 @@ fun MainComplaintSummary(complaint: ComplaintSummary) {
         }
 
 
-        if (complaint.additionalTests.isNotBlank()){
+        if (complaint.additionalTestsText.isNotBlank()){
             TitleText("Additional tests", fontSize = 16)
 
             Text(
-                text = complaint.additionalTests,
+                text = complaint.additionalTestsText,
                 fontSize = 14.sp
             )
         }

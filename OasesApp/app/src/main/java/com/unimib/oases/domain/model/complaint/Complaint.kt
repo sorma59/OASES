@@ -114,6 +114,7 @@ sealed class QuestionType {
 }
 
 sealed interface ComplaintQuestion: Question{
+    val id: String
     override val question: String
     override val type: QuestionType
     override val options: List<Symptom>

@@ -4,7 +4,7 @@ import com.unimib.oases.domain.model.complaint.TherapyText
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-object SupportiveTherapyTextSerializer {
+object TherapyTextSerializer {
 
     fun serialize(therapyText: TherapyText): ByteArray {
         val textBytes = therapyText.text.toByteArray()

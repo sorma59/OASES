@@ -20,7 +20,8 @@ object PatientFullDataSerializer {
         val malnutritionScreeningBytes = patientFullData.malnutritionScreening?.let {
             MalnutritionScreeningSerializer.serialize(it)
         }
-        val complaintSummariesListBytes = patientFullData.complaintsSummaries.map { ComplaintSummarySerializer.serialize(it)}
+        val evaluationListBytes = patientFullData.evaluations.map { EvaluationSerializer.serialize(it)}
+        val reassessmentListBytes = patientFullData.reassessment.map { ReassessmentSerializer.serialize(it)}
 
         val totalSize =
             4 + patientByteArray.size +
@@ -29,7 +30,8 @@ object PatientFullDataSerializer {
             4 + vitalSignBytesList.sumOf { 4 + it.size } +
             1 + (triageByteArray?.let { 4 + it.size } ?: 0) +
             1 + (malnutritionScreeningBytes?.let { 4 + it.size } ?: 0) +
-            4 + complaintSummariesListBytes.sumOf { 4 + it.size }
+            4 + evaluationListBytes.sumOf { 4 + it.size } +
+            4 + reassessmentListBytes.sumOf { 4 + it.size }
 
         val buffer = ByteBuffer.allocate(totalSize).order(ByteOrder.BIG_ENDIAN)
 
@@ -51,8 +53,13 @@ object PatientFullDataSerializer {
 
         buffer.putNullable(malnutritionScreeningBytes)
 
-        buffer.putInt(complaintSummariesListBytes.size)
-        complaintSummariesListBytes.forEach {
+        buffer.putInt(evaluationListBytes.size)
+        evaluationListBytes.forEach {
+            buffer.putBytes(it)
+        }
+
+        buffer.putInt(reassessmentListBytes.size)
+        reassessmentListBytes.forEach {
             buffer.putBytes(it)
         }
 
@@ -94,12 +101,20 @@ object PatientFullDataSerializer {
         // Malnutrition Screening (nullable)
         val malnutritionScreening = buffer.readNullable(MalnutritionScreeningSerializer::deserialize)
 
-        // Complaint summaries
-        val complaintSummariesCount = buffer.int
-        val complaintSummaries = List(complaintSummariesCount) {
+        // Evaluations
+        val evaluationCount = buffer.int
+        val evaluations = List(evaluationCount) {
             val size = buffer.int
             val itemBytes = ByteArray(size).also { buffer.get(it) }
-            ComplaintSummarySerializer.deserialize(itemBytes)
+            EvaluationSerializer.deserialize(itemBytes)
+        }
+
+        // Reassessments
+        val reassessmentCount = buffer.int
+        val reassessments = List(reassessmentCount) {
+            val size = buffer.int
+            val itemBytes = ByteArray(size).also { buffer.get(it) }
+            ReassessmentSerializer.deserialize(itemBytes)
         }
 
         return PatientFullData(
@@ -109,7 +124,8 @@ object PatientFullDataSerializer {
             visit = visit,
             triageEvaluation = triageEvaluation,
             malnutritionScreening = malnutritionScreening,
-            complaintsSummaries = complaintSummaries
+            evaluations = evaluations,
+            reassessment = reassessments,
         )
     }
 }

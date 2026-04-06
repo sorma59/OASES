@@ -1,21 +1,23 @@
 package com.unimib.oases.di
 
-import com.unimib.oases.data.repository.ComplaintSummaryRepositoryImpl
 import com.unimib.oases.data.repository.DiseaseRepositoryImpl
+import com.unimib.oases.data.repository.EvaluationRepositoryImpl
 import com.unimib.oases.data.repository.MalnutritionScreeningRepositoryImpl
 import com.unimib.oases.data.repository.PatientDiseaseRepositoryImpl
 import com.unimib.oases.data.repository.PatientRepositoryImpl
+import com.unimib.oases.data.repository.ReassessmentRepositoryImpl
 import com.unimib.oases.data.repository.RoomRepositoryImpl
 import com.unimib.oases.data.repository.TriageEvaluationRepositoryImpl
 import com.unimib.oases.data.repository.UserRepositoryImpl
 import com.unimib.oases.data.repository.VisitRepositoryImpl
 import com.unimib.oases.data.repository.VisitVitalSignRepositoryImpl
 import com.unimib.oases.data.repository.VitalSignRepositoryImpl
-import com.unimib.oases.domain.repository.ComplaintSummaryRepository
 import com.unimib.oases.domain.repository.DiseaseRepository
+import com.unimib.oases.domain.repository.EvaluationRepository
 import com.unimib.oases.domain.repository.MalnutritionScreeningRepository
 import com.unimib.oases.domain.repository.PatientDiseaseRepository
 import com.unimib.oases.domain.repository.PatientRepository
+import com.unimib.oases.domain.repository.ReassessmentRepository
 import com.unimib.oases.domain.repository.RoomRepository
 import com.unimib.oases.domain.repository.TriageEvaluationRepository
 import com.unimib.oases.domain.repository.UserRepository
@@ -94,7 +96,13 @@ abstract class RepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindComplaintSummaryRepository(
-        complaintSummaryRepositoryImpl: ComplaintSummaryRepositoryImpl
-    ): ComplaintSummaryRepository
+    abstract fun bindEvaluationRepository(
+        evaluationRepositoryImpl: EvaluationRepositoryImpl
+    ): EvaluationRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindReassessmentRepository(
+        reassessmentRepositoryImpl: ReassessmentRepositoryImpl
+    ): ReassessmentRepository
 }

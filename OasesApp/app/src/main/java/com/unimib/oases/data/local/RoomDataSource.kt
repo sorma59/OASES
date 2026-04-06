@@ -1,11 +1,12 @@
 package com.unimib.oases.data.local
 
 import androidx.room.withTransaction
-import com.unimib.oases.data.local.dao.ComplaintSummaryDao
 import com.unimib.oases.data.local.dao.DiseaseDao
+import com.unimib.oases.data.local.dao.EvaluationDao
 import com.unimib.oases.data.local.dao.MalnutritionScreeningDao
 import com.unimib.oases.data.local.dao.PatientDao
 import com.unimib.oases.data.local.dao.PatientDiseaseDao
+import com.unimib.oases.data.local.dao.ReassessmentDao
 import com.unimib.oases.data.local.dao.RoomsDao
 import com.unimib.oases.data.local.dao.TriageEvaluationDao
 import com.unimib.oases.data.local.dao.UserDao
@@ -14,11 +15,12 @@ import com.unimib.oases.data.local.dao.VisitVitalSignDao
 import com.unimib.oases.data.local.dao.VitalSignsDao
 import com.unimib.oases.data.local.db.AuthDatabase
 import com.unimib.oases.data.local.db.OasesDatabase
-import com.unimib.oases.data.local.model.ComplaintSummaryEntity
 import com.unimib.oases.data.local.model.DiseaseEntity
+import com.unimib.oases.data.local.model.EvaluationEntity
 import com.unimib.oases.data.local.model.MalnutritionScreeningEntity
 import com.unimib.oases.data.local.model.PatientDiseaseEntity
 import com.unimib.oases.data.local.model.PatientEntity
+import com.unimib.oases.data.local.model.ReassessmentEntity
 import com.unimib.oases.data.local.model.Role
 import com.unimib.oases.data.local.model.RoomEntity
 import com.unimib.oases.data.local.model.TriageEvaluationEntity
@@ -48,7 +50,8 @@ class RoomDataSource @Inject constructor(
     private val visitVitalSignDao: VisitVitalSignDao get() = appDatabase.visitVitalSignDao()
     private val vitalSignDao: VitalSignsDao get() = appDatabase.vitalSignDao()
     private val roomsDao: RoomsDao get() = appDatabase.roomsDao()
-    private val complaintSummaryDao: ComplaintSummaryDao get() = appDatabase.complaintSummaryDao()
+    private val evaluationDao: EvaluationDao get() = appDatabase.complaintSummaryDao()
+    private val reassessmentDao: ReassessmentDao get() = appDatabase.reassessmentDao()
 
     // -------------------Patients-------------------
     suspend fun insertPatient(patient: PatientEntity) {
@@ -265,23 +268,35 @@ class RoomDataSource @Inject constructor(
     }
 
     // Complaint summaries --------------------------
-    suspend fun insertComplaintSummary(complaintSummary: ComplaintSummaryEntity) {
-        complaintSummaryDao.insert(complaintSummary)
+    suspend fun insertComplaintSummary(complaintSummary: EvaluationEntity) {
+        evaluationDao.insert(complaintSummary)
     }
 
-    suspend fun insertComplaintSummaries(complaintSummaries: List<ComplaintSummaryEntity>) {
-        complaintSummaryDao.insertAll(complaintSummaries)
+    suspend fun insertComplaintSummaries(complaintSummaries: List<EvaluationEntity>) {
+        evaluationDao.insertAll(complaintSummaries)
     }
 
-    suspend fun deleteComplaintSummary(complaintSummary: ComplaintSummaryEntity) {
-        complaintSummaryDao.delete(complaintSummary)
+    suspend fun deleteComplaintSummary(complaintSummary: EvaluationEntity) {
+        evaluationDao.delete(complaintSummary)
     }
 
-    fun getVisitComplaintsSummaries(visitId: String): Flow<List<ComplaintSummaryEntity>> {
-        return complaintSummaryDao.getVisitComplaintsSummaries(visitId)
+    fun getVisitComplaintsSummaries(visitId: String): Flow<List<EvaluationEntity>> {
+        return evaluationDao.getVisitEvaluations(visitId)
     }
 
-    fun getComplaintSummary(visitId: String, complaintId: String): Flow<ComplaintSummaryEntity?> {
-        return complaintSummaryDao.getComplaintSummary(visitId, complaintId)
+    fun getEvaluation(visitId: String, complaintId: String): Flow<EvaluationEntity?> {
+        return evaluationDao.getEvaluation(visitId, complaintId)
+    }
+
+    suspend fun insertReassessment(reassessment: ReassessmentEntity) {
+        reassessmentDao.insert(reassessment)
+    }
+
+    fun getVisitReassessments(visitId: String): Flow<List<ReassessmentEntity>> {
+        return reassessmentDao.getVisitReassessments(visitId)
+    }
+
+    fun getReassessment(visitId: String, complaintId: String): Flow<ReassessmentEntity?> {
+        return reassessmentDao.getReassessment(visitId, complaintId)
     }
 }

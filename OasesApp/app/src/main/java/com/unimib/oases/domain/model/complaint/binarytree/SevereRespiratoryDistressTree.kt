@@ -5,6 +5,8 @@ import com.unimib.oases.domain.model.symptom.Symptom
 
 data object SevereRespiratoryDistressTree: Tree {
 
+    override val id = TreeId.SEVERE_RESPIRATORY_DISTRESS
+
     // Questions
 
     val severeRespiratoryDistressQuestion = "Are there signs of severe respiratory distress (SpO2 < 90%, central cyanosis, severe chest indrawing, nasal flaring, grunting, use of accessory muscles, head nodding)?"

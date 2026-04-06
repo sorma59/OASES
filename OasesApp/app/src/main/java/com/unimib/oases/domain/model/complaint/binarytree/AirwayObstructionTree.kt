@@ -5,6 +5,8 @@ import com.unimib.oases.domain.model.symptom.Symptom
 
 data object AirwayObstructionTree: Tree {
 
+    override val id = TreeId.AIRWAY_OBSTRUCTION
+
     // Questions 
     
     val airWayObstructionQuestion = "Are there signs of airway obstruction (stridor, apnea/gasping, unable to speak or cough)?"

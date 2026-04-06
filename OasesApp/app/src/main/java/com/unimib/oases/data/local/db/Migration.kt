@@ -159,3 +159,78 @@ val MIGRATION_Disease_Refactor: Migration = object : Migration(2, 3) {
         db.execSQL("PRAGMA foreign_keys=ON")
     }
 }
+
+val migrationEvaluationsAndReassessments: Migration = object : Migration(3,4) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+
+        // rename old table to new name
+        db.execSQL("ALTER TABLE complaints_summaries RENAME TO evaluations")
+
+        // rename symptoms → symptom_ids (SQLite doesn't support column rename before 3.25.0,
+        // so we recreate the table)
+        db.execSQL("""
+        CREATE TABLE evaluations_new (
+            visit_id TEXT NOT NULL,
+            complaint_id TEXT NOT NULL,
+            tree_answers TEXT NOT NULL DEFAULT '[]',
+            detail_question_answers TEXT NOT NULL DEFAULT '[]',
+            algorithms_questions_and_answers TEXT NOT NULL,
+            symptom_ids TEXT NOT NULL,
+            suggested_tests TEXT NOT NULL DEFAULT '[]',
+            labelled_tests TEXT NOT NULL,
+            additional_tests TEXT NOT NULL,
+            immediate_treatments TEXT NOT NULL,
+            supportive_therapies TEXT NOT NULL,
+            PRIMARY KEY(visit_id, complaint_id),
+            FOREIGN KEY(visit_id) REFERENCES visits(id) ON UPDATE NO ACTION ON DELETE CASCADE
+        )
+        """.trimIndent())
+
+        // copy existing data, mapping symptoms → symptom_ids
+        db.execSQL("""
+        INSERT INTO evaluations_new (
+            visit_id,
+            complaint_id,
+            tree_answers,
+            detail_question_answers,
+            algorithms_questions_and_answers,
+            symptom_ids,
+            suggested_tests,
+            labelled_tests,
+            additional_tests,
+            immediate_treatments,
+            supportive_therapies
+        )
+        SELECT
+            visit_id,
+            complaint_id,
+            '[]',
+            '[]',
+            algorithms_questions_and_answers,
+            symptoms,
+            '[]',
+            labelled_tests,
+            additional_tests,
+            immediate_treatments,
+            supportive_therapies
+        FROM evaluations
+        """.trimIndent())
+
+        db.execSQL("DROP TABLE evaluations")
+        db.execSQL("ALTER TABLE evaluations_new RENAME TO evaluations")
+
+        // create new reassessments table
+        db.execSQL("""
+        CREATE TABLE reassessments (
+            visit_id TEXT NOT NULL,
+            complaint_id TEXT NOT NULL,
+            symptom_ids TEXT NOT NULL,
+            findings TEXT NOT NULL,
+            definitive_therapies TEXT NOT NULL,
+            PRIMARY KEY(visit_id, complaint_id),
+            FOREIGN KEY(visit_id) REFERENCES visits(id) ON UPDATE NO ACTION ON DELETE CASCADE
+        )
+        """.trimIndent()
+        )
+    }
+}

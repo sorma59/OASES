@@ -1,35 +1,42 @@
 package com.unimib.oases.data.mapper
 
-import com.unimib.oases.data.local.model.ComplaintSummaryEntity
-import com.unimib.oases.domain.model.ComplaintSummary
+import com.unimib.oases.data.local.model.EvaluationEntity
+import com.unimib.oases.domain.model.Evaluation
+import com.unimib.oases.domain.model.complaint.ComplaintId
 import com.unimib.oases.domain.model.symptom.symptomsById
 
-fun ComplaintSummary.toEntity(): ComplaintSummaryEntity {
-    return ComplaintSummaryEntity(
+fun Evaluation.toEntity(): EvaluationEntity {
+    return EvaluationEntity(
         visitId = visitId,
-        complaintId = complaintId,
+        complaintId = complaintId.id,
         algorithmsQuestionsAndAnswers = algorithmsQuestionsAndAnswers,
-        symptoms = symptoms.map{it.id},
-        labelledTests = tests.toList(),
+        symptomIds = symptoms.map { it.id },
+        suggestedTests = suggestedTests.toList(),
+        labelledTests = requestedTests.toList(),
         immediateTreatments = immediateTreatments.toList(),
         supportiveTherapies = supportiveTherapies.toList(),
-        additionalTests = additionalTests
+        additionalTests = additionalTestsText,
+        treeAnswers = treeAnswers,
+        detailQuestionAnswers = detailQuestionAnswers,
     )
 }
 
-fun ComplaintSummaryEntity.toDomain(): ComplaintSummary {
-    return ComplaintSummary(
+fun EvaluationEntity.toDomain(): Evaluation {
+    return Evaluation(
         visitId = visitId,
-        complaintId = complaintId,
+        complaintId = ComplaintId.complaints[complaintId] ?: error("Complaint id $complaintId not found"),
         algorithmsQuestionsAndAnswers = algorithmsQuestionsAndAnswers,
-        symptoms = symptoms.map { symptomsById[it] ?: error("Symptom not found $it") }.toSet(),
-        tests = labelledTests.toSet(),
+        symptoms = symptomIds.map { symptomsById[it] ?: error("Symptom not found $it") }.toSet(),
+        suggestedTests = suggestedTests.toSet(),
+        requestedTests = labelledTests.toSet(),
         immediateTreatments = immediateTreatments.toSet(),
         supportiveTherapies = supportiveTherapies.toSet(),
-        additionalTests = additionalTests,
+        additionalTestsText = additionalTests,
+        treeAnswers = treeAnswers,
+        detailQuestionAnswers = detailQuestionAnswers,
     )
 }
 
-fun List<ComplaintSummary>.toEntities(): List<ComplaintSummaryEntity> {
+fun List<Evaluation>.toEntities(): List<EvaluationEntity> {
     return this.map { it.toEntity() }
 }

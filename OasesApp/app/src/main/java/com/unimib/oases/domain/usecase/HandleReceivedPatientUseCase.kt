@@ -3,7 +3,7 @@ package com.unimib.oases.domain.usecase
 import android.util.Log
 import com.unimib.oases.domain.model.BluetoothPatientHandlingResult
 import com.unimib.oases.domain.model.PatientFullData
-import com.unimib.oases.domain.repository.ComplaintSummaryRepository
+import com.unimib.oases.domain.repository.EvaluationRepository
 import com.unimib.oases.domain.repository.MalnutritionScreeningRepository
 import com.unimib.oases.domain.repository.PatientDiseaseRepository
 import com.unimib.oases.domain.repository.PatientRepository
@@ -22,7 +22,7 @@ class HandleReceivedPatientUseCase @Inject constructor(
     private val visitVitalSignRepository: VisitVitalSignRepository,
     private val triageEvaluationRepository: TriageEvaluationRepository,
     private val malnutritionScreeningRepository: MalnutritionScreeningRepository,
-    private val complaintSummaryRepository: ComplaintSummaryRepository
+    private val evaluationRepository: EvaluationRepository
 ) {
 
     val errorString = { name: String ->
@@ -64,7 +64,7 @@ class HandleReceivedPatientUseCase @Inject constructor(
             }
 
             // Add the complaint summaries to the db
-            if (complaintSummaryRepository.addComplaintSummaries(patientFullData.complaintsSummaries) is Outcome.Error)
+            if (evaluationRepository.addEvaluations(patientFullData.evaluations) is Outcome.Error)
                 throw Exception("Failed to insert complaint summaries")
 
             BluetoothPatientHandlingResult.PatientReceived(patientFullData.patientDetails)

@@ -4,21 +4,23 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.unimib.oases.data.local.Converters
-import com.unimib.oases.data.local.dao.ComplaintSummaryDao
 import com.unimib.oases.data.local.dao.DiseaseDao
+import com.unimib.oases.data.local.dao.EvaluationDao
 import com.unimib.oases.data.local.dao.MalnutritionScreeningDao
 import com.unimib.oases.data.local.dao.PatientDao
 import com.unimib.oases.data.local.dao.PatientDiseaseDao
+import com.unimib.oases.data.local.dao.ReassessmentDao
 import com.unimib.oases.data.local.dao.RoomsDao
 import com.unimib.oases.data.local.dao.TriageEvaluationDao
 import com.unimib.oases.data.local.dao.VisitDao
 import com.unimib.oases.data.local.dao.VisitVitalSignDao
 import com.unimib.oases.data.local.dao.VitalSignsDao
-import com.unimib.oases.data.local.model.ComplaintSummaryEntity
 import com.unimib.oases.data.local.model.DiseaseEntity
+import com.unimib.oases.data.local.model.EvaluationEntity
 import com.unimib.oases.data.local.model.MalnutritionScreeningEntity
 import com.unimib.oases.data.local.model.PatientDiseaseEntity
 import com.unimib.oases.data.local.model.PatientEntity
+import com.unimib.oases.data.local.model.ReassessmentEntity
 import com.unimib.oases.data.local.model.RoomEntity
 import com.unimib.oases.data.local.model.TriageEvaluationEntity
 import com.unimib.oases.data.local.model.VisitEntity
@@ -36,9 +38,10 @@ import com.unimib.oases.data.local.model.VitalSignEntity
         VisitVitalSignEntity::class,
         VitalSignEntity::class,
         RoomEntity::class,
-        ComplaintSummaryEntity::class
+        EvaluationEntity::class,
+        ReassessmentEntity::class,
     ],
-    version = 3
+    version = 4
 )
 @TypeConverters(Converters::class)
 abstract class OasesDatabase : RoomDatabase() {
@@ -51,5 +54,7 @@ abstract class OasesDatabase : RoomDatabase() {
     abstract fun visitVitalSignDao(): VisitVitalSignDao
     abstract fun vitalSignDao(): VitalSignsDao
     abstract fun roomsDao(): RoomsDao
-    abstract fun complaintSummaryDao(): ComplaintSummaryDao
+    abstract fun complaintSummaryDao(): EvaluationDao
+
+    abstract fun reassessmentDao(): ReassessmentDao
 }

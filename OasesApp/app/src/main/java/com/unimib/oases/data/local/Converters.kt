@@ -2,6 +2,9 @@ package com.unimib.oases.data.local
 
 import android.util.Base64
 import androidx.room.TypeConverter
+import com.unimib.oases.data.local.model.DetailQuestionAnswer
+import com.unimib.oases.data.local.model.FindingSnapshot
+import com.unimib.oases.data.local.model.TreeAnswers
 import com.unimib.oases.domain.model.QuestionAndAnswer
 import com.unimib.oases.domain.model.complaint.ImmediateTreatment
 import com.unimib.oases.domain.model.complaint.LabelledTest
@@ -80,5 +83,33 @@ object Converters {
     fun toLocalDate(value: String?): LocalDate? =
         value?.let { LocalDate.parse(it) }
 
+    @TypeConverter
+    fun fromTreeAnswersListToString(list: List<TreeAnswers>): String {
+        return Json.encodeToString(list)
+    }
 
+    @TypeConverter
+    fun fromStringToTreeAnswersList(value: String): List<TreeAnswers> {
+        return if (value.isEmpty()) emptyList() else Json.decodeFromString(value)
+    }
+
+    @TypeConverter
+    fun fromDetailQuestionAnswerListToString(list: List<DetailQuestionAnswer>): String {
+        return Json.encodeToString(list)
+    }
+
+    @TypeConverter
+    fun fromStringToDetailQuestionAnswerList(value: String): List<DetailQuestionAnswer> {
+        return if (value.isEmpty()) emptyList() else Json.decodeFromString(value)
+    }
+
+    @TypeConverter
+    fun fromFindingSnapshotListToString(list: List<FindingSnapshot>): String {
+        return Json.encodeToString(list)
+    }
+
+    @TypeConverter
+    fun fromStringToFindingSnapshotList(value: String): List<FindingSnapshot> {
+        return if (value.isEmpty()) emptyList() else Json.decodeFromString(value)
+    }
 }

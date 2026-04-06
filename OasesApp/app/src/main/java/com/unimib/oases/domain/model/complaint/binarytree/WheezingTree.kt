@@ -5,6 +5,8 @@ import com.unimib.oases.domain.model.symptom.Symptom
 
 data object WheezingTree: Tree {
 
+    override val id = TreeId.WHEEZING
+
     // Questions
 
     val wheezingQuestion = "Is there wheezing?"

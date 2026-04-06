@@ -5,14 +5,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.unimib.oases.di.IoDispatcher
+import com.unimib.oases.domain.model.Reassessment
 import com.unimib.oases.domain.model.complaint.Complaint
 import com.unimib.oases.domain.model.symptom.Symptom
-import com.unimib.oases.domain.repository.ComplaintSummaryRepository
+import com.unimib.oases.domain.repository.EvaluationRepository
 import com.unimib.oases.domain.repository.PatientRepository
+import com.unimib.oases.domain.repository.ReassessmentRepository
 import com.unimib.oases.domain.usecase.GenerateDefinitiveTherapiesUseCase
+import com.unimib.oases.domain.usecase.SubmitReassessmentUseCase
 import com.unimib.oases.ui.components.scaffold.UiEvent
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Route
+import com.unimib.oases.ui.util.snackbar.SnackbarData.Companion.SaveError
+import com.unimib.oases.util.Outcome
+import com.unimib.oases.util.firstNullableSuccess
 import com.unimib.oases.util.firstSuccess
 import com.unimib.oases.util.toggle
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -32,7 +38,9 @@ import javax.inject.Inject
 class ReassessmentViewModel @Inject constructor(
     private val generateDefinitiveTherapiesUseCase: GenerateDefinitiveTherapiesUseCase,
     private val patientRepository: PatientRepository,
-    private val complaintSummaryRepository: ComplaintSummaryRepository,
+    private val evaluationRepository: EvaluationRepository,
+    private val reassessmentRepository: ReassessmentRepository,
+    private val submitReassessmentUseCase: SubmitReassessmentUseCase,
     savedStateHandle: SavedStateHandle,
     @param:IoDispatcher private val dispatcher: CoroutineDispatcher,
 ): ViewModel() {
@@ -70,6 +78,16 @@ class ReassessmentViewModel @Inject constructor(
 
     private fun initialize() {
         viewModelScope.launch(mainContext) {
+
+            val reassessmentDeferred = async {
+                reassessmentRepository
+                    .getReassessment(
+                        visitId = state.value.visitId,
+                        complaintId = state.value.complaintId,
+                    )
+                    .firstNullableSuccess()
+            }
+
             val patientDeferred = async {
                 patientRepository
                     .getPatientById(state.value.patientId)
@@ -78,8 +96,11 @@ class ReassessmentViewModel @Inject constructor(
             val symptomsDeferred = async {
                 retrieveSymptoms(state.value.visitId, state.value.complaintId)
             }
+
+            val reassessment = reassessmentDeferred.await()
             val patient = patientDeferred.await()
             val symptoms = symptomsDeferred.await()
+
             _state.update {
                 it.copy(
                     patient = patient,
@@ -92,6 +113,12 @@ class ReassessmentViewModel @Inject constructor(
                     )
                 )
             }
+            if (reassessment != null) {
+                _state.update {
+                    reassessment.toReassessmentState()
+                }
+            }
+
         }
     }
 
@@ -119,16 +146,55 @@ class ReassessmentViewModel @Inject constructor(
                 }
                 initialize()
             }
-            ReassessmentEvent.SubmitClicked -> {  } //TODO
+            ReassessmentEvent.SubmitClicked -> {
+                submitReassessment()
+            }
+
+            ReassessmentEvent.ReattemptSaving -> {
+                onEvent(ReassessmentEvent.SubmitClicked)
+            }
+        }
+    }
+
+    private fun submitReassessment() {
+        viewModelScope.launch(mainContext) {
+            when (submitReassessmentUseCase(state.value)) {
+                is Outcome.Error -> uiEventsChannel.send(
+                    UiEvent.ShowSnackbar(
+                        snackbarData = SaveError.copy(
+                            onAction = {
+                                onEvent(ReassessmentEvent.ReattemptSaving)
+                            }
+                        )
+                    )
+                )
+
+                is Outcome.Success -> navigationEventsChannel.send(NavigationEvent.NavigateBack)
+            }
         }
     }
 
     private suspend fun retrieveSymptoms(visitId: String, complaintId: String): Set<Symptom> {
-        return complaintSummaryRepository
-            .getComplaintSummary(
+        return evaluationRepository
+            .getEvaluation(
                 visitId = visitId,
                 complaintId = complaintId,
             ).firstSuccess()
             .symptoms
+    }
+
+    fun Reassessment.toReassessmentState(): ReassessmentState {
+
+        val complaint = state.value.complaint ?: error("Complaint id $complaintId not found")
+
+        val findingSet = findings.map { snapshot ->
+            complaint.findings.findings.find { it.id == snapshot.id }
+                ?: error("Finding not found ${snapshot.id}")
+        }.toSet()
+
+        return state.value.copy(
+            symptoms = symptoms,
+            findings = findingSet,
+        )
     }
 }

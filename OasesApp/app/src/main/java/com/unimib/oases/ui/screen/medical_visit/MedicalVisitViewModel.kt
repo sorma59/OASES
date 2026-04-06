@@ -5,7 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.unimib.oases.di.IoDispatcher
-import com.unimib.oases.domain.repository.ComplaintSummaryRepository
+import com.unimib.oases.domain.repository.EvaluationRepository
+import com.unimib.oases.domain.repository.ReassessmentRepository
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.util.Resource
@@ -23,7 +24,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MedicalVisitViewModel @Inject constructor(
-    private val complaintSummaryRepository: ComplaintSummaryRepository,
+    private val evaluationRepository: EvaluationRepository,
+    private val reassessmentRepository: ReassessmentRepository,
     savedStateHandle: SavedStateHandle,
     @param:IoDispatcher private val dispatcher: CoroutineDispatcher,
 ):ViewModel() {
@@ -54,17 +56,36 @@ class MedicalVisitViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(mainContext) {
-            complaintSummaryRepository
-                .getVisitComplaintsSummaries(state.value.visitId)
-                .collect { complaintSummaries ->
-                    when (complaintSummaries) {
-                        is Resource.Error -> _state.update { it.copy(error = complaintSummaries.message) }
+            evaluationRepository
+                .getVisitEvaluations(state.value.visitId)
+                .collect { evaluations ->
+                    when (evaluations) {
+                        is Resource.Error -> _state.update { it.copy(error = evaluations.message) }
                         is Resource.Loading -> _state.update { it.copy(isLoading = true) }
-                        is Resource.NotFound -> throw NoSuchElementException("Complaint summaries not found")
+                        is Resource.NotFound -> throw NoSuchElementException("Evaluations not found")
                         is Resource.Success -> _state.update {
                             it.copy(
-                                complaintSummaries = complaintSummaries.data.associateBy {
-                                    complaint -> complaint.complaintId
+                                evaluations = evaluations.data.associateBy {
+                                    complaint -> complaint.complaintId.id
+                                }
+                            )
+                        }
+                    }
+                }
+        }
+
+        viewModelScope.launch(mainContext) {
+            reassessmentRepository
+                .getVisitReassessments(state.value.visitId)
+                .collect { reassessments ->
+                    when (reassessments) {
+                        is Resource.Error -> _state.update { it.copy(error = reassessments.message) }
+                        is Resource.Loading -> _state.update { it.copy(isLoading = true) }
+                        is Resource.NotFound -> throw NoSuchElementException("Reassessments not found")
+                        is Resource.Success -> _state.update {
+                            it.copy(
+                                reassessments = reassessments.data.associateBy {
+                                    complaint -> complaint.complaintId.id
                                 }
                             )
                         }

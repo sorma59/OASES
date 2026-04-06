@@ -7,6 +7,8 @@ import com.unimib.oases.domain.model.complaint.binarytree.next
 import com.unimib.oases.domain.model.complaint.binarytree.toImmediateTreatmentQuestionState
 import com.unimib.oases.ui.screen.medical_visit.initial_medical_evaluation.EvaluationState
 import com.unimib.oases.ui.screen.medical_visit.initial_medical_evaluation.ImmediateTreatmentQuestionState
+import com.unimib.oases.ui.screen.medical_visit.initial_medical_evaluation.TreeSummary
+import com.unimib.oases.ui.screen.medical_visit.initial_medical_evaluation.appendQuestion
 import com.unimib.oases.ui.screen.medical_visit.initial_medical_evaluation.rebranch
 import com.unimib.oases.util.replaceAt
 import javax.inject.Inject
@@ -21,8 +23,8 @@ class AnswerImmediateTreatmentQuestionUseCase @Inject constructor() {
             is ManualNode -> {
                 val updatedQuestions = state.immediateTreatmentQuestions
                     .elementAt(treeIndex)
-                    .rebranch(node, answer) +
-                        ImmediateTreatmentQuestionState(nextNode)
+                    .rebranch(node, answer)
+                    .appendQuestion(ImmediateTreatmentQuestionState(nextNode))
                 state.copy(
                     immediateTreatmentQuestions = updateImmediateTreatmentQuestions(
                         state,
@@ -95,20 +97,23 @@ class AnswerImmediateTreatmentQuestionUseCase @Inject constructor() {
     private fun updateImmediateTreatmentQuestions(
         state: EvaluationState,
         algorithmToEdit: Int,
-        updatedList: List<ImmediateTreatmentQuestionState>,
+        updatedList: TreeSummary,
         shouldShowNextAlgorithm: Boolean
-    ): List<List<ImmediateTreatmentQuestionState>> {
+    ): List<TreeSummary> {
         val newImmediateTreatmentQuestions = state.immediateTreatmentQuestions.toMutableList()
         newImmediateTreatmentQuestions[algorithmToEdit] = updatedList
 
-        if (shouldShowNextAlgorithm)
+        if (shouldShowNextAlgorithm) {
+            val nextTree = state.immediateTreatmentAlgorithms.elementAt(algorithmToEdit + 1)
             newImmediateTreatmentQuestions.add(
-                listOf(
-                    state.immediateTreatmentAlgorithms
-                        .elementAt(algorithmToEdit + 1).root
-                        .toImmediateTreatmentQuestionState()
+                TreeSummary(
+                    treeId = nextTree.id.value,
+                    answers = listOf(
+                        nextTree.root.toImmediateTreatmentQuestionState()
+                    )
                 )
             )
+        }
 
         return newImmediateTreatmentQuestions.toList()
     }

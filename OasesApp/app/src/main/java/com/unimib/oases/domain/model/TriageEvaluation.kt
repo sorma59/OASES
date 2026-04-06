@@ -6,4 +6,6 @@ data class TriageEvaluation(
     val redSymptomIds: List<String>,
 
     val yellowSymptomIds: List<String>,
-)
+) {
+    val symptomsIds = redSymptomIds + yellowSymptomIds
+}
