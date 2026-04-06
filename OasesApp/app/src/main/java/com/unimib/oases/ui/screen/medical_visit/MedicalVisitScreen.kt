@@ -105,14 +105,19 @@ private fun MainComplaintsGrid(
 
         DispositionButton(
             isEnabled = state.isDispositionUnlocked
-        )
+        ) {
+            onEvent(MedicalVisitEvent.DispositionClicked)
+        }
 
         Spacer(Modifier.height(32.dp))
     }
 }
 
 @Composable
-private fun DispositionButton(isEnabled: Boolean) {
+private fun DispositionButton(
+    isEnabled: Boolean,
+    onClick: () -> Unit,
+) {
 
     val (boxColor, textColor) = if (isEnabled) {
         MaterialTheme.colorScheme.primaryContainer to MaterialTheme.colorScheme.onPrimaryContainer
@@ -121,7 +126,7 @@ private fun DispositionButton(isEnabled: Boolean) {
     }
 
     Button(
-        onClick = { },
+        onClick = onClick,
         modifier = Modifier.size(256.dp, 64.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = boxColor,

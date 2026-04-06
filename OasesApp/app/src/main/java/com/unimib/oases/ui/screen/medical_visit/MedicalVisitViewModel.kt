@@ -123,6 +123,18 @@ class MedicalVisitViewModel @Inject constructor(
                     )
                 }
             }
+
+            MedicalVisitEvent.DispositionClicked -> {
+                viewModelScope.launch {
+                    navigationEventsChannel.send(
+                        NavigationEvent.Navigate(
+                            Route.Disposition(
+                                visitId = state.value.visitId,
+                            )
+                        )
+                    )
+                }
+            }
         }
     }
 }

@@ -78,6 +78,10 @@ sealed class Route {
         val complaintId: String,
     ): Route()
     @Serializable
+    data class Disposition(
+        val visitId: String,
+    ): Route()
+    @Serializable
     data object DiseaseManagement: Route()
     @Serializable
     data object UserManagement: Route()

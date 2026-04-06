@@ -39,6 +39,7 @@ enum class PatientStatus(val displayValue: String) {
     WAITING_FOR_TRIAGE("Waiting for triage"),
     WAITING_FOR_VISIT("Waiting for visit"),
     WAITING_FOR_TEST_RESULTS("Waiting for test results"),
+    WAITING_FOR_DISPOSITION("Waiting for disposition"),
     HOSPITALIZED("Hospitalized"),
     DISMISSED("Dismissed")
 }

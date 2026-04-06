@@ -16,6 +16,7 @@ import com.unimib.oases.ui.screen.dashboard.admin.vitalsigns.VitalSignManagement
 import com.unimib.oases.ui.screen.dashboard.patient.PatientDashboardScreen
 import com.unimib.oases.ui.screen.homepage.HomeScreen
 import com.unimib.oases.ui.screen.medical_visit.MedicalVisitScreen
+import com.unimib.oases.ui.screen.medical_visit.disposition.DispositionScreen
 import com.unimib.oases.ui.screen.medical_visit.initial_medical_evaluation.EvaluationScreen
 import com.unimib.oases.ui.screen.medical_visit.reassessment.ReassessmentScreen
 import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreen
@@ -137,6 +138,10 @@ fun AppNavigation(
 
         composable<Route.Reassessment> {
             ReassessmentScreen(appViewModel)
+        }
+
+        composable<Route.Disposition> {
+            DispositionScreen(appViewModel)
         }
     }
 }
