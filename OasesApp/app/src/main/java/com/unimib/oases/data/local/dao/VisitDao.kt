@@ -18,6 +18,12 @@ interface VisitDao {
     @Upsert
     suspend fun upsert(visit: VisitEntity)
 
+    @Query("UPDATE ${TableNames.VISIT} SET patient_status = 'DISMISSED' WHERE id = :visitId")
+    suspend fun discharge(visitId: String)
+
+    @Query("UPDATE ${TableNames.VISIT} SET patient_status = 'HOSPITALIZED' WHERE id = :visitId")
+    suspend fun hospitalize(visitId: String)
+
     @Query("SELECT * FROM " + TableNames.VISIT + " WHERE patient_id = :patientId")
     fun getVisits(patientId: String): Flow<List<VisitEntity>>
 

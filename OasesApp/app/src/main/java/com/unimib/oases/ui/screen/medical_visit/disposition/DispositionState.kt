@@ -7,13 +7,17 @@ data class DispositionState(
 
     val complaintIds: Set<ComplaintId> = emptySet(),
 
-    val dispositionType: DispositionType? = null,
+    val dispositionChoice: DispositionChoice = DispositionChoice.NONE,
+
+    val wardChoice: WardChoice = WardChoice.NONE,
 
     val prescribedTreatmentsText: String = "",
     val finalDiagnosisText: String = "",
 
     val isLoading: Boolean = false,
     val error: String? = null,
+
+    val closeVisitError: String? = null,
 ) {
     val dispositionTypeQuestion = DispositionTypeQuestion
 
@@ -23,19 +27,20 @@ data class DispositionState(
         HomeTreatment.Diarrhea,
         HomeTreatment.Dyspnea,
         HomeTreatment.SeizuresOrComa,
-        HomeTreatment.OtherComplaints,
+//        HomeTreatment.OtherComplaints, TODO uncomment
     )
 
     val suggestedHomeTreatments: List<HomeTreatment>?
         get() = homeTreatments
-            .filter { it.complaintId in complaintIds }
-            .takeIf { dispositionType == DispositionType.Discharge }
+            .takeIf { dispositionChoice == DispositionChoice.DISCHARGE }
+            ?.filter { it.complaintId in complaintIds }
+
 
     private val isDispositionComplete: Boolean
-        get() = when (dispositionType) {
-            DispositionType.Discharge -> true
-            is DispositionType.Hospitalization -> dispositionType.ward != null
-            null -> false
+        get() = when (dispositionChoice) {
+            DispositionChoice.DISCHARGE -> true
+            DispositionChoice.HOSPITALIZE -> wardChoice != WardChoice.NONE
+            DispositionChoice.NONE -> false
         }
 
     val areFreeTextsVisible: Boolean
@@ -45,17 +50,19 @@ data class DispositionState(
         get() = isDispositionComplete && finalDiagnosisText.isNotBlank()
 }
 
-sealed class DispositionType(val label: String) {
-    data object Discharge: DispositionType("Discharge")
-    data class Hospitalization(val ward: Ward? = null): DispositionType("Hospitalize")
+enum class DispositionChoice(val label: String) {
+    DISCHARGE("Discharge"),
+    HOSPITALIZE("Hospitalize"),
+    NONE(""),
 }
 
-enum class Ward(val label: String) {
+enum class WardChoice(val label: String) {
     MEDICAL("Medical ward"),
     SURGICAL("Surgical ward"),
     CHILDREN("Children ward"),
     MATERNITY("Maternity ward"),
-    HIGH_DEPENDENCY_UNIT("High-dependency unit")
+    HIGH_DEPENDENCY_UNIT("High-dependency unit"),
+    NONE(""),
 }
 
 sealed class HomeTreatment(
@@ -106,26 +113,26 @@ sealed class HomeTreatment(
         """.trimIndent()
     )
 
-    data object OtherComplaints: HomeTreatment(
-        complaintId = ComplaintId.DIARRHEA, //TODO REPLACE WITH OTHER
-        label = """
-        For patients discharged home, counsel the patient/the mother:
-        - encourage adequate oral hydration and feeding / breastfeeding to avoid hypoglycemia and dehydration
-        - return if the patient becomes sicker or if presence of danger signs (lethargy, convulsions, inability to drink/breastfeed)
-        - paracetamol 1 gr PO (children: 15 mg/kg or 7.5mg/kg if < 10 kg) if fever/pain (every 4-6 hr)
-        """.trimIndent()
-    )
+//    data object OtherComplaints: HomeTreatment(
+//        complaintId = ComplaintId.DIARRHEA, //TODO REPLACE WITH OTHER
+//        label = """
+//        For patients discharged home, counsel the patient/the mother:
+//        - encourage adequate oral hydration and feeding / breastfeeding to avoid hypoglycemia and dehydration
+//        - return if the patient becomes sicker or if presence of danger signs (lethargy, convulsions, inability to drink/breastfeed)
+//        - paracetamol 1 gr PO (children: 15 mg/kg or 7.5mg/kg if < 10 kg) if fever/pain (every 4-6 hr)
+//        """.trimIndent()
+//    )
 }
 
 data object DispositionTypeQuestion {
     val question: String = "What is your final disposition decision?"
-    val options: Set<DispositionType> = setOf(
-        DispositionType.Hospitalization(),
-        DispositionType.Discharge,
+    val options: Set<DispositionChoice> = setOf(
+        DispositionChoice.HOSPITALIZE,
+        DispositionChoice.DISCHARGE,
     )
 }
 
 data object WardQuestion {
     val question: String = "In which ward will the patient be hospitalized?"
-    val options: Set<Ward> = Ward.entries.toSet()
+    val options: Set<WardChoice> = WardChoice.entries.minus(WardChoice.NONE).toSet()
 }

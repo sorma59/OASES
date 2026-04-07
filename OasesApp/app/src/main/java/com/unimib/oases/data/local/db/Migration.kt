@@ -259,3 +259,20 @@ val MIGRATION_history_patients: Migration = object : Migration(4, 5) {
         db.execSQL("PRAGMA foreign_keys=ON")
     }
 }
+
+val migrationDisposition: Migration = object : Migration(5,6) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("""
+            CREATE TABLE IF NOT EXISTS ${TableNames.DISPOSITION} (
+                visit_id TEXT NOT NULL,
+                disposition_type_label TEXT NOT NULL,
+                ward TEXT,
+                home_treatments TEXT NOT NULL,
+                prescribed_therapies_text TEXT NOT NULL,
+                final_diagnosis_text TEXT NOT NULL,
+                PRIMARY KEY(visit_id),
+                FOREIGN KEY(visit_id) REFERENCES visits(id) ON DELETE CASCADE
+            )
+        """.trimIndent())
+    }
+}

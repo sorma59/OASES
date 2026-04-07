@@ -64,6 +64,26 @@ class VisitRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun dischargePatient(visitId: String): Outcome<Unit> {
+        return try {
+            roomDataSource.dischargePatient(visitId)
+            Outcome.Success(Unit)
+        } catch (e: Exception) {
+            Log.e("VisitRepository", "Error discharging patient in visit $visitId: ${e.message}")
+            Outcome.Error(e.message ?: "An error occurred")
+        }
+    }
+
+    override suspend fun hospitalizePatient(visitId: String): Outcome<Unit> {
+        return try {
+            roomDataSource.hospitalizePatient(visitId)
+            Outcome.Success(Unit)
+        } catch (e: Exception) {
+            Log.e("VisitRepository", "Error hospitalizing patient in visit $visitId: ${e.message}")
+            Outcome.Error(e.message ?: "An error occurred")
+        }
+    }
+
     override fun getVisits(patientId: String): Flow<Resource<List<Visit>>> = flow {
         roomDataSource.getVisits(patientId)
             .onStart { emit(Resource.Loading()) }

@@ -20,6 +20,10 @@ interface VisitRepository {
 
     suspend fun updateVisit(visit: Visit): Outcome<Unit>
 
+    suspend fun dischargePatient(visitId: String): Outcome<Unit>
+
+    suspend fun hospitalizePatient(visitId: String): Outcome<Unit>
+
     fun getVisits(patientId: String): Flow<Resource<List<Visit>>>
 
     fun getVisitById(visitId: String): Flow<Resource<Visit>>

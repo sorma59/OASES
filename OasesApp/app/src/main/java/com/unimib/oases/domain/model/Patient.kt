@@ -40,6 +40,6 @@ enum class PatientStatus(val displayValue: String) {
     WAITING_FOR_VISIT("Waiting for visit"),
     WAITING_FOR_TEST_RESULTS("Waiting for test results"),
     WAITING_FOR_DISPOSITION("Waiting for disposition"),
-    HOSPITALIZED("Hospitalized"),
-    DISMISSED("Dismissed")
+    HOSPITALIZED("Hospitalized"), // NB if you change this then you have to change the query at [PatientDao::getPatientsAndVisitsOn]
+    DISMISSED("Dismissed"), // NB if you change this then you have to change the query at [PatientDao::getPatientsAndVisitsOn]
 }

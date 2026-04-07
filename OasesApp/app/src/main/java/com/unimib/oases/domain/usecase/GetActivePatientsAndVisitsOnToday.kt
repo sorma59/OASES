@@ -7,10 +7,10 @@ import com.unimib.oases.util.Resource
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class GetPatientsWithVisitInfoUseCase @Inject constructor(
+class GetActivePatientsAndVisitsOnToday @Inject constructor(
     private val patientRepository: PatientRepository,
 ) {
     operator fun invoke(): Flow<Resource<List<PatientWithVisitInfo>>> {
-        return patientRepository.getPatientsAndVisitsOn(DateAndTimeUtils.getCurrentDate())
+        return patientRepository.getActivePatientsAndVisitsOn(DateAndTimeUtils.getCurrentDate())
     }
 }

@@ -6,9 +6,12 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.repository.ReassessmentRepository
+import com.unimib.oases.domain.usecase.CloseVisitUseCase
 import com.unimib.oases.ui.components.scaffold.UiEvent
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Route
+import com.unimib.oases.ui.util.snackbar.SnackbarData
+import com.unimib.oases.util.Outcome
 import com.unimib.oases.util.firstSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -24,6 +27,7 @@ import javax.inject.Inject
 @HiltViewModel
 class DispositionViewModel @Inject constructor(
     private val reassessmentRepository: ReassessmentRepository,
+    private val closeVisitUseCase: CloseVisitUseCase,
     @param:IoDispatcher private val dispatcher: CoroutineDispatcher,
     savedStateHandle: SavedStateHandle
 ): ViewModel() {
@@ -32,13 +36,25 @@ class DispositionViewModel @Inject constructor(
         e.printStackTrace()
         _state.update{
             it.copy(
-                error = e.message
+                error = e.message,
+                isLoading = false,
+            )
+        }
+    }
+
+    private val closeVisitErrorHandler = CoroutineExceptionHandler { _, e ->
+        e.printStackTrace()
+        _state.update{
+            it.copy(
+                closeVisitError = e.message,
+                isLoading = false,
             )
         }
     }
 
     private val mainContext = dispatcher + errorHandler
 
+    private val closeVisitContext = dispatcher + closeVisitErrorHandler
     private val args = savedStateHandle.toRoute<Route.Disposition>()
 
     private val _state = MutableStateFlow(
@@ -85,14 +101,14 @@ class DispositionViewModel @Inject constructor(
             is DispositionEvent.DispositionTypeSelected -> {
                 _state.update {
                     it.copy(
-                        dispositionType = event.dispositionType
+                        dispositionChoice = event.dispositionChoice
                     )
                 }
             }
             is DispositionEvent.WardSelected -> {
                 _state.update {
                     it.copy(
-                        dispositionType = DispositionType.Hospitalization(event.ward)
+                        wardChoice = event.wardChoice
                     )
                 }
             }
@@ -110,7 +126,42 @@ class DispositionViewModel @Inject constructor(
                     )
                 }
             }
-            DispositionEvent.CloseVisitClicked -> {}
+            DispositionEvent.CloseVisitClicked -> {
+                viewModelScope.launch(closeVisitContext) {
+                    when (closeVisitUseCase(state.value)) {
+                        is Outcome.Error -> {
+                            onEvent(DispositionEvent.CloseVisitError("Failed to close the visit"))
+                        }
+                        is Outcome.Success -> {
+                            uiEventsChannel.send(
+                                UiEvent.ShowSnackbar(
+                                    SnackbarData.SaveSuccess
+                                )
+                            )
+                            navigationEventsChannel.send(
+                                NavigationEvent.PopUpTo(
+                                    Route.Home
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+
+            is DispositionEvent.CloseVisitError -> {
+                viewModelScope.launch {
+                    uiEventsChannel.send(
+                        UiEvent.ShowSnackbar(
+                            SnackbarData.SaveError.copy(
+                                message = event.message,
+                                onAction = {
+                                    onEvent(DispositionEvent.CloseVisitClicked)
+                                }
+                            )
+                        )
+                    )
+                }
+            }
         }
 
     }

@@ -251,7 +251,7 @@ class FirestoreManager @Inject constructor(
         scope.launch {
             try {
                 val localPatients =
-                    roomDataSource.getPatientsAndVisitsOn(DateAndTimeUtils.getCurrentDate()).first()
+                    roomDataSource.getActivePatientsAndVisitsOn(DateAndTimeUtils.getCurrentDate()).first()
                 if (localPatients.isEmpty()) return@launch
                 println("SYNC: Found ${localPatients.size} current patients.")
                 println("SYNC: Starting upload of current patients...")

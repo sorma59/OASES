@@ -5,6 +5,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.unimib.oases.data.local.Converters
 import com.unimib.oases.data.local.dao.DiseaseDao
+import com.unimib.oases.data.local.dao.DispositionDao
 import com.unimib.oases.data.local.dao.EvaluationDao
 import com.unimib.oases.data.local.dao.HistoryDao
 import com.unimib.oases.data.local.dao.MalnutritionScreeningDao
@@ -17,6 +18,7 @@ import com.unimib.oases.data.local.dao.VisitDao
 import com.unimib.oases.data.local.dao.VisitVitalSignDao
 import com.unimib.oases.data.local.dao.VitalSignsDao
 import com.unimib.oases.data.local.model.DiseaseEntity
+import com.unimib.oases.data.local.model.DispositionEntity
 import com.unimib.oases.data.local.model.EvaluationEntity
 import com.unimib.oases.data.local.model.HistoryEntity
 import com.unimib.oases.data.local.model.MalnutritionScreeningEntity
@@ -43,8 +45,9 @@ import com.unimib.oases.data.local.model.VitalSignEntity
         RoomEntity::class,
         EvaluationEntity::class,
         ReassessmentEntity::class,
+        DispositionEntity::class,
     ],
-    version = 5
+    version = 6
 )
 @TypeConverters(Converters::class)
 abstract class OasesDatabase : RoomDatabase() {
@@ -58,7 +61,7 @@ abstract class OasesDatabase : RoomDatabase() {
     abstract fun visitVitalSignDao(): VisitVitalSignDao
     abstract fun vitalSignDao(): VitalSignsDao
     abstract fun roomsDao(): RoomsDao
-    abstract fun complaintSummaryDao(): EvaluationDao
-
+    abstract fun evaluationDao(): EvaluationDao
     abstract fun reassessmentDao(): ReassessmentDao
+    abstract fun dispositionDao(): DispositionDao
 }

@@ -23,7 +23,7 @@ class EvaluationRepositoryImpl @Inject constructor(
 
     override suspend fun addEvaluation(evaluation: Evaluation): Outcome<Unit> {
         return try {
-            roomDataSource.insertComplaintSummary(evaluation.toEntity())
+            roomDataSource.insertEvaluation(evaluation.toEntity())
             Outcome.Success(Unit)
         } catch (e: Exception) {
             Outcome.Error(e.message ?: "An error occurred")
@@ -32,7 +32,7 @@ class EvaluationRepositoryImpl @Inject constructor(
 
     override suspend fun addEvaluations(evaluations: List<Evaluation>): Outcome<Unit> {
         return try {
-            roomDataSource.insertComplaintSummaries(evaluations.toEntities())
+            roomDataSource.insertEvaluations(evaluations.toEntities())
             Outcome.Success(Unit)
         } catch (e: Exception) {
             Outcome.Error(e.message ?: "An error occurred")
@@ -41,7 +41,7 @@ class EvaluationRepositoryImpl @Inject constructor(
 
     override suspend fun deleteEvaluation(evaluation: Evaluation): Outcome<Unit> {
         return try {
-            roomDataSource.deleteComplaintSummary(evaluation.toEntity())
+            roomDataSource.deleteEvaluation(evaluation.toEntity())
             Outcome.Success(Unit)
         } catch (e: Exception) {
             Outcome.Error(e.message ?: "An error occurred")
@@ -49,7 +49,7 @@ class EvaluationRepositoryImpl @Inject constructor(
     }
 
     override fun getVisitEvaluations(visitId: String): Flow<Resource<List<Evaluation>>> =
-        roomDataSource.getVisitComplaintsSummaries(visitId)
+        roomDataSource.getVisitEvaluations(visitId)
             .map<List<EvaluationEntity>, Resource<List<Evaluation>>> { entities ->
                 val domainModels = entities.map { it.toDomain() }
                 Resource.Success(domainModels)

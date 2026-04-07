@@ -7,6 +7,7 @@ import com.unimib.oases.data.local.db.MIGRATION_1_2
 import com.unimib.oases.data.local.db.MIGRATION_Disease_Refactor
 import com.unimib.oases.data.local.db.MIGRATION_history_patients
 import com.unimib.oases.data.local.db.OasesDatabase
+import com.unimib.oases.data.local.db.migrationDisposition
 import com.unimib.oases.data.local.db.migrationEvaluationsAndReassessments
 import dagger.Module
 import dagger.Provides
@@ -110,6 +111,7 @@ object AppModule {
             MIGRATION_Disease_Refactor,
             migrationEvaluationsAndReassessments,
             MIGRATION_history_patients,
+            migrationDisposition,
         )
         .build()
     }

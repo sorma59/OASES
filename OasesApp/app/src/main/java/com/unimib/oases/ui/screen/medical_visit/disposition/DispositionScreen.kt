@@ -61,7 +61,7 @@ private fun DispositionContent(
 
         DispositionTypeQuestion(
             question = state.dispositionTypeQuestion,
-            isSelected = { it.javaClass == state.dispositionType?.javaClass },
+            isSelected = { it == state.dispositionChoice },
             onSelected = {
                 onEvent(DispositionEvent.DispositionTypeSelected(it))
             }
@@ -69,14 +69,11 @@ private fun DispositionContent(
 
         WardQuestion(
             question = state.wardQuestion,
-            isSelected = {
-                state.dispositionType is DispositionType.Hospitalization
-                && state.dispositionType.ward == it
-            },
+            isSelected = { it == state.wardChoice },
             onSelected = {
                 onEvent(DispositionEvent.WardSelected(it))
             },
-            isVisible = state.dispositionType is DispositionType.Hospitalization
+            isVisible = state.dispositionChoice == DispositionChoice.HOSPITALIZE
         )
 
         state.suggestedHomeTreatments?.let {
@@ -123,8 +120,8 @@ private fun DispositionContent(
 @Composable
 private fun DispositionTypeQuestion(
     question: DispositionTypeQuestion,
-    isSelected: (DispositionType) -> Boolean,
-    onSelected: (DispositionType) -> Unit,
+    isSelected: (DispositionChoice) -> Boolean,
+    onSelected: (DispositionChoice) -> Unit,
 ){
 
     Column{
@@ -143,8 +140,8 @@ private fun DispositionTypeQuestion(
 @Composable
 private fun WardQuestion(
     question: WardQuestion,
-    isSelected: (Ward) -> Boolean,
-    onSelected: (Ward) -> Unit,
+    isSelected: (WardChoice) -> Boolean,
+    onSelected: (WardChoice) -> Unit,
     isVisible: Boolean,
 ){
 

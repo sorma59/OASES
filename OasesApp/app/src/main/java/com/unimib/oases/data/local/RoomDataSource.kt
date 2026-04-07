@@ -2,6 +2,7 @@ package com.unimib.oases.data.local
 
 import androidx.room.withTransaction
 import com.unimib.oases.data.local.dao.DiseaseDao
+import com.unimib.oases.data.local.dao.DispositionDao
 import com.unimib.oases.data.local.dao.EvaluationDao
 import com.unimib.oases.data.local.dao.HistoryDao
 import com.unimib.oases.data.local.dao.MalnutritionScreeningDao
@@ -17,6 +18,7 @@ import com.unimib.oases.data.local.dao.VitalSignsDao
 import com.unimib.oases.data.local.db.AuthDatabase
 import com.unimib.oases.data.local.db.OasesDatabase
 import com.unimib.oases.data.local.model.DiseaseEntity
+import com.unimib.oases.data.local.model.DispositionEntity
 import com.unimib.oases.data.local.model.EvaluationEntity
 import com.unimib.oases.data.local.model.HistoryEntity
 import com.unimib.oases.data.local.model.MalnutritionScreeningEntity
@@ -53,8 +55,9 @@ class RoomDataSource @Inject constructor(
     private val visitVitalSignDao: VisitVitalSignDao get() = appDatabase.visitVitalSignDao()
     private val vitalSignDao: VitalSignsDao get() = appDatabase.vitalSignDao()
     private val roomsDao: RoomsDao get() = appDatabase.roomsDao()
-    private val evaluationDao: EvaluationDao get() = appDatabase.complaintSummaryDao()
+    private val evaluationDao: EvaluationDao get() = appDatabase.evaluationDao()
     private val reassessmentDao: ReassessmentDao get() = appDatabase.reassessmentDao()
+    private val dispositionDao: DispositionDao get() = appDatabase.dispositionDao()
 
     // -------------------Patients-------------------
     suspend fun insertPatient(patient: PatientEntity) {
@@ -101,8 +104,12 @@ class RoomDataSource @Inject constructor(
         return patientDao.getPatientsWithLastVisitDate()
     }
 
-    fun getPatientsAndVisitsOn(date: LocalDate): Flow<List<PatientWithVisitInfoEntity>> {
-        return patientDao.getPatientsAndVisitsOn(date)
+    fun getActivePatientsAndVisitsOn(date: LocalDate): Flow<List<PatientWithVisitInfoEntity>> {
+        return patientDao.getActivePatientsAndVisitsOn(date)
+    }
+
+    fun getAllPatientsAndVisitsOn(date: LocalDate): Flow<List<PatientWithVisitInfoEntity>> {
+        return patientDao.getAllPatientsAndVisitsOn(date)
     }
 
     fun getPatientById(id: String): Flow<PatientEntity?> {
@@ -232,6 +239,14 @@ class RoomDataSource @Inject constructor(
         visitDao.upsert(visit)
     }
 
+    suspend fun dischargePatient(visitId: String) {
+        visitDao.discharge(visitId)
+    }
+
+    suspend fun hospitalizePatient(visitId: String) {
+        visitDao.hospitalize(visitId)
+    }
+
     fun getVisits(patientId: String): Flow<List<VisitEntity>> {
         return visitDao.getVisits(patientId)
     }
@@ -285,19 +300,19 @@ class RoomDataSource @Inject constructor(
     }
 
     // Complaint summaries --------------------------
-    suspend fun insertComplaintSummary(complaintSummary: EvaluationEntity) {
-        evaluationDao.insert(complaintSummary)
+    suspend fun insertEvaluation(evaluation: EvaluationEntity) {
+        evaluationDao.insert(evaluation)
     }
 
-    suspend fun insertComplaintSummaries(complaintSummaries: List<EvaluationEntity>) {
-        evaluationDao.insertAll(complaintSummaries)
+    suspend fun insertEvaluations(evaluations: List<EvaluationEntity>) {
+        evaluationDao.insertAll(evaluations)
     }
 
-    suspend fun deleteComplaintSummary(complaintSummary: EvaluationEntity) {
-        evaluationDao.delete(complaintSummary)
+    suspend fun deleteEvaluation(evaluation: EvaluationEntity) {
+        evaluationDao.delete(evaluation)
     }
 
-    fun getVisitComplaintsSummaries(visitId: String): Flow<List<EvaluationEntity>> {
+    fun getVisitEvaluations(visitId: String): Flow<List<EvaluationEntity>> {
         return evaluationDao.getVisitEvaluations(visitId)
     }
 
@@ -315,5 +330,13 @@ class RoomDataSource @Inject constructor(
 
     fun getReassessment(visitId: String, complaintId: String): Flow<ReassessmentEntity?> {
         return reassessmentDao.getReassessment(visitId, complaintId)
+    }
+
+    suspend fun insertDisposition(disposition: DispositionEntity) {
+        dispositionDao.insert(disposition)
+    }
+
+    fun getDisposition(visitId: String): Flow<DispositionEntity?> {
+        return dispositionDao.getDisposition(visitId)
     }
 }

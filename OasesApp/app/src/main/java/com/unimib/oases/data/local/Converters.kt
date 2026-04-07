@@ -6,9 +6,11 @@ import com.unimib.oases.data.local.model.DetailQuestionAnswer
 import com.unimib.oases.data.local.model.FindingSnapshot
 import com.unimib.oases.data.local.model.TreeAnswers
 import com.unimib.oases.domain.model.QuestionAndAnswer
+import com.unimib.oases.domain.model.complaint.ComplaintId
 import com.unimib.oases.domain.model.complaint.ImmediateTreatment
 import com.unimib.oases.domain.model.complaint.LabelledTest
 import com.unimib.oases.domain.model.complaint.TherapyText
+import com.unimib.oases.ui.screen.medical_visit.disposition.HomeTreatment
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.time.LocalDate
@@ -112,4 +114,21 @@ object Converters {
     fun fromStringToFindingSnapshotList(value: String): List<FindingSnapshot> {
         return if (value.isEmpty()) emptyList() else Json.decodeFromString(value)
     }
+
+    @TypeConverter
+    fun fromHomeTreatments(homeTreatments: List<HomeTreatment>): String =
+        homeTreatments.joinToString(",") { it.complaintId.id }
+
+    @TypeConverter
+    fun toHomeTreatments(value: String): List<HomeTreatment> =
+        value.split(",")
+            .filter { it.isNotBlank() }
+            .mapNotNull { id ->
+                when (id) {
+                    ComplaintId.DIARRHEA.id -> HomeTreatment.Diarrhea
+                    ComplaintId.DYSPNEA.id -> HomeTreatment.Dyspnea
+                    ComplaintId.SEIZURES_OR_COMA.id -> HomeTreatment.SeizuresOrComa
+                    else -> null //TODO add other
+                }
+            }
 }

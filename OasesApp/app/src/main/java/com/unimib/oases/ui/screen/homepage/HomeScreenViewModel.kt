@@ -3,7 +3,7 @@ package com.unimib.oases.ui.screen.homepage
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.unimib.oases.di.IoDispatcher
-import com.unimib.oases.domain.usecase.GetPatientsWithVisitInfoUseCase
+import com.unimib.oases.domain.usecase.GetActivePatientsAndVisitsOnToday
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.util.Resource
@@ -20,7 +20,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
-    private val getPatientsWithVisitInfoUseCase: GetPatientsWithVisitInfoUseCase,
+    private val getActivePatientsWithVisitInfoUseCase: GetActivePatientsAndVisitsOnToday,
     @param:IoDispatcher private val dispatcher: CoroutineDispatcher,
 ): ViewModel() {
 
@@ -74,7 +74,7 @@ class HomeScreenViewModel @Inject constructor(
     fun getPatientsWithVisitInfo() {
         viewModelScope.launch(coroutineContext) {
 
-            getPatientsWithVisitInfoUseCase()
+            getActivePatientsWithVisitInfoUseCase()
                 .collect { resource ->
                     when (resource) {
                         is Resource.Loading -> {

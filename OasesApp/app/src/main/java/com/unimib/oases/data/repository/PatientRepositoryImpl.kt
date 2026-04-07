@@ -138,8 +138,23 @@ class PatientRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getPatientsAndVisitsOn(date: LocalDate): Flow<Resource<List<PatientWithVisitInfo>>>  = flow {
-        roomDataSource.getPatientsAndVisitsOn(date)
+    override fun getActivePatientsAndVisitsOn(date: LocalDate): Flow<Resource<List<PatientWithVisitInfo>>>  = flow {
+        roomDataSource.getActivePatientsAndVisitsOn(date)
+            .onStart {
+                emit(Resource.Loading())
+            }
+            .catch {
+                Log.e("PatientRepositoryImpl", "Error getting patients and their visits info: ${it.message}")
+                emit(Resource.Error(it.localizedMessage ?: "Unknown error occurred"))
+            }
+            .collect { entities ->
+                val patientsWithVisitInfo = entities.map { entity -> entity.toDomain() }
+                emit(Resource.Success(patientsWithVisitInfo))
+            }
+    }
+
+    override fun getAllPatientsAndVisitsOn(date: LocalDate): Flow<Resource<List<PatientWithVisitInfo>>>  = flow {
+        roomDataSource.getAllPatientsAndVisitsOn(date)
             .onStart {
                 emit(Resource.Loading())
             }

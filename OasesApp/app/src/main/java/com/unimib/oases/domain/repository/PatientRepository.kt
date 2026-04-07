@@ -21,5 +21,6 @@ interface PatientRepository {
     fun getPatients(): Flow<Resource<List<Patient>>>
     fun getPatientsWithLastVisitDate(): Flow<Resource<List<PatientWithLastVisitDate>>>
     fun getHistoryPatients(): Flow<Resource<List<Patient>>>
-    fun getPatientsAndVisitsOn(date: LocalDate): Flow<Resource<List<PatientWithVisitInfo>>>
+    fun getActivePatientsAndVisitsOn(date: LocalDate): Flow<Resource<List<PatientWithVisitInfo>>>
+    fun getAllPatientsAndVisitsOn(date: LocalDate): Flow<Resource<List<PatientWithVisitInfo>>>
 }

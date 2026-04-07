@@ -1,6 +1,7 @@
 package com.unimib.oases.di
 
 import com.unimib.oases.data.repository.DiseaseRepositoryImpl
+import com.unimib.oases.data.repository.DispositionRepositoryImpl
 import com.unimib.oases.data.repository.EvaluationRepositoryImpl
 import com.unimib.oases.data.repository.MalnutritionScreeningRepositoryImpl
 import com.unimib.oases.data.repository.PatientDiseaseRepositoryImpl
@@ -13,6 +14,7 @@ import com.unimib.oases.data.repository.VisitRepositoryImpl
 import com.unimib.oases.data.repository.VisitVitalSignRepositoryImpl
 import com.unimib.oases.data.repository.VitalSignRepositoryImpl
 import com.unimib.oases.domain.repository.DiseaseRepository
+import com.unimib.oases.domain.repository.DispositionRepository
 import com.unimib.oases.domain.repository.EvaluationRepository
 import com.unimib.oases.domain.repository.MalnutritionScreeningRepository
 import com.unimib.oases.domain.repository.PatientDiseaseRepository
@@ -105,4 +107,10 @@ abstract class RepositoryModule {
     abstract fun bindReassessmentRepository(
         reassessmentRepositoryImpl: ReassessmentRepositoryImpl
     ): ReassessmentRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindDispositionRepository(
+        dispositionRepositoryImpl: DispositionRepositoryImpl
+    ): DispositionRepository
 }

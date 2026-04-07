@@ -15,4 +15,5 @@ object TableNames {
     const val COMPLAINT_SUMMARY = "complaints_summaries" // keep this for migration
     const val EVALUATION = "evaluations"
     const val REASSESSMENT = "reassessments"
+    const val DISPOSITION = "dispositions"
 }
