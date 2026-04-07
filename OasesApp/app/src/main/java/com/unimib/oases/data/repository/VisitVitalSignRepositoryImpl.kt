@@ -5,6 +5,7 @@ import com.unimib.oases.data.local.RoomDataSource
 import com.unimib.oases.data.mapper.toDomain
 import com.unimib.oases.data.mapper.toEntities
 import com.unimib.oases.data.mapper.toEntity
+import com.unimib.oases.data.util.FirestoreManager
 import com.unimib.oases.domain.model.VisitVitalSign
 import com.unimib.oases.domain.repository.VisitVitalSignRepository
 import com.unimib.oases.util.Outcome
@@ -17,6 +18,7 @@ import javax.inject.Inject
 
 class VisitVitalSignRepositoryImpl @Inject constructor(
     private val roomDataSource: RoomDataSource,
+    private val firestoreManager: FirestoreManager
 ): VisitVitalSignRepository
 {
     override suspend fun addVisitVitalSign(visitVitalSign: VisitVitalSign): Outcome<Unit> {

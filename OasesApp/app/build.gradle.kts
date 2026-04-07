@@ -9,7 +9,7 @@ plugins {
     id("com.google.devtools.ksp") version "2.2.20-2.0.3"
     id("kotlin-parcelize")
     id("com.google.dagger.hilt.android")
-//    alias(libs.plugins.google.gms.google.services)
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -51,7 +51,7 @@ android {
 
     buildTypes {
         debug {
-            applicationIdSuffix = ".debug"
+           // applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
             isMinifyEnabled = false
         }
@@ -89,11 +89,11 @@ dependencies {
     implementation(libs.play.services.maps)
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.androidx.ui.text.google.fonts)
-//    implementation(libs.firebase.auth)
+    implementation(libs.firebase.auth)
     implementation(libs.androidx.animation.core.android)
-//    implementation(libs.firebase.storage.ktx)
-//    implementation(libs.firebase.database.ktx)
-//    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.storage.ktx)
+    implementation(libs.firebase.database.ktx)
+   implementation(libs.firebase.firestore)
     implementation(libs.androidx.material3.window.size.class1.android)
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation(libs.androidx.compose.runtime) // For serializing Routes in MainScaffold

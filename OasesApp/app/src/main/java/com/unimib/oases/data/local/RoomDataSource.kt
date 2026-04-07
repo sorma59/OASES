@@ -3,6 +3,7 @@ package com.unimib.oases.data.local
 import androidx.room.withTransaction
 import com.unimib.oases.data.local.dao.DiseaseDao
 import com.unimib.oases.data.local.dao.EvaluationDao
+import com.unimib.oases.data.local.dao.HistoryDao
 import com.unimib.oases.data.local.dao.MalnutritionScreeningDao
 import com.unimib.oases.data.local.dao.PatientDao
 import com.unimib.oases.data.local.dao.PatientDiseaseDao
@@ -17,6 +18,7 @@ import com.unimib.oases.data.local.db.AuthDatabase
 import com.unimib.oases.data.local.db.OasesDatabase
 import com.unimib.oases.data.local.model.DiseaseEntity
 import com.unimib.oases.data.local.model.EvaluationEntity
+import com.unimib.oases.data.local.model.HistoryEntity
 import com.unimib.oases.data.local.model.MalnutritionScreeningEntity
 import com.unimib.oases.data.local.model.PatientDiseaseEntity
 import com.unimib.oases.data.local.model.PatientEntity
@@ -41,6 +43,7 @@ class RoomDataSource @Inject constructor(
     private val authDatabase: AuthDatabase
 ) {
     private val patientDao: PatientDao get() = appDatabase.patientDao()
+    private val historyDao: HistoryDao get() = appDatabase.historyDao()
     private val userDao: UserDao get() = authDatabase.userDao()
     private val patientDiseaseDao: PatientDiseaseDao get() = appDatabase.patientDiseaseDao()
     private val diseaseDao: DiseaseDao get() = appDatabase.diseaseDao()
@@ -75,6 +78,20 @@ class RoomDataSource @Inject constructor(
     fun deleteById(id: String) {
         patientDao.deleteById(id)
     }
+
+    suspend fun addToCache(patientId: String) {
+        historyDao.copyPatientToHistory(patientId)
+    }
+
+    fun getCachedPatients(): Flow<List<HistoryEntity>> {
+        return historyDao.getPatients()
+    }
+
+    fun clearCachedPatients() {
+        historyDao.delete()
+    }
+
+
 
     fun getPatients(): Flow<List<PatientEntity>> {
         return patientDao.getPatients()

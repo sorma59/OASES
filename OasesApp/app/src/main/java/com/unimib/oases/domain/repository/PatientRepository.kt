@@ -15,12 +15,11 @@ interface PatientRepository {
 
     suspend fun addPatientAndCreateVisit(patient: Patient, visit: Visit): Outcome<PatientAndVisitIds>
     suspend fun deletePatient(patient: Patient): Outcome<Unit>
-    fun deletePatientById(patientId: String): Outcome<Unit>
+    suspend fun deletePatientById(patientId: String): Outcome<Unit>
     fun getPatientById(patientId: String): Flow<Resource<Patient>>
 //    suspend fun updateTriageState(patient: Patient, triageState: String): Resource<Unit>
     fun getPatients(): Flow<Resource<List<Patient>>>
     fun getPatientsWithLastVisitDate(): Flow<Resource<List<PatientWithLastVisitDate>>>
+    fun getHistoryPatients(): Flow<Resource<List<Patient>>>
     fun getPatientsAndVisitsOn(date: LocalDate): Flow<Resource<List<PatientWithVisitInfo>>>
-    fun doOnlineTasks()
-    fun doOfflineTasks()
 }
