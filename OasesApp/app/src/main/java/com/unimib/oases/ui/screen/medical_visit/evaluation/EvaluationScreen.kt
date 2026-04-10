@@ -111,7 +111,7 @@ private fun EvaluationContent(
         )
 
         DetailsQuestions(
-            detailsQuestions = state.detailsQuestions,
+            detailsQuestions = state.detailsQuestions.take(state.detailsQuestionsToShow),
             symptoms = state.symptoms,
             onSymptomSelected = { symptom, question ->
                 onEvent(EvaluationEvent.SymptomSelected(symptom, question))
