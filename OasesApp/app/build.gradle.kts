@@ -51,7 +51,7 @@ android {
 
     buildTypes {
         debug {
-           // applicationIdSuffix = ".debug"
+            applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
             isMinifyEnabled = false
         }
@@ -93,7 +93,7 @@ dependencies {
     implementation(libs.androidx.animation.core.android)
     implementation(libs.firebase.storage.ktx)
     implementation(libs.firebase.database.ktx)
-   implementation(libs.firebase.firestore)
+    implementation(libs.firebase.firestore)
     implementation(libs.androidx.material3.window.size.class1.android)
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation(libs.androidx.compose.runtime) // For serializing Routes in MainScaffold

@@ -100,7 +100,7 @@ class MedicalVisitViewModel @Inject constructor(
                 viewModelScope.launch {
                     navigationEventsChannel.send(
                         NavigationEvent.Navigate(
-                            Route.Evaluation(
+                            Route.EvaluationSummary(
                                 patientId = state.value.patientId,
                                 visitId = state.value.visitId,
                                 complaintId = event.complaintId,

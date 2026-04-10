@@ -1,4 +1,4 @@
-package com.unimib.oases.ui.screen.medical_visit.initial_medical_evaluation
+package com.unimib.oases.ui.screen.medical_visit.evaluation
 
 import com.unimib.oases.domain.model.Patient
 import com.unimib.oases.domain.model.complaint.Complaint
@@ -64,8 +64,8 @@ data class EvaluationState(
     val isLoading: Boolean = false,
     val error: String? = null,
 ){
-    val immediateTreatments : List<ImmediateTreatment?>
-        get() = leaves.map { it?.value } +
+    val immediateTreatments : List<ImmediateTreatment>
+        get() = leaves.mapNotNull { it?.value } +
             detailsQuestions
                 .filterIsInstance<ComplaintQuestionWithImmediateTreatment>()
                 .filter { it.shouldShowTreatment(symptoms) }

@@ -1,7 +1,7 @@
 package com.unimib.oases.domain.usecase
 
 import com.unimib.oases.domain.repository.EvaluationRepository
-import com.unimib.oases.ui.screen.medical_visit.initial_medical_evaluation.EvaluationState
+import com.unimib.oases.ui.screen.medical_visit.evaluation.EvaluationState
 import com.unimib.oases.util.Outcome
 import javax.inject.Inject
 

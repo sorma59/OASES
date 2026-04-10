@@ -1,4 +1,4 @@
-package com.unimib.oases.ui.screen.medical_visit.initial_medical_evaluation
+package com.unimib.oases.ui.screen.medical_visit.evaluation
 
 import com.unimib.oases.domain.model.complaint.ComplaintQuestion
 import com.unimib.oases.domain.model.complaint.LabelledTest

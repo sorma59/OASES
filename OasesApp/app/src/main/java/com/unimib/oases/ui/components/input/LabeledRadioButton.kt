@@ -13,13 +13,15 @@ fun LabeledRadioButton(
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    asReversed: Boolean = false
+    asReversed: Boolean = false,
+    readOnly: Boolean = false,
 ){
 
     val radioButton = @Composable {
         RadioButton(
             selected = selected,
-            onClick = onClick
+            onClick = onClick,
+            enabled = readOnly.not()
         )
     }
 

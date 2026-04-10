@@ -5,11 +5,11 @@ import com.unimib.oases.domain.model.complaint.binarytree.ManualNode
 import com.unimib.oases.domain.model.complaint.binarytree.Tree
 import com.unimib.oases.domain.model.complaint.binarytree.next
 import com.unimib.oases.domain.model.complaint.binarytree.toImmediateTreatmentQuestionState
-import com.unimib.oases.ui.screen.medical_visit.initial_medical_evaluation.EvaluationState
-import com.unimib.oases.ui.screen.medical_visit.initial_medical_evaluation.ImmediateTreatmentQuestionState
-import com.unimib.oases.ui.screen.medical_visit.initial_medical_evaluation.TreeSummary
-import com.unimib.oases.ui.screen.medical_visit.initial_medical_evaluation.appendQuestion
-import com.unimib.oases.ui.screen.medical_visit.initial_medical_evaluation.rebranch
+import com.unimib.oases.ui.screen.medical_visit.evaluation.EvaluationState
+import com.unimib.oases.ui.screen.medical_visit.evaluation.ImmediateTreatmentQuestionState
+import com.unimib.oases.ui.screen.medical_visit.evaluation.TreeSummary
+import com.unimib.oases.ui.screen.medical_visit.evaluation.appendQuestion
+import com.unimib.oases.ui.screen.medical_visit.evaluation.rebranch
 import com.unimib.oases.util.replaceAt
 import javax.inject.Inject
 

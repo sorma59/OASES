@@ -17,7 +17,8 @@ import com.unimib.oases.ui.screen.dashboard.patient.PatientDashboardScreen
 import com.unimib.oases.ui.screen.homepage.HomeScreen
 import com.unimib.oases.ui.screen.medical_visit.MedicalVisitScreen
 import com.unimib.oases.ui.screen.medical_visit.disposition.DispositionScreen
-import com.unimib.oases.ui.screen.medical_visit.initial_medical_evaluation.EvaluationScreen
+import com.unimib.oases.ui.screen.medical_visit.evaluation.EvaluationScreen
+import com.unimib.oases.ui.screen.medical_visit.evaluation.summary.EvaluationSummaryScreen
 import com.unimib.oases.ui.screen.medical_visit.reassessment.ReassessmentScreen
 import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreen
 import com.unimib.oases.ui.screen.nurse_assessment.demographics.DemographicsScreen
@@ -131,6 +132,10 @@ fun AppNavigation(
 //        composable<Route.ViewPatientDetails> {
 //            PatientDetailsScreen(appViewModel)
 //        }
+
+        composable<Route.EvaluationSummary> {
+            EvaluationSummaryScreen(appViewModel)
+        }
 
         composable<Route.Evaluation> {
             EvaluationScreen(appViewModel)

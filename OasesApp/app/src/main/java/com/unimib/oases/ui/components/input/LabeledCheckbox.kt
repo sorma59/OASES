@@ -15,7 +15,8 @@ fun LabeledCheckbox(
     label: String,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    readOnly: Boolean = false,
 ) {
     Row(
         modifier = modifier,
@@ -23,7 +24,8 @@ fun LabeledCheckbox(
     ) {
         Checkbox(
             checked = checked,
-            onCheckedChange = onCheckedChange
+            onCheckedChange = onCheckedChange,
+            enabled = readOnly.not()
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(label)

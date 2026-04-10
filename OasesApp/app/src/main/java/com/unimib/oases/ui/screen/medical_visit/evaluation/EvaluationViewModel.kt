@@ -1,4 +1,4 @@
-package com.unimib.oases.ui.screen.medical_visit.initial_medical_evaluation
+package com.unimib.oases.ui.screen.medical_visit.evaluation
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -161,7 +161,6 @@ class EvaluationViewModel @Inject constructor(
             if (evaluation == null) {
                 _state.update {
                     it.copy(
-                        patient = patient,
                         symptoms = triageSymptomsIds + vitalSignsSymptomsIds
                     )
                 }
@@ -292,9 +291,19 @@ class EvaluationViewModel @Inject constructor(
                             }
                         }
                         is Outcome.Success -> {
-                            patientRepository.addPatient(state.value.patient!!)
-                            uiEventsChannel.send(UiEvent.ShowSnackbar(SnackbarData.SaveSuccess))
-                            navigationEventsChannel.send(NavigationEvent.NavigateBack)
+                            uiEventsChannel.send(
+                                UiEvent.ShowSnackbar(
+                                    SnackbarData.SaveSuccess
+                                )
+                            )
+                            navigationEventsChannel.send(
+                                NavigationEvent.PopUpTo(
+                                    Route.MedicalVisit(
+                                        patientId = state.value.patientId,
+                                        visitId = state.value.visitId,
+                                    )
+                                )
+                            )
                         }
                     }
                 }
