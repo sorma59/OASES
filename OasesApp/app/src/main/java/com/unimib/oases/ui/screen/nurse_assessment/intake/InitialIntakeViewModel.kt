@@ -171,7 +171,7 @@ class InitialIntakeViewModel @Inject constructor(
     fun getPatients() {
         viewModelScope.launch(coroutineContext) {
 
-            patientRepository.getHistoryPatients()
+            patientRepository.getPatients()
                 .collect { resource ->
                     when (resource) {
                         is Resource.Loading -> {

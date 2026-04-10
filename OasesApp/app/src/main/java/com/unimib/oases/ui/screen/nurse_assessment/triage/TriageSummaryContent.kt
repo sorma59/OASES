@@ -83,7 +83,7 @@ private fun TriageCard(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = "Triage Result",
+                    text = "Triage Code",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )

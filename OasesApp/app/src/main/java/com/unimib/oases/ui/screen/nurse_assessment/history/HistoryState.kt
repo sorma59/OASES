@@ -92,6 +92,6 @@ data class VisitState(
 )
 
 enum class HistoryScreenTab(val title: String) {
-    PAST_MEDICAL_HISTORY("Chronic diseases"),
+    PAST_MEDICAL_HISTORY("Past Medical History"),
     PAST_VISITS("Past visits")
 }

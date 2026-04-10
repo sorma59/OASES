@@ -125,7 +125,7 @@ private fun PatientsListContent(
                 modifier = Modifier.fillMaxWidth(),
                 columns = listOf(
                     DataColumn(Alignment.Center) {
-                        Text(color = MaterialTheme.colorScheme.surface, text = "Public ID")
+                        Text(color = MaterialTheme.colorScheme.surface, text = "Patient ID")
                     },
                     DataColumn(Alignment.Center) {
                         Text(color = MaterialTheme.colorScheme.surface, text = "Name")
