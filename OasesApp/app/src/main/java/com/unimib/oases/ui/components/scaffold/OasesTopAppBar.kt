@@ -56,6 +56,7 @@ val titlesAndTypesByClass: Map<KClass<out Route>, Pair<String, OasesTopAppBarTyp
     put(Route.ViewPatientDetails::class, "Patient Details" to OasesTopAppBarType.BACK)
     put(Route.EvaluationSummary::class, "Evaluation Summary" to OasesTopAppBarType.BACK)
     put(Route.Evaluation::class, "Patient Medical Evaluation" to OasesTopAppBarType.BACK)
+    put(Route.ReassessmentSummary::class, "Reassessment Summary" to OasesTopAppBarType.BACK)
     put(Route.Reassessment::class, "Patient Reassessment" to OasesTopAppBarType.BACK)
     put(Route.Disposition::class, "Patient Disposition" to OasesTopAppBarType.BACK)
     put(Route.DiseaseManagement::class, "Diseases Management" to OasesTopAppBarType.BACK)

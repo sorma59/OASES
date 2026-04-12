@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -22,9 +21,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.unimib.oases.domain.model.complaint.DefinitiveTherapy
 import com.unimib.oases.domain.model.complaint.Finding
-import com.unimib.oases.ui.components.input.LabeledCheckbox
+import com.unimib.oases.ui.components.question.DefinitiveTherapies
+import com.unimib.oases.ui.components.question.Findings
 import com.unimib.oases.ui.components.util.TitleText
 import com.unimib.oases.ui.components.util.button.RetryButton
 import com.unimib.oases.ui.components.util.effect.HandleNavigationEvents
@@ -89,32 +88,16 @@ fun ReassessmentContent(
 
         TitleText("Flag the findings present as diagnostic test results")
 
-        Findings(state, isChecked, onCheckedChange)
+        Findings(state.possibleFindings, isChecked, onCheckedChange)
 
         GenerateDefinitiveTherapiesButton { onGenerateDefinitiveTherapiesPressed() }
 
-        state.definitiveTherapies?.let { DefinitiveTherapies(it) }
+        state.definitiveTherapies?.map { it.description }
+            ?.let { DefinitiveTherapies(it) }
 
         SubmitButton(state.shouldShowSubmitButton) { onSubmit() }
 
         Spacer(Modifier.height(256.dp))
-    }
-}
-
-@Composable
-private fun Findings(
-    state: ReassessmentState,
-    isChecked: (Finding) -> Boolean,
-    onCheckedChange: (Finding) -> Unit,
-) {
-    Column{
-        state.possibleFindings.forEach { finding ->
-            LabeledCheckbox(
-                label = finding.description,
-                checked = isChecked(finding),
-                onCheckedChange = { onCheckedChange(finding) }
-            )
-        }
     }
 }
 
@@ -131,25 +114,6 @@ private fun GenerateDefinitiveTherapiesButton(
         ) {
             Text("Suggest diagnosis and treatment", fontWeight = FontWeight.Bold)
         }
-    }
-}
-
-@Composable
-private fun DefinitiveTherapies(
-    definitiveTherapies: Set<DefinitiveTherapy>,
-) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ){
-        if (definitiveTherapies.isNotEmpty()){
-            TitleText("Suggested diagnosis and treatment", fontSize = 18)
-            HorizontalDivider(thickness = 0.8.dp)
-            definitiveTherapies.forEach {
-                Text(it.description.text)
-                HorizontalDivider(thickness = 0.8.dp)
-            }
-        } else
-            Text("No diagnosis or treatment suggested")
     }
 }
 

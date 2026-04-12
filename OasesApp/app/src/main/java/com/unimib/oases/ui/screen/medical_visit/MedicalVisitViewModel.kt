@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.model.Evaluation
+import com.unimib.oases.domain.model.Reassessment
 import com.unimib.oases.domain.repository.EvaluationRepository
 import com.unimib.oases.domain.repository.ReassessmentRepository
 import com.unimib.oases.ui.navigation.NavigationEvent
@@ -124,11 +125,19 @@ class MedicalVisitViewModel @Inject constructor(
                 viewModelScope.launch {
                     navigationEventsChannel.send(
                         NavigationEvent.Navigate(
-                            Route.Reassessment(
-                                patientId = state.value.patientId,
-                                visitId = state.value.visitId,
-                                complaintId = event.complaintId,
-                            )
+                            if (getReassessment(event.complaintId) != null) {
+                                Route.ReassessmentSummary(
+                                    patientId = state.value.patientId,
+                                    visitId = state.value.visitId,
+                                    complaintId = event.complaintId,
+                                )
+                            } else {
+                                Route.Reassessment(
+                                    patientId = state.value.patientId,
+                                    visitId = state.value.visitId,
+                                    complaintId = event.complaintId,
+                                )
+                            }
                         )
                     )
                 }
@@ -168,6 +177,15 @@ class MedicalVisitViewModel @Inject constructor(
         startLoading()
         return evaluationRepository
             .getEvaluation(
+                visitId = state.value.visitId,
+                complaintId = complaintId,
+            ).firstNullableSuccess()
+            .also { stopLoading() }
+    }
+    private suspend fun getReassessment(complaintId: String): Reassessment? {
+        startLoading()
+        return reassessmentRepository
+            .getReassessment(
                 visitId = state.value.visitId,
                 complaintId = complaintId,
             ).firstNullableSuccess()

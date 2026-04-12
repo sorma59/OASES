@@ -20,6 +20,7 @@ import com.unimib.oases.ui.screen.medical_visit.disposition.DispositionScreen
 import com.unimib.oases.ui.screen.medical_visit.evaluation.EvaluationScreen
 import com.unimib.oases.ui.screen.medical_visit.evaluation.summary.EvaluationSummaryScreen
 import com.unimib.oases.ui.screen.medical_visit.reassessment.ReassessmentScreen
+import com.unimib.oases.ui.screen.medical_visit.reassessment.summary.ReassessmentSummaryScreen
 import com.unimib.oases.ui.screen.nurse_assessment.RegistrationScreen
 import com.unimib.oases.ui.screen.nurse_assessment.demographics.DemographicsScreen
 import com.unimib.oases.ui.screen.nurse_assessment.history.HistoryScreen
@@ -139,6 +140,10 @@ fun AppNavigation(
 
         composable<Route.Evaluation> {
             EvaluationScreen(appViewModel)
+        }
+
+        composable<Route.ReassessmentSummary> {
+            ReassessmentSummaryScreen(appViewModel)
         }
 
         composable<Route.Reassessment> {

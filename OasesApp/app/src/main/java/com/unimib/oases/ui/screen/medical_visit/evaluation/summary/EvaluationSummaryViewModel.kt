@@ -53,7 +53,7 @@ class EvaluationSummaryViewModel @Inject constructor(
 
     private val mainContext = dispatcher + errorHandler
 
-    private val args = savedStateHandle.toRoute<Route.Evaluation>()
+    private val args = savedStateHandle.toRoute<Route.EvaluationSummary>()
 
     private val _state = MutableStateFlow(
         EvaluationSummaryState(

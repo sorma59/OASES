@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.unimib.oases.domain.model.complaint.ComplaintQuestion
 import com.unimib.oases.domain.model.complaint.ComplaintQuestionWithImmediateTreatment
 import com.unimib.oases.domain.model.complaint.Condition
+import com.unimib.oases.domain.model.complaint.Finding
 import com.unimib.oases.domain.model.complaint.ImmediateTreatment
 import com.unimib.oases.domain.model.complaint.LabelledTest
 import com.unimib.oases.domain.model.complaint.MultipleChoiceComplaintQuestion
@@ -301,5 +302,43 @@ fun MultipleChoiceQuestion(
                 readOnly = readOnly,
             )
         }
+    }
+}
+
+@Composable
+fun Findings(
+    possibleFindings: Set<Finding>,
+    isChecked: (Finding) -> Boolean,
+    onCheckedChange: (Finding) -> Unit,
+    readOnly: Boolean = false,
+) {
+    Column{
+        possibleFindings.forEach { finding ->
+            LabeledCheckbox(
+                label = finding.description,
+                checked = isChecked(finding),
+                onCheckedChange = { onCheckedChange(finding) },
+                readOnly = readOnly,
+            )
+        }
+    }
+}
+
+@Composable
+fun DefinitiveTherapies(
+    definitiveTherapies: List<TherapyText>,
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ){
+        if (definitiveTherapies.isNotEmpty()){
+            TitleText("Suggested diagnosis and treatment", fontSize = 18)
+            HorizontalDivider(thickness = 0.8.dp)
+            definitiveTherapies.forEach {
+                Text(it.text)
+                HorizontalDivider(thickness = 0.8.dp)
+            }
+        } else
+            Text("No diagnosis or treatment suggested")
     }
 }
