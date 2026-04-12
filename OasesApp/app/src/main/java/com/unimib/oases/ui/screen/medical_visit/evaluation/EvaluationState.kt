@@ -61,6 +61,8 @@ data class EvaluationState(
 
     val wereTestsGenerated: Boolean = false,
 
+    val isTriageMissing: Boolean = false,
+
     val isLoading: Boolean = false,
     val error: String? = null,
 ){

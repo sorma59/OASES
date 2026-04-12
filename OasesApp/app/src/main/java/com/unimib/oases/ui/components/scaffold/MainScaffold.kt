@@ -131,6 +131,13 @@ fun MainScaffold(
                             inclusive = event.inclusive,
                         )
                     }
+                    is NavigationEvent.PopUpToAndNavigate -> {
+                        navController.popBackStack(
+                            route = event.popRoute,
+                            inclusive = event.inclusive,
+                        )
+                        navController.navigate(event.destinationRoute)
+                    }
                     NavigationEvent.NavigateBack -> navController.popBackStack()
                     is NavigationEvent.NavigateBackWithResult<*> -> {
 

@@ -5,11 +5,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.unimib.oases.di.IoDispatcher
+import com.unimib.oases.domain.model.Evaluation
 import com.unimib.oases.domain.repository.EvaluationRepository
 import com.unimib.oases.domain.repository.ReassessmentRepository
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.util.Resource
+import com.unimib.oases.util.firstNullableSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -28,7 +30,7 @@ class MedicalVisitViewModel @Inject constructor(
     private val reassessmentRepository: ReassessmentRepository,
     savedStateHandle: SavedStateHandle,
     @param:IoDispatcher private val dispatcher: CoroutineDispatcher,
-):ViewModel() {
+): ViewModel() {
 
     private val errorHandler = CoroutineExceptionHandler { _, e ->
         e.printStackTrace()
@@ -100,11 +102,19 @@ class MedicalVisitViewModel @Inject constructor(
                 viewModelScope.launch {
                     navigationEventsChannel.send(
                         NavigationEvent.Navigate(
-                            Route.EvaluationSummary(
-                                patientId = state.value.patientId,
-                                visitId = state.value.visitId,
-                                complaintId = event.complaintId,
-                            )
+                            if (getEvaluation(event.complaintId) != null){
+                                Route.EvaluationSummary(
+                                    patientId = state.value.patientId,
+                                    visitId = state.value.visitId,
+                                    complaintId = event.complaintId,
+                                )
+                            } else {
+                                Route.Evaluation(
+                                    patientId = state.value.patientId,
+                                    visitId = state.value.visitId,
+                                    complaintId = event.complaintId,
+                                )
+                            }
                         )
                     )
                 }
@@ -136,5 +146,31 @@ class MedicalVisitViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun stopLoading() {
+        _state.update {
+            it.copy(
+                isLoading = false,
+            )
+        }
+    }
+
+    private fun startLoading() {
+        _state.update {
+            it.copy(
+                isLoading = true,
+            )
+        }
+    }
+
+    private suspend fun getEvaluation(complaintId: String): Evaluation? {
+        startLoading()
+        return evaluationRepository
+            .getEvaluation(
+                visitId = state.value.visitId,
+                complaintId = complaintId,
+            ).firstNullableSuccess()
+            .also { stopLoading() }
     }
 }

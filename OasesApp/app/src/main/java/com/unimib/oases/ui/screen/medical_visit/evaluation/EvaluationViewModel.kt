@@ -130,7 +130,7 @@ class EvaluationViewModel @Inject constructor(
             val triageEvaluationDeferred = async {
                 triageEvaluationRepository
                     .getTriageEvaluation(visitId = state.value.visitId)
-                    .firstSuccess()
+                    .firstNullableSuccess()
             }
 
             val vitalSignsDeferred = async {
@@ -141,6 +141,16 @@ class EvaluationViewModel @Inject constructor(
             val patient = patientDeferred.await()
             val triageEvaluation = triageEvaluationDeferred.await()
             val vitalSignsSymptomsIds = vitalSignsDeferred.await()
+
+            if (triageEvaluation == null) {
+                _state.update {
+                    it.copy(
+                        isLoading = false,
+                        isTriageMissing = true,
+                    )
+                }
+                return@launch
+            }
 
             _state.update {
                 it.copy(
@@ -268,6 +278,24 @@ class EvaluationViewModel @Inject constructor(
 
             EvaluationEvent.RetryButtonClicked -> {
                 initialize()
+            }
+
+            EvaluationEvent.GoToTriageClicked -> {
+                viewModelScope.launch(dispatcher + errorHandler) {
+                    navigationEventsChannel.send(
+                        NavigationEvent.PopUpToAndNavigate(
+                            popRoute = Route.PatientDashboard(
+                                patientId = state.value.patientId,
+                                visitId = state.value.visitId,
+                            ),
+                            destinationRoute = Route.Triage(
+                                patientId = state.value.patientId,
+                                visitId = state.value.visitId,
+                                isWizardMode = false,
+                            ),
+                        )
+                    )
+                }
             }
 
             EvaluationEvent.GenerateTestsPressed -> {

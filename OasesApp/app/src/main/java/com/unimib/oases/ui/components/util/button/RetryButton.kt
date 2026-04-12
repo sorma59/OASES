@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 @Composable
 fun RetryButton(
     error: String,
+    label: String = "Retry",
     onClick: () -> Unit,
 ){
     Column(
@@ -24,7 +25,7 @@ fun RetryButton(
         Button(
             onClick = onClick
         ) {
-            Text("Retry")
+            Text(label)
         }
     }
 
