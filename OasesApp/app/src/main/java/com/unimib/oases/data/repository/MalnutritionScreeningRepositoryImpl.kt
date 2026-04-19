@@ -22,7 +22,7 @@ class MalnutritionScreeningRepositoryImpl @Inject constructor(
 
     override suspend fun insertMalnutritionScreening(malnutritionScreening: MalnutritionScreening): Outcome<Unit> {
         return try {
-            //firestoreManager.insertMalnutritionScreening(malnutritionScreening)
+            firestoreManager.insertMalnutritionScreening(malnutritionScreening.toEntity())
             roomDataSource.insertMalnutritionScreening(malnutritionScreening.toEntity())
             Outcome.Success(Unit)
         } catch (e: Exception) {

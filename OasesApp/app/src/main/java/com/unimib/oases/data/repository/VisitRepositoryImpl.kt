@@ -41,6 +41,8 @@ class VisitRepositoryImpl @Inject constructor(
     ): Outcome<Unit> {
         return try {
             firestoreManager.updateVisit(visit.toEntity())
+            firestoreManager.insertTriageEvaluation(visit.patientId, triageEvaluation.toEntity())
+            firestoreManager.insertVitalSigns(visit.patientId,vitalSigns.toEntities())
             roomDataSource.insertTriageEvaluationAndUpdateVisit(
                 visit.toEntity(),
                 triageEvaluation.toEntity(),

@@ -34,7 +34,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         // start listener
-//       firestoreManager.startListener()
+       firestoreManager.startListener()
+        firestoreManager.observeCurrentPatients()
 
 
         // Define an ActivityResultLauncher for enabling Bluetooth

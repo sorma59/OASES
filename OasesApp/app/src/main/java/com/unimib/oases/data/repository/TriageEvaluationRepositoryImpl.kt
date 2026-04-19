@@ -19,7 +19,6 @@ class TriageEvaluationRepositoryImpl @Inject constructor(private val roomDataSou
                                                          private val firestoreManager: FirestoreManager): TriageEvaluationRepository {
     override suspend fun insertTriageEvaluation(triageEvaluation: TriageEvaluation): Outcome<Unit> {
         return try {
-            // firestoreManager.insertTriageEvaluation(triageEvaluation)
             roomDataSource.insertTriageEvaluation(triageEvaluation.toEntity())
             Outcome.Success(Unit)
         } catch (e: Exception){

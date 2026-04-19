@@ -12,6 +12,7 @@ import com.unimib.oases.util.Outcome
 import com.unimib.oases.util.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
@@ -32,6 +33,8 @@ class VisitVitalSignRepositoryImpl @Inject constructor(
 
     override suspend fun addVisitVitalSigns(visitVitalSigns: List<VisitVitalSign>): Outcome<Unit> {
         return try {
+            val visit = roomDataSource.getVisitById(visitVitalSigns.toEntities().first().visitId).first()
+            firestoreManager.insertVitalSigns(visit.patientId, visitVitalSigns.toEntities())
             roomDataSource.insertVisitVitalSigns(visitVitalSigns.toEntities())
             Outcome.Success(Unit)
         } catch (e: Exception) {
