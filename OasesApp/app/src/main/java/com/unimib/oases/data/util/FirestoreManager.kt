@@ -306,6 +306,8 @@ class FirestoreManager @Inject constructor(
         } catch (e: Exception) {
             Log.e("FirestoreManager", "Error in delete/move process: ${e.message}")
             false
+        } finally {
+            syncHistoryToFirestore()
         }
     }
 
