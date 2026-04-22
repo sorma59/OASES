@@ -142,16 +142,6 @@ class EvaluationViewModel @Inject constructor(
             val triageEvaluation = triageEvaluationDeferred.await()
             val vitalSignsSymptomsIds = vitalSignsDeferred.await()
 
-            if (triageEvaluation == null) {
-                _state.update {
-                    it.copy(
-                        isLoading = false,
-                        isTriageMissing = true,
-                    )
-                }
-                return@launch
-            }
-
             _state.update {
                 it.copy(
                     patient = patient,
@@ -165,7 +155,7 @@ class EvaluationViewModel @Inject constructor(
             }
 
             val triageSymptomsIds = translateTriageSymptomIdsToSymptomsUseCase(
-                triageEvaluation.symptomsIds
+                triageEvaluation?.symptomsIds ?: error("Triage is missing")
             )
 
             if (evaluation == null) {
@@ -278,24 +268,6 @@ class EvaluationViewModel @Inject constructor(
 
             EvaluationEvent.RetryButtonClicked -> {
                 initialize()
-            }
-
-            EvaluationEvent.GoToTriageClicked -> {
-                viewModelScope.launch(dispatcher + errorHandler) {
-                    navigationEventsChannel.send(
-                        NavigationEvent.PopUpToAndNavigate(
-                            popRoute = Route.PatientDashboard(
-                                patientId = state.value.patientId,
-                                visitId = state.value.visitId,
-                            ),
-                            destinationRoute = Route.Triage(
-                                patientId = state.value.patientId,
-                                visitId = state.value.visitId,
-                                isWizardMode = false,
-                            ),
-                        )
-                    )
-                }
             }
 
             EvaluationEvent.GenerateTestsPressed -> {

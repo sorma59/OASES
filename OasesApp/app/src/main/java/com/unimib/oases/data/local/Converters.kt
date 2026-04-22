@@ -74,7 +74,7 @@ object Converters {
 
     @TypeConverter
     fun fromStringToSupportiveTherapyTextList(string: String): List<TherapyText> {
-        return if (string.isBlank()) emptyList() else string.split("_").map{ TherapyText("G$it") }
+        return if (string.isBlank()) emptyList() else string.split("_").map{ TherapyText(it) }
     }
 
     @TypeConverter

@@ -9,6 +9,8 @@ data class MedicalVisitState(
     val evaluations: Map<String, Evaluation> = emptyMap(),
     val reassessments: Map<String, Reassessment> = emptyMap(),
 
+    val isTriageMissing: Boolean = false,
+
     val isLoading: Boolean = false,
     val error: String? = null,
 ) {

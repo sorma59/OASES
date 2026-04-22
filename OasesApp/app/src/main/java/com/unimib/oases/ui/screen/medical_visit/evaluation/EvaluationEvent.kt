@@ -16,8 +16,6 @@ sealed class EvaluationEvent {
 
     data object RetryButtonClicked: EvaluationEvent()
 
-    data object GoToTriageClicked: EvaluationEvent()
-
     data object GenerateTestsPressed: EvaluationEvent()
 
     data class AdditionalTestsTextChanged(val text: String): EvaluationEvent()

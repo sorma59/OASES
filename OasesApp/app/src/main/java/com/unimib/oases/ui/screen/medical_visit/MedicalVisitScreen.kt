@@ -37,6 +37,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.unimib.oases.domain.model.complaint.ComplaintId
 import com.unimib.oases.ui.components.util.CenteredTextInBox
 import com.unimib.oases.ui.components.util.TitleText
+import com.unimib.oases.ui.components.util.button.RetryButton
 import com.unimib.oases.ui.components.util.effect.HandleNavigationEvents
 import com.unimib.oases.ui.screen.root.AppViewModel
 
@@ -59,18 +60,27 @@ private fun MedicalVisitContent(
     state: MedicalVisitState,
     onEvent: (MedicalVisitEvent) -> Unit
 ) {
-    val scrollState = rememberScrollState()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(scrollState),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        Spacer(Modifier.height(32.dp))
+    if (state.isTriageMissing) {
+        RetryButton(
+            error = "Triage is needed",
+            label = "Go to triage",
+            onClick = { onEvent(MedicalVisitEvent.GoToTriageClicked) }
+        )
+    } else {
+        val scrollState = rememberScrollState()
 
-        MainComplaintsGrid(state, onEvent)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(scrollState),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Spacer(Modifier.height(32.dp))
+
+            MainComplaintsGrid(state, onEvent)
+        }
     }
 }
 
@@ -79,6 +89,7 @@ private fun MainComplaintsGrid(
     state: MedicalVisitState,
     onEvent: (MedicalVisitEvent) -> Unit
 ) {
+
     val scrollState = rememberScrollState()
 
     Column(

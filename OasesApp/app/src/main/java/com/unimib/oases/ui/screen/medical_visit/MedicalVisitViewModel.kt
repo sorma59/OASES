@@ -9,6 +9,7 @@ import com.unimib.oases.domain.model.Evaluation
 import com.unimib.oases.domain.model.Reassessment
 import com.unimib.oases.domain.repository.EvaluationRepository
 import com.unimib.oases.domain.repository.ReassessmentRepository
+import com.unimib.oases.domain.repository.TriageEvaluationRepository
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.util.Resource
@@ -29,6 +30,7 @@ import javax.inject.Inject
 class MedicalVisitViewModel @Inject constructor(
     private val evaluationRepository: EvaluationRepository,
     private val reassessmentRepository: ReassessmentRepository,
+    private val triageEvaluationRepository: TriageEvaluationRepository,
     savedStateHandle: SavedStateHandle,
     @param:IoDispatcher private val dispatcher: CoroutineDispatcher,
 ): ViewModel() {
@@ -59,46 +61,81 @@ class MedicalVisitViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(mainContext) {
-            evaluationRepository
-                .getVisitEvaluations(state.value.visitId)
-                .collect { evaluations ->
-                    when (evaluations) {
-                        is Resource.Error -> _state.update { it.copy(error = evaluations.message) }
-                        is Resource.Loading -> _state.update { it.copy(isLoading = true) }
-                        is Resource.NotFound -> throw NoSuchElementException("Evaluations not found")
-                        is Resource.Success -> _state.update {
+            triageEvaluationRepository
+                .getTriageEvaluation(state.value.visitId)
+                .firstNullableSuccess()
+                .let { triage ->
+                    if (triage == null) {
+                        _state.update {
                             it.copy(
-                                evaluations = evaluations.data.associateBy {
-                                    complaint -> complaint.complaintId.id
-                                }
+                                isLoading = false,
+                                isTriageMissing = true,
                             )
                         }
+                        return@launch
                     }
                 }
-        }
 
-        viewModelScope.launch(mainContext) {
-            reassessmentRepository
-                .getVisitReassessments(state.value.visitId)
-                .collect { reassessments ->
-                    when (reassessments) {
-                        is Resource.Error -> _state.update { it.copy(error = reassessments.message) }
-                        is Resource.Loading -> _state.update { it.copy(isLoading = true) }
-                        is Resource.NotFound -> throw NoSuchElementException("Reassessments not found")
-                        is Resource.Success -> _state.update {
-                            it.copy(
-                                reassessments = reassessments.data.associateBy {
-                                    complaint -> complaint.complaintId.id
-                                }
-                            )
+            launch {
+                evaluationRepository
+                    .getVisitEvaluations(state.value.visitId)
+                    .collect { evaluations ->
+                        when (evaluations) {
+                            is Resource.Error -> _state.update { it.copy(error = evaluations.message) }
+                            is Resource.Loading -> _state.update { it.copy(isLoading = true) }
+                            is Resource.NotFound -> throw NoSuchElementException("Evaluations not found")
+                            is Resource.Success -> _state.update {
+                                it.copy(
+                                    evaluations = evaluations.data.associateBy {
+                                            complaint -> complaint.complaintId.id
+                                    }
+                                )
+                            }
                         }
                     }
-                }
+            }
+
+            launch {
+                reassessmentRepository
+                    .getVisitReassessments(state.value.visitId)
+                    .collect { reassessments ->
+                        when (reassessments) {
+                            is Resource.Error -> _state.update { it.copy(error = reassessments.message) }
+                            is Resource.Loading -> _state.update { it.copy(isLoading = true) }
+                            is Resource.NotFound -> throw NoSuchElementException("Reassessments not found")
+                            is Resource.Success -> _state.update {
+                                it.copy(
+                                    reassessments = reassessments.data.associateBy {
+                                            complaint -> complaint.complaintId.id
+                                    }
+                                )
+                            }
+                        }
+                    }
+            }
         }
     }
 
     fun onEvent(event: MedicalVisitEvent) {
         when (event) {
+            MedicalVisitEvent.GoToTriageClicked -> {
+                viewModelScope.launch(dispatcher + errorHandler) {
+                    navigationEventsChannel.send(
+                        NavigationEvent.PopUpToAndNavigate(
+                            popRoute = Route.PatientDashboard(
+                                patientId = state.value.patientId,
+                                visitId = state.value.visitId,
+                            ),
+                            destinationRoute = Route.Triage(
+                                patientId = state.value.patientId,
+                                visitId = state.value.visitId,
+                                isWizardMode = false,
+                            ),
+                        )
+                    )
+                }
+            }
+
             is MedicalVisitEvent.EvaluationClicked -> {
                 viewModelScope.launch {
                     navigationEventsChannel.send(

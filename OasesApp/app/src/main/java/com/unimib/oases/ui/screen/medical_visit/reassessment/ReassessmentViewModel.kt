@@ -169,7 +169,14 @@ class ReassessmentViewModel @Inject constructor(
                     )
                 )
 
-                is Outcome.Success -> navigationEventsChannel.send(NavigationEvent.NavigateBack)
+                is Outcome.Success -> navigationEventsChannel.send(
+                    NavigationEvent.PopUpTo(
+                        Route.MedicalVisit(
+                            patientId = state.value.patientId,
+                            visitId = state.value.visitId,
+                        )
+                    )
+                )
             }
         }
     }

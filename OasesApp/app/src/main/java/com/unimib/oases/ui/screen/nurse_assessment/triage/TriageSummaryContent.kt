@@ -48,8 +48,7 @@ fun TriageSummaryContent(
         ) {
             onEvent(TriageEvent.CreateButtonPressed)
         }
-    }
-    else {
+    } else {
         TriageCard(state.storedData, onEvent, modifier)
     }
 }

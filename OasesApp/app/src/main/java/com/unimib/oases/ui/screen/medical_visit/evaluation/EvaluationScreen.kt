@@ -89,66 +89,58 @@ private fun EvaluationContent(
                 onClick = { onEvent(EvaluationEvent.RetryButtonClicked) }
             )
         }
-    } ?: if (state.isTriageMissing) {
-        RetryButton(
-            error = "Triage is needed",
-            label = "Go to triage",
-            onClick = { onEvent(EvaluationEvent.GoToTriageClicked) }
-        )
-    } else {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp)
-                .verticalScroll(scrollState),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
-        ) {
+    } ?: Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp)
+            .verticalScroll(scrollState),
+        verticalArrangement = Arrangement.spacedBy(24.dp)
+    ) {
 
-            TitleText("Ask these questions:")
+        TitleText("Ask these questions:")
 
-            ImmediateTreatmentQuestions(
-                algorithms = state.immediateTreatmentAlgorithms.take(
-                    state.immediateTreatmentAlgorithmsToShow
-                ),
-                immediateTreatmentQuestions = state.immediateTreatmentQuestions,
-                immediateTreatments = state.immediateTreatments,
-                onNodeAnswer = { answer, node, tree ->
-                    onEvent(EvaluationEvent.NodeAnswered(answer, node, tree))
-                }
-            )
-
-            DetailsQuestions(
-                detailsQuestions = state.detailsQuestions.take(state.detailsQuestionsToShow),
-                symptoms = state.symptoms,
-                onSymptomSelected = { symptom, question ->
-                    onEvent(EvaluationEvent.SymptomSelected(symptom, question))
-                },
-            )
-
-            GenerateTestsButton(
-                onGenerateTestsPressed,
-                state.shouldShowGenerateTestsButton
-            )
-
-
-            if (state.wereTestsGenerated){
-                Tests(
-                    state.conditions,
-                    isChecked,
-                    onCheckedChange,
-                    additionalTestsText,
-                    onAdditionalTestsChanged
-                )
-
-                SupportiveTherapies(state.supportiveTherapies?.map { it.therapy })
-
-                SubmitButton(
-                    onSubmit,
-                )
+        ImmediateTreatmentQuestions(
+            algorithms = state.immediateTreatmentAlgorithms.take(
+                state.immediateTreatmentAlgorithmsToShow
+            ),
+            immediateTreatmentQuestions = state.immediateTreatmentQuestions,
+            immediateTreatments = state.immediateTreatments,
+            onNodeAnswer = { answer, node, tree ->
+                onEvent(EvaluationEvent.NodeAnswered(answer, node, tree))
             }
+        )
 
-            Spacer(Modifier.height(256.dp))
+        DetailsQuestions(
+            detailsQuestions = state.detailsQuestions.take(state.detailsQuestionsToShow),
+            symptoms = state.symptoms,
+            onSymptomSelected = { symptom, question ->
+                onEvent(EvaluationEvent.SymptomSelected(symptom, question))
+            },
+        )
+
+        GenerateTestsButton(
+            onGenerateTestsPressed,
+            state.shouldShowGenerateTestsButton
+        )
+
+
+        if (state.wereTestsGenerated){
+            Tests(
+                state.conditions,
+                isChecked,
+                onCheckedChange,
+                additionalTestsText,
+                onAdditionalTestsChanged
+            )
+
+            SupportiveTherapies(state.supportiveTherapies?.map { it.therapy })
+
+            SubmitButton(
+                onSubmit,
+            )
         }
+
+        Spacer(Modifier.height(256.dp))
     }
 }
 
