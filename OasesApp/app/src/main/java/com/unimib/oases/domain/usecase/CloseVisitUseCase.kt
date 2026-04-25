@@ -16,14 +16,14 @@ class CloseVisitUseCase @Inject constructor(
     private val dispositionRepository: DispositionRepository,
 ) {
     suspend operator fun invoke(state: DispositionState): Outcome<Unit> {
-
         when (val outcome = dispositionRepository.insertDisposition(state.toDomain())) {
             is Outcome.Error -> error(outcome.message)
             is Outcome.Success -> {
                 return when (state.getDispositionType()) {
-                    DispositionType.Discharge -> visitRepository.dischargePatient(state.visitId)
-                    is DispositionType.Hospitalization -> visitRepository.hospitalizePatient(state.visitId)
+                    DispositionType.Discharge -> visitRepository.finalizeVisit(state.visitId, "DISMISSED")
+                    is DispositionType.Hospitalization -> visitRepository.finalizeVisit(state.visitId, "HOSPITALIZED")
                 }
+
             }
         }
 

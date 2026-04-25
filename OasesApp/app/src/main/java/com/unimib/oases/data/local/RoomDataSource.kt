@@ -239,14 +239,6 @@ class RoomDataSource @Inject constructor(
         visitDao.upsert(visit)
     }
 
-    suspend fun dischargePatient(visitId: String) {
-        visitDao.discharge(visitId)
-    }
-
-    suspend fun hospitalizePatient(visitId: String) {
-        visitDao.hospitalize(visitId)
-    }
-
     fun getVisits(patientId: String): Flow<List<VisitEntity>> {
         return visitDao.getVisits(patientId)
     }

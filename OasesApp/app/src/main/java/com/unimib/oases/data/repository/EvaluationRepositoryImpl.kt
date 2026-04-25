@@ -6,6 +6,7 @@ import com.unimib.oases.data.local.model.EvaluationEntity
 import com.unimib.oases.data.mapper.toDomain
 import com.unimib.oases.data.mapper.toEntities
 import com.unimib.oases.data.mapper.toEntity
+import com.unimib.oases.data.util.FirestoreManager
 import com.unimib.oases.domain.model.Evaluation
 import com.unimib.oases.domain.repository.EvaluationRepository
 import com.unimib.oases.util.Outcome
@@ -18,12 +19,14 @@ import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
 class EvaluationRepositoryImpl @Inject constructor(
-    private val roomDataSource: RoomDataSource
+    private val roomDataSource: RoomDataSource,
+    private val firestoreManager: FirestoreManager
 ): EvaluationRepository {
 
     override suspend fun addEvaluation(evaluation: Evaluation): Outcome<Unit> {
         return try {
             roomDataSource.insertEvaluation(evaluation.toEntity())
+            firestoreManager.insertEvaluation(evaluation.toEntity())
             Outcome.Success(Unit)
         } catch (e: Exception) {
             Outcome.Error(e.message ?: "An error occurred")

@@ -66,22 +66,12 @@ class VisitRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun dischargePatient(visitId: String): Outcome<Unit> {
+    override suspend fun finalizeVisit(visitId: String, status: String): Outcome<Unit> {
         return try {
-            roomDataSource.dischargePatient(visitId)
+            firestoreManager.updateStatusAndCloseVisit(visitId, status)
             Outcome.Success(Unit)
         } catch (e: Exception) {
-            Log.e("VisitRepository", "Error discharging patient in visit $visitId: ${e.message}")
-            Outcome.Error(e.message ?: "An error occurred")
-        }
-    }
-
-    override suspend fun hospitalizePatient(visitId: String): Outcome<Unit> {
-        return try {
-            roomDataSource.hospitalizePatient(visitId)
-            Outcome.Success(Unit)
-        } catch (e: Exception) {
-            Log.e("VisitRepository", "Error hospitalizing patient in visit $visitId: ${e.message}")
+            Log.e("VisitRepository", "Error closing visit: ${e.message}")
             Outcome.Error(e.message ?: "An error occurred")
         }
     }
