@@ -4,6 +4,7 @@ import android.util.Log
 import com.unimib.oases.data.local.RoomDataSource
 import com.unimib.oases.data.mapper.toDomain
 import com.unimib.oases.data.mapper.toEntity
+import com.unimib.oases.data.util.FirestoreManager
 import com.unimib.oases.domain.model.Disposition
 import com.unimib.oases.domain.repository.DispositionRepository
 import com.unimib.oases.util.Outcome
@@ -16,10 +17,12 @@ import javax.inject.Inject
 
 class DispositionRepositoryImpl @Inject constructor(
     private val roomDataSource: RoomDataSource,
+    private val firestoreManager: FirestoreManager,
 ): DispositionRepository {
     override suspend fun insertDisposition(disposition: Disposition): Outcome<Unit> {
         return try {
             roomDataSource.insertDisposition(disposition.toEntity())
+            firestoreManager.insertDisposition(disposition.toEntity())
             Outcome.Success(Unit)
         } catch (e: Exception) {
             Outcome.Error(e.message ?: "An error occurred")

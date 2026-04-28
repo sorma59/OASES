@@ -5,6 +5,7 @@ import com.unimib.oases.data.local.RoomDataSource
 import com.unimib.oases.data.local.model.ReassessmentEntity
 import com.unimib.oases.data.mapper.toDomain
 import com.unimib.oases.data.mapper.toEntity
+import com.unimib.oases.data.util.FirestoreManager
 import com.unimib.oases.domain.model.Reassessment
 import com.unimib.oases.domain.repository.ReassessmentRepository
 import com.unimib.oases.util.Outcome
@@ -17,11 +18,13 @@ import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
 class ReassessmentRepositoryImpl @Inject constructor(
-    private val roomDataSource: RoomDataSource
+    private val roomDataSource: RoomDataSource,
+    private val firestoreManager: FirestoreManager
 ): ReassessmentRepository {
     override suspend fun insert(reassessment: Reassessment): Outcome<Unit> {
         return try {
             roomDataSource.insertReassessment(reassessment.toEntity())
+            firestoreManager.insertReassessment(reassessment.toEntity())
             Outcome.Success(Unit)
         } catch (e: Exception) {
             Log.e("ReassessmentRepository", "Error adding reassessment: ${e.message}")

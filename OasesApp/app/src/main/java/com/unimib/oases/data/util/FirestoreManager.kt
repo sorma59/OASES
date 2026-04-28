@@ -6,8 +6,11 @@ import com.google.firebase.firestore.FieldValue.arrayUnion
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.MetadataChanges
 import com.unimib.oases.data.local.RoomDataSource
+import com.unimib.oases.data.local.model.DispositionEntity
+import com.unimib.oases.data.local.model.EvaluationEntity
 import com.unimib.oases.data.local.model.MalnutritionScreeningEntity
 import com.unimib.oases.data.local.model.PatientEntity
+import com.unimib.oases.data.local.model.ReassessmentEntity
 import com.unimib.oases.data.local.model.TriageEvaluationEntity
 import com.unimib.oases.data.local.model.VisitEntity
 import com.unimib.oases.data.local.model.VisitVitalSignEntity
@@ -592,6 +595,113 @@ class FirestoreManager @Inject constructor(
             false
         }
     }
+
+    override suspend fun insertDisposition(dispositionEntity: DispositionEntity): Boolean {
+        return try {
+            val patientId = roomDataSource.getVisitById(dispositionEntity.visitId).first().patientId
+            db.collection("currentPatients")
+                .document(patientId)
+                .update("disposition", dispositionEntity.dispositionTypeLabel)
+                .addOnSuccessListener {
+                    Log.d("FirestoreManager", "Disposition for $patientId updated.")
+                }
+                .addOnFailureListener { e ->
+                    Log.e("FirestoreManager", "Error updating disposition: $e")
+                }
+            true
+        } catch (e: Exception) {
+            Log.e("FirestoreManager", "Failed to initiate insertDisposition: ${e.message}")
+            false
+        }
+    }
+
+    override suspend fun insertEvaluation(evaluationEntity: EvaluationEntity): Boolean {
+        return try {
+            val patientId = roomDataSource.getVisitById(evaluationEntity.visitId).first().patientId
+
+            // Manually map the entity to a Map.
+            // Firestore handles standard Lists, but we convert complex objects to Maps.
+            val evaluationMap = mapOf(
+                "visitId" to evaluationEntity.visitId,
+                "complaintId" to evaluationEntity.complaintId,
+
+                // Maps lists of complex objects to lists of maps
+                //"treeAnswers" to evaluationEntity.treeAnswers,
+                //"detailQuestionAnswers" to evaluationEntity.detailQuestionAnswers,
+
+                // Firestore allows lists, but List<List<...>> can be tricky.
+                // Explicitly passing it as the property name:
+                //"algorithmsQuestionsAndAnswers" to evaluationEntity.algorithmsQuestionsAndAnswers,
+
+                // "symptomIds" to evaluationEntity.symptomIds,
+
+                // "suggestedTests" to evaluationEntity.suggestedTests,
+                //  "labelledTests" to evaluationEntity.labelledTests,
+                //  "additionalTests" to evaluationEntity.additionalTests,
+
+                // "immediateTreatments" to evaluationEntity.immediateTreatments,
+                //  "supportiveTherapies" to evaluationEntity.supportiveTherapies
+            )
+
+            db.collection("currentPatients")
+                .document(patientId)
+                .update("evaluation", evaluationMap)
+                .addOnSuccessListener {
+                    Log.d("FirestoreManager", "Evaluation for $patientId successfully updated.")
+                }
+                .addOnFailureListener { e ->
+                    Log.e("FirestoreManager", "Error updating evaluation: $e")
+                }
+            true
+        } catch (e: Exception) {
+            Log.e("FirestoreManager", "Failed to initiate insertEvaluation: ${e.message}")
+            false
+        }
+    }
+
+    override suspend fun insertReassessment(reassessmentEntity: ReassessmentEntity): Boolean {
+        return try {
+            val patientId = roomDataSource.getVisitById(reassessmentEntity.visitId).first().patientId
+            db.collection("currentPatients")
+                .document(patientId)
+                .update("reassessment", reassessmentEntity.findings)
+                .addOnSuccessListener {
+                    Log.d("FirestoreManager", "Reassessment for $patientId updated.")
+                }
+                .addOnFailureListener { e ->
+                    Log.e("FirestoreManager", "Error updating reassessment: $e")
+                }
+            true
+        } catch (e: Exception) {
+            Log.e("FirestoreManager", "Failed to initiate insertReassessment: ${e.message}")
+            false
+        }
+    }
+
+    override suspend fun updateStatusAndCloseVisit(visitId: String, status: String): Boolean {
+        return try {
+            val patientId = roomDataSource.getVisitById(visitId).first().patientId
+            // 1. Update the patientStatus inside the nested visitEntity object
+            // We use dot notation "visitEntity.patientStatus" to target only that field
+            db.collection("currentPatients")
+                .document(patientId)
+                .update("visitEntity.patientStatus", status)
+                .addOnSuccessListener {
+                    Log.d("FirestoreManager", "Status updated to $status for $patientId. Proceeding to close visit.")
+                    deletePatient(patientId)
+                }
+                .addOnFailureListener { e ->
+                    Log.e("FirestoreManager", "Failed to update status before closing visit: $e")
+                }
+
+            true
+        } catch (e: Exception) {
+            Log.e("FirestoreManager", "Error in updateStatusAndCloseVisit: ${e.message}")
+            false
+        }
+    }
+
+
 
 
 }
