@@ -247,15 +247,10 @@ enum class TriageSymptom(
         TriageSymptomGroup.CIRCULATION,
         yellowForAll
     ),
-    LETHARGY_OR_CONFUSION_OR_AGITATION(
-        Symptom.LethargyOrConfusionOrAgitation,
+    ALTERED_MENTAL_STATUS(
+        Symptom.AlteredMentalStatus,
         TriageSymptomGroup.DISABILITY,
-        yellowForAdultNullForKid
-    ),
-    LETHARGY_OR_RESTLESS_OR_IRRITABLE_OR_CONFUSED(
-        Symptom.LethargyOrRestlessOrIrritableOrConfused,
-        TriageSymptomGroup.DISABILITY,
-        nullForAdultYellowForKid
+        yellowForAll
     ),
     FOCAL_NEUROLOGIC_DEFICIT_OR_FOCAL_VISUAL_DEFICIT(
         Symptom.FocalNeurologicDeficitOrFocalVisualDeficit,

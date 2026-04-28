@@ -30,7 +30,7 @@ object DyspneaTests: ComplaintTests {
 
 data object DyspneaBasicTests: Condition {
     override val label: String = "Consider ordering the following diagnostic tests"
-    override val predicate = { symptoms: Set<Symptom> -> true }
+    override val predicate = { _: Set<Symptom> -> true }
     override val suggestedTests = listOf(
         LabelledTest(
             testId = RapidBloodSugarTest.id,

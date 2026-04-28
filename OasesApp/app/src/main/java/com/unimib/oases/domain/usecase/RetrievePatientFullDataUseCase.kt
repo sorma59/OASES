@@ -5,6 +5,7 @@ import com.unimib.oases.domain.model.PatientFullData
 import com.unimib.oases.domain.repository.EvaluationRepository
 import com.unimib.oases.domain.repository.MalnutritionScreeningRepository
 import com.unimib.oases.domain.repository.PatientRepository
+import com.unimib.oases.domain.repository.ReassessmentRepository
 import com.unimib.oases.domain.repository.TriageEvaluationRepository
 import com.unimib.oases.domain.repository.VisitVitalSignRepository
 import com.unimib.oases.util.Resource
@@ -23,7 +24,8 @@ class RetrievePatientFullDataUseCase @Inject constructor(
     private val visitVitalSignRepository: VisitVitalSignRepository,
     private val triageEvaluationRepository: TriageEvaluationRepository,
     private val malnutritionScreeningRepository: MalnutritionScreeningRepository,
-    private val evaluationRepository: EvaluationRepository
+    private val evaluationRepository: EvaluationRepository,
+    private val reassessmentRepository: ReassessmentRepository,
 ) {
 
     suspend operator fun invoke(patientId: String): Resource<PatientFullData> {
@@ -74,18 +76,26 @@ class RetrievePatientFullDataUseCase @Inject constructor(
                     }
 
                     // Current visit's complaints summaries
-                    val complaintsSummariesDeferred = async {
+                    val evaluationsDeferred = async {
                         evaluationRepository
                             .getVisitEvaluations(visit.id)
                             .firstSuccess()
                     }
+
+                    val reassessmentsDeferred = async {
+                        reassessmentRepository
+                            .getVisitReassessments(visit.id)
+                            .firstSuccess()
+                    }
+
 
                     val patient = patientDeferred.await()
                     val patientDiseases = patientDiseasesDeferred.await()
                     val vitalSigns = vitalSignsDeferred.await()
                     val triageEvaluation = triageEvaluationDeferred.await()
                     val malnutritionScreening = malnutritionScreeningDeferred.await()
-                    val complaintsSummaries = complaintsSummariesDeferred.await()
+                    val evaluations = evaluationsDeferred.await()
+                    val reassessments = reassessmentsDeferred.await()
 
                     Resource.Success(
                         PatientFullData(
@@ -95,7 +105,8 @@ class RetrievePatientFullDataUseCase @Inject constructor(
                             vitalSigns = vitalSigns,
                             triageEvaluation = triageEvaluation,
                             malnutritionScreening = malnutritionScreening,
-                            evaluations = complaintsSummaries
+                            evaluations = evaluations,
+                            reassessments = reassessments,
                         )
                     )
                 }

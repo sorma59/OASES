@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.unimib.oases.domain.model.complaint.ComplaintQuestion
 import com.unimib.oases.domain.model.complaint.ComplaintQuestionWithImmediateTreatment
+import com.unimib.oases.domain.model.complaint.ComplaintQuestionWithImmediateTreatments
 import com.unimib.oases.domain.model.complaint.Condition
 import com.unimib.oases.domain.model.complaint.Finding
 import com.unimib.oases.domain.model.complaint.ImmediateTreatment
@@ -166,11 +167,21 @@ fun DetailsQuestions(
                     )
                 }
             }
-            if (question is ComplaintQuestionWithImmediateTreatment)
+            if (question is ComplaintQuestionWithImmediateTreatment) {
                 if (question.shouldShowTreatment(symptoms)) {
                     TitleText("Immediate Treatment")
                     Text(question.treatment.text)
                 }
+            } else if (question is ComplaintQuestionWithImmediateTreatments) {
+                question.options.forEach {
+                    if (symptoms.contains(it)) {
+                        question.optionsAndTreatments[it.id]?.let { treatment ->
+                            TitleText("Immediate Treatment")
+                            Text(treatment.text)
+                        }
+                    }
+                }
+            }
         }
     }
 }

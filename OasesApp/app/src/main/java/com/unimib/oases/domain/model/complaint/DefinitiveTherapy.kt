@@ -127,8 +127,8 @@ sealed interface DefinitiveTherapy {
 
                 appendLine("Start malaria treatment:")
                 appendLine("- uncomplicated malaria: artemether/lumefantrine (A/L, Coartem) 20/120 mg bid for 3 days --> 1 tab (< 15 kg) OR 2 tab (15-24 kg) OR 3 tab (25-34 Kg) OR 4 tab (> 34 Kg) twice a day (on day 1, give at 0hr then at 8hr, on days 2 and 3, give every 12 hr)")
-                appendLine("- recurrent uncomplicated malaria (new episode < 28 days from treatment with A/L): Dihydroartemisinin/Piperaquine (DHA/PPQ, D-Artepp, P-alaxin) 40/320 mg od for 3 days --> ...")
-                appendLine("- severe malaria/inability to take oral drugs: artesunate IV/IM for at least 24 hr --> ...")
+                appendLine("- recurrent uncomplicated malaria (new episode < 28 days from treatment with A/L): Dihydroartemisinin/Piperaquine (DHA/PPQ, D-Artepp, P-alaxin) 40/320 mg od for 3 days --> 0.5 tab (< 11 KG) OR 1 tab (11-24 Kg) OR 2 tab (25-36 Kg) OR 3 tab (36-59 kg) OR 4 tab (60-80 kg) OR 5 tab (>80 kg) once a day for 3 days")
+                appendLine("- severe malaria/inability to take oral drugs: artesunate IV/IM for at least 24 hr --> 3 mg/kg (< 20 Kg) OR 2.4 mg/kg (>20 Kg) at 0hr, 12hr and 24hr, then od until the patient can tolerate oral medications then A/L for 3 days as in uncomplicated malaria. If artesunate not available, use artemether (preferred, 3.2 mg/kg IM) or quinine (20 mg/kg IV loading those, followed by 10 mg/kg IV every 8 hr diluted in 5% dextrose and infused over 4 h)")
             }
         )
 
@@ -192,7 +192,7 @@ sealed interface DefinitiveTherapy {
             """
             Consider transfusion if:
             - children: Hb < 5 g/dl --> 10 mL/kg of pRBC or 20 ml/kg WB administered over 2–4 hours
-            - adults: Hb < 7 g/dl --> 1 unit (500 ml) of of pRBC or WB
+            - adults: Hb < 7 g/dl --> 1 unit (500 ml) of pRBC or WB
             """.trimIndent()
         )
 
@@ -308,13 +308,11 @@ sealed interface DefinitiveTherapy {
         }
     }
 
-    data object PresumptiveOrConfirmedTuberculosis: DefinitiveTherapy {
+    data class PresumptiveOrConfirmedTuberculosis(val complaintId: ComplaintId): DefinitiveTherapy {
         override val description = TherapyText(
             """
-            This is a patient with presumptive/confirmed TB. 
-            Hospitalize (isolated room) and start TB treatment if diagnosis confirmed.
-            If drug-susceptible: HRZE × 2 months, then HR × 4 months.
-            If latent TB: H x 6 months. Doses:
+            This is a patient with presumptive/confirmed TB. Hospitalize (isolated room) and start TB treatment if diagnosis confirmed.
+            If drug-susceptible: HRZE × 2 months, then HR × 4 months. If latent TB: H x 6 months. Doses:
             - isoniazid (H) 10 mg/kg (5 mg/kg in adults, max 300 mg)
             - rifampicin (R) 15 mg/kg (10 mg/kg adults, max 600 mg)
             - pyrazinamide (Z) 35 mg/kg (20 mg/kg adults, max 2500 mg)
@@ -849,6 +847,61 @@ sealed interface DefinitiveTherapy {
                     Finding.CerebrospinalFluidSuggestiveOfCryptococcalMeningitis,
                     Finding.CerebrospinalFluidSuggestiveOfNeurosyphilis,
                     Finding.SkullXRaySuggestiveOfSkullFracture
+                )
+            }
+        }
+    }
+
+    data object ConfirmedTuberculosis: DefinitiveTherapy {
+        override val description = TherapyText(
+            """
+            This is a patient with confirmed TB. Hospitalize (isolated room) and start TB treatment:
+            If drug-susceptible: HRZE × 2 months, then HR × 4 months. If latent TB: H x 6 months. Doses:
+            - isoniazid (H) 10 mg/kg (5 mg/kg in adults, max 300 mg)
+            - rifampicin (R) 15 mg/kg (10 mg/kg adults, max 600 mg)
+            - pyrazinamide (Z) 35 mg/kg (20 mg/kg adults, max 2500 mg)
+            - ethambutol (E) 20 mg/kg
+            - add vitamin B6 25 mg/day with isoniazid where risk of neuropathy.
+            All drugs are given once a day.
+            """.trimIndent()
+        )
+        override val predicate = { (_, findings): TherapyEvaluationParameters ->
+            Finding.TuberculosisGeneXpertOrMicroscopyPositive in findings
+        }
+    }
+
+    data object PregnancyTestPositive: DefinitiveTherapy {
+        override val description = TherapyText(
+            """
+            This is a pregnant patient. If pregnancy was not known, refer to antenatal care after excluding obstetrics emergencies (ectopic pregnancy, abortion, eclampsia).
+            """.trimIndent()
+        )
+        override val predicate = { (_, findings): TherapyEvaluationParameters ->
+            Finding.PregnancyTestPositive in findings
+        }
+    }
+
+    data object OtherHighRiskPatientHospitalization: DefinitiveTherapy {
+        override val description = TherapyText(
+            """
+            This is a high-risk patient in which hospitalization should always be considered. Reassess patient frequently and provide supportive therapy with
+            - oxygen to keep SpO2 > 90%
+            - paracetamol 1 gr PO/IV/PR (children: 15 mg/kg or 7.5mg/kg if < 10 kg) if fever/pain (every 4-6 hr)
+            - encourage oral fluids uptake and feeding. If the patient is unable to drink/breastfeed, start IV fluid maintenance with NS + 5% glucose:
+            - 100 ml/kg for each Kg from 1 to 10 Kg (1 L)
+            - 50 ml/kg for each Kg from 11 to 20 Kg (500 ml)
+            - 20 ml/kg for each Kg from 21 to 40 Kg (400 ml)
+            NB: If >40 Kg = give 2 L/24 hr
+            """.trimIndent()
+        )
+        override val predicate = { (symptoms): TherapyEvaluationParameters ->
+            symptoms.any {
+                it in setOf(
+                    Symptom.Shock,
+                    Symptom.InabilityToBreastfeedOrDrink,
+                    Symptom.Convulsions,
+                    Symptom.AlteredMentalStatus,
+                    Symptom.Malnutrition,
                 )
             }
         }

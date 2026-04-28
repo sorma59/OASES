@@ -106,7 +106,7 @@ private fun DispositionContent(
             )
         }
 
-        SubmitButton(
+        SubmitButton( //TODO make not clickable
             isVisible = state.isSubmitButtonVisible,
             onClick = {
                 onEvent(DispositionEvent.CloseVisitClicked)

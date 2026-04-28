@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.union
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.unimib.oases.domain.model.complaint.ComplementaryChoicesQuestion
 import com.unimib.oases.domain.model.symptom.Symptom
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -62,6 +63,39 @@ fun Set<Symptom>.selectAndRemove(symptom: Symptom, toRemove: Set<Symptom>): Set<
 
     // Return an immutable set
     return mutableSet.toSet()
+}
+
+fun Set<Symptom>.selectComplementary(symptom: Symptom, question: ComplementaryChoicesQuestion): Set<Symptom> {
+    return if (this.contains(symptom)) {
+        // Trying to uncheck this symptom
+        if (question.isRequired.not()) {
+            // The question is not required: remove the symptom
+            this.minus(symptom)
+        } else {
+            // The question is required: remove only if it is not the last symptom of its complementary group
+            if (question.complementaryChoices
+                .filter { it.contains(symptom) }
+                .flatten()
+                .toSet()
+                .intersect(this)
+                .size > 1
+            ) {
+                this.minus(symptom)
+            } else {
+                this
+            }
+        }
+    } else {
+        //Trying to add the symptom: remove complementary groups and add symptom
+        question.complementaryChoices
+            .filter { it.contains(symptom).not() }
+            .flatten()
+            .toSet()
+            .let {
+                this.minus(it)
+            }
+            .plus(symptom)
+    }
 }
 
 fun <T> List<T>.replaceAt(index: Int, element: T): List<T>{

@@ -46,7 +46,6 @@ data class EvaluationState(
     val immediateTreatmentQuestions: List<TreeSummary> = emptyList(),
     val leaves: List<LeafNode?> = emptyList(),
 
-    val detailsQuestions: List<ComplaintQuestion> = emptyList(),
     val detailsQuestionsToShow: Int = 0,
 
     val symptoms: Set<Symptom> = emptySet(),
@@ -64,6 +63,9 @@ data class EvaluationState(
     val isLoading: Boolean = false,
     val error: String? = null,
 ){
+    val detailsQuestions: List<ComplaintQuestion>
+        get() = complaint?.details?.questions.orEmpty()
+
     val immediateTreatments : List<ImmediateTreatment>
         get() = leaves.mapNotNull { it?.value } +
             detailsQuestions

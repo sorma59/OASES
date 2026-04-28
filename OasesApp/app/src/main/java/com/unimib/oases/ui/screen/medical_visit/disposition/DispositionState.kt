@@ -27,7 +27,7 @@ data class DispositionState(
         HomeTreatment.Diarrhea,
         HomeTreatment.Dyspnea,
         HomeTreatment.SeizuresOrComa,
-//        HomeTreatment.OtherComplaints, TODO uncomment
+        HomeTreatment.OtherComplaints,
     )
 
     val suggestedHomeTreatments: List<HomeTreatment>?
@@ -113,15 +113,15 @@ sealed class HomeTreatment(
         """.trimIndent()
     )
 
-//    data object OtherComplaints: HomeTreatment(
-//        complaintId = ComplaintId.DIARRHEA, //TODO REPLACE WITH OTHER
-//        label = """
-//        For patients discharged home, counsel the patient/the mother:
-//        - encourage adequate oral hydration and feeding / breastfeeding to avoid hypoglycemia and dehydration
-//        - return if the patient becomes sicker or if presence of danger signs (lethargy, convulsions, inability to drink/breastfeed)
-//        - paracetamol 1 gr PO (children: 15 mg/kg or 7.5mg/kg if < 10 kg) if fever/pain (every 4-6 hr)
-//        """.trimIndent()
-//    )
+    data object OtherComplaints: HomeTreatment(
+        complaintId = ComplaintId.OTHER,
+        label = """
+        For patients discharged home, counsel the patient/the mother:
+        - encourage adequate oral hydration and feeding / breastfeeding to avoid hypoglycemia and dehydration
+        - return if the patient becomes sicker or if presence of danger signs (lethargy, convulsions, inability to drink/breastfeed)
+        - paracetamol 1 gr PO (children: 15 mg/kg or 7.5mg/kg if < 10 kg) if fever/pain (every 4-6 hr)
+        """.trimIndent()
+    )
 }
 
 data object DispositionTypeQuestion {

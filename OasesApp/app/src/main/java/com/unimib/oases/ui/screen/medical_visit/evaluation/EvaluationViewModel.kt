@@ -8,7 +8,6 @@ import com.unimib.oases.data.local.model.TreeAnswers
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.model.Evaluation
 import com.unimib.oases.domain.model.complaint.Complaint
-import com.unimib.oases.domain.model.complaint.ComplaintQuestion
 import com.unimib.oases.domain.model.complaint.binarytree.LeafNode
 import com.unimib.oases.domain.model.complaint.binarytree.ManualNode
 import com.unimib.oases.domain.model.complaint.binarytree.ShowableNode
@@ -176,18 +175,34 @@ class EvaluationViewModel @Inject constructor(
     }
 
     private fun handleComplaint() {
-        setAlgorithms()
-        showFirstAlgorithm()
-        showFirstQuestion(state.value.complaint!!.immediateTreatmentTrees.first().root)
+        setAlgorithmsAndShowFirstQuestion()
     }
 
-    private fun setAlgorithms() {
+    private fun setAlgorithmsAndShowFirstQuestion() {
         _state.update {
             val algorithms = it.complaint!!.immediateTreatmentTrees
-            it.copy(
-                immediateTreatmentAlgorithms = algorithms,
-                leaves = List(algorithms.size){ null }
-            )
+            if (algorithms.isNotEmpty()) {
+                algorithms[0].let { firstTree ->
+                    it.copy(
+                        immediateTreatmentAlgorithms = algorithms,
+                        leaves = List(algorithms.size){ null },
+                        immediateTreatmentAlgorithmsToShow = 1,
+                        immediateTreatmentQuestions = listOf(
+                            TreeSummary(
+                                treeId = firstTree.id.value,
+                                answers = listOf(
+                                    ImmediateTreatmentQuestionState(firstTree.root)
+                                )
+                            )
+                        )
+                    )
+                }
+            } else {
+                it.copy(
+                    detailsQuestionsToShow = calculateNumberOfDetailsQuestionsToShow(it)
+                )
+            }
+
         }
     }
 
@@ -245,7 +260,7 @@ class EvaluationViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         symptoms = selectSymptomUseCase(event.symptom, it.symptoms, event.question),
-                        detailsQuestionsToShow = calculateNumberOfDetailsQuestionsToShow(event.question)
+                        detailsQuestionsToShow = calculateNumberOfDetailsQuestionsToShow(it)
                     )
                 }
             }
@@ -312,36 +327,19 @@ class EvaluationViewModel @Inject constructor(
     }
 
     /**
-     * Calculates the number of details questions to show.
-     *
-     * The logic is as follows:
-     * - If the answered question is not required, the number of questions to show does not change.
-     * - If the answered question is required:
-     *     - If the answered question is not the last one currently shown, the number of questions to show does not change.
-     *     - If the answered question is the last one currently shown:
-     *         - If the next question in the list is required, increment the number of questions to show by 1.
-     *         - If the next question in the list is not required, show all questions. This assumes that all required questions are listed before non-required ones.
-     *
-     * @param question The [ComplaintQuestion] that was just answered.
-     * @return The updated number of details questions to be shown.
+     * Returns the number of questions to show.
+     * Shows all the next not required questions and one required.
      */
-    private fun calculateNumberOfDetailsQuestionsToShow(question: ComplaintQuestion): Int {
-        return if (!question.isRequired)
-            state.value.detailsQuestionsToShow
-        else {
-            val questionOrdinal = state.value.detailsQuestions.indexOf(question) + 1
-            if (questionOrdinal != state.value.detailsQuestionsToShow)
-                state.value.detailsQuestionsToShow
-            else {
-                // The next question happens to be at the index "questionOrdinal"
-                // Reason being the ordinal is index of the question + 1
-                val nextQuestion = state.value.detailsQuestions.elementAt(questionOrdinal)
-                if (nextQuestion.isRequired)
-                    state.value.detailsQuestionsToShow + 1
-                else
-                    state.value.detailsQuestions.size
-            }
-        }
+    private fun calculateNumberOfDetailsQuestionsToShow(currentState: EvaluationState): Int {
+        val startIndex = currentState.detailsQuestionsToShow
+        val allQuestions = currentState.detailsQuestions
+
+        // Find the index of the first required question starting from the current count
+        val firstRequiredIndex = (startIndex until allQuestions.size)
+            .firstOrNull { allQuestions[it].isRequired }
+
+        // If found, show up to that question (index + 1). Otherwise, show all.
+        return if (firstRequiredIndex != null) firstRequiredIndex + 1 else allQuestions.size
     }
 
     fun Evaluation.toEvaluationState(): EvaluationState {
@@ -354,7 +352,6 @@ class EvaluationViewModel @Inject constructor(
             replayTreePath(tree.root, treeAnswer)
         }
 
-        val detailQuestions = complaint.details.questions
 
         return state.value.copy(
             immediateTreatmentAlgorithms = complaint.immediateTreatmentTrees,
@@ -368,8 +365,7 @@ class EvaluationViewModel @Inject constructor(
                     } as? LeafNode
                 }
             },
-            detailsQuestions = detailQuestions,
-            detailsQuestionsToShow = detailQuestions.size,
+            detailsQuestionsToShow = state.value.detailsQuestions.size,
             symptoms = symptoms,
             requestedTests = emptySet(), // must fill in again
             additionalTestsText = additionalTestsText,

@@ -53,7 +53,6 @@ class AnswerImmediateTreatmentQuestionUseCase @Inject constructor() {
                         ),
                         leaves = state.leaves.replaceAt(treeIndex, nextNode),
                         immediateTreatmentAlgorithmsToShow = calculateNumberOfTreesToShow(tree, state),
-                        detailsQuestions = getDetailsQuestion(state),
                         detailsQuestionsToShow = if (state.detailsQuestionsToShow == 0) 1 else state.detailsQuestionsToShow
                     )
                 else {

@@ -1,12 +1,13 @@
 package com.unimib.oases.domain.model.complaint
 
 object DyspneaDefinitiveTherapies: ComplaintDefinitiveTherapies {
+    val complaintId = ComplaintId.DYSPNEA
     override val definitiveTherapies = setOf(
         DefinitiveTherapy.SeverePneumonia,
         DefinitiveTherapy.NonSeverePneumonia,
         DefinitiveTherapy.PleuralEffusion,
         DefinitiveTherapy.Pneumothorax,
-        DefinitiveTherapy.PresumptiveOrConfirmedTuberculosis,
+        DefinitiveTherapy.PresumptiveOrConfirmedTuberculosis(complaintId),
         DefinitiveTherapy.PulmonaryEdema,
         DefinitiveTherapy.PericardialEffusionOrPericardialTamponade,
         DefinitiveTherapy.MyocardialInfarction,
@@ -19,8 +20,8 @@ object DyspneaDefinitiveTherapies: ComplaintDefinitiveTherapies {
         DefinitiveTherapy.SuspectedPertussis,
         DefinitiveTherapy.SickleCellDiseaseAndSuspectedAcuteChestSyndrome,
         DefinitiveTherapy.StridorAndNoForeignBodyObstruction,
-        DefinitiveTherapy.Malaria(ComplaintId.DYSPNEA),
-        DefinitiveTherapy.HIVInfection(ComplaintId.DYSPNEA),
+        DefinitiveTherapy.Malaria(complaintId),
+        DefinitiveTherapy.HIVInfection(complaintId),
         DefinitiveTherapy.LowHemoglobin,
         DefinitiveTherapy.DyspneaHighRiskPatientHospitalization
     )

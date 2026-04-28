@@ -1,7 +1,9 @@
 package com.unimib.oases.domain.model.complaint
 
+import com.unimib.oases.domain.model.complaint.TestId.AbdominalUltraSoundId
 import com.unimib.oases.domain.model.complaint.TestId.AbdominalXRayId
 import com.unimib.oases.domain.model.complaint.TestId.AcidFastBacilliMicroscopyId
+import com.unimib.oases.domain.model.complaint.TestId.BloodGroupingAndCrossMatchingId
 import com.unimib.oases.domain.model.complaint.TestId.BloodSmearForMalariaParasitesId
 import com.unimib.oases.domain.model.complaint.TestId.ChestXRayId
 import com.unimib.oases.domain.model.complaint.TestId.CompleteBloodCountId
@@ -9,11 +11,15 @@ import com.unimib.oases.domain.model.complaint.TestId.EchocardiographyId
 import com.unimib.oases.domain.model.complaint.TestId.ElectrocardiogramId
 import com.unimib.oases.domain.model.complaint.TestId.ElectrolytesTestsId
 import com.unimib.oases.domain.model.complaint.TestId.HIVId
+import com.unimib.oases.domain.model.complaint.TestId.LimbXRayId
 import com.unimib.oases.domain.model.complaint.TestId.LiverFunctionTestsId
 import com.unimib.oases.domain.model.complaint.TestId.LumbarPunctureAndCSFExaminationId
 import com.unimib.oases.domain.model.complaint.TestId.MalariaRapidDiagnosticTestId
+import com.unimib.oases.domain.model.complaint.TestId.PelvicXRayId
+import com.unimib.oases.domain.model.complaint.TestId.PregnancyTestId
 import com.unimib.oases.domain.model.complaint.TestId.RapidBloodSugarId
 import com.unimib.oases.domain.model.complaint.TestId.RenalFunctionTestsId
+import com.unimib.oases.domain.model.complaint.TestId.SicklingTestId
 import com.unimib.oases.domain.model.complaint.TestId.SkullXRayId
 import com.unimib.oases.domain.model.complaint.TestId.StoolMicroscopyId
 import com.unimib.oases.domain.model.complaint.TestId.TuberculosisGeneXpertId
@@ -148,6 +154,42 @@ sealed interface Test{
         override val name: String = "Skull X-ray"
     }
 
+    data object BloodGroupingAndCrossMatching: Test {
+        override val testId: TestId = BloodGroupingAndCrossMatchingId
+        override val acronym: String? = null
+        override val name: String = "Blood grouping and cross-matching"
+    }
+
+    data object PregnancyTest: Test {
+        override val testId: TestId = PregnancyTestId
+        override val acronym: String? = null
+        override val name: String = "Pregnancy test"
+    }
+
+    data object SicklingTest: Test {
+        override val testId: TestId = SicklingTestId
+        override val acronym: String? = null
+        override val name: String = "Sickling test"
+    }
+
+    data object PelvicXRay: Test {
+        override val testId: TestId = PelvicXRayId
+        override val acronym: String? = null
+        override val name: String = "Pelvic X-ray"
+    }
+
+    data object LimbXRay: Test {
+        override val testId: TestId = LimbXRayId
+        override val acronym: String? = null
+        override val name: String = "Limb X-ray"
+    }
+
+    data object AbdominalUltraSound: Test {
+        override val testId: TestId = AbdominalUltraSoundId
+        override val acronym: String? = null
+        override val name: String = "Abdominal ultrasound"
+    }
+
     companion object {
         val tests: Map<String, Test> by lazy {
             buildMap {
@@ -170,6 +212,12 @@ sealed interface Test{
                 put(LiverFunctionTests.id, LiverFunctionTests)
                 put(LumbarPunctureAndCSFExamination.id, LumbarPunctureAndCSFExamination)
                 put(SkullXRay.id, SkullXRay)
+                put(BloodGroupingAndCrossMatching.id, BloodGroupingAndCrossMatching)
+                put(PregnancyTest.id, PregnancyTest)
+                put(SicklingTest.id, SicklingTest)
+                put(PelvicXRay.id, PelvicXRay)
+                put(LimbXRay.id, LimbXRay)
+                put(AbdominalUltraSound.id, AbdominalUltraSound)
             }
         }
     }
@@ -203,4 +251,10 @@ sealed class TestId (
     object LiverFunctionTestsId: TestId(snakeCase("liver_function_tests"))
     object LumbarPunctureAndCSFExaminationId: TestId(snakeCase("lumbar_puncture_and_csf_examination"))
     object SkullXRayId: TestId(snakeCase("skull_x_ray"))
+    object BloodGroupingAndCrossMatchingId: TestId(snakeCase("blood_grouping_and_cross_matching"))
+    object PregnancyTestId: TestId(snakeCase("pregnancy_test"))
+    object SicklingTestId: TestId(snakeCase("sickling_test"))
+    object PelvicXRayId: TestId(snakeCase("pelvic_x_ray"))
+    object LimbXRayId: TestId(snakeCase("limb_x_ray"))
+    object AbdominalUltraSoundId: TestId(snakeCase("abdominal_ultra_sound"))
 }

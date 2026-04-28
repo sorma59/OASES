@@ -21,7 +21,7 @@ object PatientFullDataSerializer {
             MalnutritionScreeningSerializer.serialize(it)
         }
         val evaluationListBytes = patientFullData.evaluations.map { EvaluationSerializer.serialize(it)}
-        val reassessmentListBytes = patientFullData.reassessment.map { ReassessmentSerializer.serialize(it)}
+        val reassessmentListBytes = patientFullData.reassessments.map { ReassessmentSerializer.serialize(it)}
 
         val totalSize =
             4 + patientByteArray.size +
@@ -125,7 +125,7 @@ object PatientFullDataSerializer {
             triageEvaluation = triageEvaluation,
             malnutritionScreening = malnutritionScreening,
             evaluations = evaluations,
-            reassessment = reassessments,
+            reassessments = reassessments,
         )
     }
 }

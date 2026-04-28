@@ -69,6 +69,7 @@ object DispositionSerializer {
                 ComplaintId.DIARRHEA.id -> HomeTreatment.Diarrhea
                 ComplaintId.DYSPNEA.id -> HomeTreatment.Dyspnea
                 ComplaintId.SEIZURES_OR_COMA.id -> HomeTreatment.SeizuresOrComa
+                ComplaintId.OTHER.id -> HomeTreatment.OtherComplaints
                 else -> error("Unknown HomeTreatment id: $id")
             }
         }.toSet()

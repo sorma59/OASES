@@ -143,12 +143,8 @@ sealed interface Symptom {
         override val symptomId = SymptomId.RecentFaintingId
         override val label = "Recent fainting"
     }
-    data object LethargyOrConfusionOrAgitation: Symptom {
-        override val symptomId = SymptomId.LethargyOrConfusionOrAgitationId
-        override val label = "Lethargy / confusion / agitation"
-    }
-    data object LethargyOrRestlessOrIrritableOrConfused: Symptom {
-        override val symptomId = SymptomId.LethargyOrRestlessOrIrritableOrConfusedId
+    data object AlteredMentalStatus: Symptom {
+        override val symptomId = SymptomId.AlteredMentalStatus
         override val label = "Lethargic / restless / irritable / confused"
     }
     data object FocalNeurologicDeficitOrFocalVisualDeficit: Symptom {
@@ -167,9 +163,9 @@ sealed interface Symptom {
         override val symptomId = SymptomId.UnableToPassUrineId
         override val label = "Unable to pass urine"
     }
-    data object AcuteLimbDeformityOrOpenFracture: Symptom {
+    data object AcuteLimbDeformityOrOpenFracture: Symptom, Pain {
         override val symptomId = SymptomId.AcuteLimbDeformityOrOpenFractureId
-        override val label = "Acute limb/deformity or open fracture"
+        override val label = "Acute limb deformity / open fracture"
     }
     data object NonHighRiskTrauma: Symptom {
         override val symptomId = SymptomId.NonHighRiskTraumaId
@@ -591,7 +587,7 @@ sealed interface Symptom {
         override val label = "Irritability or confusion"
     }
 
-    data object HeadacheOrCervicalPain: Symptom {
+    data object HeadacheOrCervicalPain: Symptom, Pain {
         override val symptomId = SymptomId.HeadacheOrCervicalPainId
         override val label = "Headache or cervical pain"
     }
@@ -630,6 +626,154 @@ sealed interface Symptom {
         override val symptomId = SymptomId.JaundiceId
         override val label = "Jaundice"
     }
+
+    // --------Other---------------
+
+    data object AirwayNotOpen: Symptom {
+        override val symptomId = SymptomId.AirwayNotOpenId
+        override val label = "A – Airway NOT open (patient unable to speak, stridor, apnea, gasping, visible obstruction, excessive secretions or vomit, drooling, suspected choking, decreased level of consciousness with loss of airway protection)"
+    }
+
+    data object BreathingNotAdequate: Symptom {
+        override val symptomId = SymptomId.BreathingNotAdequateId
+        override val label = "B – Breathing NOT adequate (absent breathing, high or low RR, low SpO2, chest indrawing, nasal flaring, grunting, use of accessory muscles, cyanosis, asymmetric chest expansion, wheezing)"
+    }
+
+    data object CirculationNotAdequate: Symptom {
+        override val symptomId = SymptomId.CirculationNotAdequateId
+        override val label = "C – Circulation NOT adequate (weak rapid pulse, cold extremities, capillary refill > 3 sec, hypotension, active external or internal bleeding)"
+    }
+
+    data object DisabilityAbnormal: Symptom {
+        override val symptomId = SymptomId.DisabilityAbnormalId
+        override val label = "D – Disability abnormal (responds only to voice or pain, unresponsive, active seizures, confusion, focal neurological deficit, unequal pupils, hypoglycemia)"
+    }
+
+    data object ExposureProblem: Symptom {
+        override val symptomId = SymptomId.ExposureProblemId
+        override val label = "E – Exposure problem identified (severe rash or signs of anaphylaxis, major trauma, large burns, signs of hypothermia or hyperthermia, suspected snakebite)"
+    }
+
+    data object ABCDEUnremarkable: Symptom {
+        override val symptomId = SymptomId.ABCDEUnremarkableId
+        override val label = "ABCDE assessment unremarakable"
+    }
+
+    data object FatigueOrGeneralizedWeakness: Symptom {
+        override val symptomId = SymptomId.FatigueOrGeneralizedWeaknessId
+        override val label = "Fatigue / generalized weakness"
+    }
+
+    data object Cough: Symptom {
+        override val symptomId = SymptomId.CoughId
+        override val label = "Cough"
+    }
+
+    data object Dyspnea: Symptom {
+        override val symptomId = SymptomId.DyspneaId
+        override val label = "Dyspnea"
+    }
+
+    data object Diarrhea: Symptom {
+        override val symptomId = SymptomId.DiarrheaId
+        override val label = "Diarrhea"
+    }
+
+    data object GastrointestinalBleeding: Symptom {
+        override val symptomId = SymptomId.GastrointestinalBleedingId
+        override val label = "GI bleeding (hematemesis, melena)"
+    }
+
+    data object GenitourinarySymptoms: Symptom {
+        override val symptomId = SymptomId.GenitourinarySymptomsId
+        override val label = "Genitourinary symptoms"
+    }
+
+    data object VaginalBleeding: Symptom {
+        override val symptomId = SymptomId.VaginalBleedingId
+        override val label = "Vaginal bleeding"
+    }
+
+    data object Headache: Symptom, Pain {
+        override val symptomId = SymptomId.HeadacheId
+        override val label = "Headache"
+    }
+
+    data object SkinRash: Symptom {
+        override val symptomId = SymptomId.SkinRashId
+        override val label = "Skin rash"
+    }
+
+    data object Wound: Symptom, Pain {
+        override val symptomId = SymptomId.WoundId
+        override val label = "Wound"
+    }
+
+    data object LumbarPain: Symptom, Pain {
+        override val symptomId = SymptomId.LumbarPainId
+        override val label = "Lumbar pain"
+    }
+
+    data object ArticularPainOrSwelling: Symptom, Pain {
+        override val symptomId = SymptomId.ArticularPainOrSwellingId
+        override val label = "Articular pain or swelling"
+    }
+
+    data object EyeSymptoms: Symptom {
+        override val symptomId = SymptomId.EyeSymptomsId
+        override val label = "Eye symptoms"
+    }
+
+    data object ENTSymptoms: Symptom {
+        override val symptomId = SymptomId.ENTSymptomsId
+        override val label = "ENT symptoms"
+    }
+
+    data object OralOrDentalSymptoms: Symptom {
+        override val symptomId = SymptomId.OralOrDentalSymptomsId
+        override val label = "Oral / dental symptoms"
+    }
+
+    data object MoodDisorder: Symptom {
+        override val symptomId = SymptomId.MoodDisorderId
+        override val label = "Mood disorder (anxiety, depression, psychosis)"
+    }
+
+    data object OtherSymptomsInTheLastOneToSevenDays: Symptom, OtherDuration {
+        override val symptomId = SymptomId.OtherSymptomsInTheLastOneToSevenDaysId
+        override val label = "1-7 days"
+    }
+
+    data object OtherSymptomsInTheLastEightToFourteenDays: Symptom, OtherDuration {
+        override val symptomId = SymptomId.OtherSymptomsInTheLastEightToFourteenDaysId
+        override val label = "8-14 days"
+    }
+
+    data object OtherSymptomsInTheLastFifteenToThirtyDays: Symptom, OtherDuration {
+        override val symptomId = SymptomId.OtherSymptomsInTheLastFifteenToThirtyDaysId
+        override val label = "15-30 days"
+    }
+
+    data object OtherSymptomsInTheLastThirtyPlusDays: Symptom, OtherDuration {
+        override val symptomId = SymptomId.OtherSymptomsInTheLastThirtyPlusDaysId
+        override val label = "30+ days"
+    }
+
+    data object OtherAcuteCourse: Symptom, OtherCourse {
+        override val symptomId = SymptomId.OtherAcuteCourseId
+        override val label = "Acute (new onset)"
+    }
+
+    data object OtherProgressiveCourse: Symptom, OtherCourse {
+        override val symptomId = SymptomId.OtherProgressiveCourseId
+        override val label = "Progressive (worsening over days/weeks)"
+    }
+
+    data object OtherRecurrentCourse: Symptom, OtherCourse {
+        override val symptomId = SymptomId.OtherRecurrentCourseId
+        override val label = "Recurrent (previous similar episodes with symptom-free gaps)"
+    }
+
     // --------High-risk------------
 
     data object HivPositive: Symptom {
@@ -719,6 +863,13 @@ sealed interface Symptom {
         override val symptomId = SymptomId.DiabetesId
         override val label = "Diabetes"
     }
+
+    // ---------------Other-----------------
+
+    data object InsectBiteOrSting: Symptom {
+        override val symptomId = SymptomId.InsectBiteOrStingId
+        override val label = "Insect bite / sting"
+    }
 }
 
 sealed interface Pain
@@ -736,6 +887,8 @@ sealed interface AbsenceOrPresenceOfStatusEpilepticus
 sealed interface SeizuresOrComaConsciousness
 sealed interface SeizuresOrComaDuration
 sealed interface SeizuresType
+sealed interface OtherDuration
+sealed interface OtherCourse
 
 /**
  * Sealed interface representing the unique identifier for a symptom.
@@ -781,8 +934,7 @@ sealed class SymptomId (
     object ModerateDehydrationId: SymptomId(snakeCase("moderate_dehydration"))
     object UnableToFeedOrDrinkId: SymptomId(snakeCase("unable_to_feed_or_drink"))
     object RecentFaintingId: SymptomId(snakeCase("recent_fainting"))
-    object LethargyOrConfusionOrAgitationId: SymptomId(snakeCase("lethargy_or_confusion_or_agitation"))
-    object LethargyOrRestlessOrIrritableOrConfusedId: SymptomId(snakeCase("lethargy_or_restless_or_irritable_or_confused"))
+    object AlteredMentalStatus: SymptomId(snakeCase("lethargy_or_restless_or_irritable_or_confused"))
     object FocalNeurologicDeficitOrFocalVisualDeficitId: SymptomId(snakeCase("focal_neurologic_deficit_or_focal_visual_deficit"))
     object HeadacheWithStiffNeckId: SymptomId(snakeCase("headache_with_stiff_neck"))
     object SeverePainId: SymptomId(snakeCase("severe_pain"))
@@ -868,6 +1020,40 @@ sealed class SymptomId (
     object SeizuresOrComaFocalSeizuresId: SymptomId(snakeCase("seizures_or_coma_focal_seizures"))
     object SeizuresOrComaGeneralizedMotorSeizuresId: SymptomId(snakeCase("seizures_or_coma_generalized_motor_seizures"))
     object SeizuresOrComaAbsenceOfSeizuresId: SymptomId(snakeCase("seizures_or_coma_absence_of_seizures"))
+
+    //---------------Other-----------------
+
+    object AirwayNotOpenId: SymptomId(snakeCase("other_airway_not_open"))
+    object BreathingNotAdequateId: SymptomId(snakeCase("other_breathing_not_adequate"))
+    object CirculationNotAdequateId: SymptomId(snakeCase("other_circulation_not_adequate"))
+    object DisabilityAbnormalId: SymptomId(snakeCase("other_disability_abnormal"))
+    object ExposureProblemId: SymptomId(snakeCase("other_exposure_problem"))
+    object ABCDEUnremarkableId: SymptomId(snakeCase("other_abcde_unremarkable"))
+
+    object FatigueOrGeneralizedWeaknessId: SymptomId(snakeCase("other_fatigue_or_generalized_weakness"))
+    object CoughId: SymptomId(snakeCase("cough"))
+    object DyspneaId: SymptomId(snakeCase("dyspnea"))
+    object DiarrheaId: SymptomId(snakeCase("diarrhea"))
+    object GastrointestinalBleedingId: SymptomId(snakeCase("gastrointestinal_bleeding"))
+    object GenitourinarySymptomsId: SymptomId(snakeCase("genitourinary_symptoms"))
+    object VaginalBleedingId: SymptomId(snakeCase("vaginal_bleeding"))
+    object HeadacheId: SymptomId(snakeCase("headache"))
+    object SkinRashId: SymptomId(snakeCase("skin_rash"))
+    object WoundId: SymptomId(snakeCase("wound"))
+    object LumbarPainId: SymptomId(snakeCase("lumbar_pain"))
+    object ArticularPainOrSwellingId: SymptomId(snakeCase("articular_pain_or_swelling"))
+    object EyeSymptomsId: SymptomId(snakeCase("eye_symptoms"))
+    object ENTSymptomsId: SymptomId(snakeCase("ent_symptoms"))
+    object OralOrDentalSymptomsId: SymptomId(snakeCase("oral_or_dental_symptoms"))
+    object MoodDisorderId: SymptomId(snakeCase("mood_disorder"))
+    object OtherSymptomsInTheLastOneToSevenDaysId: SymptomId(snakeCase("other_symptoms_in_the_last_one_to_seven_days"))
+    object OtherSymptomsInTheLastEightToFourteenDaysId: SymptomId(snakeCase("other_symptoms_in_the_last_eight_to_fourteen_days"))
+    object OtherSymptomsInTheLastFifteenToThirtyDaysId: SymptomId(snakeCase("other_symptoms_in_the_last_fifteen_to_thirty_days"))
+    object OtherSymptomsInTheLastThirtyPlusDaysId: SymptomId(snakeCase("other_symptoms_in_the_last_thirty_plus_days"))
+    object OtherAcuteCourseId: SymptomId(snakeCase("other_acute_course"))
+    object OtherProgressiveCourseId: SymptomId(snakeCase("other_progressive_course"))
+    object OtherRecurrentCourseId: SymptomId(snakeCase("other_recurrent_course"))
+
     //--------------------------------------------------------------
 
     object VomitingId: SymptomId(snakeCase("vomiting"))
@@ -923,6 +1109,8 @@ sealed class SymptomId (
     object SuspectOfDrugOrToxinIngestionId: SymptomId(snakeCase("suspect_of_drug_or_toxin_ingestion"))
     object SuspectOfAlcoholUseOrWithdrawalId: SymptomId(snakeCase("suspect_of_alcohol_use_or_withdrawal"))
     object DiabetesId: SymptomId(snakeCase("diabetes"))
+
+    object InsectBiteOrStingId: SymptomId(snakeCase("insect_bite_or_sting"))
 }
 
 

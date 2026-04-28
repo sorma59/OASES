@@ -1,5 +1,6 @@
 package com.unimib.oases.domain.model.symptom
 
+import com.unimib.oases.domain.model.symptom.Symptom.ABCDEUnremarkable
 import com.unimib.oases.domain.model.symptom.Symptom.AbdominalDistensionAndTendernessWithAlteredBowelSounds
 import com.unimib.oases.domain.model.symptom.Symptom.AbdominalPain
 import com.unimib.oases.domain.model.symptom.Symptom.AbsenceOfStatusEpilepticus
@@ -7,20 +8,27 @@ import com.unimib.oases.domain.model.symptom.Symptom.AcuteLimbDeformityOrOpenFra
 import com.unimib.oases.domain.model.symptom.Symptom.AcuteTesticularOrScrotalPainOrPriapism
 import com.unimib.oases.domain.model.symptom.Symptom.AgeOverEightyYears
 import com.unimib.oases.domain.model.symptom.Symptom.AggressiveBehavior
+import com.unimib.oases.domain.model.symptom.Symptom.AirwayNotOpen
 import com.unimib.oases.domain.model.symptom.Symptom.AirwaySwellingOrMassOfMouthOrThroatOrNeck
 import com.unimib.oases.domain.model.symptom.Symptom.AlertLevelOfConsciousness
+import com.unimib.oases.domain.model.symptom.Symptom.AlteredMentalStatus
 import com.unimib.oases.domain.model.symptom.Symptom.AnimalBiteOrNeedlestickPuncture
+import com.unimib.oases.domain.model.symptom.Symptom.ArticularPainOrSwelling
 import com.unimib.oases.domain.model.symptom.Symptom.AsthmaCOPDHistory
+import com.unimib.oases.domain.model.symptom.Symptom.BreathingNotAdequate
 import com.unimib.oases.domain.model.symptom.Symptom.BulgingFontanelle
 import com.unimib.oases.domain.model.symptom.Symptom.CardiacMurmurAtChestAuscultation
 import com.unimib.oases.domain.model.symptom.Symptom.ChestPain
 import com.unimib.oases.domain.model.symptom.Symptom.CholeraOutbreak
+import com.unimib.oases.domain.model.symptom.Symptom.CirculationNotAdequate
 import com.unimib.oases.domain.model.symptom.Symptom.CloseContactWithKnownTuberculosisPatient
 import com.unimib.oases.domain.model.symptom.Symptom.Convulsions
+import com.unimib.oases.domain.model.symptom.Symptom.Cough
 import com.unimib.oases.domain.model.symptom.Symptom.CracklesAtChestAuscultation
 import com.unimib.oases.domain.model.symptom.Symptom.CurrentPregnancy
 import com.unimib.oases.domain.model.symptom.Symptom.DecreasedBreathSoundsAtChestAuscultation
 import com.unimib.oases.domain.model.symptom.Symptom.Diabetes
+import com.unimib.oases.domain.model.symptom.Symptom.Diarrhea
 import com.unimib.oases.domain.model.symptom.Symptom.DiarrheaBloodyStools
 import com.unimib.oases.domain.model.symptom.Symptom.DiarrheaEpisodesOnceOrTwiceADay
 import com.unimib.oases.domain.model.symptom.Symptom.DiarrheaEpisodesSixOrMoreTimesADay
@@ -33,6 +41,8 @@ import com.unimib.oases.domain.model.symptom.Symptom.DiarrheaMalnourishment
 import com.unimib.oases.domain.model.symptom.Symptom.DiarrheaOilyOrGreasyOrFoulSmellingStools
 import com.unimib.oases.domain.model.symptom.Symptom.DiarrheaShockOrSevereDehydration
 import com.unimib.oases.domain.model.symptom.Symptom.DiarrheaWateryStools
+import com.unimib.oases.domain.model.symptom.Symptom.DisabilityAbnormal
+import com.unimib.oases.domain.model.symptom.Symptom.Dyspnea
 import com.unimib.oases.domain.model.symptom.Symptom.DyspneaAcuteCourse
 import com.unimib.oases.domain.model.symptom.Symptom.DyspneaAirwayObstruction
 import com.unimib.oases.domain.model.symptom.Symptom.DyspneaCoughWithBlood
@@ -47,16 +57,24 @@ import com.unimib.oases.domain.model.symptom.Symptom.DyspneaProgressiveCourse
 import com.unimib.oases.domain.model.symptom.Symptom.DyspneaRecurrentCourse
 import com.unimib.oases.domain.model.symptom.Symptom.DyspneaSevereRespiratoryDistress
 import com.unimib.oases.domain.model.symptom.Symptom.DyspneaWheezing
+import com.unimib.oases.domain.model.symptom.Symptom.ENTSymptoms
 import com.unimib.oases.domain.model.symptom.Symptom.EasyBruising
 import com.unimib.oases.domain.model.symptom.Symptom.EdemaOfBothFeet
 import com.unimib.oases.domain.model.symptom.Symptom.EpilepsyOrHistoryOfRecurrentUnprovokedSeizures
+import com.unimib.oases.domain.model.symptom.Symptom.ExposureProblem
+import com.unimib.oases.domain.model.symptom.Symptom.EyeSymptoms
+import com.unimib.oases.domain.model.symptom.Symptom.FatigueOrGeneralizedWeakness
 import com.unimib.oases.domain.model.symptom.Symptom.FeverAbove38Degrees
 import com.unimib.oases.domain.model.symptom.Symptom.FocalNeurologicDeficitOrFocalVisualDeficit
 import com.unimib.oases.domain.model.symptom.Symptom.FocalNeurologicalDeficit
+import com.unimib.oases.domain.model.symptom.Symptom.GastrointestinalBleeding
+import com.unimib.oases.domain.model.symptom.Symptom.GenitourinarySymptoms
 import com.unimib.oases.domain.model.symptom.Symptom.HeadInjury
+import com.unimib.oases.domain.model.symptom.Symptom.Headache
 import com.unimib.oases.domain.model.symptom.Symptom.HeadacheOrCervicalPain
 import com.unimib.oases.domain.model.symptom.Symptom.HeadacheWithStiffNeck
 import com.unimib.oases.domain.model.symptom.Symptom.HeavyBleeding
+import com.unimib.oases.domain.model.symptom.Symptom.HighDbp
 import com.unimib.oases.domain.model.symptom.Symptom.HighHr
 import com.unimib.oases.domain.model.symptom.Symptom.HighRbs
 import com.unimib.oases.domain.model.symptom.Symptom.HighRiskTrauma
@@ -70,21 +88,22 @@ import com.unimib.oases.domain.model.symptom.Symptom.HypertensiveEmergency
 import com.unimib.oases.domain.model.symptom.Symptom.Hypoglycemia
 import com.unimib.oases.domain.model.symptom.Symptom.Hypotension
 import com.unimib.oases.domain.model.symptom.Symptom.InabilityToBreastfeedOrDrink
+import com.unimib.oases.domain.model.symptom.Symptom.InsectBiteOrSting
 import com.unimib.oases.domain.model.symptom.Symptom.IrregularPulseOrIrregularHeartSounds
 import com.unimib.oases.domain.model.symptom.Symptom.IrritabilityOrConfusion
 import com.unimib.oases.domain.model.symptom.Symptom.Jaundice
 import com.unimib.oases.domain.model.symptom.Symptom.Lethargy
-import com.unimib.oases.domain.model.symptom.Symptom.LethargyOrConfusionOrAgitation
-import com.unimib.oases.domain.model.symptom.Symptom.LethargyOrRestlessOrIrritableOrConfused
 import com.unimib.oases.domain.model.symptom.Symptom.LowHr
 import com.unimib.oases.domain.model.symptom.Symptom.LowRbs
 import com.unimib.oases.domain.model.symptom.Symptom.LowRr
 import com.unimib.oases.domain.model.symptom.Symptom.LowSbp
 import com.unimib.oases.domain.model.symptom.Symptom.LowSpo2
 import com.unimib.oases.domain.model.symptom.Symptom.LowTemp
+import com.unimib.oases.domain.model.symptom.Symptom.LumbarPain
 import com.unimib.oases.domain.model.symptom.Symptom.MajorBurns
 import com.unimib.oases.domain.model.symptom.Symptom.Malnutrition
 import com.unimib.oases.domain.model.symptom.Symptom.ModerateDehydration
+import com.unimib.oases.domain.model.symptom.Symptom.MoodDisorder
 import com.unimib.oases.domain.model.symptom.Symptom.NightSweats
 import com.unimib.oases.domain.model.symptom.Symptom.NonHeavyBleeding
 import com.unimib.oases.domain.model.symptom.Symptom.NonHighRiskPregnancyRelatedComplaints
@@ -92,7 +111,15 @@ import com.unimib.oases.domain.model.symptom.Symptom.NonHighRiskTrauma
 import com.unimib.oases.domain.model.symptom.Symptom.NonMajorBurns
 import com.unimib.oases.domain.model.symptom.Symptom.OngoingSevereVomitingOrOngoingSevereDiarrhea
 import com.unimib.oases.domain.model.symptom.Symptom.Opisthotonus
+import com.unimib.oases.domain.model.symptom.Symptom.OralOrDentalSymptoms
 import com.unimib.oases.domain.model.symptom.Symptom.OrthopneaOrParoxysmalNocturnalDyspnea
+import com.unimib.oases.domain.model.symptom.Symptom.OtherAcuteCourse
+import com.unimib.oases.domain.model.symptom.Symptom.OtherProgressiveCourse
+import com.unimib.oases.domain.model.symptom.Symptom.OtherRecurrentCourse
+import com.unimib.oases.domain.model.symptom.Symptom.OtherSymptomsInTheLastEightToFourteenDays
+import com.unimib.oases.domain.model.symptom.Symptom.OtherSymptomsInTheLastFifteenToThirtyDays
+import com.unimib.oases.domain.model.symptom.Symptom.OtherSymptomsInTheLastOneToSevenDays
+import com.unimib.oases.domain.model.symptom.Symptom.OtherSymptomsInTheLastThirtyPlusDays
 import com.unimib.oases.domain.model.symptom.Symptom.PeripheralEdemaOrJugularVenousDistension
 import com.unimib.oases.domain.model.symptom.Symptom.PetechialRashOrPurpura
 import com.unimib.oases.domain.model.symptom.Symptom.PoisoningIntoxication
@@ -127,6 +154,7 @@ import com.unimib.oases.domain.model.symptom.Symptom.SeverePallor
 import com.unimib.oases.domain.model.symptom.Symptom.SexualAssault
 import com.unimib.oases.domain.model.symptom.Symptom.Shock
 import com.unimib.oases.domain.model.symptom.Symptom.SickleCellDisease
+import com.unimib.oases.domain.model.symptom.Symptom.SkinRash
 import com.unimib.oases.domain.model.symptom.Symptom.SmokingOrExposedToSmoke
 import com.unimib.oases.domain.model.symptom.Symptom.SnakeBite
 import com.unimib.oases.domain.model.symptom.Symptom.StatusEpilepticus
@@ -142,9 +170,11 @@ import com.unimib.oases.domain.model.symptom.Symptom.Unconsciousness
 import com.unimib.oases.domain.model.symptom.Symptom.UnequalPupils
 import com.unimib.oases.domain.model.symptom.Symptom.UnresponsiveLevelOfConsciousness
 import com.unimib.oases.domain.model.symptom.Symptom.Unvaccinated
+import com.unimib.oases.domain.model.symptom.Symptom.VaginalBleeding
 import com.unimib.oases.domain.model.symptom.Symptom.Vomiting
 import com.unimib.oases.domain.model.symptom.Symptom.WeightLoss
 import com.unimib.oases.domain.model.symptom.Symptom.Wheezing
+import com.unimib.oases.domain.model.symptom.Symptom.Wound
 import com.unimib.oases.domain.model.symptom.Symptom.YoungerThanEightDays
 import com.unimib.oases.domain.model.symptom.Symptom.YoungerThanSixMonths
 import com.unimib.oases.domain.model.symptom.Symptom.YoungerThanTwoMonthsAndLowOrHighTemperature
@@ -185,8 +215,7 @@ val allSymptoms: Set<Symptom> = setOf(
     ModerateDehydration,
     UnableToFeedOrDrink,
     RecentFainting,
-    LethargyOrConfusionOrAgitation,
-    LethargyOrRestlessOrIrritableOrConfused,
+    AlteredMentalStatus,
     FocalNeurologicDeficitOrFocalVisualDeficit,
     HeadacheWithStiffNeck,
     SeverePain,
@@ -301,7 +330,41 @@ val allSymptoms: Set<Symptom> = setOf(
     HeadInjury,
     SuspectOfDrugOrToxinIngestion,
     SuspectOfAlcoholUseOrWithdrawal,
-    Diabetes
+    Diabetes,
+    InsectBiteOrSting,
+    SuspectOfAlcoholUseOrWithdrawal,
+    Diabetes,
+    InsectBiteOrSting,
+    HighDbp,
+    AirwayNotOpen,
+    BreathingNotAdequate,
+    CirculationNotAdequate,
+    DisabilityAbnormal,
+    ExposureProblem,
+    ABCDEUnremarkable,
+    FatigueOrGeneralizedWeakness,
+    Cough,
+    Dyspnea,
+    Diarrhea,
+    GastrointestinalBleeding,
+    GenitourinarySymptoms,
+    VaginalBleeding,
+    Headache,
+    SkinRash,
+    Wound,
+    LumbarPain,
+    ArticularPainOrSwelling,
+    EyeSymptoms,
+    ENTSymptoms,
+    OralOrDentalSymptoms,
+    MoodDisorder,
+    OtherSymptomsInTheLastOneToSevenDays,
+    OtherSymptomsInTheLastEightToFourteenDays,
+    OtherSymptomsInTheLastFifteenToThirtyDays,
+    OtherSymptomsInTheLastThirtyPlusDays,
+    OtherAcuteCourse,
+    OtherProgressiveCourse,
+    OtherRecurrentCourse,
 )
 
 /**
