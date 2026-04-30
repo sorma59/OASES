@@ -214,7 +214,7 @@ fun ImmediateTreatmentQuestions(
 
                     Spacer(Modifier.height(8.dp))
 
-                    if (immediateTreatments.isNotEmpty()){
+                    if (index < immediateTreatments.size) {
                         immediateTreatments.elementAt(index).let {
                             TitleText("Immediate Treatment")
                             Text(it.text)
