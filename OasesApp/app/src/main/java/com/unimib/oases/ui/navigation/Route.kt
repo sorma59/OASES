@@ -102,6 +102,11 @@ sealed class Route {
     @Serializable
     data object RoomsManagement: Route()
     @Serializable
+    data class PastVisitSummary(
+        val visitId: String,
+        val patientId: String,
+    ): Route()
+    @Serializable
     data object PairDevice: Route()
 
     /**

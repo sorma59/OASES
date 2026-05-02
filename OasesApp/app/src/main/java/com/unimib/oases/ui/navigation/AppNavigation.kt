@@ -29,6 +29,7 @@ import com.unimib.oases.ui.screen.nurse_assessment.malnutrition_screening.Malnut
 import com.unimib.oases.ui.screen.nurse_assessment.triage.TriageScreen
 import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.VitalSignsSummary
 import com.unimib.oases.ui.screen.nurse_assessment.vital_signs.form.VitalSignsForm
+import com.unimib.oases.ui.screen.past_visit.PastVisitSummaryScreen
 import com.unimib.oases.ui.screen.root.AppViewModel
 
 @Composable
@@ -76,6 +77,10 @@ fun AppNavigation(
 
         composable<Route.RoomsManagement> {
             RoomsManagementScreen()
+        }
+
+        composable<Route.PastVisitSummary> {
+            PastVisitSummaryScreen(appViewModel)
         }
 
         composable<Route.Home> {

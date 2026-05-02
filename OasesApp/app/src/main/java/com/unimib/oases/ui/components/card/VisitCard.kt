@@ -1,5 +1,6 @@
 package com.unimib.oases.ui.components.card
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,12 +21,18 @@ import androidx.compose.ui.unit.dp
 import com.unimib.oases.ui.screen.nurse_assessment.history.VisitState
 
 @Composable
-fun VisitCard(visit: VisitState) {
+fun VisitCard(
+    visit: VisitState,
+    onClick: (String) -> Unit,
+) {
 
     OasesCard(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(8.dp)
+            .clickable {
+                onClick(visit.visitId)
+            },
     ) {
         Column(
             modifier = Modifier

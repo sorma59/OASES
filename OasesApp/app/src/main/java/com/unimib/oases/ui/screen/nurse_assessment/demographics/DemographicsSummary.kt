@@ -31,7 +31,8 @@ import com.unimib.oases.util.StringFormatHelper.getAgeWithSuffix
 fun DemographicsSummary(
     demographics: PatientData,
     onEvent: (DemographicsEvent) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    hasEditButton: Boolean = true,
 ) {
     OasesCard(modifier.fillMaxWidth()) {
         // Add padding inside the card to give the content some breathing room.
@@ -59,13 +60,15 @@ fun DemographicsSummary(
                     )
                 }
 
-                IconButton(
-                    onClick = { onEvent(DemographicsEvent.EditButtonPressed) }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = "Edit triage"
-                    )
+                if (hasEditButton) {
+                    IconButton(
+                        onClick = { onEvent(DemographicsEvent.EditButtonPressed) }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = "Edit triage"
+                        )
+                    }
                 }
             }
 

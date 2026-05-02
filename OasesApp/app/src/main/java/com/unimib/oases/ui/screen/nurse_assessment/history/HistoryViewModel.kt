@@ -242,6 +242,19 @@ class HistoryViewModel @Inject constructor(
                 onEvent(HistoryEvent.Save)
             }
 
+            is HistoryEvent.VisitClicked -> {
+                viewModelScope.launch {
+                    navigationEventsChannel.send(
+                        NavigationEvent.Navigate(
+                            Route.PastVisitSummary(
+                                visitId = event.visitId,
+                                patientId = state.value.patientId
+                            )
+                        )
+                    )
+                }
+            }
+
             HistoryEvent.UndoMarkingAllAsNos -> {
                 diseasesBeforeDenyingAll?.let { previousState ->
                     updatePmhEditState {
@@ -256,8 +269,6 @@ class HistoryViewModel @Inject constructor(
     }
 
     fun shouldShowCreateButton() = isDoctor
-
-    fun shouldShowEditButton() = isDoctor
 
     private fun goBackToViewMode() {
         val currentMode = state.value.pastMedicalHistoryState.mode

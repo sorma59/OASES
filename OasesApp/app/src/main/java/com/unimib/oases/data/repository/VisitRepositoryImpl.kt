@@ -88,6 +88,18 @@ class VisitRepositoryImpl @Inject constructor(
             }
     }
 
+    override fun getPastVisits(patientId: String): Flow<Resource<List<Visit>>> = flow {
+        roomDataSource.getPastVisits(patientId)
+            .onStart { emit(Resource.Loading()) }
+            .catch {
+                Log.e("VisitRepository", "Error getting past visits: ${it.message}")
+                emit(Resource.Error(it.message ?: "An error occurred"))
+            }
+            .collect {
+                emit(Resource.Success(it.map { entity -> entity.toDomain() }))
+            }
+    }
+
     override fun getVisitById(visitId: String): Flow<Resource<Visit>> = flow {
         roomDataSource.getVisitById(visitId)
             .onStart {

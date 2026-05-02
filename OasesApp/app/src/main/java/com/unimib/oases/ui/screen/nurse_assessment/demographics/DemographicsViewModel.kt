@@ -92,7 +92,7 @@ class DemographicsViewModel @Inject constructor(
                 )
             }
 
-            val patientId = _state.value.storedData.id
+            val patientId = state.value.storedData.id
 
             patientId?.let {
                 val patient = patientUseCase

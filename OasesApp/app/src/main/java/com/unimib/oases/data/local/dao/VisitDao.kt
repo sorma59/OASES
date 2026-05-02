@@ -6,6 +6,7 @@ import androidx.room.Upsert
 import com.unimib.oases.data.local.TableNames
 import com.unimib.oases.data.local.model.VisitEntity
 import com.unimib.oases.data.local.model.relation.PatientWithVisitInfoEntity
+import com.unimib.oases.domain.model.PatientStatus
 import com.unimib.oases.util.DateAndTimeUtils
 import kotlinx.coroutines.flow.Flow
 
@@ -23,6 +24,17 @@ interface VisitDao {
 
     @Query("SELECT * FROM " + TableNames.VISIT + " WHERE patient_id = :patientId")
     fun getVisits(patientId: String): Flow<List<VisitEntity>>
+
+    @Query("""
+        SELECT * FROM ${TableNames.VISIT}
+        WHERE patient_id = :patientId AND
+        (patient_status == :dismissedStatus OR patient_status == :hospitalizedStatus)
+    """)
+    fun getPastVisits(
+        patientId: String,
+        dismissedStatus: String = PatientStatus.DISMISSED.name,
+        hospitalizedStatus: String = PatientStatus.HOSPITALIZED.name,
+    ): Flow<List<VisitEntity>>
 
     @Query("SELECT * FROM " + TableNames.VISIT + " WHERE id = :visitId")
     fun getVisitById(visitId: String): Flow<VisitEntity>

@@ -11,7 +11,7 @@ class ReloadPastVisitsUseCase @Inject constructor(
 ){
     suspend operator fun invoke(patientId: String): List<VisitState> {
         return repo
-            .getVisits(patientId)
+            .getPastVisits(patientId)
             .firstSuccess()
             .toVisitStates()
     }

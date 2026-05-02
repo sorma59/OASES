@@ -243,6 +243,10 @@ class RoomDataSource @Inject constructor(
         return visitDao.getVisits(patientId)
     }
 
+    fun getPastVisits(patientId: String): Flow<List<VisitEntity>> {
+        return visitDao.getPastVisits(patientId)
+    }
+
     fun getVisitById(visitId: String): Flow<VisitEntity> {
         return visitDao.getVisitById(visitId)
     }

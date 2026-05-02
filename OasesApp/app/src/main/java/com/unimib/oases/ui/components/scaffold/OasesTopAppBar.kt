@@ -63,6 +63,7 @@ val titlesAndTypesByClass: Map<KClass<out Route>, Pair<String, OasesTopAppBarTyp
     put(Route.UserManagement::class, "Users Management" to OasesTopAppBarType.BACK)
     put(Route.VitalSignsManagement::class, "Vital Signs Management" to OasesTopAppBarType.BACK)
     put(Route.RoomsManagement::class, "Rooms Management" to OasesTopAppBarType.BACK)
+    put(Route.PastVisitSummary::class, "Past Visit" to OasesTopAppBarType.BACK)
     put(Route.PairDevice::class, "Pair Device" to OasesTopAppBarType.BACK)
 }
 

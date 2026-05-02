@@ -31,8 +31,8 @@ fun PastHistorySummary(
     freeTextDiseases: List<PatientDiseaseState>,
     selectionDiseases: List<PatientDiseaseState>,
     onEvent: (HistoryEvent) -> Unit,
-    shouldShowEditButton: () -> Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    hasEditButton: Boolean = true
 ) {
     val documentedConditions = freeTextDiseases
         .filter { it.freeTextValue.isNotBlank() }
@@ -56,7 +56,7 @@ fun PastHistorySummary(
                     style = MaterialTheme.typography.titleMedium
                 )
 
-                if (shouldShowEditButton()) {
+                if (hasEditButton) {
                     IconButton(
                         onClick = { onEvent(HistoryEvent.EditButtonPressed) }
                     ) {

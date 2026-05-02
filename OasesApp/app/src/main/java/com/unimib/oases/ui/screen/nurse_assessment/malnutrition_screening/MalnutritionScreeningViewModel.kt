@@ -5,11 +5,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.unimib.oases.di.DefaultDispatcher
-import com.unimib.oases.domain.model.MalnutritionScreening
 import com.unimib.oases.domain.repository.MalnutritionScreeningRepository
 import com.unimib.oases.domain.usecase.ValidateMalnutritionScreeningFormUseCase
 import com.unimib.oases.domain.usecase.toFormErrors
 import com.unimib.oases.ui.components.scaffold.UiEvent
+import com.unimib.oases.ui.mapper.toState
 import com.unimib.oases.ui.navigation.NavigationEvent
 import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.ui.screen.nurse_assessment.PatientRegistrationScreensUiMode
@@ -250,18 +250,6 @@ class MalnutritionScreeningViewModel @Inject constructor(
     private suspend fun getMalnutritionScreening(visitId: String) = malnutritionScreeningRepository
         .getMalnutritionScreening(visitId)
         .firstNullableSuccess()
-
-
-    private fun MalnutritionScreening?.toState(): MalnutritionScreeningData? {
-        return this?.let {
-            MalnutritionScreeningData(
-                weight = it.weight.toString(),
-                height = it.height.toString(),
-                muacState = MuacState(it.muac.value.toString(), it.muac.color),
-                bmi = it.bmi
-            )
-        }
-    }
 
     private fun validateForm(): Boolean {
         val validationResult = validateMalnutritionScreeningFormUseCase(

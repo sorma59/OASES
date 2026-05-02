@@ -13,6 +13,8 @@ sealed class HistoryEvent {
     data object Save: HistoryEvent()
     data object Cancel: HistoryEvent()
     data object ReattemptSaving: HistoryEvent()
+
+    data class VisitClicked(val visitId: String): HistoryEvent()
     data object ReloadPastVisits: HistoryEvent()
 
     data object ReloadPastMedicalHistory: HistoryEvent()

@@ -29,8 +29,15 @@ fun VisitHistoryContent(
                 error = state.error,
                 onClick = { onEvent(HistoryEvent.ReloadPastVisits) }
             )
-        else
-            VisitHistoryList(state.visits, Modifier.padding(16.dp))
+        else {
+            VisitHistoryList(
+                state.visits,
+                Modifier.padding(16.dp),
+                onClick = { visitId ->
+                    onEvent(HistoryEvent.VisitClicked(visitId))
+                }
+            )
+        }
     }
 
 }
@@ -38,7 +45,8 @@ fun VisitHistoryContent(
 @Composable
 fun VisitHistoryList(
     visits: List<VisitState>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: (String) -> Unit,
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -46,14 +54,14 @@ fun VisitHistoryList(
     ) {
         if (visits.isNotEmpty()) {
             if (visits.size == 1) {
-                item { VisitCard(visits[0]) }
+                item { VisitCard(visits[0], onClick) }
             }
             else
                 itemsIndexed(visits) { index, visit ->
                     TimelineNode(
                         isFirstNode = index == 0,
                         isLastNode = index == visits.size - 1
-                    ) { VisitCard(visit) }
+                    ) { VisitCard(visit, onClick) }
                 }
         }
         else

@@ -39,7 +39,7 @@ fun HistoryScreen(
         state,
         viewModel::onEvent,
         viewModel::shouldShowCreateButton,
-        viewModel::shouldShowEditButton,
+        viewModel.isDoctor,
         Modifier.padding(16.dp)
     )
 
@@ -50,7 +50,7 @@ private fun HistoryContent(
     state: HistoryState,
     onEvent: (HistoryEvent) -> Unit,
     shouldShowCreateButton: () -> Boolean,
-    shouldShowEditButton: () -> Boolean,
+    hasEditButton: Boolean,
     modifier: Modifier = Modifier
 ) {
 
@@ -69,8 +69,8 @@ private fun HistoryContent(
                         state.pastMedicalHistoryState.mode.freeTextDiseases,
                         state.pastMedicalHistoryState.mode.selectionDiseases,
                         onEvent,
-                        shouldShowEditButton,
-                        Modifier.padding(16.dp)
+                        Modifier.padding(16.dp),
+                        hasEditButton
                     )
                 else {
                     if (shouldShowCreateButton())

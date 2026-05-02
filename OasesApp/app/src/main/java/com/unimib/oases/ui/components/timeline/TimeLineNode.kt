@@ -145,7 +145,7 @@ private fun TimelinePreview() {
                 isFirstNode = index == 0,
                 isLastNode = index == visits.size - 1
             ) {
-                VisitCard(visit)
+                VisitCard(visit) {}
             }
         }
     }
