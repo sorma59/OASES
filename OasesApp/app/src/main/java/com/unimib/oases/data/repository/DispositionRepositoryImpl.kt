@@ -4,7 +4,7 @@ import android.util.Log
 import com.unimib.oases.data.local.RoomDataSource
 import com.unimib.oases.data.mapper.toDomain
 import com.unimib.oases.data.mapper.toEntity
-import com.unimib.oases.data.util.FirestoreManager
+import com.unimib.oases.data.remote.FirestoreManager
 import com.unimib.oases.domain.model.Disposition
 import com.unimib.oases.domain.repository.DispositionRepository
 import com.unimib.oases.util.Outcome

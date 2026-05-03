@@ -5,7 +5,7 @@ import com.unimib.oases.data.local.RoomDataSource
 import com.unimib.oases.data.mapper.toDomain
 import com.unimib.oases.data.mapper.toEntities
 import com.unimib.oases.data.mapper.toEntity
-import com.unimib.oases.data.util.FirestoreManager
+import com.unimib.oases.data.remote.FirestoreManager
 import com.unimib.oases.domain.model.PatientDisease
 import com.unimib.oases.domain.repository.PatientDiseaseRepository
 import com.unimib.oases.util.Outcome
@@ -35,6 +35,7 @@ class PatientDiseaseRepositoryImpl @Inject constructor(
     override suspend fun addPatientDiseases(patientDiseases: List<PatientDisease>): Outcome<Unit> {
         return try {
             roomDataSource.insertPatientDiseases(patientDiseases.toEntities())
+            firestoreManager.insertPatientDiseases(patientDiseases.toEntities())
             Outcome.Success(Unit)
         } catch (e: Exception) {
             Log.e("PatientDiseaseRepository", "Error adding patient disease: ${e.message}")

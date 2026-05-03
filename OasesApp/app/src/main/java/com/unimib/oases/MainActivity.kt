@@ -12,7 +12,7 @@ import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSiz
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.CompositionLocalProvider
 import com.unimib.oases.bluetooth.BluetoothCustomManager
-import com.unimib.oases.data.util.FirestoreManager
+import com.unimib.oases.data.remote.FirestoreManager
 import com.unimib.oases.ui.screen.root.OasesRoot
 import com.unimib.oases.ui.theme.OasesTheme
 import com.unimib.oases.util.LocalWindowSizeClass

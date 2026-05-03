@@ -5,7 +5,7 @@ import com.unimib.oases.data.local.RoomDataSource
 import com.unimib.oases.data.local.model.ReassessmentEntity
 import com.unimib.oases.data.mapper.toDomain
 import com.unimib.oases.data.mapper.toEntity
-import com.unimib.oases.data.util.FirestoreManager
+import com.unimib.oases.data.remote.FirestoreManager
 import com.unimib.oases.domain.model.Reassessment
 import com.unimib.oases.domain.repository.ReassessmentRepository
 import com.unimib.oases.util.Outcome

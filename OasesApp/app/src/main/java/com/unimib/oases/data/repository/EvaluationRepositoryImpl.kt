@@ -6,7 +6,7 @@ import com.unimib.oases.data.local.model.EvaluationEntity
 import com.unimib.oases.data.mapper.toDomain
 import com.unimib.oases.data.mapper.toEntities
 import com.unimib.oases.data.mapper.toEntity
-import com.unimib.oases.data.util.FirestoreManager
+import com.unimib.oases.data.remote.FirestoreManager
 import com.unimib.oases.domain.model.Evaluation
 import com.unimib.oases.domain.repository.EvaluationRepository
 import com.unimib.oases.util.Outcome
