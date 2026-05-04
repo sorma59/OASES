@@ -1,14 +1,17 @@
-package com.unimib.oases.data.util
+package com.unimib.oases.data.remote
 
 import android.util.Log
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FieldValue.arrayUnion
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.MetadataChanges
+import com.google.firebase.firestore.SetOptions
+import com.google.gson.Gson
 import com.unimib.oases.data.local.RoomDataSource
 import com.unimib.oases.data.local.model.DispositionEntity
 import com.unimib.oases.data.local.model.EvaluationEntity
 import com.unimib.oases.data.local.model.MalnutritionScreeningEntity
+import com.unimib.oases.data.local.model.PatientDiseaseEntity
 import com.unimib.oases.data.local.model.PatientEntity
 import com.unimib.oases.data.local.model.ReassessmentEntity
 import com.unimib.oases.data.local.model.TriageEvaluationEntity
@@ -81,6 +84,7 @@ class FirestoreManager @Inject constructor(
                             val vitalsData = doc.get("vitalSigns") as? List<*>
                             val malnutritionScreeningData =
                                 doc.get("malnutritionScreening") as? Map<*, *>
+                            val patientDiseases = doc.get("patientDiseases") as? List<*>
 
                             val patient = patientData?.let {
                                 PatientEntity(
@@ -145,6 +149,17 @@ class FirestoreManager @Inject constructor(
                                 }
                             }
 
+                            val patientDiseasesList = patientDiseases?.map { item ->
+                                PatientDiseaseEntity(
+                                    patientId = (item as? Map<*, *>)?.get("patientId") as String,
+                                    additionalInfo = item["additionalInfo"] as String,
+                                    diseaseName = item["diseaseName"] as String,
+                                    diagnosisDate = item["diagnosisDate"] as String,
+                                    isDiagnosed = (item["diagnosed"] as? Boolean) ?: true,
+                                    freeTextValue = item["freeTextValue"] as String,
+                                )
+                            } ?: emptyList()
+
                             val malnutritionScreening = malnutritionScreeningData?.let {
                                 MalnutritionScreeningEntity(
                                     visitId = it["visitId"] as String,
@@ -163,17 +178,19 @@ class FirestoreManager @Inject constructor(
                                     visit,
                                     triageData,
                                     vitalsList,
-                                    malnutritionScreening
+                                    malnutritionScreening,
+                                    patientDiseasesList
                                 )
                             } else null
                         } catch (e: Exception) {
+                            Log.e("FirestoreManager", "Error parsing document: $e")
                             null
                         }
 
                         when (dc.type) {
                             DocumentChange.Type.ADDED,
                             DocumentChange.Type.MODIFIED -> {
-                                patientAndVisit?.let { (patient, visit, triageData, vitals, malnutritionScreening) ->
+                                patientAndVisit?.let { (patient, visit, triageData, vitals, malnutritionScreening, diseases) ->
                                     roomDataSource.insertPatientAndCreateVisit(patient, visit)
                                     triageData?.let {
                                         roomDataSource.insertTriageEvaluation(
@@ -185,6 +202,10 @@ class FirestoreManager @Inject constructor(
                                         roomDataSource.insertMalnutritionScreening(
                                             malnutritionScreening
                                         )
+                                    }
+
+                                    diseases?.let {
+                                        roomDataSource.insertPatientDiseases(diseases)
                                     }
                                     Log.d(
                                         "FirestoreManager",
@@ -262,57 +283,72 @@ class FirestoreManager @Inject constructor(
         }
     }
 
-    override fun deletePatient(patientId: String): Boolean {
+    override suspend fun deletePatient(patientId: String): Boolean {
         return try {
-            // 1. Reference to the document we are moving
-            val currentDocRef = db.collection("currentPatients").document(patientId)
-            val pastDocRef = db.collection("pastPatients").document(patientId)
-
-            // 2. Fetch the data first to move it
-            // Note: Since we want to handle this gracefully offline, we use a Get call
-            currentDocRef.get().addOnSuccessListener { snapshot ->
-                if (snapshot.exists()) {
-                    val data = snapshot.data
-                    val visitId = (data?.get("visitEntity") as? Map<*, *>)?.get("id") as? String
-                        ?: "unknown_visit"
-
-                    val batch = db.batch()
-
-                    // 3. Set the data in pastPatients using the visitId as the field key
-                    // Using merge() ensures we don't overwrite other visits already stored for this patient
-                    batch.set(
-                        pastDocRef,
-                        mapOf(visitId to data),
-                        com.google.firebase.firestore.SetOptions.merge()
-                    )
-
-                    // 4. Delete from currentPatients
-                    batch.delete(currentDocRef)
-
-                    // 5. Execute
-                    batch.commit()
-                        .addOnSuccessListener {
-                            Log.d(
-                                "FirestoreManager",
-                                "Patient $patientId moved to pastPatients successfully."
-                            )
-                        }
-                        .addOnFailureListener { e ->
-                            Log.e("FirestoreManager", "Failed to move patient: $e")
-                        }
+            db.collection("currentPatients")
+                .document(patientId)
+                .delete()
+                .addOnSuccessListener {
+                    Log.d("FirestoreManager", "Patient $patientId successfully deleted.")
                 }
-            }.addOnFailureListener { e ->
-                Log.e("FirestoreManager", "Could not find patient to delete: $e")
-            }
-
-            true // Return true to indicate the process started
+                .addOnFailureListener { e ->
+                    Log.e("FirestoreManager", "Error deleting patient: $e")
+                }
+            true
         } catch (e: Exception) {
-            Log.e("FirestoreManager", "Error in delete/move process: ${e.message}")
+            Log.e("FirestoreManager", "Failed to initiate deletePatient: ${e.message}")
             false
         } finally {
             syncHistoryToFirestore()
         }
     }
+
+    override suspend fun storeVisit(patientId: String): Boolean {
+        return try {
+            val currentDocRef = db.collection("currentPatients").document(patientId)
+
+            // OPTIMIZATION: Use a subcollection for visits.
+            // Storing all visits in a single document with SetOptions.merge()
+            // becomes exponentially slower as the document size grows.
+            val pastVisitsCollection = db.collection("pastPatients")
+                .document(patientId)
+                .collection("visits")
+
+            // 1. Await the data fetch
+            val snapshot = currentDocRef.get().await()
+
+            if (snapshot.exists()) {
+                val data = snapshot.data ?: return false
+                val visitId = (data["visitEntity"] as? Map<*, *>)?.get("id") as? String
+                    ?: "unknown_visit_${System.currentTimeMillis()}"
+
+                val batch = db.batch()
+
+                // Migration logic: Write to a new document in the subcollection.
+                // This is a much faster operation than merging into a large document.
+                batch.set(pastVisitsCollection.document(visitId), data)
+
+                // 2. Delete from current collection
+                batch.delete(currentDocRef)
+
+                // 3. Commit atomically and await completion
+                batch.commit().await()
+
+                Log.d("FirestoreManager", "Migration for $patientId completed successfully.")
+                true
+            } else {
+                Log.e("FirestoreManager", "Patient $patientId not found in currentPatients.")
+                false
+            }
+        } catch (e: Exception) {
+            Log.e("FirestoreManager", "Error in storeVisit: ${e.message}")
+            false
+        } finally {
+            // Trigger history sync only after the migration is truly finished
+            syncHistoryToFirestore()
+        }
+    }
+
 
     private fun syncHistoryToFirestore() {
         scope.launch {
@@ -368,127 +404,6 @@ class FirestoreManager @Inject constructor(
             false
         }
     }
-
-//    private fun syncPatientsToFirestore() {
-//        scope.launch {
-//            try {
-//                val localPatients =
-//                    roomDataSource.getActivePatientsAndVisitsOn(DateAndTimeUtils.getCurrentDate()).first()
-//                if (localPatients.isEmpty()) return@launch
-//                println("SYNC: Found ${localPatients.size} current patients.")
-//                println("SYNC: Starting upload of current patients...")
-//                val batch = db.batch()
-//                localPatients.forEach { patient ->
-//                    val triageEvaluation = roomDataSource.getTriageEvaluation(patient.visitEntity.id).first()
-//                    // 2. Build the data map including the new field
-//                    val patientData = mutableMapOf(
-//                        "patientEntity" to patient.patientEntity,
-//                        "visitEntity" to patient.visitEntity,
-//                        "triageEvaluation" to triageEvaluation // Added this line
-//                    )
-//                    val docRef = db.collection("currentPatients").document(patient.patientEntity.id)
-//                    batch.set(docRef, patientData)
-//                }
-//                batch.commit()
-//                    .addOnSuccessListener { println("SYNC: Successfully uploaded ${localPatients.size} current patients.") }
-//                    .addOnFailureListener { e -> println("SYNC: Failed to upload current patients: $e") }
-//
-//            } catch (e: Exception) {
-//                println("SYNC: Error during synchronization: ${e.message}")
-//            } finally {
-//                 //importPatientsFromFirestore()
-//            }
-//        }
-//    }
-
-//    private fun importPatientsFromFirestore() {
-//        scope.launch {
-//            try {
-//                db.collection("currentPatients")
-//                    .get()
-//                    .addOnSuccessListener { result ->
-//                        scope.launch {
-//                            val patientsToImport = result.mapNotNull { document ->
-//                                try {
-//                                    val patientData = document.get("patientEntity") as? Map<String, Any>
-//                                    val patient = patientData?.let {
-//                                        PatientEntity(
-//                                            id = it["id"] as String,
-//                                            publicId = it["publicId"] as String,
-//                                            name = it["name"] as String,
-//                                            birthDate = it["birthDate"] as String,
-//                                            sex = it["sex"] as String,
-//                                            village = it["village"] as String,
-//                                            parish = it["parish"] as String,
-//                                            subCounty = it["subCounty"] as String,
-//                                            district = it["district"] as String,
-//                                            nextOfKin = it["nextOfKin"] as String,
-//                                            contact = it["contact"] as String,
-//                                            image = null
-//                                        )
-//                                    }
-//
-//                                    val visitData = document.get("visitEntity") as? Map<String, Any>
-//                                    val visit = visitData?.let {
-//                                        VisitEntity(
-//                                            id = it["id"] as String,
-//                                            patientId = it["patientId"] as String,
-//                                            triageCode = it["triageCode"] as String,
-//                                            patientStatus = it["patientStatus"] as String,
-//                                            roomName = it["roomName"] as? String,
-//                                            arrivalTime = it["arrivalTime"] as String,
-//                                            date = it["date"] as String,
-//                                            description = it["description"] as String
-//                                        )
-//                                    }
-//
-//                                    val triageEvaluation = document.get("triageEvaluation") as? Map<String, Any>
-//                                    val triageData = triageEvaluation?.let {
-//                                        TriageEvaluationEntity(
-//                                            visitId = it["visitId"] as String,
-//                                            redSymptomIds = it["redSymptomIds"] as List<String>,
-//                                            yellowSymptomIds = it["yellowSymptomIds"] as List<String>,
-//                                        )
-//
-//                                    }
-//
-////                                    val vitalsData = document.get("vitalSigns") as? Map<String, Any>
-////                                    val vitals = vitalsData?.let {
-////                                            it -> VisitVitalSignEntity(
-////                                        visitId = it["visitId"] as String,
-////                                        timestamp = it["timestamp"] as String,
-////                                        vitalSignName = it["vitalSignName"] as String,
-////                                        value = it["value"] as Double,
-////                                    )
-////                                    }
-//
-//
-//
-//                                    if (patient != null && visit != null && triageData != null) PatientSyncData(patient, visit, triageData) else null
-//                                } catch (e: Exception) {
-//                                    println("IMPORT: Error parsing patient: $e")
-//                                    null
-//                                }
-//                            }
-//
-//                            if (patientsToImport.isNotEmpty()) {
-//                                patientsToImport.forEach { (patient, visit, triageData) ->
-//                                    roomDataSource.insertPatientAndCreateVisit(patient, visit)
-//                                    triageData?.let {roomDataSource.insertTriageEvaluation(triageData)}
-//                                    //vitals?.let {roomDataSource.insertVisitVitalSign(vitals)}
-//                                }
-//                                println("IMPORT: Successfully imported ${patientsToImport.size} patients.")
-//                            }
-//                        }
-//                    }
-//                    .addOnFailureListener { e ->
-//                        println("IMPORT: Error fetching patients: $e")
-//                    }
-//            } catch (e: Exception) {
-//                println("IMPORT: unexpected error: ${e.message}")
-//            }
-//        }
-//    }
 
     override suspend fun getHistoryPatients(): List<PatientEntity> {
         return try {
@@ -598,82 +513,118 @@ class FirestoreManager @Inject constructor(
 
     override suspend fun insertDisposition(dispositionEntity: DispositionEntity): Boolean {
         return try {
-            val patientId = roomDataSource.getVisitById(dispositionEntity.visitId).first().patientId
-            db.collection("currentPatients")
-                .document(patientId)
-                .update("disposition", dispositionEntity.dispositionTypeLabel)
-                .addOnSuccessListener {
-                    Log.d("FirestoreManager", "Disposition for $patientId updated.")
-                }
-                .addOnFailureListener { e ->
-                    Log.e("FirestoreManager", "Error updating disposition: $e")
-                }
-            true
-        } catch (e: Exception) {
-            Log.e("FirestoreManager", "Failed to initiate insertDisposition: ${e.message}")
-            false
-        }
-    }
+            val visit = roomDataSource.getVisitById(dispositionEntity.visitId).first()
+            val patientId = visit.patientId
+            val gson = Gson()
 
-    override suspend fun insertEvaluation(evaluationEntity: EvaluationEntity): Boolean {
-        return try {
-            val patientId = roomDataSource.getVisitById(evaluationEntity.visitId).first().patientId
-
-            // Manually map the entity to a Map.
-            // Firestore handles standard Lists, but we convert complex objects to Maps.
-            val evaluationMap = mapOf(
-                "visitId" to evaluationEntity.visitId,
-                "complaintId" to evaluationEntity.complaintId,
-
-                // Maps lists of complex objects to lists of maps
-                //"treeAnswers" to evaluationEntity.treeAnswers,
-                //"detailQuestionAnswers" to evaluationEntity.detailQuestionAnswers,
-
-                // Firestore allows lists, but List<List<...>> can be tricky.
-                // Explicitly passing it as the property name:
-                //"algorithmsQuestionsAndAnswers" to evaluationEntity.algorithmsQuestionsAndAnswers,
-
-                // "symptomIds" to evaluationEntity.symptomIds,
-
-                // "suggestedTests" to evaluationEntity.suggestedTests,
-                //  "labelledTests" to evaluationEntity.labelledTests,
-                //  "additionalTests" to evaluationEntity.additionalTests,
-
-                // "immediateTreatments" to evaluationEntity.immediateTreatments,
-                //  "supportiveTherapies" to evaluationEntity.supportiveTherapies
+            val dispositionMap = mutableMapOf<String, Any?>(
+                "visitId" to dispositionEntity.visitId,
+                "dispositionTypeLabel" to dispositionEntity.dispositionTypeLabel,
+                "ward" to dispositionEntity.ward,
+                "homeTreatments" to gson.toJson(dispositionEntity.homeTreatments), // Serialized
+                "prescribedTherapiesText" to dispositionEntity.prescribedTherapiesText,
+                "finalDiagnosisText" to dispositionEntity.finalDiagnosisText
             )
 
             db.collection("currentPatients")
                 .document(patientId)
-                .update("evaluation", evaluationMap)
+                .update("disposition", dispositionMap)
                 .addOnSuccessListener {
-                    Log.d("FirestoreManager", "Evaluation for $patientId successfully updated.")
+                    Log.d(
+                        "FirestoreManager",
+                        "Disposition successfully queued for patient $patientId."
+                    )
                 }
                 .addOnFailureListener { e ->
-                    Log.e("FirestoreManager", "Error updating evaluation: $e")
+                    Log.e("FirestoreManager", "Error adding TriageEvaluation: $e")
                 }
             true
         } catch (e: Exception) {
-            Log.e("FirestoreManager", "Failed to initiate insertEvaluation: ${e.message}")
+            Log.e("FirestoreManager", "Failed to insert disposition: ${e.message}")
+            false
+        }
+    }
+
+    // Add this import at the top of your file
+
+    override suspend fun insertEvaluation(evaluationEntity: EvaluationEntity): Boolean {
+        return try {
+            val visit = roomDataSource.getVisitById(evaluationEntity.visitId).first()
+            val patientId = visit.patientId
+            val gson = Gson()
+
+            // We convert the problematic large lists into JSON strings.
+            // This solves: 1. The "Nested Array" error 2. The serialization lag.
+            val evaluationMap = mutableMapOf<String, Any>(
+                "visitId" to evaluationEntity.visitId,
+                "complaintId" to evaluationEntity.complaintId,
+
+                // Serialize complex/large lists to JSON strings
+                "treeAnswers" to gson.toJson(evaluationEntity.treeAnswers),
+                "detailQuestionAnswers" to gson.toJson(evaluationEntity.detailQuestionAnswers),
+                "algorithmsQuestionsAndAnswers" to gson.toJson(evaluationEntity.algorithmsQuestionsAndAnswers),
+
+                "symptomIds" to evaluationEntity.symptomIds,
+                "suggestedTests" to gson.toJson(evaluationEntity.suggestedTests),
+                "labelledTests" to gson.toJson(evaluationEntity.labelledTests),
+                "additionalTests" to evaluationEntity.additionalTests,
+                "immediateTreatments" to gson.toJson(evaluationEntity.immediateTreatments),
+                "supportiveTherapies" to gson.toJson(evaluationEntity.supportiveTherapies)
+            )
+
+            // Use .set with merge to handle the update efficiently
+            db.collection("currentPatients")
+                .document(patientId)
+                .update("evaluation", evaluationMap)
+                .addOnSuccessListener {
+                    Log.d(
+                        "FirestoreManager",
+                        "Evaluation for $patientId successfully queued for Firestore."
+                    )
+                }
+                .addOnFailureListener { e ->
+                    Log.e("FirestoreManager", "Error adding TriageEvaluation: $e")
+                }
+
+            Log.d("FirestoreManager", "Evaluation for $patientId optimized and uploaded.")
+            true
+        } catch (e: Exception) {
+            Log.e("FirestoreManager", "Failed to insert evaluation: ${e.message}")
             false
         }
     }
 
     override suspend fun insertReassessment(reassessmentEntity: ReassessmentEntity): Boolean {
         return try {
-            val patientId = roomDataSource.getVisitById(reassessmentEntity.visitId).first().patientId
+            val visit = roomDataSource.getVisitById(reassessmentEntity.visitId).first()
+            val patientId = visit.patientId
+            val gson = Gson()
+
+            val reassessmentMap = mutableMapOf<String, Any>(
+                "visitId" to reassessmentEntity.visitId,
+                "complaintId" to reassessmentEntity.complaintId,
+                "symptomIds" to reassessmentEntity.symptomIds,
+                "findings" to gson.toJson(reassessmentEntity.findings), // Serialized
+                "definitiveTherapies" to gson.toJson(reassessmentEntity.definitiveTherapies) // Serialized
+            )
+
             db.collection("currentPatients")
                 .document(patientId)
-                .update("reassessment", reassessmentEntity.findings)
+                .update("reassessment", reassessmentMap)
                 .addOnSuccessListener {
-                    Log.d("FirestoreManager", "Reassessment for $patientId updated.")
+                    Log.d(
+                        "FirestoreManager",
+                        "Reassessment for $patientId successfully queued for Firestore."
+                    )
                 }
                 .addOnFailureListener { e ->
-                    Log.e("FirestoreManager", "Error updating reassessment: $e")
+                    Log.e("FirestoreManager", "Error adding Reassessment: $e")
                 }
+
+            Log.d("FirestoreManager", "Reassessment for $patientId optimized and updated.")
             true
         } catch (e: Exception) {
-            Log.e("FirestoreManager", "Failed to initiate insertReassessment: ${e.message}")
+            Log.e("FirestoreManager", "Failed to insert reassessment: ${e.message}")
             false
         }
     }
@@ -681,18 +632,24 @@ class FirestoreManager @Inject constructor(
     override suspend fun updateStatusAndCloseVisit(visitId: String, status: String): Boolean {
         return try {
             val patientId = roomDataSource.getVisitById(visitId).first().patientId
-            // 1. Update the patientStatus inside the nested visitEntity object
-            // We use dot notation "visitEntity.patientStatus" to target only that field
+            roomDataSource.addToCache(patientId)
             db.collection("currentPatients")
                 .document(patientId)
                 .update("visitEntity.patientStatus", status)
                 .addOnSuccessListener {
-                    Log.d("FirestoreManager", "Status updated to $status for $patientId. Proceeding to close visit.")
-                    deletePatient(patientId)
+                    Log.d(
+                        "FirestoreManager",
+                        "Status for $patientId successfully queued for Firestore."
+                    )
+                    scope.launch {
+                        storeVisit(patientId)
+                    }
                 }
                 .addOnFailureListener { e ->
-                    Log.e("FirestoreManager", "Failed to update status before closing visit: $e")
+                    Log.e("FirestoreManager", "Error adding status to Firestore: $e")
                 }
+
+
 
             true
         } catch (e: Exception) {
@@ -701,9 +658,35 @@ class FirestoreManager @Inject constructor(
         }
     }
 
+    override suspend fun insertPatientDiseases(diseases: List<PatientDiseaseEntity>): Boolean {
 
+        if (diseases.isEmpty()) return true
 
+        return try {
+            // Assume all diseases in the list belong to the same patient
+            val patientId = diseases.first().patientId
 
+            // We use update so we don't overwrite the patient doc, just the diseases field
+            db.collection("currentPatients")
+                .document(patientId)
+                .update("patientDiseases", diseases)
+                .addOnSuccessListener {
+                    Log.d(
+                        "FirestoreManager",
+                        "Diseases for $patientId successfully queued for Firestore."
+                    )
+                }
+                .addOnFailureListener { e ->
+                    Log.e("FirestoreManager", "Error adding diseases to Firestore: $e")
+                }
+
+            Log.d("FirestoreManager", "Diseases for $patientId successfully updated in Firestore.")
+            true
+        } catch (e: Exception) {
+            Log.e("FirestoreManager", "Error updating patient diseases: ${e.message}")
+            false
+        }
+    }
 }
 
 data class PatientSyncData(
@@ -711,5 +694,6 @@ data class PatientSyncData(
     val visit: VisitEntity,
     val triage: TriageEvaluationEntity?,
     val vitals: List<VisitVitalSignEntity>, // Example 4th entity
-    val malnutritionScreening: MalnutritionScreeningEntity?
+    val malnutritionScreening: MalnutritionScreeningEntity?,
+    val patientDiseases: List<PatientDiseaseEntity>?
 )

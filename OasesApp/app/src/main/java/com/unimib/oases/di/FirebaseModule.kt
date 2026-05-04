@@ -2,8 +2,8 @@ package com.unimib.oases.di
 
 //import com.unimib.oases.data.remote.FirebaseFirestoreSource
 //import com.unimib.oases.data.remote.FirebaseFirestoreSourceImpl
-//import com.unimib.oases.data.util.FirestoreManager
-//import com.unimib.oases.data.util.FirestoreManagerInterface
+//import com.unimib.oases.data.remote.FirestoreManager
+//import com.unimib.oases.data.remote.FirestoreManagerInterface
 //import dagger.Module
 //import dagger.Provides
 //import dagger.hilt.InstallIn

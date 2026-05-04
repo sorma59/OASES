@@ -1,7 +1,6 @@
 package com.unimib.oases.data.remote
 
 import com.unimib.oases.data.remote.dto.PatientDto
-import com.unimib.oases.data.util.FirestoreManagerInterface
 import com.unimib.oases.util.Resource
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
