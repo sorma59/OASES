@@ -1,9 +1,11 @@
 package com.unimib.oases.ui.screen.past_visit
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.unimib.oases.ui.components.util.effect.HandleNavigationEvents
 import com.unimib.oases.ui.components.util.effect.HandleUiEvents
@@ -36,7 +38,7 @@ private fun PastVisitSummaryContent(
 ) {
 
     Column(
-
+        verticalArrangement = Arrangement.spacedBy(32.dp)
     ) {
         DemographicsSummary(state.patientData, { }, hasEditButton = false)
 

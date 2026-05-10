@@ -5,18 +5,27 @@ import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FieldValue.arrayUnion
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.MetadataChanges
-import com.google.firebase.firestore.SetOptions
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.unimib.oases.data.local.RoomDataSource
+import com.unimib.oases.data.local.model.DetailQuestionAnswer
 import com.unimib.oases.data.local.model.DispositionEntity
 import com.unimib.oases.data.local.model.EvaluationEntity
+import com.unimib.oases.data.local.model.FindingSnapshot
 import com.unimib.oases.data.local.model.MalnutritionScreeningEntity
 import com.unimib.oases.data.local.model.PatientDiseaseEntity
 import com.unimib.oases.data.local.model.PatientEntity
 import com.unimib.oases.data.local.model.ReassessmentEntity
+import com.unimib.oases.data.local.model.TreeAnswers
 import com.unimib.oases.data.local.model.TriageEvaluationEntity
 import com.unimib.oases.data.local.model.VisitEntity
 import com.unimib.oases.data.local.model.VisitVitalSignEntity
+import com.unimib.oases.domain.model.QuestionAndAnswer
+import com.unimib.oases.domain.model.Ward
+import com.unimib.oases.domain.model.complaint.ImmediateTreatment
+import com.unimib.oases.domain.model.complaint.LabelledTest
+import com.unimib.oases.domain.model.complaint.TherapyText
+import com.unimib.oases.ui.screen.medical_visit.disposition.HomeTreatment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,7 +33,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
-import kotlin.collections.get
 
 class FirestoreManager @Inject constructor(
     private val roomDataSource: RoomDataSource,
@@ -685,6 +693,178 @@ class FirestoreManager @Inject constructor(
         } catch (e: Exception) {
             Log.e("FirestoreManager", "Error updating patient diseases: ${e.message}")
             false
+        }
+    }
+
+    override suspend fun getPatientVisits(patientId: String): List<VisitEntity> {
+        return try {
+            val gson = Gson()
+            val snapshot = db.collection("pastPatients")
+                .document(patientId)
+                .collection("visits")
+                .get()
+                .await()
+
+            val visits = mutableListOf<VisitEntity>()
+
+            snapshot.documents.forEach { document ->
+                try {
+                    val data = document.data ?: return@forEach
+
+                    // ── Visit ────────────────────────────────────────────────
+                    val visitData = data["visitEntity"] as? Map<*, *> ?: return@forEach
+                    val visit = VisitEntity(
+                        id = visitData["id"] as String,
+                        patientId = visitData["patientId"] as String,
+                        triageCode = visitData["triageCode"] as String,
+                        patientStatus = visitData["patientStatus"] as String,
+                        roomName = visitData["roomName"] as? String,
+                        arrivalTime = visitData["arrivalTime"] as String,
+                        date = visitData["date"] as String,
+                        description = visitData["description"] as String
+                    )
+                    visits.add(visit)
+                    roomDataSource.insertVisit(visit)
+
+                    // ── Triage ───────────────────────────────────────────────
+                    val triageData = data["triageEvaluation"] as? Map<*, *>
+                    triageData?.let {
+                        val triage = TriageEvaluationEntity(
+                            visitId = it["visitId"] as String,
+                            redSymptomIds = it["redSymptomIds"] as List<String>,
+                            yellowSymptomIds = it["yellowSymptomIds"] as List<String>,
+                        )
+                        roomDataSource.insertTriageEvaluation(triage)
+                    }
+
+                    // ── Vitals ───────────────────────────────────────────────
+                    val vitalsData = data["vitalSigns"] as? List<*>
+                    vitalsData?.mapNotNull { item ->
+                        val map = item as? Map<*, *> ?: return@mapNotNull null
+                        VisitVitalSignEntity(
+                            visitId = map["visitId"] as String,
+                            vitalSignName = map["vitalSignName"] as String,
+                            timestamp = map["timestamp"] as String,
+                            value = (map["value"] as? Number)?.toDouble() ?: 0.0
+                        )
+                    }?.let { roomDataSource.insertVisitVitalSigns(it) }
+
+                    // ── Malnutrition ─────────────────────────────────────────
+                    val malnutritionData = data["malnutritionScreening"] as? Map<*, *>
+                    malnutritionData?.let {
+                        val malnutrition = MalnutritionScreeningEntity(
+                            visitId = it["visitId"] as String,
+                            weightInKg = it["weightInKg"] as Double,
+                            heightInCm = it["heightInCm"] as Double,
+                            bmi = it["bmi"] as Double,
+                            muacInCm = it["muacInCm"] as Double,
+                            muacCategory = it["muacCategory"] as String,
+                        )
+                        roomDataSource.insertMalnutritionScreening(malnutrition)
+                    }
+
+                    // ── Diseases ─────────────────────────────────────────────
+                    val diseasesData = data["patientDiseases"] as? List<*>
+                    diseasesData?.mapNotNull { item ->
+                        val map = item as? Map<*, *> ?: return@mapNotNull null
+                        PatientDiseaseEntity(
+                            patientId = map["patientId"] as String,
+                            diseaseName = map["diseaseName"] as String,
+                            additionalInfo = map["additionalInfo"] as String,
+                            diagnosisDate = map["diagnosisDate"] as String,
+                            isDiagnosed = (map["diagnosed"] as? Boolean) ?: true,
+                            freeTextValue = map["freeTextValue"] as String,
+                        )
+                    }?.let { roomDataSource.insertPatientDiseases(it) }
+
+                    // ── Evaluation (Gson-serialized fields) ──────────────────
+                    val evaluationData = data["evaluation"] as? Map<*, *>
+                    evaluationData?.let {
+                        val evaluation = EvaluationEntity(
+                            visitId = it["visitId"] as String,
+                            complaintId = it["complaintId"] as String,
+                            treeAnswers = gson.fromJson(
+                                it["treeAnswers"] as String,
+                                object : TypeToken<List<TreeAnswers>>() {}.type
+                            ),
+                            detailQuestionAnswers = gson.fromJson(
+                                it["detailQuestionAnswers"] as String,
+                                object : TypeToken<List<DetailQuestionAnswer>>() {}.type
+                            ),
+                            algorithmsQuestionsAndAnswers = gson.fromJson(
+                                it["algorithmsQuestionsAndAnswers"] as String,
+                                object : TypeToken<List<List<QuestionAndAnswer>>>() {}.type
+                            ),
+                            symptomIds = it["symptomIds"] as List<String>,
+                            suggestedTests = gson.fromJson(
+                                it["suggestedTests"] as String,
+                                object : TypeToken<List<LabelledTest>>() {}.type
+                            ),
+                            labelledTests = gson.fromJson(
+                                it["labelledTests"] as String,
+                                object : TypeToken<List<LabelledTest>>() {}.type
+                            ),
+                            additionalTests = it["additionalTests"] as String,
+                            immediateTreatments = gson.fromJson(
+                                it["immediateTreatments"] as String,
+                                object : TypeToken<List<ImmediateTreatment>>() {}.type
+                            ),
+                            supportiveTherapies = gson.fromJson(
+                                it["supportiveTherapies"] as String,
+                                object : TypeToken<List<TherapyText>>() {}.type
+                            ),
+                        )
+                        roomDataSource.insertEvaluation(evaluation)
+                    }
+
+                    // ── Reassessment (Gson-serialized fields) ────────────────
+                    val reassessmentData = data["reassessment"] as? Map<*, *>
+                    reassessmentData?.let {
+                        val reassessment = ReassessmentEntity(
+                            visitId = it["visitId"] as String,
+                            complaintId = it["complaintId"] as String,
+                            symptomIds = it["symptomIds"] as List<String>,
+                            findings = gson.fromJson(
+                                it["findings"] as String,
+                                object : TypeToken<List<FindingSnapshot>>() {}.type
+                            ),
+                            definitiveTherapies = gson.fromJson(
+                                it["definitiveTherapies"] as String,
+                                object : TypeToken<List<TherapyText>>() {}.type
+                            ),
+                        )
+                        roomDataSource.insertReassessment(reassessment)
+                    }
+
+                    // ── Disposition (Gson-serialized fields) ─────────────────
+                    val dispositionData = data["disposition"] as? Map<*, *>
+                    dispositionData?.let {
+                        val disposition = DispositionEntity(
+                            visitId = it["visitId"] as String,
+                            dispositionTypeLabel = it["dispositionTypeLabel"] as String,
+                            ward = gson.fromJson(
+                                it["ward"] as? String,
+                                Ward::class.java
+                            ),
+                            homeTreatments = gson.fromJson(
+                                it["homeTreatments"] as String,
+                                object : TypeToken<List<HomeTreatment>>() {}.type
+                            ),
+                            prescribedTherapiesText = it["prescribedTherapiesText"] as String,
+                            finalDiagnosisText = it["finalDiagnosisText"] as String,
+                        )
+                        roomDataSource.insertDisposition(disposition)
+                    }
+
+                } catch (e: Exception) {
+                    Log.e("FirestoreManager", "Error parsing visit document ${document.id}: ${e.message}")
+                }
+            }
+
+            visits
+        } catch (e: Exception) {
+            Log.e("FirestoreManager", "Error fetching visits for patient $patientId: ${e.message}")
+            emptyList()
         }
     }
 }

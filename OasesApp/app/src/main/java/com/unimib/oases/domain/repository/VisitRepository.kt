@@ -21,6 +21,8 @@ interface VisitRepository {
     suspend fun updateVisit(visit: Visit): Outcome<Unit>
     fun getVisits(patientId: String): Flow<Resource<List<Visit>>>
 
+    suspend fun syncVisitsIfNeeded(patientId: String)
+
     fun getPastVisits(patientId: String): Flow<Resource<List<Visit>>>
 
     fun getVisitById(visitId: String): Flow<Resource<Visit>>

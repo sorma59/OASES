@@ -18,5 +18,6 @@ data class PatientEntity (
     @ColumnInfo(name = "district") val district: String,
     @ColumnInfo(name = "next_of_kin") val nextOfKin: String,
     @ColumnInfo(name = "contact") val contact: String,
-    @ColumnInfo(name = "image") val image: ByteArray? = null
+    @ColumnInfo(name = "image") val image: ByteArray? = null,
+    @ColumnInfo(name = "visits_loaded") val visitsLoaded: Boolean = false
 )

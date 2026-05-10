@@ -47,7 +47,7 @@ import com.unimib.oases.data.local.model.VitalSignEntity
         ReassessmentEntity::class,
         DispositionEntity::class,
     ],
-    version = 6
+    version = 7
 )
 @TypeConverters(Converters::class)
 abstract class OasesDatabase : RoomDatabase() {

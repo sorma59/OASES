@@ -49,6 +49,7 @@ interface PatientDao {
             p.next_of_kin AS patient_next_of_kin,
             p.contact AS patient_contact,
             p.image AS patient_image,
+            p.visits_loaded AS patient_visits_loaded,
     
             v.id AS visit_id,
             v.patient_id AS visit_patient_id,
@@ -87,6 +88,7 @@ interface PatientDao {
             p.next_of_kin AS patient_next_of_kin,
             p.contact AS patient_contact,
             p.image AS patient_image,
+            p.visits_loaded AS patient_visits_loaded,
     
             v.id AS visit_id,
             v.patient_id AS visit_patient_id,
@@ -116,4 +118,7 @@ interface PatientDao {
 
     @Query("SELECT * FROM " + TableNames.PATIENT + " WHERE id = :id")
     fun getPatientById(id: String): Flow<PatientEntity?>
+
+    @Query("UPDATE ${TableNames.PATIENT} SET visits_loaded = 1 WHERE id = :patientId")
+    suspend fun markVisitsLoaded(patientId: String)
 }

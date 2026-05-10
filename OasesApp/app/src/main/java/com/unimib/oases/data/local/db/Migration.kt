@@ -276,3 +276,14 @@ val migrationDisposition: Migration = object : Migration(5,6) {
         """.trimIndent())
     }
 }
+
+val migrationPatientPastVisits = object : Migration(6, 7) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            "ALTER TABLE ${TableNames.PATIENT} ADD COLUMN visits_loaded INTEGER NOT NULL DEFAULT 0"
+        )
+        db.execSQL(
+            "ALTER TABLE ${TableNames.HISTORY} ADD COLUMN visits_loaded INTEGER NOT NULL DEFAULT 0"
+        )
+    }
+}

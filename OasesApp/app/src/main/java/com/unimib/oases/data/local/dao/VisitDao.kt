@@ -17,6 +17,9 @@ interface VisitDao {
     suspend fun insert(visit: VisitEntity)
 
     @Upsert
+    suspend fun insertVisits(visits: List<VisitEntity>)
+
+    @Upsert
     suspend fun upsert(visit: VisitEntity)
 
     @Query("UPDATE ${TableNames.VISIT} SET patient_status = :status WHERE id = :visitId")
@@ -53,6 +56,7 @@ interface VisitDao {
             p.next_of_kin AS patient_next_of_kin,
             p.contact AS patient_contact,
             p.image AS patient_image,
+            p.visits_loaded AS patient_visits_loaded,
     
             v.id AS visit_id,
             v.patient_id AS visit_patient_id,

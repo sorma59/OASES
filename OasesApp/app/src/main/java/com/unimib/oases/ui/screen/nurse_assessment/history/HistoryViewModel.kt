@@ -9,8 +9,9 @@ import androidx.navigation.toRoute
 import com.unimib.oases.data.local.model.Role
 import com.unimib.oases.di.IoDispatcher
 import com.unimib.oases.domain.auth.AuthManager
+import com.unimib.oases.domain.model.Visit
+import com.unimib.oases.domain.repository.VisitRepository
 import com.unimib.oases.domain.usecase.GetChronicDiseasesInfo
-import com.unimib.oases.domain.usecase.ReloadPastVisitsUseCase
 import com.unimib.oases.domain.usecase.SavePastMedicalHistoryUseCase
 import com.unimib.oases.ui.components.scaffold.UiEvent
 import com.unimib.oases.ui.navigation.NavigationEvent
@@ -18,6 +19,7 @@ import com.unimib.oases.ui.navigation.Route
 import com.unimib.oases.ui.util.snackbar.SnackbarData
 import com.unimib.oases.ui.util.snackbar.SnackbarType
 import com.unimib.oases.util.Outcome
+import com.unimib.oases.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -33,7 +35,7 @@ import kotlin.coroutines.CoroutineContext
 @HiltViewModel
 class HistoryViewModel @Inject constructor(
     private val getChronicDiseasesInfo: GetChronicDiseasesInfo,
-    private val reloadPastVisits: ReloadPastVisitsUseCase,
+    private val visitRepository: VisitRepository,
     private val savePastMedicalHistoryUseCase: SavePastMedicalHistoryUseCase,
     private val authManager: AuthManager,
     savedStateHandle: SavedStateHandle,
@@ -323,12 +325,33 @@ class HistoryViewModel @Inject constructor(
 
     private fun loadPastVisits() {
         viewModelScope.launch(pastVisitsContext) {
-            val visits = reloadPastVisits(state.value.patientId)
-            updatePastVisitsState {
-                it.copy(
-                    visits = visits,
-                    isLoading = false
-                )
+            with(visitRepository) {
+                state.value.patientId.let {
+                    syncVisitsIfNeeded(it)
+                    getPastVisits(it).collect { resource ->
+                        updatePastVisitsState { state ->
+                            when (resource) {
+                                is Resource.Error -> state.copy(
+                                    error = resource.message,
+                                    isLoading = false
+                                )
+
+                                is Resource.Loading -> state.copy(
+                                    isLoading = true
+                                )
+
+                                is Resource.NotFound -> state.copy(
+                                    error = "Visits not found",
+                                    isLoading = false,
+                                )
+                                is Resource.Success -> state.copy(
+                                    visits = resource.data.toVisitStates(),
+                                    isLoading = false,
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -362,6 +385,17 @@ class HistoryViewModel @Inject constructor(
                         onEvent(HistoryEvent.ReattemptSaving)
                     }
                 )
+            )
+        }
+    }
+
+    private fun List<Visit>.toVisitStates(): List<VisitState> {
+        return this.map {
+            VisitState(
+                visitId = it.id,
+                date = it.date.toString(),
+                triageCode = it.triageCode.getColor(),
+                status = it.patientStatus
             )
         }
     }
