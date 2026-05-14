@@ -146,14 +146,14 @@ class PastVisitSummaryViewModel @Inject constructor(
         }
         val triageEvaluation = triageEvaluationRepository
             .getTriageEvaluation(state.value.visitId)
-            .firstSuccess()
+            .firstNullableSuccess()
         _state.update {
             it.copy(
                 triageData = TriageData(
-                    selectedReds = triageEvaluation.redSymptomIds.toSet(),
-                    selectedYellows = triageEvaluation.yellowSymptomIds.toSet(),
+                    selectedReds = triageEvaluation?.redSymptomIds?.toSet().orEmpty(),
+                    selectedYellows = triageEvaluation?.yellowSymptomIds?.toSet().orEmpty(),
                     triageCode = visit.triageCode,
-                    selectedRoom = Room(visit.roomName!!)
+                    selectedRoom = Room(visit.roomName ?: "No room")
                 ),
                 isTriageDataLoading = false,
             )
